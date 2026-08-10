@@ -24,47 +24,73 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
     facebook: site.social.facebook ?? "#",
   };
 
+  const privacyLink = footer.links.find((link) => link.href.includes("privacy"));
+  const utilityLinks = footer.links.filter((link) => !link.href.includes("privacy"));
+
   return (
-    <footer id="contact" className="site-footer" data-reveal>
+    <footer id="contact" className="site-footer">
       <PageContainer>
-        <div className="site-footer__grid">
-          <div className="space-y-8">
-            <TransitionLink
-              href={localePath(locale, "/")}
-              aria-label={site.name}
-              className="relative block h-12 w-[213px]"
-            >
-              <Image
-                src="/images/metric/logo/metric-logo.svg"
-                alt={site.name}
-                fill
-                className="object-contain object-left"
-              />
-            </TransitionLink>
-            <div className="site-footer__cities">
-              {footer.cities.map((city) => (
-                <span key={city}>{city}</span>
-              ))}
-            </div>
+        <div className="site-footer__form" data-reveal>
+          <div className="site-footer__form-copy">
+            <h2 className="site-footer__form-title font-display">{footer.startCta}</h2>
+            <p className="site-footer__form-subtitle">{ui.contactSubtitle}</p>
+          </div>
+          <ContactForm locale={locale} ui={ui} captcha={captcha} />
+        </div>
+
+        <div className="site-footer__main" data-reveal>
+          <TransitionLink
+            href={localePath(locale, "/")}
+            aria-label={site.name}
+            className="site-footer__logo"
+          >
+            <Image
+              src="/images/metric/logo/metric-logo.svg"
+              alt={site.name}
+              width={213}
+              height={48}
+              className="site-footer__logo-img"
+            />
+          </TransitionLink>
+
+          <div className="site-footer__cities" aria-label="Locations">
+            {footer.cities.map((city) => (
+              <span key={city}>{city}</span>
+            ))}
           </div>
 
           <div className="site-footer__contact">
-            <div>
+            <div className="site-footer__contact-block">
               <p className="site-footer__contact-label">{ui.phoneLabel}</p>
               <a
                 href={`tel:${site.phone.replace(/\s+/g, "")}`}
-                className="text-[22px] font-medium tracking-tight"
+                className="site-footer__contact-value"
               >
                 {site.phone}
               </a>
             </div>
-            <div>
+            <div className="site-footer__contact-block">
               <p className="site-footer__contact-label">{ui.addressLabel}</p>
-              <p className="text-[18px] tracking-tight">{site.address.join(", ")}</p>
+              <p className="site-footer__contact-value site-footer__contact-value--address">
+                {site.address.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="site-footer__links">
+        <div className="site-footer__bottom" data-reveal>
+          <div className="site-footer__legal">
+            <p>© 2026 {site.name}</p>
+            {privacyLink ? (
+              <TransitionLink href={localePath(locale, privacyLink.href)}>
+                {privacyLink.label}
+              </TransitionLink>
+            ) : null}
+          </div>
+
+          <div className="site-footer__meta">
             {footer.social.map((item) => (
               <a
                 key={item.label}
@@ -75,25 +101,7 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
                 {item.label}
               </a>
             ))}
-          </div>
-        </div>
-
-        <div className="site-footer__form">
-          <div className="mb-6 max-w-xl">
-            <h2 className="font-display text-[clamp(28px,4vw,48px)] text-foreground">
-              {footer.startCta}
-            </h2>
-            <p className="mt-3 text-[18px] text-[color:var(--muted)]">
-              {ui.contactSubtitle}
-            </p>
-          </div>
-          <ContactForm locale={locale} ui={ui} captcha={captcha} />
-        </div>
-
-        <div className="site-footer__bottom">
-          <p>© 2026 {site.name}</p>
-          <div className="site-footer__bottom-links">
-            {footer.links.map((link) => (
+            {utilityLinks.map((link) => (
               <TransitionLink key={link.label} href={localePath(locale, link.href)}>
                 {link.label}
               </TransitionLink>

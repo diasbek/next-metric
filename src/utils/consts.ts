@@ -10,8 +10,7 @@ export const SITE_CONFIG = {
   // TODO: replace phone + social homepage stubs with real Metric contacts before launch.
   phone: "+987 778 99 88",
   email: getPublicEnv("NEXT_PUBLIC_CONTACT_EMAIL", "hello@metric.agency"),
-  // Mirrors footer city list until a confirmed HQ address is provided.
-  address: ["London", "New York", "Austin", "Berlin"],
+  address: ["Uzbekistan, Tashkent,", "Street"],
   map: {
     center: [69.279737, 41.311151] as [number, number],
     zoom: 15,
