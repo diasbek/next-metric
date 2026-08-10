@@ -97,7 +97,8 @@ const metricHomeEn = {
   },
   services: {
     id: "services",
-    title: "Everything your Amazon brand needs to convert",
+    titleLines: ["Everything your", "Amazon brand needs"],
+    titleSuffix: "to convert",
     titleBracket: "[in one place]",
     subtitle:
       "Amazon listing images, A+ Content, Brand Stores, and advertising creatives built as one consistent visual system.",
@@ -271,7 +272,8 @@ const metricHomeDe = {
   },
   services: {
     ...metricHomeEn.services,
-    title: "Alles, was Ihre Amazon-Marke braucht,",
+    titleLines: ["Alles, was Ihre", "Amazon-Marke braucht,"],
+    titleSuffix: "",
     titleBracket: "[an einem Ort]",
     subtitle:
       "Listing-Bilder, A+ Content, Brand Stores und Anzeigen-Creatives als ein konsistentes visuelles System.",

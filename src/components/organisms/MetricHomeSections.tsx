@@ -300,8 +300,20 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
     <section id={services.id} className="metric-services">
       <PageContainer className="metric-services__inner">
         <h2 className="metric-services__title font-display" data-reveal>
-          {services.title}{" "}
-          <span className="metric-services__bracket">{services.titleBracket}</span>
+          {services.titleLines.map((line) => (
+            <span key={line} className="metric-services__title-line">
+              {line}
+            </span>
+          ))}
+          <span className="metric-services__title-line metric-services__title-line--end">
+            {services.titleSuffix ? (
+              <span className="metric-services__title-suffix">
+                {services.titleSuffix}
+                {"\u00A0"}
+              </span>
+            ) : null}
+            <span className="metric-services__bracket">{services.titleBracket}</span>
+          </span>
         </h2>
 
         <div className="metric-services__layout">
