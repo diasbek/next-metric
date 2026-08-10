@@ -28,9 +28,9 @@ export const SITE_CONFIG = {
     brief: "/files/brief.pdf",
   },
   nav: [
-    { label: "Services", href: "/#services" },
-    { label: "Case Studies", href: "/#case-studies" },
     { label: "Projects", href: "/#projects" },
+    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Services", href: "/#services" },
     { label: "Workflow", href: "/#workflow" },
     { label: "FAQ", href: "/#faq" },
   ],

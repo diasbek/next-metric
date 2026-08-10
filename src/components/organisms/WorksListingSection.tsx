@@ -10,21 +10,18 @@ export function WorksListingSection({ locale, content }: LocalePageProps) {
   const home = getMetricHome(locale);
 
   return (
-    <div className="bg-white pb-20 pt-10 md:pt-14">
+    <div className="metric-works bg-white pb-20 pt-10 md:pt-14">
       <PageContainer>
-        <div
-          className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
-          data-reveal
-        >
-          <h1 className="font-display text-[clamp(42px,6vw,90px)] text-foreground">
+        <div className="metric-works__header mb-12 md:mb-16" data-reveal>
+          <h1 className="metric-works__title font-display text-foreground">
             {ui.allProjects}
           </h1>
-          <p className="max-w-md text-[18px] leading-[1.2] tracking-[-0.02em] text-[color:var(--muted)]">
+          <p className="metric-works__subtitle">
             {home.caseStudies.subtitle}
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3" data-reveal-group>
+        <div className="metric-works-grid" data-reveal-group>
           {projects.map((project) => (
             <TransitionLink
               key={project.slug}
@@ -32,7 +29,7 @@ export function WorksListingSection({ locale, content }: LocalePageProps) {
               className="metric-work-card group"
               data-reveal
             >
-              <div className="metric-work-card__media overflow-hidden rounded-t-[32px]">
+              <div className="metric-work-card__media">
                 <Image
                   src={project.image}
                   alt={project.title}
@@ -41,22 +38,23 @@ export function WorksListingSection({ locale, content }: LocalePageProps) {
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
-              <div className="rounded-b-[32px] bg-[color:var(--surface)] p-6">
-                <div className="mb-4 flex flex-wrap gap-2">
+              <div className="metric-work-card__body">
+                <div className="mb-4 flex flex-wrap gap-[5px]">
                   {project.tags.map((tag) => (
-                    <span key={tag} className="metric-pill border-foreground/20 text-foreground">
+                    <span
+                      key={tag}
+                      className="metric-pill border-foreground text-foreground"
+                    >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <h2 className="text-[28px] font-medium tracking-[-0.02em]">
-                  {project.title}
-                </h2>
-                <p className="mt-2 text-[16px] text-[color:var(--muted)]">
-                  {project.description}
-                </p>
-                <span className="metric-cta metric-cta--dark metric-cta--skew mt-6 inline-flex">
-                  <span className="metric-cta__label">{home.caseStudies.viewLabel}</span>
+                <h2 className="metric-work-card__title">{project.title}</h2>
+                <p className="metric-work-card__desc">{project.description}</p>
+                <span className="metric-cta metric-cta--skew-dark mt-6 inline-flex">
+                  <span className="metric-cta__label">
+                    {home.caseStudies.viewLabel}
+                  </span>
                 </span>
               </div>
             </TransitionLink>

@@ -28,11 +28,11 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
     <footer id="contact" className="site-footer" data-reveal>
       <PageContainer>
         <div className="site-footer__grid">
-          <div className="space-y-6">
+          <div className="space-y-8">
             <TransitionLink
               href={localePath(locale, "/")}
               aria-label={site.name}
-              className="relative block h-10 w-[160px]"
+              className="relative block h-12 w-[213px]"
             >
               <Image
                 src="/images/metric/logo/metric-logo.svg"
@@ -41,24 +41,27 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
                 className="object-contain object-left"
               />
             </TransitionLink>
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[18px]">
+            <div className="site-footer__cities">
               {footer.cities.map((city) => (
-                <span key={city} className="text-foreground">
-                  {city}
-                </span>
+                <span key={city}>{city}</span>
               ))}
             </div>
           </div>
 
-          <div className="site-footer__links">
-            {footer.links.map((link) => (
-              <TransitionLink
-                key={link.label}
-                href={localePath(locale, link.href)}
+          <div className="site-footer__contact">
+            <div>
+              <p className="site-footer__contact-label">{ui.phoneLabel}</p>
+              <a
+                href={`tel:${site.phone.replace(/\s+/g, "")}`}
+                className="text-[22px] font-medium tracking-tight"
               >
-                {link.label}
-              </TransitionLink>
-            ))}
+                {site.phone}
+              </a>
+            </div>
+            <div>
+              <p className="site-footer__contact-label">{ui.addressLabel}</p>
+              <p className="text-[18px] tracking-tight">{site.address.join(", ")}</p>
+            </div>
           </div>
 
           <div className="site-footer__links">
@@ -73,25 +76,9 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
               </a>
             ))}
           </div>
-
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-[color:var(--muted)]">{ui.phoneLabel}</p>
-              <a
-                href={`tel:${site.phone.replace(/\s+/g, "")}`}
-                className="text-[22px] font-medium tracking-tight"
-              >
-                {site.phone}
-              </a>
-            </div>
-            <div>
-              <p className="text-sm text-[color:var(--muted)]">{ui.addressLabel}</p>
-              <p className="text-[18px] tracking-tight">{site.address.join(", ")}</p>
-            </div>
-          </div>
         </div>
 
-        <div className="mt-14 rounded-[32px] bg-[color:var(--surface)] p-6 md:p-10">
+        <div className="site-footer__form">
           <div className="mb-6 max-w-xl">
             <h2 className="font-display text-[clamp(28px,4vw,48px)] text-foreground">
               {footer.startCta}
@@ -105,6 +92,13 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
 
         <div className="site-footer__bottom">
           <p>© 2026 {site.name}</p>
+          <div className="site-footer__bottom-links">
+            {footer.links.map((link) => (
+              <TransitionLink key={link.label} href={localePath(locale, link.href)}>
+                {link.label}
+              </TransitionLink>
+            ))}
+          </div>
         </div>
       </PageContainer>
     </footer>

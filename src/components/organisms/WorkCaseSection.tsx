@@ -237,21 +237,21 @@ export async function WorkCaseSection({
         ) : null}
 
         <section className="mt-16 md:mt-20" data-reveal>
-          <div className="mb-8 flex items-end justify-between gap-4">
+          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
               {ui.otherWorks}
             </h2>
             <TransitionLink
               href={localePath(locale, "/works/")}
-              className="text-[18px] font-medium tracking-[-0.02em]"
+              className="metric-cta metric-cta--skew-outline"
             >
-              {home.caseStudies.moreLabel}
+              <span className="metric-cta__label">{home.caseStudies.moreLabel}</span>
             </TransitionLink>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
             {nextProjects.slice(0, 2).map((item) => (
-              <article key={item.slug} className="metric-work-card">
-                <div className="metric-work-card__media overflow-hidden rounded-[28px]">
+              <article key={item.slug} className="metric-work-card group">
+                <div className="metric-work-card__media">
                   <Image
                     src={item.image}
                     alt={item.title}
@@ -259,25 +259,14 @@ export async function WorkCaseSection({
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
-                  <span className="absolute left-4 top-4 rounded-full border border-white/40 bg-black/30 px-3 py-1 text-sm text-white backdrop-blur-sm">
-                    {item.tags[0]}
-                  </span>
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 pt-16 text-white">
-                    <p className="text-[12px] uppercase tracking-[0.12em] opacity-80">
-                      {ui.listingDesignLabel}
-                    </p>
-                    <p className="mt-1 text-[22px] font-medium tracking-[-0.02em]">
-                      {item.title}
-                    </p>
-                  </div>
                 </div>
-                <div className="p-2 pt-5">
-                  <h3 className="max-w-md text-[clamp(22px,2.2vw,32px)] font-medium leading-[1.15] tracking-[-0.02em]">
+                <div className="metric-work-card__body">
+                  <h3 className="metric-work-card__title">
                     {item.quote ?? item.description}
                   </h3>
                   <TransitionLink
                     href={localePath(locale, `/works/${item.slug}/`)}
-                    className="metric-cta metric-cta--dark metric-cta--skew mt-6"
+                    className="metric-cta metric-cta--skew-dark mt-6"
                   >
                     <span className="metric-cta__label">
                       {home.caseStudies.viewLabel}

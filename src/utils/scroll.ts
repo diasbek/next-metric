@@ -1,3 +1,11 @@
+/** Notify listeners that location changed via pushState/replaceState hash nav. */
+export const LOCATION_CHANGE_EVENT = "metric:locationchange";
+
+function emitLocationChange(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(LOCATION_CHANGE_EVENT));
+}
+
 /** Jump to the top instantly — used on client-side route changes without a hash. */
 export function resetScrollPosition(): void {
   if (typeof window === "undefined") return;
@@ -127,6 +135,7 @@ export function sanitizeLocationHash(): string | null {
     "",
     buildSameDocumentHashUrl(last),
   );
+  emitLocationChange();
   return last;
 }
 
@@ -135,6 +144,7 @@ export function navigateSameDocumentHash(hash: string): void {
   const clean = hash.replace(/^#/, "").split("#")[0]?.trim() ?? "";
   if (!clean) return;
   window.history.pushState(null, "", buildSameDocumentHashUrl(clean));
+  emitLocationChange();
   scrollToHash(clean, "smooth");
 }
 

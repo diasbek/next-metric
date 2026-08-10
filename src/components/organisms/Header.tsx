@@ -107,7 +107,7 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
               href={contactPath}
               className="metric-cta metric-cta--outline hidden sm:inline-flex"
             >
-              {home.footer.startCta}
+              <span className="metric-cta__label">{home.footer.startCta}</span>
             </TransitionLink>
             <button
               type="button"
@@ -147,10 +147,10 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
           />
           <TransitionLink
             href={contactPath}
-            className="metric-cta metric-cta--solid w-full"
+            className="metric-cta metric-cta--outline w-full"
             onClick={() => setOpen(false)}
           >
-            {home.footer.startCta}
+            <span className="metric-cta__label">{home.footer.startCta}</span>
           </TransitionLink>
           <LanguageSwitcher
             locale={locale}

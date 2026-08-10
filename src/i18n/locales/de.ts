@@ -146,9 +146,9 @@ export const deContent: SiteContent = {
   site: {
     ...metricSiteContent.site,
     nav: [
-      { label: "Leistungen", path: "/#services" },
-      { label: "Case Studies", path: "/#case-studies" },
       { label: "Projekte", path: "/#projects" },
+      { label: "Case Studies", path: "/#case-studies" },
+      { label: "Leistungen", path: "/#services" },
       { label: "Ablauf", path: "/#workflow" },
       { label: "FAQ", path: "/#faq" },
     ],

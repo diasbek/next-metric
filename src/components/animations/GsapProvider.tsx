@@ -50,17 +50,9 @@ export function GsapProvider({ children }: GsapProviderProps) {
     // Preserve / repair in-page hash targets across route changes.
     settleScrollAfterNavigation();
 
-    // Jumping straight to a mid-page anchor (nav click from another page,
-    // or a hard reload on a `#section` URL) must never leave that section
-    // sitting invisible for however long GSAP takes to boot. Force it (and
-    // everything else) visible immediately; initAnimations() below skips
-    // already-revealed elements, so this never causes a flash.
-    if (typeof window !== "undefined" && window.location.hash) {
-      void import("@/animations/gsap").then(({ showAllRevealTargets }) => {
-        showAllRevealTargets();
-      });
-    }
-
+    // Jumping straight to a mid-page anchor must never leave that section
+    // sitting invisible for however long GSAP takes to boot. The awaited
+    // force-show inside `run()` handles this before initAnimations.
     const reduced = prefersReducedMotion();
     if (!reduced) {
       document.documentElement.classList.add("gsap-pending");
@@ -84,6 +76,18 @@ export function GsapProvider({ children }: GsapProviderProps) {
     };
 
     const run = async () => {
+      // Await the hash force-show so initAnimations never races ahead and
+      // re-hides mid-page targets that the user already jumped to.
+      if (typeof window !== "undefined" && window.location.hash) {
+        try {
+          const { showAllRevealTargets } = await import("@/animations/gsap");
+          if (cancelled) return;
+          showAllRevealTargets();
+        } catch {
+          /* continue — fallback timer / catch path still force-shows */
+        }
+      }
+
       if (reduced) {
         try {
           const { initAnimations } = await import("@/animations");

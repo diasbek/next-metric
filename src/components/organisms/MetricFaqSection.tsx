@@ -18,21 +18,21 @@ export function MetricFaqSection({
   const { faq } = getMetricHome(locale);
 
   return (
-    <section id={faq.id} className="metric-gradient-pink metric-section">
+    <section id={faq.id} className="metric-gradient-pink metric-section metric-faq">
       <PageContainer>
         <div
-          className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+          className="metric-faq__grid"
           data-reveal-group
         >
           <div data-reveal>
-            <h2 className="font-display text-[clamp(64px,10vw,120px)] text-white">
+            <h2 className="metric-faq__title font-display text-white">
               {faq.title}
             </h2>
-            <p className="mt-6 max-w-[453px] text-[clamp(16px,1.5vw,24px)] leading-[1.2] tracking-[-0.02em] text-white">
+            <p className="metric-faq__subtitle">
               {faq.subtitle}
             </p>
           </div>
-          <div className="flex flex-col gap-5" data-reveal>
+          <div className="metric-faq__list" data-reveal>
             {items.map((item, index) => {
               const isOpen = open === index;
               return (

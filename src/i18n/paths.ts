@@ -47,10 +47,21 @@ export function stripLocalePrefix(pathname: string): {
   return { locale: defaultLocale, path: normalizePath(normalized) };
 }
 
-export function switchLocalePath(pathname: string, targetLocale: Locale) {
+export function switchLocalePath(
+  pathname: string,
+  targetLocale: Locale,
+  hash?: string | null,
+) {
   const withoutHash = pathname.split("#")[0] ?? pathname;
   const { path } = stripLocalePrefix(withoutHash);
-  return localePath(targetLocale, path);
+  const cleanHash =
+    typeof hash === "string"
+      ? hash.replace(/^#/, "").split("#")[0]?.trim() ?? ""
+      : "";
+  return localePath(
+    targetLocale,
+    cleanHash ? `${path}#${cleanHash}` : path,
+  );
 }
 
 export function getLocalizedAlternates(path: string) {

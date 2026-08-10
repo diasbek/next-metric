@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
+import { useLocationHash } from "@/hooks/useLocationHash";
 import { usePathname } from "next/navigation";
 import { locales, localeLabels, type Locale } from "./config";
 import { switchLocalePath } from "./paths";
@@ -22,6 +23,7 @@ export function LanguageSwitcher({
   className = "",
 }: LanguageSwitcherProps) {
   const pathname = usePathname();
+  const hash = useLocationHash();
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -57,7 +59,7 @@ export function LanguageSwitcher({
       >
         {locales.map((targetLocale, index) => {
           const isActive = targetLocale === locale;
-          const href = switchLocalePath(pathname, targetLocale);
+          const href = switchLocalePath(pathname, targetLocale, hash);
 
           return (
             <span key={targetLocale} className="language-switcher__item">
@@ -113,7 +115,7 @@ export function LanguageSwitcher({
       >
         {locales.map((targetLocale) => {
           const isActive = targetLocale === locale;
-          const href = switchLocalePath(pathname, targetLocale);
+          const href = switchLocalePath(pathname, targetLocale, hash);
 
           return (
             <li

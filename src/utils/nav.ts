@@ -2,21 +2,45 @@ import { stripLocalePrefix } from "@/i18n/paths";
 
 function normalizePath(path: string) {
   if (!path || path === "/") return "/";
-  return path.endsWith("/") ? path : `${path}/`;
+  const withoutHash = path.split("#")[0] ?? path;
+  return withoutHash.endsWith("/") ? withoutHash : `${withoutHash}/`;
 }
 
-export function isNavPathActive(pathname: string, itemPath: string) {
+function getHashSegment(value: string): string {
+  const index = value.indexOf("#");
+  if (index < 0) return "";
+  return value.slice(index + 1).split("#")[0]?.trim() ?? "";
+}
+
+/**
+ * Active nav helper. Path-only items use pathname; hash items
+ * (`/#services`) also require the current location hash to match.
+ */
+export function isNavPathActive(
+  pathname: string,
+  itemPath: string,
+  hash = "",
+) {
+  const itemHash = getHashSegment(itemPath);
   const { path } = stripLocalePrefix(pathname);
   const current = normalizePath(path);
-  const target = normalizePath(itemPath);
+  const targetBase = normalizePath(itemPath);
 
-  if (target === "/") {
-    return current === "/";
+  if (itemHash) {
+    if (current !== targetBase) return false;
+    const currentHash = getHashSegment(
+      hash.startsWith("#") ? hash : `#${hash}`,
+    );
+    return currentHash === itemHash;
   }
 
-  if (target === "/works/") {
+  if (targetBase === "/") {
+    return current === "/" && !getHashSegment(hash);
+  }
+
+  if (targetBase === "/works/") {
     return current === "/works/" || current.startsWith("/works/");
   }
 
-  return current === target;
+  return current === targetBase;
 }

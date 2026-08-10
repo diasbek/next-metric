@@ -12,6 +12,18 @@ function markRevealed(targets: HTMLElement | HTMLElement[]): void {
   list.forEach((el) => el.classList.add("is-revealed"));
 }
 
+/** True when the element has already crossed a ScrollTrigger "top XX%" start. */
+function isPastRevealStart(el: HTMLElement, viewportPct = 88): boolean {
+  const top = el.getBoundingClientRect().top;
+  return top < (window.innerHeight * viewportPct) / 100;
+}
+
+function showImmediately(targets: HTMLElement | HTMLElement[]): void {
+  const list = Array.isArray(targets) ? targets : [targets];
+  gsap.set(list, { autoAlpha: 1, y: 0, scale: 1, clearProps: CLEAR_MOTION_PROPS });
+  markRevealed(list);
+}
+
 export function createReveals(): void {
   document
     // Skip items owned by a reveal-group — group tween handles them.
@@ -21,6 +33,14 @@ export function createReveals(): void {
       "[data-reveal]:not(.is-revealed):not([data-split-title]):not([data-reveal-group] > [data-reveal])",
     )
     .forEach((el) => {
+      // Hash jumps / settled scroll can leave mid-page targets already past
+      // the trigger. Animating from autoAlpha:0 then would hide them forever
+      // if ScrollTrigger mis-times the play. Show them immediately instead.
+      if (isPastRevealStart(el, 88)) {
+        showImmediately(el);
+        return;
+      }
+
       const y = Number(el.dataset.revealY ?? 40);
       const delay = Number(el.dataset.revealDelay ?? 0);
       gsap.fromTo(
@@ -47,6 +67,13 @@ export function createRevealGroups(): void {
     .forEach((group) => {
       const items = Array.from(group.children) as HTMLElement[];
       if (!items.length) return;
+
+      if (isPastRevealStart(group, 85)) {
+        showImmediately(items);
+        group.classList.add("is-revealed");
+        return;
+      }
+
       const pop = group.dataset.revealGroup === "pop";
       const stagger = Number(group.dataset.revealStagger ?? (pop ? 0.08 : 0.1));
       gsap.fromTo(

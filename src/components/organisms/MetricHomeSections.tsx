@@ -164,24 +164,60 @@ export function MetricHeroSection({ locale }: { locale: Locale }) {
 export function MetricCategoriesSection({ locale = "en" }: { locale?: Locale }) {
   const { categories } = getMetricHome(locale);
   return (
-    <section id="projects" className="metric-gradient-pink metric-section">
+    <section id="projects" className="metric-gradient-pink metric-section metric-categories">
       <PageContainer>
         <h2
-          className="font-display max-w-[1390px] text-[clamp(40px,7vw,120px)] text-white"
+          className="metric-categories__title font-display text-white"
           data-reveal
         >
-          {categories.titleBefore}
-          <span className="text-accent">{categories.titleAccent}</span>
-          {categories.titleAfter}
+          {categories.titleLines.map((line, index) => {
+            if (typeof line === "string") {
+              return (
+                <span key={index} className="metric-categories__title-line">
+                  {line}
+                </span>
+              );
+            }
+
+            return (
+              <span
+                key={index}
+                className={
+                  line.icon
+                    ? "metric-categories__title-line metric-categories__title-line--with-icon"
+                    : "metric-categories__title-line"
+                }
+              >
+                {line.prefix}
+                <span className="metric-categories__accent text-accent">
+                  {line.accent}
+                  {line.icon ? (
+                    <Image
+                      src="/images/metric/icons/arrow.svg"
+                      alt=""
+                      width={56}
+                      height={48}
+                      className="metric-categories__laurel"
+                      aria-hidden
+                    />
+                  ) : null}
+                </span>
+                {line.suffix}
+              </span>
+            );
+          })}
         </h2>
-        <div className="metric-categories__track mt-12 md:mt-16" data-reveal-group>
+      </PageContainer>
+
+      <div className="metric-categories__track-wrap">
+        <div className="metric-categories__track" data-reveal-group>
           {categories.images.map((src) => (
             <div key={src} className="metric-categories__card" data-reveal>
-              <Image src={src} alt="" fill className="object-cover" sizes="300px" />
+              <Image src={src} alt="" fill className="object-cover" sizes="320px" />
             </div>
           ))}
         </div>
-      </PageContainer>
+      </div>
     </section>
   );
 }
@@ -191,23 +227,21 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
   const titleParts = caseStudies.title.split(caseStudies.titleAccent);
 
   return (
-    <section id="case-studies" className="metric-section">
+    <section id="case-studies" className="metric-section metric-case-studies">
       <PageContainer>
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end" data-reveal>
-          <h2 className="font-display text-[clamp(40px,6vw,100px)] text-foreground">
+        <div className="metric-case-studies__header" data-reveal>
+          <h2 className="metric-case-studies__title font-display">
             {titleParts[0]}
             <span className="text-accent">{caseStudies.titleAccent}</span>
             {titleParts[1] ?? ""}
           </h2>
-          <p className="max-w-[430px] text-[clamp(16px,1.5vw,24px)] leading-[1.2] tracking-[-0.02em] text-foreground lg:justify-self-end">
-            {caseStudies.subtitle}
-          </p>
+          <p className="metric-case-studies__subtitle">{caseStudies.subtitle}</p>
         </div>
 
-        <div className="mt-12 space-y-6 md:mt-16" data-reveal-group>
+        <div className="mt-12 space-y-5 md:mt-16 md:space-y-5" data-reveal-group>
           {caseStudies.items.map((item) => (
             <article key={item.slug} className="metric-case-card" data-reveal>
-              <div className="flex flex-col justify-between gap-10 p-8 md:p-12">
+              <div className="metric-case-card__body">
                 <div className="flex flex-wrap gap-[5px]">
                   {item.tags.map((tag) => (
                     <span key={tag} className="metric-pill border-foreground text-foreground">
@@ -216,24 +250,24 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
                   ))}
                 </div>
                 <div>
-                  <h3 className="font-display text-[clamp(28px,4vw,60px)] text-foreground">
+                  <h3 className="font-display text-[clamp(28px,4vw,60px)] leading-[0.9] tracking-[-0.02em] text-foreground">
                     {item.quote}
                   </h3>
-                  <p className="mt-8 text-[clamp(22px,2vw,32px)] font-medium tracking-[-0.02em]">
+                  <p className="mt-8 text-[clamp(22px,2vw,32px)] font-medium tracking-[-0.02em] text-foreground">
                     {item.author}
                   </p>
-                  <p className="mt-2 text-[clamp(16px,1.5vw,24px)] tracking-[-0.02em] text-[color:var(--muted)]">
+                  <p className="mt-5 text-[clamp(16px,1.5vw,24px)] tracking-[-0.02em] text-foreground">
                     {item.role}
                   </p>
                 </div>
                 <TransitionLink
                   href={localePath(locale, `/works/${item.slug}/`)}
-                  className="metric-cta metric-cta--dark w-fit"
+                  className="metric-cta metric-cta--skew-dark w-fit"
                 >
-                  {caseStudies.viewLabel}
+                  <span className="metric-cta__label">{caseStudies.viewLabel}</span>
                 </TransitionLink>
               </div>
-              <div className="relative min-h-[280px] lg:min-h-[600px]">
+              <div className="metric-case-card__media">
                 <Image
                   src={item.image}
                   alt={item.author}
@@ -249,15 +283,9 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
         <div className="mt-10 flex justify-center" data-reveal>
           <TransitionLink
             href={localePath(locale, "/works/")}
-            className="inline-flex items-center gap-3 text-[20px] font-medium tracking-[-0.02em]"
+            className="metric-cta metric-cta--skew-outline"
           >
-            {caseStudies.moreLabel}
-            <Image
-              src="/images/metric/icons/arrow.svg"
-              alt=""
-              width={24}
-              height={24}
-            />
+            <span className="metric-cta__label">{caseStudies.moreLabel}</span>
           </TransitionLink>
         </div>
       </PageContainer>
@@ -268,25 +296,25 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
 export function MetricServicesSection({ locale }: { locale: Locale }) {
   const { services } = getMetricHome(locale);
   return (
-    <section id={services.id} className="bg-accent metric-section text-white">
-      <PageContainer>
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+    <section id={services.id} className="metric-services bg-accent text-white">
+      <PageContainer className="metric-services__inner">
+        <div className="metric-services__grid">
           <div data-reveal>
-            <h2 className="font-display text-[clamp(36px,5vw,80px)] text-white">
+            <h2 className="metric-services__title font-display text-white">
               {services.title}{" "}
-              <span className="text-foreground">{services.titleBracket}</span>
+              <span className="metric-services__bracket">{services.titleBracket}</span>
             </h2>
-            <p className="mt-6 max-w-[480px] text-[clamp(16px,1.5vw,22px)] leading-[1.2] tracking-[-0.02em] text-white/85">
+            <p className="metric-services__subtitle">
               {services.subtitle}
             </p>
             <TransitionLink
               href={localePath(locale, "/#contact")}
-              className="metric-cta mt-10 inline-flex bg-white text-accent"
+              className="metric-cta metric-cta--on-accent mt-10"
             >
-              {services.cta}
+              <span className="metric-cta__label">{services.cta}</span>
             </TransitionLink>
           </div>
-          <div className="space-y-0" data-reveal-group>
+          <div className="metric-services__list" data-reveal-group>
             {services.items.map((item) => (
               <div key={item.n} className="metric-services-item" data-reveal>
                 <span className="font-display text-[48px] text-white/90">{item.n}</span>
@@ -308,46 +336,42 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
 export function MetricWorkflowSection({ locale }: { locale: Locale }) {
   const { workflow } = getMetricHome(locale);
   return (
-    <section id={workflow.id} className="metric-section">
+    <section id={workflow.id} className="metric-section metric-workflow">
       <PageContainer>
-        <div className="max-w-3xl" data-reveal>
-          <h2 className="font-display text-[clamp(40px,6vw,100px)] text-foreground">
+        <div className="metric-workflow__header" data-reveal>
+          <h2 className="metric-workflow__title font-display text-foreground">
             {workflow.title}
           </h2>
-          <p className="mt-4 text-[clamp(18px,2vw,28px)] tracking-[-0.02em] text-[color:var(--muted)]">
-            {workflow.subtitle}
-          </p>
+          <p className="metric-workflow__subtitle">{workflow.subtitle}</p>
         </div>
         <div className="metric-workflow__grid mt-12" data-reveal-group>
-          {workflow.cards.map((card) => (
+          {workflow.cards.map((card, index) => (
             <article
               key={card.title}
-              className="overflow-hidden rounded-[32px] bg-[color:var(--surface)]"
+              className={`metric-workflow-card metric-workflow-card--${card.layout}${
+                index === 1 ? " metric-workflow-card--offset" : ""
+              }`}
               data-reveal
             >
-              <div className="relative aspect-[4/3]">
-                <Image src={card.image} alt="" fill className="object-cover" sizes="400px" />
+              <div className="metric-workflow-card__media">
+                <Image src={card.image} alt="" fill className="object-contain" sizes="450px" />
               </div>
-              <div className="p-6 md:p-8">
-                <h3 className="font-display text-[clamp(24px,2.5vw,36px)] text-foreground">
+              <div className="metric-workflow-card__copy">
+                <h3 className="metric-workflow-card__title font-display">
                   {card.title}
                 </h3>
+                <p className="metric-workflow-card__body">{card.body}</p>
               </div>
             </article>
           ))}
         </div>
-        <div
-          className="mt-12 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between"
-          data-reveal
-        >
-          <p className="max-w-md text-[18px] tracking-[-0.02em] text-[color:var(--muted)]">
-            {workflow.note}
-          </p>
+        <div className="metric-workflow__cta" data-reveal>
+          <p className="metric-workflow__note">{workflow.note}</p>
           <TransitionLink
             href={localePath(locale, "/#contact")}
-            className="metric-cta metric-cta--solid"
+            className="metric-cta metric-cta--skew"
           >
-            {workflow.cta}
+            <span className="metric-cta__label">{workflow.cta}</span>
           </TransitionLink>
         </div>
       </PageContainer>

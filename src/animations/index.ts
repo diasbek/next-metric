@@ -47,7 +47,9 @@ function initHeroEntrance(): Cleanup {
 
 function initCtaHovers(): Cleanup {
   const links = Array.from(
-    document.querySelectorAll<HTMLElement>(".metric-cta--skew"),
+    document.querySelectorAll<HTMLElement>(
+      ".metric-cta--skew, .metric-cta--skew-dark, .metric-cta--skew-outline, .metric-cta--outline, .metric-cta--on-accent, .metric-cta--solid",
+    ),
   );
   if (!links.length) return () => {};
 

@@ -1,7 +1,9 @@
 import { PageContainer } from "@/components/atoms/PageContainer";
+import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { SiteLayout } from "@/components/templates";
 import type { Locale } from "@/i18n/config";
 import { getMetricHome } from "@/data/metric-home";
+import { localePath } from "@/i18n/paths";
 
 const copy = {
   en: {
@@ -44,23 +46,25 @@ export function LegalPageView({
   page: LegalKey;
 }) {
   const content = copy[locale][page];
-  const cta = getMetricHome(locale).footer.startCta;
+  const home = getMetricHome(locale);
 
   return (
     <SiteLayout locale={locale} headerVariant="compact">
-      <div className="bg-white py-16 md:py-24">
+      <div className="metric-legal bg-white py-16 md:py-24">
         <PageContainer>
-          <h1 className="font-display max-w-3xl text-[clamp(40px,6vw,90px)] text-foreground">
-            {content.title}
-          </h1>
-          <p className="mt-8 max-w-2xl text-[clamp(18px,1.6vw,24px)] leading-[1.3] tracking-[-0.02em] text-foreground">
-            {content.body}
-          </p>
-          <p className="mt-10 text-[18px] text-[color:var(--muted)]">
-            {locale === "de"
-              ? `${cta} — Formular unten.`
-              : `${cta} — contact form below.`}
-          </p>
+          <div className="metric-legal__inner" data-reveal>
+            <p className="metric-legal__eyebrow">{home.footer.cities[0]}</p>
+            <h1 className="metric-legal__title font-display text-foreground">
+              {content.title}
+            </h1>
+            <p className="metric-legal__body">{content.body}</p>
+            <TransitionLink
+              href={localePath(locale, "/#contact")}
+              className="metric-cta metric-cta--skew mt-10"
+            >
+              <span className="metric-cta__label">{home.footer.startCta}</span>
+            </TransitionLink>
+          </div>
         </PageContainer>
       </div>
     </SiteLayout>

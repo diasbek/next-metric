@@ -44,9 +44,16 @@ const metricHomeEn = {
     },
   ],
   categories: {
-    titleBefore: "We help turn products into Amazon ",
-    titleAccent: "bestsellers",
-    titleAfter: " across categories.",
+    titleLines: [
+      "We help turn products into",
+      {
+        prefix: "Amazon ",
+        accent: "bestsellers",
+        suffix: " across",
+        icon: true,
+      },
+      "categories.",
+    ],
     images: [
       "/images/metric/categories/cat-1.jpg",
       "/images/metric/categories/cat-2.jpg",
@@ -81,10 +88,10 @@ const metricHomeEn = {
       },
       {
         slug: "tobias",
-        tags: ["Listing", "Home", "Premium A+"],
+        tags: ["Listing", "Agriculture", "Premium A+"],
         quote: "The conversion rate has increased by one and a half times",
         author: "Tobias Fraikin",
-        role: "Brand founder",
+        role: "CRAFTUS, Mitgründer & Geschäftsführer",
         image: "/images/metric/cases/case-3.jpg",
       },
     ],
@@ -121,22 +128,28 @@ const metricHomeEn = {
   },
   workflow: {
     id: "workflow",
-    title: "That’s how Metric is made",
+    title: "That’s how Metric are made",
     subtitle: "Unique visual worlds — hand-drawn.",
     cta: "Let’s Talk",
     note: "We’d be happy to present more projects in a personal call.",
     cards: [
       {
         title: "Launching has never been this easy!",
+        body: "The product achieved bestseller status within just one week, supported by its distinctive composition and high-quality imagery.",
         image: "/images/metric/workflow/wf-1.png",
+        layout: "media-top" as const,
       },
       {
         title: "A consistent bestseller and Amazon’s Choice",
+        body: "Achieving a consistent conversion rate of 41% through image content tailored to the target audience and relevant to customers",
         image: "/images/metric/workflow/wf-2.jpg",
+        layout: "media-bottom" as const,
       },
       {
         title: "Launch your first product with confidence",
+        body: "Strategic visuals that make your product easy to understand—and easier to choose.",
         image: "/images/metric/workflow/wf-3.png",
+        layout: "media-top" as const,
       },
     ],
   },
@@ -162,9 +175,9 @@ const metricHomeEn = {
     startCta: "Start Your Project",
   },
   nav: [
-    { label: "Services", href: "/#services" },
-    { label: "Case Studies", href: "/#case-studies" },
     { label: "Projects", href: "/#projects" },
+    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Services", href: "/#services" },
     { label: "Workflow", href: "/#workflow" },
     { label: "FAQ", href: "/#faq" },
   ],
@@ -210,9 +223,16 @@ const metricHomeDe = {
     },
   ],
   categories: {
-    titleBefore: "Wir machen Produkte zu Amazon-",
-    titleAccent: "Bestsellern",
-    titleAfter: " in allen Kategorien.",
+    titleLines: [
+      "Wir machen Produkte zu",
+      {
+        prefix: "Amazon-",
+        accent: "Bestsellern",
+        suffix: "",
+        icon: true,
+      },
+      "in allen Kategorien.",
+    ],
     images: metricHomeEn.categories.images,
   },
   caseStudies: {
@@ -241,10 +261,10 @@ const metricHomeDe = {
       },
       {
         slug: "tobias",
-        tags: ["Listing", "Home", "Premium A+"],
+        tags: ["Listing", "Agriculture", "Premium A+"],
         quote: "Die Conversion-Rate hat sich um das Eineinhalbfache erhöht",
         author: "Tobias Fraikin",
-        role: "Brand founder",
+        role: "CRAFTUS, Mitgründer & Geschäftsführer",
         image: "/images/metric/cases/case-3.jpg",
       },
     ],
@@ -272,15 +292,21 @@ const metricHomeDe = {
     cards: [
       {
         title: "Launch war noch nie so einfach!",
+        body: "Das Produkt erreichte innerhalb nur einer Woche den Bestseller-Status — dank markanter Komposition und hochwertiger Bildwelt.",
         image: "/images/metric/workflow/wf-1.png",
+        layout: "media-top" as const,
       },
       {
         title: "Ein konsistenter Bestseller und Amazon’s Choice",
+        body: "Konstante Conversion-Rate von 41% durch zielgruppengerechte Bildinhalte, die für Kunden relevant sind.",
         image: "/images/metric/workflow/wf-2.jpg",
+        layout: "media-bottom" as const,
       },
       {
         title: "Starten Sie Ihr erstes Produkt mit Vertrauen",
+        body: "Strategische Visuals, die Ihr Produkt leicht verständlich — und leichter wählbar — machen.",
         image: "/images/metric/workflow/wf-3.png",
+        layout: "media-top" as const,
       },
     ],
   },
@@ -300,9 +326,9 @@ const metricHomeDe = {
     startCta: "Projekt starten",
   },
   nav: [
-    { label: "Leistungen", href: "/#services" },
-    { label: "Case Studies", href: "/#case-studies" },
     { label: "Projekte", href: "/#projects" },
+    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Leistungen", href: "/#services" },
     { label: "Ablauf", href: "/#workflow" },
     { label: "FAQ", href: "/#faq" },
   ],

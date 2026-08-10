@@ -384,14 +384,14 @@ export function ContactForm({
         type="submit"
         disabled={loading}
         className={[
-          "contact-form__submit ui-button",
+          "metric-cta metric-cta--skew contact-form__submit",
           submitted ? "is-success" : "",
           loading ? "is-loading" : "",
         ]
           .filter(Boolean)
           .join(" ")}
       >
-        {statusLabel}
+        <span className="metric-cta__label">{statusLabel}</span>
       </button>
     </form>
   );

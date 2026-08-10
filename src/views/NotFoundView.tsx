@@ -20,9 +20,9 @@ export function NotFoundView({ locale = "en" }: NotFoundViewProps) {
         <p className="mt-4 text-xl text-[color:var(--muted)]">{ui.notFoundTitle}</p>
         <TransitionLink
           href={localePath(locale, "/")}
-          className="metric-cta metric-cta--solid mt-8"
+          className="metric-cta metric-cta--skew mt-8"
         >
-          {ui.backHome}
+          <span className="metric-cta__label">{ui.backHome}</span>
         </TransitionLink>
       </section>
     </SiteLayout>
