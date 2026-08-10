@@ -3,18 +3,28 @@
 import Image from "next/image";
 import { useState } from "react";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { metricHome } from "@/data/metric-home";
+import { getMetricHome } from "@/data/metric-home";
 import type { FAQItem } from "@/data/faq";
+import type { Locale } from "@/i18n/config";
 
-export function MetricFaqSection({ items }: { items: FAQItem[] }) {
-  const [open, setOpen] = useState(1);
-  const { faq } = metricHome;
+export function MetricFaqSection({
+  locale,
+  items,
+}: {
+  locale: Locale;
+  items: FAQItem[];
+}) {
+  const [open, setOpen] = useState(0);
+  const { faq } = getMetricHome(locale);
 
   return (
-    <section id={faq.id} className="metric-gradient-pink py-16 md:py-24">
+    <section id={faq.id} className="metric-gradient-pink metric-section">
       <PageContainer>
-        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          <div>
+        <div
+          className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+          data-reveal-group
+        >
+          <div data-reveal>
             <h2 className="font-display text-[clamp(64px,10vw,120px)] text-white">
               {faq.title}
             </h2>
@@ -22,7 +32,7 @@ export function MetricFaqSection({ items }: { items: FAQItem[] }) {
               {faq.subtitle}
             </p>
           </div>
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5" data-reveal>
             {items.map((item, index) => {
               const isOpen = open === index;
               return (

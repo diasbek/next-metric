@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 
 const archivo = Archivo({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-archivo",
   display: "swap",
   preload: true,

@@ -32,6 +32,7 @@ export const SITE_CONFIG = {
     { label: "Workflow", href: "/#workflow" },
     { label: "FAQ", href: "/#faq" },
   ],
+  // Labels mirrored in getMetricHome(locale).nav for DE.
   locales: ["en", "de"] as const,
   defaultLocale: "en" as const,
   themeColor: "#ff3c82",

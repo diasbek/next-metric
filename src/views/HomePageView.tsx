@@ -3,7 +3,6 @@ import { getLocalePageProps } from "@/i18n/props";
 import { SiteLayout } from "@/components/templates";
 import {
   MetricHeroSection,
-  MetricTrustSection,
   MetricCategoriesSection,
   MetricCaseStudiesSection,
   MetricServicesSection,
@@ -21,12 +20,11 @@ export async function HomePageView({ locale }: HomePageViewProps) {
   return (
     <SiteLayout locale={locale} headerVariant="hero" showContact={false}>
       <MetricHeroSection locale={locale} />
-      <MetricTrustSection />
-      <MetricCategoriesSection />
+      <MetricCategoriesSection locale={locale} />
       <MetricCaseStudiesSection locale={locale} />
       <MetricServicesSection locale={locale} />
       <MetricWorkflowSection locale={locale} />
-      <MetricFaqSection items={page.content.faq} />
+      <MetricFaqSection locale={locale} items={page.content.faq} />
     </SiteLayout>
   );
 }

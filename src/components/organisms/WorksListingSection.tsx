@@ -1,33 +1,38 @@
 import Image from "next/image";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
-import { metricHome } from "@/data/metric-home";
+import { getMetricHome } from "@/data/metric-home";
 import type { LocalePageProps } from "@/i18n/props";
 import { localePath } from "@/i18n/paths";
 
 export function WorksListingSection({ locale, content }: LocalePageProps) {
   const { projects, ui } = content;
+  const home = getMetricHome(locale);
 
   return (
     <div className="bg-white pb-20 pt-10 md:pt-14">
       <PageContainer>
-        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div
+          className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+          data-reveal
+        >
           <h1 className="font-display text-[clamp(42px,6vw,90px)] text-foreground">
             {ui.allProjects}
           </h1>
           <p className="max-w-md text-[18px] leading-[1.2] tracking-[-0.02em] text-[color:var(--muted)]">
-            {metricHome.caseStudies.subtitle}
+            {home.caseStudies.subtitle}
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3" data-reveal-group>
           {projects.map((project) => (
             <TransitionLink
               key={project.slug}
               href={localePath(locale, `/works/${project.slug}/`)}
-              className="group overflow-hidden rounded-[32px] bg-[color:var(--surface)]"
+              className="metric-work-card group"
+              data-reveal
             >
-              <div className="relative aspect-[4/5]">
+              <div className="metric-work-card__media overflow-hidden rounded-t-[32px]">
                 <Image
                   src={project.image}
                   alt={project.title}
@@ -36,13 +41,10 @@ export function WorksListingSection({ locale, content }: LocalePageProps) {
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
-              <div className="p-6">
+              <div className="rounded-b-[32px] bg-[color:var(--surface)] p-6">
                 <div className="mb-4 flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-foreground/20 px-3 py-1 text-sm"
-                    >
+                    <span key={tag} className="metric-pill border-foreground/20 text-foreground">
                       {tag}
                     </span>
                   ))}
@@ -53,6 +55,9 @@ export function WorksListingSection({ locale, content }: LocalePageProps) {
                 <p className="mt-2 text-[16px] text-[color:var(--muted)]">
                   {project.description}
                 </p>
+                <span className="metric-cta metric-cta--dark metric-cta--skew mt-6 inline-flex">
+                  <span className="metric-cta__label">{home.caseStudies.viewLabel}</span>
+                </span>
               </div>
             </TransitionLink>
           ))}

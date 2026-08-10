@@ -1,10 +1,18 @@
-export const metricHome = {
+import type { Locale } from "@/i18n/config";
+
+const metricHomeEn = {
   hero: {
-    title: "On Amazon, customers buy with their eyes first.",
+    titleLine1: "On Amazon,",
+    titleLine2: "customers buy with their eyes first.",
     subtitle:
       "Strategic Amazon listing images and A+ Content designed to communicate value, inspire confidence, and turn attention into sales.",
     cta: "Build a Stronger Listing",
-    badge: "9.5%",
+    badgeValue: "9.5%",
+    badgeLabel: "Click-through rate:",
+    redesignLabel: "Metric Redesign",
+    redesignValue: "22%",
+    redesignDelta: "+132% CTR",
+    redesignCaption: "Click-through rate:",
     product1: "/images/metric/hero/product-1.jpg",
     product2: "/images/metric/hero/product-2.jpg",
     glow: "/images/metric/hero/glow.png",
@@ -24,13 +32,15 @@ export const metricHome = {
     {
       kind: "rating" as const,
       value: "5",
-      label: "Excellent 5.0 out of 5",
+      labelLine1: "Excellent",
+      labelLine2: "5.0 out of 5",
       icon: "/images/metric/icons/star.svg",
     },
     {
       kind: "stat" as const,
       value: "800+",
-      label: "Sellers served",
+      labelLine1: "Sellers",
+      labelLine2: "served",
     },
   ],
   categories: {
@@ -81,7 +91,8 @@ export const metricHome = {
   },
   services: {
     id: "services",
-    title: "Everything your Amazon brand needs to convert [in one place]",
+    title: "Everything your Amazon brand needs to convert",
+    titleBracket: "[in one place]",
     subtitle:
       "Amazon listing images, A+ Content, Brand Stores, and advertising creatives built as one consistent visual system.",
     cta: "Book a Free Concept Call",
@@ -89,22 +100,22 @@ export const metricHome = {
       {
         n: "1",
         title: "Product images",
-        image: "/images/metric/services/svc-1.jpg",
+        image: "/images/metric/services/svc-1.png",
       },
       {
         n: "2",
         title: "A+ Content",
-        image: "/images/metric/services/svc-2.jpg",
+        image: "/images/metric/services/svc-2.png",
       },
       {
         n: "3",
         title: "Ad-Banner",
-        image: "/images/metric/services/svc-3.jpg",
+        image: "/images/metric/services/svc-3.png",
       },
       {
         n: "4",
         title: "BrandStore",
-        image: "/images/metric/services/svc-4.jpg",
+        image: "/images/metric/services/svc-4.png",
       },
     ],
   },
@@ -138,9 +149,9 @@ export const metricHome = {
   footer: {
     cities: ["London", "New York", "Austin", "Berlin"],
     links: [
-      { label: "Privacy Policy", href: "#" },
-      { label: "Newsletter", href: "#" },
-      { label: "Careers", href: "#" },
+      { label: "Privacy Policy", href: "/privacy/" },
+      { label: "Newsletter", href: "/newsletter/" },
+      { label: "Careers", href: "/careers/" },
     ],
     social: [
       { label: "Instagram", key: "instagram" as const },
@@ -150,4 +161,133 @@ export const metricHome = {
     ],
     startCta: "Start Your Project",
   },
+  nav: [
+    { label: "Services", href: "/#services" },
+    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Projects", href: "/#projects" },
+    { label: "Workflow", href: "/#workflow" },
+    { label: "FAQ", href: "/#faq" },
+  ],
 } as const;
+
+const metricHomeDe = {
+  ...metricHomeEn,
+  hero: {
+    ...metricHomeEn.hero,
+    titleLine1: "Auf Amazon",
+    titleLine2: "kaufen Kunden zuerst mit den Augen.",
+    subtitle:
+      "Strategische Amazon Listing-Bilder und A+ Content, die Wert kommunizieren, Vertrauen schaffen und Aufmerksamkeit in Verkäufe verwandeln.",
+    cta: "Stärkeres Listing bauen",
+    badgeLabel: "Klickrate:",
+    redesignLabel: "Metric Redesign",
+    redesignCaption: "Klickrate:",
+  },
+  trust: [
+    {
+      kind: "spn" as const,
+      label: "Offizieller Service-Partner",
+      text: "Wir sind offizieller Partner im Amazon Service Provider Network (SPN).",
+      icon: "/images/metric/icons/spn.svg",
+    },
+    {
+      kind: "reviews" as const,
+      label: "Basierend auf verifizierten Kundenbewertungen",
+      icon: "/images/metric/icons/trustpilot.svg",
+    },
+    {
+      kind: "rating" as const,
+      value: "5",
+      labelLine1: "Ausgezeichnet",
+      labelLine2: "5,0 von 5",
+      icon: "/images/metric/icons/star.svg",
+    },
+    {
+      kind: "stat" as const,
+      value: "800+",
+      labelLine1: "Seller",
+      labelLine2: "betreut",
+    },
+  ],
+  categories: {
+    titleBefore: "Wir machen Produkte zu Amazon-",
+    titleAccent: "Bestsellern",
+    titleAfter: " in allen Kategorien.",
+    images: metricHomeEn.categories.images,
+  },
+  caseStudies: {
+    title: "So treiben bessere Visuals echte Amazon-Ergebnisse.",
+    titleAccent: "Amazon-Ergebnisse.",
+    subtitle:
+      "Erfahren Sie, wie strategische Listing-Bilder und A+ Content Marken mehr Aufmerksamkeit, Klarheit und Conversion gebracht haben.",
+    moreLabel: "Mehr Projekte",
+    viewLabel: "Case Study ansehen",
+    items: metricHomeEn.caseStudies.items,
+  },
+  services: {
+    ...metricHomeEn.services,
+    title: "Alles, was Ihre Amazon-Marke braucht,",
+    titleBracket: "[an einem Ort]",
+    subtitle:
+      "Listing-Bilder, A+ Content, Brand Stores und Anzeigen-Creatives als ein konsistentes visuelles System.",
+    cta: "Kostenloses Konzeptgespräch",
+    items: [
+      { n: "1", title: "Produktbilder", image: "/images/metric/services/svc-1.png" },
+      { n: "2", title: "A+ Content", image: "/images/metric/services/svc-2.png" },
+      { n: "3", title: "Ad-Banner", image: "/images/metric/services/svc-3.png" },
+      { n: "4", title: "BrandStore", image: "/images/metric/services/svc-4.png" },
+    ],
+  },
+  workflow: {
+    ...metricHomeEn.workflow,
+    title: "So entsteht Metric",
+    subtitle: "Einzigartige Bildwelten — handgezeichnet.",
+    cta: "Lass uns sprechen",
+    note: "Gerne stellen wir weitere Projekte in einem persönlichen Gespräch vor.",
+    cards: [
+      {
+        title: "Launch war noch nie so einfach!",
+        image: "/images/metric/workflow/wf-1.png",
+      },
+      {
+        title: "Ein konsistenter Bestseller und Amazon’s Choice",
+        image: "/images/metric/workflow/wf-2.jpg",
+      },
+      {
+        title: "Starten Sie Ihr erstes Produkt mit Vertrauen",
+        image: "/images/metric/workflow/wf-3.png",
+      },
+    ],
+  },
+  faq: {
+    id: "faq",
+    title: "FAQ",
+    subtitle:
+      "Hier finden Sie die wichtigsten Antworten zu unseren Amazon-Produktbildern, Videos und Leistungen.",
+  },
+  footer: {
+    ...metricHomeEn.footer,
+    links: [
+      { label: "Datenschutz", href: "/privacy/" },
+      { label: "Newsletter", href: "/newsletter/" },
+      { label: "Karriere", href: "/careers/" },
+    ],
+    startCta: "Projekt starten",
+  },
+  nav: [
+    { label: "Leistungen", href: "/#services" },
+    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Projekte", href: "/#projects" },
+    { label: "Ablauf", href: "/#workflow" },
+    { label: "FAQ", href: "/#faq" },
+  ],
+} as const;
+
+export type MetricHomeContent = typeof metricHomeEn;
+
+/** @deprecated Prefer getMetricHome(locale) */
+export const metricHome = metricHomeEn;
+
+export function getMetricHome(locale: Locale): MetricHomeContent {
+  return (locale === "de" ? metricHomeDe : metricHomeEn) as MetricHomeContent;
+}

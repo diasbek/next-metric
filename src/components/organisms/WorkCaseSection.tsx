@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
-import { metricHome } from "@/data/metric-home";
+import { getMetricHome } from "@/data/metric-home";
 import type { Project } from "@/data/projects";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
@@ -20,46 +20,75 @@ export async function WorkCaseSection({
   project,
 }: WorkCaseSectionProps) {
   const { ui } = content;
+  const home = getMetricHome(locale);
   const caseStudy = project.caseStudy;
   const nextProjects = await getNextProjects(locale, project.slug);
-  const heroSrc = caseStudy?.heroImage ?? project.image;
   const gallery =
-    caseStudy?.blocks.find((b) => b.type === "gallery")?.images ?? [];
+    caseStudy?.blocks.find((b) => b.type === "gallery")?.images ??
+    (caseStudy?.heroImage ? [caseStudy.heroImage] : [project.image]);
+
+  const authorName = project.author ?? project.title;
+  const reviews = [
+    {
+      quote: project.quote ?? project.description,
+      author: authorName,
+      role: project.role ?? project.title,
+      avatar: project.image,
+    },
+    ...nextProjects.slice(0, 2).map((item) => ({
+      quote: item.quote ?? item.description,
+      author: item.author ?? item.title,
+      role: item.role ?? item.title,
+      avatar: item.image,
+    })),
+  ];
 
   return (
-    <article className="bg-white pb-20 pt-10">
+    <article className="metric-case">
       <PageContainer>
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div>
-            <p className="text-[18px] tracking-[-0.02em] text-accent">
-              Metric Redesign
-            </p>
-            <h1 className="font-display mt-4 text-[clamp(42px,6vw,90px)] text-foreground">
-              {project.title}
+        <header className="metric-case__intro" data-reveal>
+          <div className="metric-case__intro-copy">
+            <h1 className="font-display text-[clamp(42px,6vw,90px)] leading-[0.9] tracking-[-0.02em] text-foreground">
+              {authorName}
             </h1>
-            <div className="mt-6 flex flex-wrap gap-[5px]">
+            {project.role ? (
+              <p className="mt-4 text-[clamp(18px,2vw,24px)] tracking-[-0.02em] text-[color:var(--muted)]">
+                {project.role}
+              </p>
+            ) : null}
+          </div>
+          <div className="metric-case__intro-meta">
+            <div className="flex flex-wrap gap-[5px]">
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="metric-pill border-foreground text-foreground"
+                  className="metric-pill border-foreground/25 text-foreground"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <p className="mt-8 max-w-xl text-[clamp(18px,2vw,24px)] leading-[1.2] tracking-[-0.02em]">
+            <p className="mt-6 max-w-xl text-[clamp(16px,1.5vw,20px)] leading-[1.25] tracking-[-0.02em] text-foreground">
               {project.description}
             </p>
-            {caseStudy?.task ? (
-              <div className="mt-10">
+          </div>
+        </header>
+
+        {(caseStudy?.task || caseStudy?.solution) && (
+          <div
+            className="mt-10 grid gap-8 md:grid-cols-2"
+            data-reveal-group
+          >
+            {caseStudy.task ? (
+              <div data-reveal>
                 <p className="text-sm uppercase tracking-[0.08em] text-[color:var(--muted)]">
                   {ui.task}
                 </p>
                 <p className="mt-2 text-[20px] leading-[1.3]">{caseStudy.task}</p>
               </div>
             ) : null}
-            {caseStudy?.solution ? (
-              <div className="mt-8">
+            {caseStudy.solution ? (
+              <div data-reveal>
                 <p className="text-sm uppercase tracking-[0.08em] text-[color:var(--muted)]">
                   {ui.solution}
                 </p>
@@ -69,66 +98,77 @@ export async function WorkCaseSection({
               </div>
             ) : null}
           </div>
+        )}
 
-          <div className="relative">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[32px]">
+        <section className="metric-case__stack mt-12 md:mt-16" data-reveal-group>
+          {gallery.map((src, index) => (
+            <div
+              key={src}
+              className="metric-case__stack-item"
+              data-reveal
+              data-reveal-delay={String(Math.min(index * 0.05, 0.2))}
+            >
               <Image
-                src={heroSrc}
-                alt={project.title}
+                src={src}
+                alt=""
                 fill
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
+                sizes="(max-width: 1512px) 100vw, 1392px"
+                priority={index === 0}
               />
+              {index === 0 && caseStudy?.metricValue ? (
+                <div className="metric-glass absolute bottom-6 left-6 px-5 py-4 md:bottom-10 md:left-10">
+                  <p className="text-sm text-foreground/70">
+                    {caseStudy.metricLabel}
+                  </p>
+                  <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
+                    {caseStudy.metricValue}
+                  </p>
+                </div>
+              ) : null}
             </div>
-            {caseStudy?.metricValue ? (
-              <div className="metric-glass absolute bottom-6 left-6 px-5 py-4">
-                <p className="text-sm text-foreground/70">
-                  {caseStudy.metricLabel}
-                </p>
-                <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
-                  {caseStudy.metricValue}
-                </p>
-              </div>
-            ) : null}
-          </div>
-        </div>
+          ))}
+        </section>
 
         {project.quote ? (
-          <section className="mt-20 rounded-[40px] bg-[color:var(--surface)] p-8 md:p-14">
-            <p className="text-[18px] font-medium tracking-[-0.02em] text-accent">
-              Reviews
-            </p>
-            <blockquote className="font-display mt-4 max-w-4xl text-[clamp(28px,4vw,60px)] text-foreground">
-              {project.quote}
-            </blockquote>
-            {project.author ? (
-              <p className="mt-8 text-[28px] font-medium tracking-[-0.02em]">
-                {project.author}
-              </p>
-            ) : null}
-            {project.role ? (
-              <p className="mt-2 text-[20px] text-[color:var(--muted)]">
-                {project.role}
-              </p>
-            ) : null}
+          <section className="mt-16 md:mt-20" data-reveal>
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
+                Reviews
+              </h2>
+            </div>
+            <div className="metric-case__reviews">
+              {reviews.map((review) => (
+                <article key={review.author + review.quote.slice(0, 24)} className="metric-case__review">
+                  <p className="text-[clamp(16px,1.4vw,20px)] leading-[1.3] tracking-[-0.02em]">
+                    {review.quote}
+                  </p>
+                  <div className="mt-8 flex items-center gap-3">
+                    <div className="relative size-12 overflow-hidden rounded-full bg-[color:var(--surface)]">
+                      <Image
+                        src={review.avatar}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="48px"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-[18px] font-medium tracking-[-0.02em]">
+                        {review.author}
+                      </p>
+                      <p className="text-[14px] text-[color:var(--muted)]">
+                        {review.role}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
         ) : null}
 
-        {gallery.length > 1 ? (
-          <section className="mt-12 grid gap-4 md:grid-cols-2">
-            {gallery.slice(1).map((src) => (
-              <div
-                key={src}
-                className="relative aspect-[4/3] overflow-hidden rounded-[28px]"
-              >
-                <Image src={src} alt="" fill className="object-cover" sizes="50vw" />
-              </div>
-            ))}
-          </section>
-        ) : null}
-
-        <section className="mt-20">
+        <section className="mt-16 md:mt-20" data-reveal>
           <div className="mb-8 flex items-end justify-between gap-4">
             <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
               {ui.otherWorks}
@@ -137,34 +177,46 @@ export async function WorkCaseSection({
               href={localePath(locale, "/works/")}
               className="text-[18px] font-medium tracking-[-0.02em]"
             >
-              {metricHome.caseStudies.moreLabel}
+              {home.caseStudies.moreLabel}
             </TransitionLink>
           </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {nextProjects.map((item) => (
-              <TransitionLink
-                key={item.slug}
-                href={localePath(locale, `/works/${item.slug}/`)}
-                className="group overflow-hidden rounded-[28px] bg-[color:var(--surface)]"
-              >
-                <div className="relative aspect-[4/3]">
+          <div className="grid gap-6 md:grid-cols-2">
+            {nextProjects.slice(0, 2).map((item) => (
+              <article key={item.slug} className="metric-work-card">
+                <div className="metric-work-card__media overflow-hidden rounded-[28px]">
                   <Image
                     src={item.image}
                     alt={item.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    sizes="33vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
+                  <span className="absolute left-4 top-4 rounded-full border border-white/40 bg-black/30 px-3 py-1 text-sm text-white backdrop-blur-sm">
+                    {item.tags[0]}
+                  </span>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 pt-16 text-white">
+                    <p className="text-[12px] uppercase tracking-[0.12em] opacity-80">
+                      Amazon listing design
+                    </p>
+                    <p className="mt-1 text-[22px] font-medium tracking-[-0.02em]">
+                      {item.title}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-[22px] font-medium tracking-[-0.02em]">
-                    {item.title}
+                <div className="p-2 pt-5">
+                  <h3 className="max-w-md text-[clamp(22px,2.2vw,32px)] font-medium leading-[1.15] tracking-[-0.02em]">
+                    {item.quote ?? item.description}
                   </h3>
-                  <p className="mt-2 text-[16px] text-[color:var(--muted)]">
-                    {item.description}
-                  </p>
+                  <TransitionLink
+                    href={localePath(locale, `/works/${item.slug}/`)}
+                    className="metric-cta metric-cta--dark metric-cta--skew mt-6"
+                  >
+                    <span className="metric-cta__label">
+                      {home.caseStudies.viewLabel}
+                    </span>
+                  </TransitionLink>
                 </div>
-              </TransitionLink>
+              </article>
             ))}
           </div>
         </section>

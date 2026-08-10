@@ -4,7 +4,7 @@ import { PageContainer } from "@/components/atoms/PageContainer";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
-import { metricHome } from "@/data/metric-home";
+import { getMetricHome } from "@/data/metric-home";
 import { ContactForm } from "@/components/molecules/ContactForm";
 
 interface SiteFooterProps {
@@ -14,6 +14,8 @@ interface SiteFooterProps {
 
 export function SiteFooter({ locale, content }: SiteFooterProps) {
   const { site, ui } = content;
+  const footer = getMetricHome(locale).footer;
+  const privacy = footer.links[0];
   const socialMap = {
     instagram: site.social.instagram,
     linkedin: site.social.linkedin ?? "#",
@@ -39,7 +41,7 @@ export function SiteFooter({ locale, content }: SiteFooterProps) {
               />
             </TransitionLink>
             <div className="flex flex-wrap gap-x-4 gap-y-2 text-[18px]">
-              {metricHome.footer.cities.map((city) => (
+              {footer.cities.map((city) => (
                 <span key={city} className="text-foreground">
                   {city}
                 </span>
@@ -48,15 +50,18 @@ export function SiteFooter({ locale, content }: SiteFooterProps) {
           </div>
 
           <div className="site-footer__links">
-            {metricHome.footer.links.map((link) => (
-              <a key={link.label} href={link.href}>
+            {footer.links.map((link) => (
+              <TransitionLink
+                key={link.label}
+                href={localePath(locale, link.href)}
+              >
                 {link.label}
-              </a>
+              </TransitionLink>
             ))}
           </div>
 
           <div className="site-footer__links">
-            {metricHome.footer.social.map((item) => (
+            {footer.social.map((item) => (
               <a
                 key={item.label}
                 href={socialMap[item.key]}
@@ -71,7 +76,10 @@ export function SiteFooter({ locale, content }: SiteFooterProps) {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-[color:var(--muted)]">{ui.phoneLabel}</p>
-              <a href={`tel:${site.phone.replace(/\s+/g, "")}`} className="text-[22px] font-medium tracking-tight">
+              <a
+                href={`tel:${site.phone.replace(/\s+/g, "")}`}
+                className="text-[22px] font-medium tracking-tight"
+              >
                 {site.phone}
               </a>
             </div>
@@ -85,7 +93,7 @@ export function SiteFooter({ locale, content }: SiteFooterProps) {
         <div className="mt-14 rounded-[32px] bg-[color:var(--surface)] p-6 md:p-10">
           <div className="mb-6 max-w-xl">
             <h2 className="font-display text-[clamp(28px,4vw,48px)] text-foreground">
-              {metricHome.footer.startCta}
+              {footer.startCta}
             </h2>
             <p className="mt-3 text-[18px] text-[color:var(--muted)]">
               {ui.contactSubtitle}
@@ -96,7 +104,13 @@ export function SiteFooter({ locale, content }: SiteFooterProps) {
 
         <div className="site-footer__bottom">
           <p>© 2026 {site.name}</p>
-          <a href="#">{metricHome.footer.links[0]?.label}</a>
+          {privacy ? (
+            <TransitionLink
+              href={localePath(locale, privacy.href)}
+            >
+              {privacy.label}
+            </TransitionLink>
+          ) : null}
         </div>
       </PageContainer>
     </footer>

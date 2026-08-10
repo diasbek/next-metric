@@ -114,6 +114,43 @@ export const deContent: SiteContent = {
     servicesLines: ["Produktbilder", "A+ Content", "Brand Store"],
     tagline: "Amazon-Design, das konvertiert",
   },
+  faq: [
+    {
+      question: "Was kostet ein Amazon-Designprojekt?",
+      answer:
+        "Der Preis hängt von Umfang und Komplexität ab. Nach einem kurzen Briefing erhalten Sie ein klares Angebot für Listing-Bilder, A+ Content, Brand Store oder ein Gesamtpaket.",
+    },
+    {
+      question: "Wie lange dauert ein Projekt?",
+      answer:
+        "Die meisten Projekte dauern 7 bis 14 Werktage — abhängig von Lieferumfang, Komplexität und Feedback-Tempo. Größere Projekte mit 3D, Premium A+ oder Brand Store können länger brauchen.",
+    },
+    {
+      question: "Können Sie ohne professionelle Produktfotos arbeiten?",
+      answer:
+        "Ja. Wir arbeiten mit vorhandenen Packshots, Referenzen oder einem Shoot-Briefing. Viele Projekte starten mit begrenzten Assets und liefern trotzdem ein starkes Listing-Set.",
+    },
+    {
+      question: "Welche Leistungen bieten Sie an?",
+      answer:
+        "Produktbilder, A+ Content, Ad-Banner und Brand Store Design — als ein konsistentes visuelles System für Amazon.",
+    },
+    {
+      question: "Wie läuft der Designprozess ab?",
+      answer:
+        "Briefing → Konzept → Produktion → Revisionen → finale Übergabe. Sie erhalten klare Meilensteine, strukturiertes Feedback und dateien, die für Seller Central bereit sind.",
+    },
+  ],
+  site: {
+    ...metricSiteContent.site,
+    nav: [
+      { label: "Leistungen", path: "/#services" },
+      { label: "Case Studies", path: "/#case-studies" },
+      { label: "Projekte", path: "/#projects" },
+      { label: "Ablauf", path: "/#workflow" },
+      { label: "FAQ", path: "/#faq" },
+    ],
+  },
   sections: {
     servicesHome: [
       { title: "Produktbilder", cta: "Mehr erfahren" },

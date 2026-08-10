@@ -78,7 +78,7 @@ export const projects: Project[] = [
       task: "Rebuild the Amazon listing visuals to communicate value and lift conversion.",
       solution:
         "Delivered a full Metric redesign: main images, lifestyle frames, Premium A+ modules, and consistent brand storytelling.",
-      heroImage: "/images/metric/cases/case-1.jpg",
+      heroImage: "/images/metric/case-detail/imgRectangle58.jpg",
       metricLabel: "Click-through rate:",
       metricValue: "+132% CTR",
       blocks: [
@@ -86,10 +86,18 @@ export const projects: Project[] = [
           id: "gal",
           type: "gallery",
           images: [
-            "/images/metric/cases/case-1.jpg",
-            "/images/metric/categories/cat-1.jpg",
-            "/images/metric/categories/cat-2.jpg",
+            "/images/metric/case-detail/imgRectangle58.jpg",
+            "/images/metric/case-detail/imgRectangle59.jpg",
+            "/images/metric/case-detail/imgRectangle68.jpg",
+            "/images/metric/case-detail/imgRectangle69.jpg",
+            "/images/metric/case-detail/imgRectangle70.jpg",
           ],
+        },
+        {
+          id: "ba",
+          type: "before_after",
+          beforeImage: "/images/metric/case-detail/imgRectangle71.jpg",
+          afterImage: "/images/metric/case-detail/imgRectangle72.jpg",
         },
       ],
     },

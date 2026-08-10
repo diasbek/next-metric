@@ -9,7 +9,7 @@ import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
 import { localePath } from "@/i18n/paths";
-import { metricHome } from "@/data/metric-home";
+import { getMetricHome } from "@/data/metric-home";
 
 interface HeaderProps {
   locale: Locale;
@@ -18,10 +18,16 @@ interface HeaderProps {
   variant?: "hero" | "compact";
 }
 
-export function Header({ locale, site, ui }: HeaderProps) {
+export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const homePath = localePath(locale, "/");
   const contactPath = localePath(locale, "/#contact");
+  const isHero = variant === "hero";
+  const home = getMetricHome(locale);
+  const navItems = home.nav.map((item) => ({
+    label: item.label,
+    path: item.href,
+  }));
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -34,7 +40,11 @@ export function Header({ locale, site, ui }: HeaderProps) {
     <>
       <header
         data-site-header
-        className="site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md"
+        className={
+          isHero
+            ? "site-header site-header--hero sticky top-0 z-50"
+            : "site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md"
+        }
       >
         <PageContainer className="site-header__inner">
           <TransitionLink
@@ -53,7 +63,7 @@ export function Header({ locale, site, ui }: HeaderProps) {
 
           <SiteNav
             locale={locale}
-            items={site.nav}
+            items={navItems}
             variant="header"
             ariaLabel={ui.navAria}
             className="site-header__nav"
@@ -70,7 +80,7 @@ export function Header({ locale, site, ui }: HeaderProps) {
               href={contactPath}
               className="metric-cta metric-cta--outline hidden sm:inline-flex"
             >
-              {metricHome.footer.startCta}
+              {home.footer.startCta}
             </TransitionLink>
             <button
               type="button"
@@ -103,7 +113,7 @@ export function Header({ locale, site, ui }: HeaderProps) {
           </div>
           <SiteNav
             locale={locale}
-            items={site.nav}
+            items={navItems}
             variant="mobile"
             ariaLabel={ui.navAria}
             onNavigate={() => setOpen(false)}
@@ -113,7 +123,7 @@ export function Header({ locale, site, ui }: HeaderProps) {
             className="metric-cta metric-cta--solid w-full"
             onClick={() => setOpen(false)}
           >
-            {metricHome.footer.startCta}
+            {home.footer.startCta}
           </TransitionLink>
           <LanguageSwitcher
             locale={locale}

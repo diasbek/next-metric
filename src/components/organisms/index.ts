@@ -13,7 +13,6 @@ export { ContactSection } from "./ContactSection";
 export { SiteFooter } from "./SiteFooter";
 export {
   MetricHeroSection,
-  MetricTrustSection,
   MetricCategoriesSection,
   MetricCaseStudiesSection,
   MetricServicesSection,
