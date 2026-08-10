@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
@@ -18,8 +18,11 @@ interface HeaderProps {
   variant?: "hero" | "compact";
 }
 
+const HERO_SCROLL_SOLIDIFY_PX = 24;
+
 export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const homePath = localePath(locale, "/");
   const contactPath = localePath(locale, "/#contact");
   const isHero = variant === "hero";
@@ -36,10 +39,34 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
     };
   }, [open]);
 
+  // Hero starts transparent over the white hero; solidify on scroll so
+  // dark nav doesn't disappear into pink/accent sections underneath.
+  useEffect(() => {
+    if (!isHero) return;
+    const header = headerRef.current;
+    if (!header) return;
+
+    const syncScrolled = () => {
+      header.classList.toggle(
+        "is-scrolled",
+        window.scrollY > HERO_SCROLL_SOLIDIFY_PX,
+      );
+    };
+
+    syncScrolled();
+    window.addEventListener("scroll", syncScrolled, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", syncScrolled);
+      header.classList.remove("is-scrolled");
+    };
+  }, [isHero]);
+
   return (
     <>
       <header
+        ref={headerRef}
         data-site-header
+        data-header-variant={variant}
         className={
           isHero
             ? "site-header site-header--hero sticky top-0 z-50"

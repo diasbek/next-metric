@@ -46,6 +46,8 @@ export function initHeaderAnimations(): () => void {
       });
   });
 
+  // Hero scroll solidify is owned by Header.tsx (all viewports). GSAP only
+  // handles compact headers so we don't fight the React scroll listener.
   const revertDesktop = runMatchMedia(`${MOTION_OK} and ${DESKTOP_MQ}`, () => {
     if (header.dataset.headerVariant === "hero") {
       return () => {};
