@@ -7,6 +7,7 @@ import {
   scheduleScrollTriggerRefresh,
   showAllRevealTargets,
 } from "./gsap";
+import { initBlobAnimations } from "./blobs";
 import { initGlobalReveals } from "./reveals";
 import { initBeforeAfterSliders } from "./before-after";
 
@@ -85,6 +86,7 @@ export function initAnimations(_pathname: string): Cleanup {
 
   const ctx = gsap.context(() => {
     cleanups.push(initHeroEntrance());
+    cleanups.push(initBlobAnimations());
     cleanups.push(initGlobalReveals());
     cleanups.push(initCtaHovers());
     cleanups.push(initBeforeAfterSliders());

@@ -244,31 +244,75 @@ body {
   background: #fff;
 }
 
-.metric-hero__glow {
+/* Ambient pink blobs — same GSAP drift as next-timsol services. */
+.metric-hero__blobs {
   pointer-events: none;
   position: absolute;
   z-index: 0;
   inset: 0;
-  background:
-    radial-gradient(
-      55% 48% at 88% 12%,
-      rgba(255, 60, 130, 0.28) 0%,
-      rgba(255, 60, 130, 0) 70%
-    ),
-    radial-gradient(
-      70% 55% at 78% 92%,
-      rgba(255, 60, 130, 0.55) 0%,
-      rgba(255, 120, 160, 0.18) 38%,
-      rgba(255, 255, 255, 0) 72%
-    );
+  overflow: hidden;
 }
 
-.metric-hero__glow-img {
-  object-fit: cover;
-  object-position: 78% 35%;
-  transform: scaleY(-1) rotate(180deg);
-  opacity: 0.45;
-  mix-blend-mode: multiply;
+.metric-hero-blob {
+  position: absolute;
+  width: min(110vw, 900px);
+  height: min(110vw, 900px);
+  border-radius: 50%;
+  background: var(--accent);
+  will-change: transform;
+  pointer-events: none;
+  user-select: none;
+  transform: translateZ(0);
+  contain: layout paint;
+  opacity: 0.55;
+}
+
+@media (min-width: 1024px) {
+  .metric-hero-blob {
+    width: 900px;
+    height: 900px;
+  }
+}
+
+.metric-hero-blob--a {
+  left: 55%;
+  top: -35%;
+  filter: blur(90px);
+  opacity: 0.35;
+}
+
+.metric-hero-blob--b {
+  left: 48%;
+  top: 45%;
+  filter: blur(70px);
+  opacity: 0.55;
+}
+
+.metric-hero-blob--c {
+  left: 70%;
+  top: 15%;
+  filter: blur(110px);
+  opacity: 0.28;
+}
+
+@media (min-width: 1024px) {
+  .metric-hero-blob--a {
+    left: 58%;
+    top: -42%;
+    filter: blur(140px);
+  }
+
+  .metric-hero-blob--b {
+    left: 52%;
+    top: 38%;
+    filter: blur(100px);
+  }
+
+  .metric-hero-blob--c {
+    left: 72%;
+    top: 8%;
+    filter: blur(160px);
+  }
 }
 
 .metric-hero__shell {

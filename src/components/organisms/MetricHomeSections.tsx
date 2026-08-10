@@ -83,20 +83,25 @@ function MetricTrustCards({ locale }: { locale: Locale }) {
   );
 }
 
+const HERO_BLOBS = [
+  "metric-hero-blob metric-hero-blob--a",
+  "metric-hero-blob metric-hero-blob--b",
+  "metric-hero-blob metric-hero-blob--c",
+] as const;
+
 export function MetricHeroSection({ locale }: { locale: Locale }) {
   const { hero } = getMetricHome(locale);
 
   return (
-    <section className="metric-hero" aria-label="Hero">
-      <div className="metric-hero__glow" aria-hidden>
-        <Image
-          src={hero.glow}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="metric-hero__glow-img"
-        />
+    <section
+      className="metric-hero"
+      aria-label="Hero"
+      data-blobs-section
+    >
+      <div className="metric-hero__blobs" aria-hidden>
+        {HERO_BLOBS.map((className) => (
+          <div key={className} data-blob className={className} />
+        ))}
       </div>
 
       <PageContainer className="metric-hero__shell">

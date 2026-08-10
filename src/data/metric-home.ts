@@ -15,7 +15,6 @@ const metricHomeEn = {
     redesignCaption: "Click-through rate:",
     product1: "/images/metric/hero/product-1.jpg",
     product2: "/images/metric/hero/product-2.jpg",
-    glow: "/images/metric/hero/glow.png",
   },
   trust: [
     {
