@@ -21,8 +21,8 @@ export default async function AdminContactsPage({
   const supabase = createSupabaseAdminClient();
 
   const [{ data: settings }, { data: translations }] = await Promise.all([
-    supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
-    supabase.from("site_settings_translations").select("*"),
+    supabase.from("metric_site_settings").select("*").eq("id", 1).maybeSingle(),
+    supabase.from("metric_site_settings_translations").select("*"),
   ]);
 
   const byLocale = Object.fromEntries(

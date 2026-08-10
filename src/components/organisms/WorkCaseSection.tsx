@@ -2,13 +2,13 @@ import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
-import { getMetricHome } from "@/data/metric-home";
 import type { Project } from "@/data/projects";
 import { youtubeEmbedUrl } from "@/data/projects";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
+import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
 interface WorkCaseSectionProps {
   locale: Locale;
@@ -25,7 +25,7 @@ export async function WorkCaseSection({
   presentation = "page",
 }: WorkCaseSectionProps) {
   const { ui } = content;
-  const home = getMetricHome(locale);
+  const home = await getMetricHomeResolved(locale);
   const caseStudy = project.caseStudy;
   const nextProjects = await getNextProjects(locale, project.slug);
   const blocks = caseStudy?.blocks ?? [];

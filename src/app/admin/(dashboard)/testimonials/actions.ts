@@ -38,7 +38,7 @@ export async function saveTestimonialAction(formData: FormData) {
   }
 
   await supabase
-    .from("testimonials")
+    .from("metric_testimonials")
     .update({
       sort_order: Number(formData.get("sort_order") ?? 0),
       person_image: personImage,
@@ -51,7 +51,7 @@ export async function saveTestimonialAction(formData: FormData) {
     .eq("id", id);
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("testimonial_translations").upsert({
+    await supabase.from("metric_testimonial_translations").upsert({
       testimonial_id: id,
       locale,
       role: String(formData.get(`${locale}_role`) ?? ""),
@@ -67,13 +67,13 @@ export async function createTestimonialAction() {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("testimonials")
+    .from("metric_testimonials")
     .insert({ sort_order: 99, status: "draft" })
     .select("id")
     .single();
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
-  await supabase.from("testimonial_translations").insert(
+  await supabase.from("metric_testimonial_translations").insert(
     (["en", "de"] as const).map((locale) => ({
       testimonial_id: data.id,
       locale,
@@ -89,7 +89,7 @@ export async function createTestimonialAction() {
 export async function deleteTestimonialAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
-  await supabase.from("testimonials").delete().eq("id", String(formData.get("id")));
+  await supabase.from("metric_testimonials").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "testimonials"]);
   return adminRedirect("/admin/agency/?section=testimonials");
 }

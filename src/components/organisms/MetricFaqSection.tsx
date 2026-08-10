@@ -1,42 +1,79 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { getMetricHome } from "@/data/metric-home";
+import type { MetricHomeContent } from "@/data/metric-home";
 import type { FAQItem } from "@/data/faq";
 import type { Locale } from "@/i18n/config";
 
 export function MetricFaqSection({
-  locale,
   items,
+  faq,
 }: {
-  locale: Locale;
+  locale?: Locale;
   items: FAQItem[];
+  faq: MetricHomeContent["faq"];
 }) {
   const [open, setOpen] = useState(0);
-  const { faq } = getMetricHome(locale);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const measure = () => {
+      const faqItems = Array.from(
+        list.querySelectorAll<HTMLElement>(".faq-item"),
+      );
+      const gap =
+        Number.parseFloat(
+          getComputedStyle(list).rowGap || getComputedStyle(list).gap,
+        ) || 20;
+
+      let triggersH = 0;
+      let maxPanelH = 0;
+
+      faqItems.forEach((item) => {
+        const trigger = item.querySelector<HTMLElement>(".faq-item__trigger");
+        const panel = item.querySelector<HTMLElement>(".faq-item__panel");
+        if (trigger) triggersH += trigger.getBoundingClientRect().height;
+        if (panel) maxPanelH = Math.max(maxPanelH, panel.scrollHeight);
+      });
+
+      const gaps = Math.max(0, faqItems.length - 1) * gap;
+      // Spare room so switching answers of different lengths does not jump.
+      const buffer = 48;
+      list.style.minHeight = `${Math.ceil(triggersH + maxPanelH + gaps + buffer)}px`;
+    };
+
+    measure();
+    void document.fonts?.ready?.then(measure);
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      list.style.removeProperty("min-height");
+    };
+  }, [items]);
 
   return (
     <section id={faq.id} className="metric-gradient-pink metric-section metric-faq">
       <PageContainer>
-        <div
-          className="metric-faq__grid"
-          data-reveal-group
-        >
+        <div className="metric-faq__grid" data-reveal-group>
           <div data-reveal>
             <h2 className="metric-faq__title font-display text-white">
               {faq.title}
             </h2>
-            <p className="metric-faq__subtitle">
-              {faq.subtitle}
-            </p>
+            <p className="metric-faq__subtitle">{faq.subtitle}</p>
           </div>
-          <div className="metric-faq__list" data-reveal>
+          <div ref={listRef} className="metric-faq__list" data-reveal>
             {items.map((item, index) => {
               const isOpen = open === index;
               return (
-                <div key={item.question} className="faq-item">
+                <div
+                  key={item.question}
+                  className={`faq-item${isOpen ? " is-open" : ""}`}
+                >
                   <button
                     type="button"
                     className="faq-item__trigger"
@@ -57,9 +94,11 @@ export function MetricFaqSection({
                       </span>
                     )}
                   </button>
-                  {isOpen ? (
-                    <div className="faq-item__panel">{item.answer}</div>
-                  ) : null}
+                  <div className="faq-item__collapse" aria-hidden={!isOpen}>
+                    <div className="faq-item__collapse-inner">
+                      <div className="faq-item__panel">{item.answer}</div>
+                    </div>
+                  </div>
                 </div>
               );
             })}

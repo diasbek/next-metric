@@ -88,14 +88,14 @@ export default async function AdminHomePageEditor({
 
   if (section === "process") {
     const { data: processRows } = await supabase
-      .from("process_steps")
+      .from("metric_process_steps")
       .select("*, process_step_translations(*)")
       .order("sort_order");
     process = (processRows ?? []).map(toProcessDraft);
   } else {
     const [benefitRes, homeRes] = await Promise.all([
-      supabase.from("benefits").select("*, benefit_translations(*)").order("sort_order"),
-      supabase.from("home_translations").select("*"),
+      supabase.from("metric_benefits").select("*, benefit_translations(*)").order("sort_order"),
+      supabase.from("metric_home_translations").select("*"),
     ]);
     benefits = (benefitRes.data ?? []).map(toBenefitDraft);
     const homeRows = homeRes.error ? null : homeRes.data;

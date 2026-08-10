@@ -9,22 +9,26 @@ import {
   MetricWorkflowSection,
 } from "@/components/organisms/MetricHomeSections";
 import { MetricFaqSection } from "@/components/organisms/MetricFaqSection";
+import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
 interface HomePageViewProps {
   locale: Locale;
 }
 
 export async function HomePageView({ locale }: HomePageViewProps) {
-  const page = await getLocalePageProps(locale);
+  const [page, home] = await Promise.all([
+    getLocalePageProps(locale),
+    getMetricHomeResolved(locale),
+  ]);
 
   return (
     <SiteLayout locale={locale} headerVariant="hero">
-      <MetricHeroSection locale={locale} />
-      <MetricCategoriesSection locale={locale} />
-      <MetricCaseStudiesSection locale={locale} />
-      <MetricServicesSection locale={locale} />
-      <MetricWorkflowSection locale={locale} />
-      <MetricFaqSection locale={locale} items={page.content.faq} />
+      <MetricHeroSection locale={locale} home={home} />
+      <MetricCategoriesSection locale={locale} home={home} />
+      <MetricCaseStudiesSection locale={locale} home={home} />
+      <MetricServicesSection locale={locale} home={home} />
+      <MetricWorkflowSection locale={locale} home={home} />
+      <MetricFaqSection locale={locale} items={page.content.faq} faq={home.faq} />
     </SiteLayout>
   );
 }

@@ -44,7 +44,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
   for (const [slug, variants] of bySlug) {
     const base = variants.en ?? Object.values(variants)[0]!;
     const { data: project, error } = await supabase
-      .from("projects")
+      .from("metric_projects")
       .upsert(
         {
           slug,
@@ -66,7 +66,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
 
     for (const locale of Object.keys(variants) as Locale[]) {
       const p = variants[locale]!;
-      const { error: trError } = await supabase.from("project_translations").upsert(
+      const { error: trError } = await supabase.from("metric_project_translations").upsert(
         {
           project_id: project.id,
           locale,
@@ -82,7 +82,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
       if (trError) throw new Error(`project tr ${slug}/${locale}: ${trError.message}`);
     }
 
-    await supabase.from("project_media").delete().eq("project_id", project.id);
+    await supabase.from("metric_project_media").delete().eq("project_id", project.id);
 
     const media: Array<{
       project_id: string;
@@ -118,7 +118,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
       let sort = 0;
       for (const block of cs.blocks) {
         const { data: blockRow, error: blockError } = await supabase
-          .from("project_blocks")
+          .from("metric_project_blocks")
           .insert({
             project_id: project.id,
             type: block.type,
@@ -168,7 +168,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
     }
 
     if (media.length) {
-      const { error: mediaError } = await supabase.from("project_media").insert(media);
+      const { error: mediaError } = await supabase.from("metric_project_media").insert(media);
       if (mediaError) throw new Error(`project media ${slug}: ${mediaError.message}`);
     }
   }
@@ -181,7 +181,7 @@ async function seedServices(supabase: ReturnType<typeof admin>) {
   let order = 0;
   for (const key of keys) {
     const { data: service, error } = await supabase
-      .from("services")
+      .from("metric_services")
       .upsert(
         { service_key: key, sort_order: order++, status: "published" },
         { onConflict: "service_key" },
@@ -193,7 +193,7 @@ async function seedServices(supabase: ReturnType<typeof admin>) {
     for (const locale of Object.keys(locales) as Locale[]) {
       const s = locales[locale].services.find((item) => item.id === key);
       if (!s) continue;
-      const { error: trError } = await supabase.from("service_translations").upsert(
+      const { error: trError } = await supabase.from("metric_service_translations").upsert(
         {
           service_id: service.id,
           locale,
@@ -212,12 +212,12 @@ async function seedServices(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedFaq(supabase: ReturnType<typeof admin>) {
-  await supabase.from("faq_translations").delete().neq("locale", "");
-  await supabase.from("faq_items").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  await supabase.from("metric_faq_translations").delete().neq("locale", "");
+  await supabase.from("metric_faq_items").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
   for (let i = 0; i < locales.en.faq.length; i++) {
     const { data: item, error } = await supabase
-      .from("faq_items")
+      .from("metric_faq_items")
       .insert({ sort_order: i, status: "published" })
       .select("id")
       .single();
@@ -226,7 +226,7 @@ async function seedFaq(supabase: ReturnType<typeof admin>) {
     for (const locale of Object.keys(locales) as Locale[]) {
       const faq = locales[locale].faq[i];
       if (!faq) continue;
-      const { error: trError } = await supabase.from("faq_translations").insert({
+      const { error: trError } = await supabase.from("metric_faq_translations").insert({
         faq_id: item.id,
         locale,
         question: faq.question,
@@ -239,16 +239,16 @@ async function seedFaq(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedProcess(supabase: ReturnType<typeof admin>) {
-  await supabase.from("process_step_translations").delete().neq("locale", "");
+  await supabase.from("metric_process_step_translations").delete().neq("locale", "");
   await supabase
-    .from("process_steps")
+    .from("metric_process_steps")
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
   for (let i = 0; i < locales.en.processSteps.length; i++) {
     const ru = locales.en.processSteps[i];
     const { data: step, error } = await supabase
-      .from("process_steps")
+      .from("metric_process_steps")
       .insert({ step_number: ru.number, sort_order: i, status: "published" })
       .select("id")
       .single();
@@ -257,7 +257,7 @@ async function seedProcess(supabase: ReturnType<typeof admin>) {
     for (const locale of Object.keys(locales) as Locale[]) {
       const item = locales[locale].processSteps[i];
       if (!item) continue;
-      const { error: trError } = await supabase.from("process_step_translations").insert({
+      const { error: trError } = await supabase.from("metric_process_step_translations").insert({
         step_id: step.id,
         locale,
         title: item.title,
@@ -270,15 +270,15 @@ async function seedProcess(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedBenefits(supabase: ReturnType<typeof admin>) {
-  await supabase.from("benefit_translations").delete().neq("locale", "");
+  await supabase.from("metric_benefit_translations").delete().neq("locale", "");
   await supabase
-    .from("benefits")
+    .from("metric_benefits")
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
   for (let i = 0; i < locales.en.benefits.length; i++) {
     const { data: benefit, error } = await supabase
-      .from("benefits")
+      .from("metric_benefits")
       .insert({ sort_order: i, status: "published" })
       .select("id")
       .single();
@@ -287,7 +287,7 @@ async function seedBenefits(supabase: ReturnType<typeof admin>) {
     for (const locale of Object.keys(locales) as Locale[]) {
       const label = locales[locale].benefits[i];
       if (!label) continue;
-      const { error: trError } = await supabase.from("benefit_translations").insert({
+      const { error: trError } = await supabase.from("metric_benefit_translations").insert({
         benefit_id: benefit.id,
         locale,
         label,
@@ -299,15 +299,15 @@ async function seedBenefits(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedTeam(supabase: ReturnType<typeof admin>) {
-  await supabase.from("team_member_translations").delete().neq("locale", "");
+  await supabase.from("metric_team_member_translations").delete().neq("locale", "");
   await supabase
-    .from("team_members")
+    .from("metric_team_members")
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
   const director = locales.en.agency.director;
   const { data: dir, error: dirError } = await supabase
-    .from("team_members")
+    .from("metric_team_members")
     .insert({
       sort_order: 0,
       image: director.image,
@@ -320,7 +320,7 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
 
   for (const locale of Object.keys(locales) as Locale[]) {
     const person = locales[locale].agency.director;
-    await supabase.from("team_member_translations").insert({
+    await supabase.from("metric_team_member_translations").insert({
       member_id: dir.id,
       locale,
       name: person.name,
@@ -331,7 +331,7 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
   for (let i = 0; i < locales.en.agency.team.length; i++) {
     const ru = locales.en.agency.team[i];
     const { data: member, error } = await supabase
-      .from("team_members")
+      .from("metric_team_members")
       .insert({
         sort_order: i + 1,
         image: ru.image,
@@ -345,7 +345,7 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
     for (const locale of Object.keys(locales) as Locale[]) {
       const person = locales[locale].agency.team[i];
       if (!person) continue;
-      await supabase.from("team_member_translations").insert({
+      await supabase.from("metric_team_member_translations").insert({
         member_id: member.id,
         locale,
         name: person.name,
@@ -357,16 +357,16 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedTestimonials(supabase: ReturnType<typeof admin>) {
-  await supabase.from("testimonial_translations").delete().neq("locale", "");
+  await supabase.from("metric_testimonial_translations").delete().neq("locale", "");
   await supabase
-    .from("testimonials")
+    .from("metric_testimonials")
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
   for (let i = 0; i < locales.en.agency.testimonials.length; i++) {
     const ru = locales.en.agency.testimonials[i];
     const { data: item, error } = await supabase
-      .from("testimonials")
+      .from("metric_testimonials")
       .insert({
         sort_order: i,
         person_image: ru.personImage,
@@ -382,7 +382,7 @@ async function seedTestimonials(supabase: ReturnType<typeof admin>) {
     for (const locale of Object.keys(locales) as Locale[]) {
       const t = locales[locale].agency.testimonials[i];
       if (!t) continue;
-      await supabase.from("testimonial_translations").insert({
+      await supabase.from("metric_testimonial_translations").insert({
         testimonial_id: item.id,
         locale,
         role: t.role,
@@ -394,7 +394,7 @@ async function seedTestimonials(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedAgency(supabase: ReturnType<typeof admin>) {
-  const { error } = await supabase.from("agency_content").upsert({
+  const { error } = await supabase.from("metric_agency_content").upsert({
     id: 1,
     founded_year: locales.en.agency.foundedYear,
   });
@@ -403,7 +403,7 @@ async function seedAgency(supabase: ReturnType<typeof admin>) {
   for (const locale of Object.keys(locales) as Locale[]) {
     const agency = locales[locale].agency;
     const lines = agency.about.titleLines ?? [agency.about.title];
-    const { error: trError } = await supabase.from("agency_translations").upsert({
+    const { error: trError } = await supabase.from("metric_agency_translations").upsert({
       locale,
       title: agency.about.title,
       title_line_1: lines[0] ?? "",
@@ -419,7 +419,7 @@ async function seedAgency(supabase: ReturnType<typeof admin>) {
 async function seedHomeWhyUs(supabase: ReturnType<typeof admin>) {
   for (const locale of Object.keys(locales) as Locale[]) {
     const lines = locales[locale].sections.whyUsTitleLines;
-    const { error } = await supabase.from("home_translations").upsert({
+    const { error } = await supabase.from("metric_home_translations").upsert({
       locale,
       why_us_title_line_1: lines[0] ?? "",
       why_us_title_line_2: lines[1] ?? "",
@@ -432,7 +432,7 @@ async function seedHomeWhyUs(supabase: ReturnType<typeof admin>) {
 
 async function seedSettingsAndSeo(supabase: ReturnType<typeof admin>) {
   const site = locales.en.site;
-  const { error } = await supabase.from("site_settings").upsert({
+  const { error } = await supabase.from("metric_site_settings").upsert({
     id: 1,
     phone: site.phone,
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@metric.agency",
@@ -447,7 +447,7 @@ async function seedSettingsAndSeo(supabase: ReturnType<typeof admin>) {
   for (const locale of Object.keys(locales) as Locale[]) {
     const localSite = locales[locale].site;
     const { error: trError } = await supabase
-      .from("site_settings_translations")
+      .from("metric_site_settings_translations")
       .upsert({
         locale,
         address_lines: localSite.address,
@@ -463,7 +463,7 @@ async function seedSettingsAndSeo(supabase: ReturnType<typeof admin>) {
     const meta = locales[locale].pageMeta;
     for (const [page_key, value] of Object.entries(meta)) {
       if (page_key === "notFound") continue;
-      const { error: seoError } = await supabase.from("page_seo").upsert({
+      const { error: seoError } = await supabase.from("metric_page_seo").upsert({
         locale,
         page_key,
         title: value.title,

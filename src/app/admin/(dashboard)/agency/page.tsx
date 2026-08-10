@@ -135,8 +135,8 @@ export default async function AdminAgencyPage({
 
   if (section === "about") {
     const [{ data: content }, { data: translations }] = await Promise.all([
-      supabase.from("agency_content").select("*").eq("id", 1).maybeSingle(),
-      supabase.from("agency_translations").select("*"),
+      supabase.from("metric_agency_content").select("*").eq("id", 1).maybeSingle(),
+      supabase.from("metric_agency_translations").select("*"),
     ]);
     foundedYear = content?.founded_year ?? "2019";
     aboutTranslations = Object.fromEntries(
@@ -162,19 +162,19 @@ export default async function AdminAgencyPage({
     ) as Parameters<typeof AgencyPageAdmin>[0]["about"]["translations"];
   } else if (section === "team") {
     const { data: teamRows } = await supabase
-      .from("team_members")
+      .from("metric_team_members")
       .select("*, team_member_translations(*)")
       .order("sort_order");
     team = (teamRows ?? []).map(toTeamDraft);
   } else if (section === "testimonials") {
     const { data: testimonialRows } = await supabase
-      .from("testimonials")
+      .from("metric_testimonials")
       .select("*, testimonial_translations(*)")
       .order("sort_order");
     testimonials = (testimonialRows ?? []).map(toTestimonialDraft);
   } else {
     const { data: faqRows } = await supabase
-      .from("faq_items")
+      .from("metric_faq_items")
       .select("*, faq_translations(*)")
       .order("sort_order");
     faq = (faqRows ?? []).map(toFaqDraft);

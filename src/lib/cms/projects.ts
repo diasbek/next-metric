@@ -1,6 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { hasSupabaseAdminConfig } from "@/lib/supabase/env";
+import {
+  createSupabasePublicClient,
+  hasSupabasePublicConfig,
+} from "@/lib/supabase/public";
 import type { Locale } from "@/i18n/config";
 import type { Project } from "@/data/projects";
 import {
@@ -11,18 +15,19 @@ import {
 
 const PROJECT_SELECT = `
   *,
-  project_translations (*),
-  project_media (*),
-  project_blocks (*)
+  project_translations:metric_project_translations (*),
+  project_media:metric_project_media (*),
+  project_blocks:metric_project_blocks (*)
 `;
 
 async function fetchPublishedProjectRows(): Promise<ProjectWithRelations[]> {
-  if (!hasSupabaseAdminConfig()) return [];
+  if (!hasSupabasePublicConfig()) return [];
 
   try {
-    const supabase = createSupabaseAdminClient();
+    const supabase = createSupabasePublicClient();
+    if (!supabase) return [];
     const { data, error } = await supabase
-      .from("projects")
+      .from("metric_projects")
       .select(PROJECT_SELECT)
       .eq("status", "published")
       .order("sort_order", { ascending: true });
@@ -78,9 +83,9 @@ export async function getAdminProjects(): Promise<
   if (!hasSupabaseAdminConfig()) return [];
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("projects")
+    .from("metric_projects")
     .select(
-      "id, slug, status, cover_image, sort_order, project_translations ( locale, title )",
+      "id, slug, status, cover_image, sort_order, project_translations:metric_project_translations ( locale, title )",
     )
     .order("sort_order", { ascending: true });
   if (error || !data) return [];
@@ -100,7 +105,7 @@ export async function getAdminProjectById(
   if (!hasSupabaseAdminConfig()) return null;
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("projects")
+    .from("metric_projects")
     .select(PROJECT_SELECT)
     .eq("id", id)
     .maybeSingle();

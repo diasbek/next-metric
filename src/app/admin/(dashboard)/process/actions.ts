@@ -15,7 +15,7 @@ export async function saveProcessStepAction(formData: FormData) {
     String(formData.get("step_number") ?? "").trim() || String(sortOrder);
 
   await supabase
-    .from("process_steps")
+    .from("metric_process_steps")
     .update({
       step_number: stepNumber,
       sort_order: sortOrder,
@@ -24,7 +24,7 @@ export async function saveProcessStepAction(formData: FormData) {
     .eq("id", id);
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("process_step_translations").upsert({
+    await supabase.from("metric_process_step_translations").upsert({
       step_id: id,
       locale,
       title: String(formData.get(`${locale}_title`) ?? ""),
@@ -40,13 +40,13 @@ export async function createProcessStepAction() {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("process_steps")
+    .from("metric_process_steps")
     .insert({ step_number: "99", sort_order: 99, status: "draft" })
     .select("id")
     .single();
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
-  await supabase.from("process_step_translations").insert(
+  await supabase.from("metric_process_step_translations").insert(
     (["en", "de"] as const).map((locale) => ({
       step_id: data.id,
       locale,
@@ -62,7 +62,7 @@ export async function createProcessStepAction() {
 export async function deleteProcessStepAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
-  await supabase.from("process_steps").delete().eq("id", String(formData.get("id")));
+  await supabase.from("metric_process_steps").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "process"]);
   return adminRedirect("/admin/home/?section=process");
 }

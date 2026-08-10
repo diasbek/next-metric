@@ -40,7 +40,7 @@ export async function registerTelegramWebhook(settings: DbSiteSettings) {
     secret = crypto.randomUUID().replace(/-/g, "");
     const supabase = createSupabaseAdminClient();
     await supabase
-      .from("site_settings")
+      .from("metric_site_settings")
       .update({ telegram_webhook_secret: secret })
       .eq("id", 1);
   }
@@ -114,7 +114,7 @@ export async function addTelegramChatId(chatId: string) {
   existing.add(chatId);
   const supabase = createSupabaseAdminClient();
   await supabase
-    .from("site_settings")
+    .from("metric_site_settings")
     .update({ telegram_chat_ids: Array.from(existing) })
     .eq("id", 1);
 }

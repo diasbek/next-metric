@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import { getContent } from "@/i18n/get-content";
+import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 import { getPublicCaptchaConfig } from "@/lib/cms/settings";
 import { Header } from "@/components/organisms/Header";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
@@ -16,7 +17,10 @@ export async function SiteLayout({
   headerVariant = "compact",
 }: SiteLayoutProps) {
   const content = getContent(locale);
-  const captcha = await getPublicCaptchaConfig();
+  const [captcha, home] = await Promise.all([
+    getPublicCaptchaConfig(),
+    getMetricHomeResolved(locale),
+  ]);
 
   return (
     <>
@@ -25,13 +29,19 @@ export async function SiteLayout({
         site={content.site}
         ui={content.ui}
         variant={headerVariant}
+        home={home}
       />
       <div id="site-content">
         <main id="main-content" data-page-transition-root>
           {children}
         </main>
       </div>
-      <SiteFooter locale={locale} content={content} captcha={captcha} />
+      <SiteFooter
+        locale={locale}
+        content={content}
+        captcha={captcha}
+        home={home}
+      />
     </>
   );
 }

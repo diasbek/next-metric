@@ -9,7 +9,7 @@ export default async function AdminLeadsPage() {
   const supabase = createSupabaseAdminClient();
 
   const { data } = await supabase
-    .from("leads")
+    .from("metric_leads")
     .select(
       "id, name, phone, message, attachment_url, status, locale, created_at",
     )

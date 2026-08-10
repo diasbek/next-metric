@@ -2,10 +2,10 @@ import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { SiteNav } from "@/components/molecules/SiteNav";
+import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
-import { getMetricHome } from "@/data/metric-home";
 import { ContactForm } from "@/components/molecules/ContactForm";
 import type { PublicCaptchaConfig } from "@/lib/cms/settings";
 
@@ -13,6 +13,7 @@ interface SiteFooterProps {
   locale: Locale;
   content: SiteContent;
   captcha: PublicCaptchaConfig;
+  home: MetricHomeContent;
 }
 
 /** Figma footer nav order (differs from header). */
@@ -24,9 +25,8 @@ const FOOTER_NAV_HREFS = [
   "/#faq",
 ] as const;
 
-export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
+export function SiteFooter({ locale, content, captcha, home }: SiteFooterProps) {
   const { site, ui } = content;
-  const home = getMetricHome(locale);
   const footer = home.footer;
   const socialMap = {
     instagram: site.social.instagram,

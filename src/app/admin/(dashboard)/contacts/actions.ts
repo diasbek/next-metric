@@ -59,7 +59,7 @@ export async function saveContactsAction(formData: FormData) {
 
   const enAddress = linesFromForm(formData, "en_address_lines");
 
-  const { error: settingsError } = await supabase.from("site_settings").upsert({
+  const { error: settingsError } = await supabase.from("metric_site_settings").upsert({
     id: 1,
     phone: String(formData.get("phone") ?? ""),
     email: String(formData.get("email") ?? ""),
@@ -84,7 +84,7 @@ export async function saveContactsAction(formData: FormData) {
   if (settingsError) return adminFail(settingsError.message);
 
   for (const locale of ["en", "de"] as const) {
-    const { error } = await supabase.from("site_settings_translations").upsert({
+    const { error } = await supabase.from("metric_site_settings_translations").upsert({
       locale,
       address_lines: linesFromForm(formData, `${locale}_address_lines`),
       presentation_url: urls[locale].presentation,

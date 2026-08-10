@@ -18,6 +18,8 @@
     "generate:manifest": "node scripts/generate-manifest.js",
     "generate:icons": "node scripts/generate-icons.js",
     "seed:cms": "tsx scripts/seed-cms.ts",
+    "seed:metric": "tsx scripts/seed-metric-home.ts",
+    "check:metric-env": "tsx scripts/check-metric-env.ts",
     "create:cms-admin": "tsx scripts/create-cms-admin.ts",
     "db:migrations:bundle": "tsx scripts/apply-migrations.ts --bundle",
     "db:migrate": "tsx scripts/apply-migrations.ts",

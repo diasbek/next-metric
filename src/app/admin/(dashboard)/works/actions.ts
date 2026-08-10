@@ -15,7 +15,7 @@ export async function createProjectAction() {
   const supabase = createSupabaseAdminClient();
   const slug = `project-${Date.now()}`;
   const { data, error } = await supabase
-    .from("projects")
+    .from("metric_projects")
     .insert({
       slug,
       status: "draft",
@@ -27,7 +27,7 @@ export async function createProjectAction() {
 
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
-  await supabase.from("project_translations").insert(
+  await supabase.from("metric_project_translations").insert(
     (["en", "de"] as const).map((locale) => ({
       project_id: data.id,
       locale,
@@ -72,7 +72,7 @@ export async function saveProjectAction(formData: FormData) {
   }
 
   const { error } = await supabase
-    .from("projects")
+    .from("metric_projects")
     .update({
       slug: String(formData.get("slug") ?? ""),
       status,
@@ -89,7 +89,7 @@ export async function saveProjectAction(formData: FormData) {
   if (error) return adminFail(error.message);
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("project_translations").upsert({
+    await supabase.from("metric_project_translations").upsert({
       project_id: id,
       locale,
       title: String(formData.get(`${locale}_title`) ?? ""),
@@ -117,7 +117,7 @@ export async function deleteProjectAction(formData: FormData) {
   const id = String(formData.get("id"));
 
   const { data: project } = await supabase
-    .from("projects")
+    .from("metric_projects")
     .select("cover_image, og_image, project_media(url)")
     .eq("id", id)
     .maybeSingle();
@@ -133,7 +133,7 @@ export async function deleteProjectAction(formData: FormData) {
     if (media.url) await deleteMediaByPublicUrl(media.url);
   }
 
-  await supabase.from("projects").delete().eq("id", id);
+  await supabase.from("metric_projects").delete().eq("id", id);
   revalidateCms(["cms", "projects"]);
   return adminRedirect("/admin/works/");
 }
@@ -148,7 +148,7 @@ export async function addProjectBlockAction(formData: FormData) {
   }
 
   const { data: existing } = await supabase
-    .from("project_blocks")
+    .from("metric_project_blocks")
     .select("sort_order")
     .eq("project_id", projectId)
     .order("sort_order", { ascending: false })
@@ -156,7 +156,7 @@ export async function addProjectBlockAction(formData: FormData) {
     .maybeSingle();
 
   const sortOrder = (existing?.sort_order ?? -1) + 1;
-  const { error } = await supabase.from("project_blocks").insert({
+  const { error } = await supabase.from("metric_project_blocks").insert({
     project_id: projectId,
     type,
     sort_order: sortOrder,
@@ -175,14 +175,14 @@ export async function deleteProjectBlockAction(formData: FormData) {
   const blockId = String(formData.get("block_id"));
 
   const { data: mediaRows } = await supabase
-    .from("project_media")
+    .from("metric_project_media")
     .select("url")
     .eq("block_id", blockId);
   for (const row of mediaRows ?? []) {
     if (row.url) await deleteMediaByPublicUrl(row.url);
   }
 
-  await supabase.from("project_blocks").delete().eq("id", blockId);
+  await supabase.from("metric_project_blocks").delete().eq("id", blockId);
   revalidateCms(["cms", "projects"]);
   return adminRedirect(`/admin/works/${projectId}/`);
 }
@@ -192,7 +192,7 @@ export async function reorderProjectBlocksAction(orderedIds: string[]) {
   const supabase = createSupabaseAdminClient();
   await Promise.all(
     orderedIds.map((id, index) =>
-      supabase.from("project_blocks").update({ sort_order: index }).eq("id", id),
+      supabase.from("metric_project_blocks").update({ sort_order: index }).eq("id", id),
     ),
   );
   revalidateCms(["cms", "projects"]);
@@ -207,7 +207,7 @@ export async function updateProjectBlockYoutubeAction(formData: FormData) {
   const youtubeUrl = String(formData.get("youtube_url") ?? "").trim();
 
   const { error } = await supabase
-    .from("project_blocks")
+    .from("metric_project_blocks")
     .update({ youtube_url: youtubeUrl })
     .eq("id", blockId);
   if (error) return adminFail(error.message);
@@ -245,7 +245,7 @@ export async function addProjectMediaAction(formData: FormData) {
 
   if (isComparePair) {
     let query = supabase
-      .from("project_media")
+      .from("metric_project_media")
       .select("id, url")
       .eq("project_id", projectId)
       .eq("kind", kind);
@@ -257,11 +257,11 @@ export async function addProjectMediaAction(formData: FormData) {
         await deleteMediaByPublicUrl(existing.url);
       }
       await supabase
-        .from("project_media")
+        .from("metric_project_media")
         .update({ url, alt, sort_order: sortOrder, block_id: blockId })
         .eq("id", existing.id);
     } else {
-      await supabase.from("project_media").insert({
+      await supabase.from("metric_project_media").insert({
         project_id: projectId,
         block_id: blockId,
         kind,
@@ -272,7 +272,7 @@ export async function addProjectMediaAction(formData: FormData) {
     }
   } else if (kind === "hero") {
     const { data: existing } = await supabase
-      .from("project_media")
+      .from("metric_project_media")
       .select("id, url")
       .eq("project_id", projectId)
       .eq("kind", "hero")
@@ -283,11 +283,11 @@ export async function addProjectMediaAction(formData: FormData) {
         await deleteMediaByPublicUrl(existing.url);
       }
       await supabase
-        .from("project_media")
+        .from("metric_project_media")
         .update({ url, alt, sort_order: sortOrder })
         .eq("id", existing.id);
     } else {
-      await supabase.from("project_media").insert({
+      await supabase.from("metric_project_media").insert({
         project_id: projectId,
         block_id: null,
         kind,
@@ -297,7 +297,7 @@ export async function addProjectMediaAction(formData: FormData) {
       });
     }
   } else {
-    await supabase.from("project_media").insert({
+    await supabase.from("metric_project_media").insert({
       project_id: projectId,
       block_id: blockId,
       kind,
@@ -308,7 +308,7 @@ export async function addProjectMediaAction(formData: FormData) {
   }
 
   if (kind === "cover") {
-    await supabase.from("projects").update({ cover_image: url }).eq("id", projectId);
+    await supabase.from("metric_projects").update({ cover_image: url }).eq("id", projectId);
   }
 
   revalidateCms(["cms", "projects"]);
@@ -322,7 +322,7 @@ export async function deleteProjectMediaAction(formData: FormData) {
   const mediaId = String(formData.get("media_id"));
 
   const { data: media } = await supabase
-    .from("project_media")
+    .from("metric_project_media")
     .select("url")
     .eq("id", mediaId)
     .maybeSingle();
@@ -331,7 +331,7 @@ export async function deleteProjectMediaAction(formData: FormData) {
     await deleteMediaByPublicUrl(media.url);
   }
 
-  await supabase.from("project_media").delete().eq("id", mediaId);
+  await supabase.from("metric_project_media").delete().eq("id", mediaId);
   revalidateCms(["cms", "projects"]);
   return adminRedirect(`/admin/works/${projectId}/`);
 }

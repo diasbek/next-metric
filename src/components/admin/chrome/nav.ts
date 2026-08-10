@@ -12,7 +12,7 @@ export type AdminNavItem = {
 /** Full sidebar / sheet order. */
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/", labelKey: "overview", area: "content" },
-  { href: "/admin/home/", labelKey: "home", area: "content" },
+  { href: "/admin/metric-home/", labelKey: "home", area: "content" },
   { href: "/admin/agency/", labelKey: "agency", area: "content" },
   { href: "/admin/works/", labelKey: "works", area: "content" },
   { href: "/admin/services/", labelKey: "services", area: "content" },

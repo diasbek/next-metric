@@ -33,7 +33,7 @@ export async function saveSettingsAction(formData: FormData) {
     formData.get("captcha_provider") ?? "none",
   ) as CaptchaProvider;
 
-  await supabase.from("site_settings").upsert({
+  await supabase.from("metric_site_settings").upsert({
     id: 1,
     // Contacts live on /admin/contacts/ — preserve when saving settings
     phone: current?.phone ?? "",
@@ -74,7 +74,7 @@ export async function saveSettingsAction(formData: FormData) {
 
   for (const locale of ["en", "de"] as const) {
     for (const pageKey of ["home", "agency", "works", "services", "contacts"] as const) {
-      await supabase.from("page_seo").upsert({
+      await supabase.from("metric_page_seo").upsert({
         locale,
         page_key: pageKey,
         title: String(formData.get(`${locale}_${pageKey}_title`) ?? ""),

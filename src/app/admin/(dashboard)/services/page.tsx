@@ -57,7 +57,7 @@ export default async function AdminServicesPage({
   const params = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase
-    .from("services")
+    .from("metric_services")
     .select("*, service_translations(*)")
     .order("sort_order");
 

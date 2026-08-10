@@ -12,13 +12,13 @@ export default async function AdminHomePage() {
   const supabase = await createSupabaseServerClient();
 
   const [projects, drafts, leads, services, audit] = await Promise.all([
-    supabase.from("projects").select("id", { count: "exact", head: true }),
+    supabase.from("metric_projects").select("id", { count: "exact", head: true }),
     supabase
-      .from("projects")
+      .from("metric_projects")
       .select("id", { count: "exact", head: true })
       .eq("status", "draft"),
-    supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "new"),
-    supabase.from("services").select("id", { count: "exact", head: true }),
+    supabase.from("metric_leads").select("id", { count: "exact", head: true }).eq("status", "new"),
+    supabase.from("metric_services").select("id", { count: "exact", head: true }),
     canAccess(admin.role, "audit")
       ? supabase
           .from("admin_audit_log")
@@ -44,7 +44,7 @@ export default async function AdminHomePage() {
   ];
 
   const shortcuts = [
-    { label: t.dashboard.homePage, href: "/admin/home/" },
+    { label: t.dashboard.homePage, href: "/admin/metric-home/" },
     { label: t.dashboard.agencyPage, href: "/admin/agency/" },
     { label: t.dashboard.contacts, href: "/admin/contacts/" },
   ];

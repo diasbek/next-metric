@@ -9,7 +9,7 @@ export async function saveAgencyAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
 
-  await supabase.from("agency_content").upsert({
+  await supabase.from("metric_agency_content").upsert({
     id: 1,
     founded_year: String(formData.get("founded_year") ?? "2019"),
   });
@@ -32,7 +32,7 @@ export async function saveAgencyAction(formData: FormData) {
         return { value: (value ?? "").trim(), label: rest.join("|").trim() };
       });
 
-    const { error } = await supabase.from("agency_translations").upsert({
+    const { error } = await supabase.from("metric_agency_translations").upsert({
       locale,
       title,
       title_line_1: line1,

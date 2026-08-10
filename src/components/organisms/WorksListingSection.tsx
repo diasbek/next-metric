@@ -2,13 +2,13 @@ import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
-import { getMetricHome } from "@/data/metric-home";
 import type { LocalePageProps } from "@/i18n/props";
 import { localePath } from "@/i18n/paths";
+import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
-export function WorksListingSection({ locale, content }: LocalePageProps) {
+export async function WorksListingSection({ locale, content }: LocalePageProps) {
   const { projects, ui } = content;
-  const home = getMetricHome(locale);
+  const home = await getMetricHomeResolved(locale);
 
   return (
     <div className="metric-works bg-white pb-20 pt-10 md:pt-14">

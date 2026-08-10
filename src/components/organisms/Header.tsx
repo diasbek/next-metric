@@ -6,27 +6,33 @@ import { Button } from "@/components/atoms/Button";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { SiteNav } from "@/components/molecules/SiteNav";
+import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
 import { localePath } from "@/i18n/paths";
-import { getMetricHome } from "@/data/metric-home";
 
 interface HeaderProps {
   locale: Locale;
   site: SiteContent["site"];
   ui: SiteContent["ui"];
   variant?: "hero" | "compact";
+  home: MetricHomeContent;
 }
 
 const HERO_SCROLL_SOLIDIFY_PX = 24;
 
-export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
+export function Header({
+  locale,
+  site,
+  ui,
+  variant = "compact",
+  home,
+}: HeaderProps) {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const homePath = localePath(locale, "/");
   const contactPath = localePath(locale, "/#contact");
   const isHero = variant === "hero";
-  const home = getMetricHome(locale);
   const navItems = home.nav.map((item) => ({
     label: item.label,
     path: item.href,

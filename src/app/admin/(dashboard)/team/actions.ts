@@ -19,7 +19,7 @@ export async function saveTeamMemberAction(formData: FormData) {
 
     // Ensure member still exists (draft may have been deleted in another tab)
     const { data: existing, error: existingError } = await supabase
-      .from("team_members")
+      .from("metric_team_members")
       .select("id")
       .eq("id", id)
       .maybeSingle();
@@ -58,7 +58,7 @@ export async function saveTeamMemberAction(formData: FormData) {
     }
 
     const { error: updateError } = await supabase
-      .from("team_members")
+      .from("metric_team_members")
       .update({
         sort_order: sortOrder,
         image,
@@ -71,7 +71,7 @@ export async function saveTeamMemberAction(formData: FormData) {
     if (updateError) return adminFail(updateError.message);
 
     for (const locale of ["en", "de"] as const) {
-      const { error } = await supabase.from("team_member_translations").upsert({
+      const { error } = await supabase.from("metric_team_member_translations").upsert({
         member_id: id,
         locale,
         name: String(formData.get(`${locale}_name`) ?? ""),
@@ -101,7 +101,7 @@ export async function createTeamMemberAction() {
     await requirePermission("content");
     const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase
-      .from("team_members")
+      .from("metric_team_members")
       .insert({ sort_order: 99, status: "draft" })
       .select("id")
       .single();
@@ -110,7 +110,7 @@ export async function createTeamMemberAction() {
     }
 
     const { error: trError } = await supabase
-      .from("team_member_translations")
+      .from("metric_team_member_translations")
       .insert(
         (["en", "de"] as const).map((locale) => ({
           member_id: data.id,
@@ -136,7 +136,7 @@ export async function deleteTeamMemberAction(formData: FormData) {
     if (!id) return adminFail("Не указан id");
 
     const supabase = createSupabaseAdminClient();
-    const { error } = await supabase.from("team_members").delete().eq("id", id);
+    const { error } = await supabase.from("metric_team_members").delete().eq("id", id);
     if (error) return adminFail(error.message);
 
     revalidateCms(["cms", "team"]);

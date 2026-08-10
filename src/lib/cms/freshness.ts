@@ -9,7 +9,7 @@ async function fetchSiteSettingsUpdatedAt(): Promise<string | null> {
   try {
     const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase
-      .from("site_settings")
+      .from("metric_site_settings")
       .select("updated_at")
       .eq("id", 1)
       .maybeSingle();

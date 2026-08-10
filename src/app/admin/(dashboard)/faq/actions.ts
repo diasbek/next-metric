@@ -13,7 +13,7 @@ export async function saveFaqAction(formData: FormData) {
   let faqId = id;
   if (!faqId) {
     const { data, error } = await supabase
-      .from("faq_items")
+      .from("metric_faq_items")
       .insert({
         sort_order: Number(formData.get("sort_order") ?? 0),
         status: String(formData.get("status") ?? "published"),
@@ -24,7 +24,7 @@ export async function saveFaqAction(formData: FormData) {
     faqId = data.id;
   } else {
     await supabase
-      .from("faq_items")
+      .from("metric_faq_items")
       .update({
         sort_order: Number(formData.get("sort_order") ?? 0),
         status: String(formData.get("status") ?? "published"),
@@ -33,7 +33,7 @@ export async function saveFaqAction(formData: FormData) {
   }
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("faq_translations").upsert({
+    await supabase.from("metric_faq_translations").upsert({
       faq_id: faqId,
       locale,
       question: String(formData.get(`${locale}_question`) ?? ""),
@@ -49,13 +49,13 @@ export async function createFaqAction() {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("faq_items")
+    .from("metric_faq_items")
     .insert({ sort_order: 99, status: "draft" })
     .select("id")
     .single();
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
-  await supabase.from("faq_translations").insert(
+  await supabase.from("metric_faq_translations").insert(
     (["en", "de"] as const).map((locale) => ({
       faq_id: data.id,
       locale,
@@ -71,7 +71,7 @@ export async function createFaqAction() {
 export async function deleteFaqAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
-  await supabase.from("faq_items").delete().eq("id", String(formData.get("id")));
+  await supabase.from("metric_faq_items").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "faq"]);
   return adminRedirect("/admin/agency/?section=faq");
 }

@@ -25,10 +25,18 @@ function listMigrations(): string[] {
   if (!existsSync(migrationsDir)) {
     throw new Error(`Missing ${migrationsDir}`);
   }
-  return readdirSync(migrationsDir)
+  const all = readdirSync(migrationsDir)
     .filter((name) => name.endsWith(".sql"))
-    .sort((a, b) => a.localeCompare(b))
-    .map((name) => path.join(migrationsDir, name));
+    .sort((a, b) => a.localeCompare(b));
+
+  // Metric fresh-install migrations only (skip legacy remaps like locales_en_de).
+  const metricOnly = all.filter(
+    (name) =>
+      name.includes("metric_prefixed") || name.includes("metric_storage"),
+  );
+  const files = metricOnly.length > 0 ? metricOnly : all;
+
+  return files.map((name) => path.join(migrationsDir, name));
 }
 
 function bundle(): string {

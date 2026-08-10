@@ -14,12 +14,12 @@ export async function GET() {
     const supabase = await createSupabaseServerClient();
     const [recent, newCount] = await Promise.all([
       supabase
-        .from("leads")
+        .from("metric_leads")
         .select("id, name, phone, message, status, created_at")
         .order("created_at", { ascending: false })
         .limit(8),
       supabase
-        .from("leads")
+        .from("metric_leads")
         .select("id", { count: "exact", head: true })
         .eq("status", "new"),
     ]);

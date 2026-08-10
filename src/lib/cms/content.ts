@@ -1,5 +1,4 @@
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { hasSupabaseAdminConfig } from "@/lib/supabase/env";
+import { createSupabasePublicClient, hasSupabasePublicConfig } from "@/lib/supabase/public";
 import type { Locale } from "@/i18n/config";
 import type { Service } from "@/data/services";
 import type { FAQItem } from "@/data/faq";
@@ -8,10 +7,11 @@ import type { Testimonial } from "@/data/agency";
 import { unstable_cache } from "next/cache";
 
 async function loadExtras(locale: Locale) {
-  if (!hasSupabaseAdminConfig()) return null;
+  if (!hasSupabasePublicConfig()) return null;
 
   try {
-    const supabase = createSupabaseAdminClient();
+    const supabase = createSupabasePublicClient();
+    if (!supabase) return null;
 
     const [
       servicesRes,
@@ -28,51 +28,51 @@ async function loadExtras(locale: Locale) {
       seoRes,
     ] = await Promise.all([
         supabase
-          .from("services")
-          .select("*, service_translations(*)")
+          .from("metric_services")
+          .select("*, service_translations:metric_service_translations(*)")
           .eq("status", "published")
           .order("sort_order"),
         supabase
-          .from("faq_items")
-          .select("*, faq_translations(*)")
+          .from("metric_faq_items")
+          .select("*, faq_translations:metric_faq_translations(*)")
           .eq("status", "published")
           .order("sort_order"),
         supabase
-          .from("process_steps")
-          .select("*, process_step_translations(*)")
+          .from("metric_process_steps")
+          .select("*, process_step_translations:metric_process_step_translations(*)")
           .eq("status", "published")
           .order("sort_order"),
         supabase
-          .from("benefits")
-          .select("*, benefit_translations(*)")
+          .from("metric_benefits")
+          .select("*, benefit_translations:metric_benefit_translations(*)")
           .eq("status", "published")
           .order("sort_order"),
         supabase
-          .from("team_members")
-          .select("*, team_member_translations(*)")
+          .from("metric_team_members")
+          .select("*, team_member_translations:metric_team_member_translations(*)")
           .eq("status", "published")
           .order("sort_order"),
         supabase
-          .from("testimonials")
-          .select("*, testimonial_translations(*)")
+          .from("metric_testimonials")
+          .select("*, testimonial_translations:metric_testimonial_translations(*)")
           .eq("status", "published")
           .order("sort_order"),
-        supabase.from("agency_content").select("*").eq("id", 1).maybeSingle(),
-        supabase.from("agency_translations").select("*").eq("locale", locale).maybeSingle(),
-        supabase.from("home_translations").select("*").eq("locale", locale).maybeSingle(),
+        supabase.from("metric_agency_content").select("*").eq("id", 1).maybeSingle(),
+        supabase.from("metric_agency_translations").select("*").eq("locale", locale).maybeSingle(),
+        supabase.from("metric_home_translations").select("*").eq("locale", locale).maybeSingle(),
         supabase
-          .from("site_settings")
+          .from("metric_site_settings")
           .select(
             "phone, email, telegram_url, instagram_url, presentation_url, brief_url, address_lines",
           )
           .eq("id", 1)
           .maybeSingle(),
         supabase
-          .from("site_settings_translations")
+          .from("metric_site_settings_translations")
           .select("address_lines, presentation_url, brief_url")
           .eq("locale", locale)
           .maybeSingle(),
-        supabase.from("page_seo").select("*").eq("locale", locale),
+        supabase.from("metric_page_seo").select("*").eq("locale", locale),
       ]);
 
     if (servicesRes.error) return null;

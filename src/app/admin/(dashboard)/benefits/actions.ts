@@ -11,7 +11,7 @@ export async function saveBenefitAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
 
   await supabase
-    .from("benefits")
+    .from("metric_benefits")
     .update({
       sort_order: Number(formData.get("sort_order") ?? 0),
       status: String(formData.get("status") ?? "published"),
@@ -19,7 +19,7 @@ export async function saveBenefitAction(formData: FormData) {
     .eq("id", id);
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("benefit_translations").upsert({
+    await supabase.from("metric_benefit_translations").upsert({
       benefit_id: id,
       locale,
       label: String(formData.get(`${locale}_label`) ?? ""),
@@ -34,13 +34,13 @@ export async function createBenefitAction() {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("benefits")
+    .from("metric_benefits")
     .insert({ sort_order: 99, status: "draft" })
     .select("id")
     .single();
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
-  await supabase.from("benefit_translations").insert(
+  await supabase.from("metric_benefit_translations").insert(
     (["en", "de"] as const).map((locale) => ({
       benefit_id: data.id,
       locale,
@@ -55,7 +55,7 @@ export async function createBenefitAction() {
 export async function deleteBenefitAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
-  await supabase.from("benefits").delete().eq("id", String(formData.get("id")));
+  await supabase.from("metric_benefits").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "benefits"]);
   return adminRedirect("/admin/home/?section=benefits");
 }

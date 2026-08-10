@@ -2,12 +2,11 @@ import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { CategoriesMarquee } from "@/components/molecules/CategoriesMarquee";
-import { getMetricHome } from "@/data/metric-home";
+import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 
-function MetricTrustCards({ locale }: { locale: Locale }) {
-  const { trust } = getMetricHome(locale);
+function MetricTrustCards({ trust }: { trust: MetricHomeContent["trust"] }) {
   return (
     <div className="metric-hero__trust">
       {trust.map((item, index) => (
@@ -90,8 +89,14 @@ const HERO_BLOBS = [
   "metric-hero-blob metric-hero-blob--c",
 ] as const;
 
-export function MetricHeroSection({ locale }: { locale: Locale }) {
-  const { hero } = getMetricHome(locale);
+export function MetricHeroSection({
+  locale,
+  home,
+}: {
+  locale: Locale;
+  home: MetricHomeContent;
+}) {
+  const { hero } = home;
 
   return (
     <section
@@ -158,14 +163,19 @@ export function MetricHeroSection({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        <MetricTrustCards locale={locale} />
+        <MetricTrustCards trust={home.trust} />
       </PageContainer>
     </section>
   );
 }
 
-export function MetricCategoriesSection({ locale = "en" }: { locale?: Locale }) {
-  const { categories } = getMetricHome(locale);
+export function MetricCategoriesSection({
+  home,
+}: {
+  locale?: Locale;
+  home: MetricHomeContent;
+}) {
+  const { categories } = home;
   return (
     <section id="projects" className="metric-gradient-pink metric-section metric-categories">
       <PageContainer>
@@ -217,8 +227,14 @@ export function MetricCategoriesSection({ locale = "en" }: { locale?: Locale }) 
   );
 }
 
-export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
-  const { caseStudies } = getMetricHome(locale);
+export function MetricCaseStudiesSection({
+  locale,
+  home,
+}: {
+  locale: Locale;
+  home: MetricHomeContent;
+}) {
+  const { caseStudies } = home;
   const titleParts = caseStudies.title.split(caseStudies.titleAccent);
 
   return (
@@ -262,7 +278,11 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
               <div className="metric-case-card__media">
                 <Image
                   src={item.image}
-                  alt={item.author}
+                  alt={
+                    "title" in item && typeof item.title === "string" && item.title
+                      ? item.title
+                      : item.author
+                  }
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -282,43 +302,47 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
   );
 }
 
-export function MetricServicesSection({ locale }: { locale: Locale }) {
-  const { services } = getMetricHome(locale);
+export function MetricServicesSection({
+  locale,
+  home,
+}: {
+  locale: Locale;
+  home: MetricHomeContent;
+}) {
+  const { services } = home;
   return (
     <section id={services.id} className="metric-services">
       <PageContainer className="metric-services__inner">
-        <div className="metric-services__layout">
-          <div className="metric-services__aside">
-            <h2 className="metric-services__title font-display" data-reveal>
-              {services.titleLines.map((line) => (
-                <span key={line} className="metric-services__title-line">
-                  {line}
-                </span>
-              ))}
-              <span className="metric-services__title-line metric-services__title-line--end">
-                {services.titleSuffix ? (
-                  <span className="metric-services__title-suffix">
-                    {services.titleSuffix}
-                    {"\u00A0"}
-                  </span>
-                ) : null}
-                <span className="metric-services__bracket">{services.titleBracket}</span>
+        <h2 className="metric-services__title font-display" data-reveal>
+          {services.titleLines.map((line) => (
+            <span key={line} className="metric-services__title-line">
+              {line}
+            </span>
+          ))}
+          <span className="metric-services__title-line metric-services__title-line--end">
+            {services.titleSuffix ? (
+              <span className="metric-services__title-suffix">
+                {services.titleSuffix}
+                {"\u00A0"}
               </span>
-            </h2>
+            ) : null}
+            <span className="metric-services__bracket">{services.titleBracket}</span>
+          </span>
+        </h2>
 
-            <div className="metric-services__pin">
-              <p className="metric-services__subtitle" data-reveal>
-                {services.subtitle}
-              </p>
-              <Button
-                href={localePath(locale, "/#contact")}
-                variant="onAccent"
-                className="metric-services__cta"
-                data-reveal
-              >
-                {services.cta}
-              </Button>
-            </div>
+        <div className="metric-services__layout">
+          <div className="metric-services__pin">
+            <p className="metric-services__subtitle" data-reveal>
+              {services.subtitle}
+            </p>
+            <Button
+              href={localePath(locale, "/#contact")}
+              variant="onAccent"
+              className="metric-services__cta"
+              data-reveal
+            >
+              {services.cta}
+            </Button>
           </div>
 
           <div className="metric-services__list" data-reveal-group>
@@ -355,8 +379,14 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
   );
 }
 
-export function MetricWorkflowSection({ locale }: { locale: Locale }) {
-  const { workflow } = getMetricHome(locale);
+export function MetricWorkflowSection({
+  locale,
+  home,
+}: {
+  locale: Locale;
+  home: MetricHomeContent;
+}) {
+  const { workflow } = home;
   return (
     <section id={workflow.id} className="metric-section metric-workflow">
       <PageContainer>

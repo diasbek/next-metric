@@ -2,7 +2,7 @@ import { PageContainer } from "@/components/atoms/PageContainer";
 import { Button } from "@/components/atoms/Button";
 import { SiteLayout } from "@/components/templates";
 import type { Locale } from "@/i18n/config";
-import { getMetricHome } from "@/data/metric-home";
+import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 import { localePath } from "@/i18n/paths";
 
 const copy = {
@@ -38,7 +38,7 @@ const copy = {
 
 type LegalKey = keyof typeof copy.en;
 
-export function LegalPageView({
+export async function LegalPageView({
   locale,
   page,
 }: {
@@ -46,7 +46,7 @@ export function LegalPageView({
   page: LegalKey;
 }) {
   const content = copy[locale][page];
-  const home = getMetricHome(locale);
+  const home = await getMetricHomeResolved(locale);
 
   return (
     <SiteLayout locale={locale} headerVariant="compact">

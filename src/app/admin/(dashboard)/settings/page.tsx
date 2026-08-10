@@ -12,8 +12,8 @@ export default async function AdminSettingsPage({
   const params = await searchParams;
   const supabase = createSupabaseAdminClient();
   const [{ data: settings }, { data: seo }] = await Promise.all([
-    supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
-    supabase.from("page_seo").select("*"),
+    supabase.from("metric_site_settings").select("*").eq("id", 1).maybeSingle(),
+    supabase.from("metric_page_seo").select("*"),
   ]);
 
   return (

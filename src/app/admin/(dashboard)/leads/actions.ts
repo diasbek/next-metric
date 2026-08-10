@@ -30,7 +30,7 @@ export async function setLeadStatusAction(
 
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase
-      .from("leads")
+      .from("metric_leads")
       .update({ status: next })
       .eq("id", id);
     if (error) return adminFail(error.message);

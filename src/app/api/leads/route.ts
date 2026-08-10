@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = createSupabaseAdminClient();
-    const { error } = await supabase.from("leads").insert({
+    const { error } = await supabase.from("metric_leads").insert({
       name,
       phone,
       message,

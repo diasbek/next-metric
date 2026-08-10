@@ -345,3 +345,10 @@ export const metricHome = metricHomeEn;
 export function getMetricHome(locale: Locale): MetricHomeContent {
   return (locale === "de" ? metricHomeDe : metricHomeEn) as MetricHomeContent;
 }
+
+/** Plain JSON-serializable clone for CMS payload storage. */
+export function toMetricHomePayload(
+  content: MetricHomeContent,
+): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(content)) as Record<string, unknown>;
+}

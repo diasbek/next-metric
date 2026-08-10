@@ -11,7 +11,7 @@ export async function saveServiceAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
 
   await supabase
-    .from("services")
+    .from("metric_services")
     .update({
       service_key: String(formData.get("service_key") ?? ""),
       sort_order: Number(formData.get("sort_order") ?? 0),
@@ -20,7 +20,7 @@ export async function saveServiceAction(formData: FormData) {
     .eq("id", id);
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("service_translations").upsert({
+    await supabase.from("metric_service_translations").upsert({
       service_id: id,
       locale,
       title: String(formData.get(`${locale}_title`) ?? ""),
@@ -39,7 +39,7 @@ export async function createServiceAction() {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
-    .from("services")
+    .from("metric_services")
     .insert({
       service_key: `service-${Date.now()}`,
       sort_order: 99,
@@ -49,7 +49,7 @@ export async function createServiceAction() {
     .single();
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
-  await supabase.from("service_translations").insert(
+  await supabase.from("metric_service_translations").insert(
     (["en", "de"] as const).map((locale) => ({
       service_id: data.id,
       locale,
@@ -68,7 +68,7 @@ export async function createServiceAction() {
 export async function deleteServiceAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
-  await supabase.from("services").delete().eq("id", String(formData.get("id")));
+  await supabase.from("metric_services").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "services"]);
   return adminRedirect("/admin/services/");
 }

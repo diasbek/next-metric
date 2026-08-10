@@ -126,47 +126,6 @@ function initCategoryCardHovers(): Cleanup {
   return () => cleanups.forEach((fn) => fn());
 }
 
-/** Measure title height and collapse sticky pin offset once title scrolls away. */
-function initServicesTitlePin(): Cleanup {
-  const section = document.getElementById("services");
-  const title = section?.querySelector<HTMLElement>(".metric-services__title");
-  if (!section || !title) return () => {};
-
-  const headerOffset =
-    parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue(
-        "--header-height",
-      ),
-    ) || 88;
-
-  const measure = () => {
-    section.style.setProperty(
-      "--services-title-h",
-      `${Math.ceil(title.getBoundingClientRect().height)}px`,
-    );
-  };
-
-  const update = () => {
-    const away = title.getBoundingClientRect().bottom < headerOffset + 8;
-    section.classList.toggle("is-services-title-away", away);
-  };
-
-  measure();
-  update();
-
-  window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", measure);
-  window.addEventListener("resize", update);
-
-  return () => {
-    window.removeEventListener("scroll", update);
-    window.removeEventListener("resize", measure);
-    window.removeEventListener("resize", update);
-    section.classList.remove("is-services-title-away");
-    section.style.removeProperty("--services-title-h");
-  };
-}
-
 /** Soft lift + nudge on Services glass cards. */
 function initServiceCardHovers(): Cleanup {
   const cards = Array.from(
@@ -229,7 +188,6 @@ export function initAnimations(_pathname: string): Cleanup {
     cleanups.push(initCtaHovers());
     cleanups.push(initCategoryCardHovers());
     cleanups.push(initServiceCardHovers());
-    cleanups.push(initServicesTitlePin());
     cleanups.push(initBeforeAfterSliders());
   });
 

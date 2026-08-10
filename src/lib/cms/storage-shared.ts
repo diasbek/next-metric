@@ -3,7 +3,7 @@
  * Keep upload logic (sharp) in `storage.ts` (server-only).
  */
 
-export const MEDIA_BUCKET = "media";
+export const MEDIA_BUCKET = "metric-media";
 
 /** Build a public object URL. Prefer passing the project URL at runtime. */
 export function getPublicMediaUrl(path: string, projectUrl?: string): string {

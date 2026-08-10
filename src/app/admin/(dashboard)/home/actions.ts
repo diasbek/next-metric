@@ -17,7 +17,7 @@ export async function saveHomeWhyUsAction(formData: FormData) {
     for (const locale of ["en", "de"] as const) {
       const line1 = String(formData.get(`${locale}_why_us_title_line_1`) ?? "").trim();
       const line2 = String(formData.get(`${locale}_why_us_title_line_2`) ?? "").trim();
-      const { error } = await supabase.from("home_translations").upsert({
+      const { error } = await supabase.from("metric_home_translations").upsert({
         locale,
         why_us_title_line_1: line1,
         why_us_title_line_2: line2,
