@@ -50,6 +50,17 @@ export function GsapProvider({ children }: GsapProviderProps) {
     // Preserve / repair in-page hash targets across route changes.
     settleScrollAfterNavigation();
 
+    // Jumping straight to a mid-page anchor (nav click from another page,
+    // or a hard reload on a `#section` URL) must never leave that section
+    // sitting invisible for however long GSAP takes to boot. Force it (and
+    // everything else) visible immediately; initAnimations() below skips
+    // already-revealed elements, so this never causes a flash.
+    if (typeof window !== "undefined" && window.location.hash) {
+      void import("@/animations/gsap").then(({ showAllRevealTargets }) => {
+        showAllRevealTargets();
+      });
+    }
+
     const reduced = prefersReducedMotion();
     if (!reduced) {
       document.documentElement.classList.add("gsap-pending");
@@ -157,9 +168,13 @@ export function GsapProvider({ children }: GsapProviderProps) {
       cancelled = true;
       clearFallback();
       document.documentElement.classList.remove("gsap-pending", "gsap-ready");
-      void import("@/animations/page-transition").then(({ resetPageTransition }) => {
-        resetPageTransition();
-      });
+      // Do NOT reset page-transition state here: this cleanup runs on every
+      // route change (that's the whole point of re-running this effect), but
+      // the entering page's own playEnterTransition() call still needs the
+      // pending Flip/fade/scroll-hash state stashed by navigateWithTransition.
+      // Resetting it here always won (it resolves before the new effect's
+      // first await), permanently skipping the enter animation. Real error
+      // paths already call resetPageTransition() themselves.
       cleanup?.();
     };
   }, [pathname]);

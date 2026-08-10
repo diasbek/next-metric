@@ -2,7 +2,10 @@
 export function resetScrollPosition(): void {
   if (typeof window === "undefined") return;
 
-  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  // "auto" would defer to the page's CSS `scroll-behavior: smooth`; the
+  // direct scrollTop assignments below already force it instant, but pass
+  // "instant" too so nothing here ever animates.
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
 }
@@ -88,7 +91,12 @@ export function scrollToHashAfterPaint(hash: string): void {
   const attempt = (): boolean => {
     const el = document.getElementById(id);
     if (!el) return false;
-    el.scrollIntoView({ behavior: "auto", block: "start" });
+    // "auto" defers to the page's CSS `scroll-behavior` (smooth here), so a
+    // "jump straight to it" call would silently animate over 1-2s instead —
+    // and get restarted/cut short by the next settle call in the boot
+    // sequence, landing well short of the target. "instant" always jumps,
+    // regardless of CSS.
+    el.scrollIntoView({ behavior: "instant", block: "start" });
     return true;
   };
 

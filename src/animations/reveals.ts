@@ -15,8 +15,10 @@ function markRevealed(targets: HTMLElement | HTMLElement[]): void {
 export function createReveals(): void {
   document
     // Skip items owned by a reveal-group — group tween handles them.
+    // Skip already-revealed items (e.g. force-shown for a hash jump) —
+    // re-animating them would flash them invisible again.
     .querySelectorAll<HTMLElement>(
-      "[data-reveal]:not([data-split-title]):not([data-reveal-group] > [data-reveal])",
+      "[data-reveal]:not(.is-revealed):not([data-split-title]):not([data-reveal-group] > [data-reveal])",
     )
     .forEach((el) => {
       const y = Number(el.dataset.revealY ?? 40);
@@ -40,7 +42,8 @@ export function createReveals(): void {
 
 export function createRevealGroups(): void {
   document
-    .querySelectorAll<HTMLElement>("[data-reveal-group]")
+    // Skip already-revealed groups (e.g. force-shown for a hash jump).
+    .querySelectorAll<HTMLElement>("[data-reveal-group]:not(.is-revealed)")
     .forEach((group) => {
       const items = Array.from(group.children) as HTMLElement[];
       if (!items.length) return;
@@ -58,7 +61,10 @@ export function createRevealGroups(): void {
           stagger,
           clearProps: CLEAR_MOTION_PROPS,
           scrollTrigger: { trigger: group, start: "top 85%", once: true },
-          onComplete: () => markRevealed(items),
+          onComplete: () => {
+            markRevealed(items);
+            group.classList.add("is-revealed");
+          },
         },
       );
     });
@@ -88,58 +94,62 @@ function setupParallax(): gsap.core.Tween[] {
 }
 
 export function createCounters(): void {
-  document.querySelectorAll<HTMLElement>("[data-counter]").forEach((el) => {
-    const raw = el.textContent?.trim() ?? "";
-    const match = /^(\d+)(.*)$/.exec(raw);
-    if (!match) return;
-    const target = Number(match[1]);
-    const suffix = match[2] ?? "";
-    const state = { value: 0 };
-    el.textContent = `0${suffix}`;
-    gsap.to(state, {
-      value: target,
-      duration: 1.4,
-      ease: "power2.out",
-      scrollTrigger: { trigger: el, start: "top 90%", once: true },
-      onUpdate() {
-        el.textContent = `${Math.round(state.value)}${suffix}`;
-      },
-      onComplete() {
-        el.textContent = raw;
-      },
-    });
-    gsap.fromTo(
-      el,
-      { scale: 0.7, autoAlpha: 0 },
-      {
-        scale: 1,
-        autoAlpha: 1,
-        duration: 0.7,
-        ease: "back.out(1.8)",
-        clearProps: CLEAR_MOTION_PROPS,
+  document
+    .querySelectorAll<HTMLElement>("[data-counter]:not(.is-revealed)")
+    .forEach((el) => {
+      const raw = el.textContent?.trim() ?? "";
+      const match = /^(\d+)(.*)$/.exec(raw);
+      if (!match) return;
+      const target = Number(match[1]);
+      const suffix = match[2] ?? "";
+      const state = { value: 0 };
+      el.textContent = `0${suffix}`;
+      gsap.to(state, {
+        value: target,
+        duration: 1.4,
+        ease: "power2.out",
         scrollTrigger: { trigger: el, start: "top 90%", once: true },
-      },
-    );
-  });
+        onUpdate() {
+          el.textContent = `${Math.round(state.value)}${suffix}`;
+        },
+        onComplete() {
+          el.textContent = raw;
+        },
+      });
+      gsap.fromTo(
+        el,
+        { scale: 0.7, autoAlpha: 0 },
+        {
+          scale: 1,
+          autoAlpha: 1,
+          duration: 0.7,
+          ease: "back.out(1.8)",
+          clearProps: CLEAR_MOTION_PROPS,
+          scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        },
+      );
+    });
 }
 
 export function createClipReveals(): void {
-  document.querySelectorAll<HTMLElement>("[data-clip-reveal]").forEach((el) => {
-    gsap.fromTo(
-      el,
-      { clipPath: "inset(0 100% 0 0)" },
-      {
-        clipPath: "inset(0 0% 0 0)",
-        duration: 1.2,
-        ease: "power3.inOut",
-        scrollTrigger: { trigger: el, start: "top 80%", once: true },
-        onComplete: () => {
-          el.classList.add("is-revealed");
-          gsap.set(el, { clearProps: "clipPath" });
+  document
+    .querySelectorAll<HTMLElement>("[data-clip-reveal]:not(.is-revealed)")
+    .forEach((el) => {
+      gsap.fromTo(
+        el,
+        { clipPath: "inset(0 100% 0 0)" },
+        {
+          clipPath: "inset(0 0% 0 0)",
+          duration: 1.2,
+          ease: "power3.inOut",
+          scrollTrigger: { trigger: el, start: "top 80%", once: true },
+          onComplete: () => {
+            el.classList.add("is-revealed");
+            gsap.set(el, { clearProps: "clipPath" });
+          },
         },
-      },
-    );
-  });
+      );
+    });
 }
 
 export function createBorderDraws(): void {

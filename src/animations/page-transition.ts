@@ -15,6 +15,7 @@ let pendingEnterTransition = false;
 let pendingFlipState: ReturnType<typeof Flip.getState> | null = null;
 let pendingScrollHash: string | null = null;
 let activeTweens: gsap.core.Animation[] = [];
+let watchdogTimer: ReturnType<typeof setTimeout> | undefined;
 
 // GSAP supports onKill at runtime; it is omitted from CallbackType in the bundled types.
 const TWEEN_ON_KILL = "onKill" as gsap.CallbackType;
@@ -50,6 +51,10 @@ export function resetPageTransition(): void {
   pendingEnterTransition = false;
   pendingFlipState = null;
   pendingScrollHash = null;
+  if (watchdogTimer) {
+    clearTimeout(watchdogTimer);
+    watchdogTimer = undefined;
+  }
   clearTransitionRootStyles();
 }
 
@@ -74,8 +79,20 @@ export function playExitTransition(): Promise<void> {
   const root = getTransitionRoot();
   if (!root) return Promise.resolve();
 
+  // Defensively drop any stragglers from an interrupted previous transition
+  // instead of leaving them queued up to fight the new one.
+  killTransitionTweens();
+
   transitioning = true;
   pendingEnterTransition = true;
+
+  // Safety net: if the route never actually changes (so the entering page's
+  // GsapProvider effect never re-runs to consume this), don't leave
+  // `transitioning` stuck forever and block every future nav click.
+  if (watchdogTimer) clearTimeout(watchdogTimer);
+  watchdogTimer = setTimeout(() => {
+    if (transitioning) resetPageTransition();
+  }, 4000);
 
   return new Promise((resolve) => {
     trackTween(
@@ -151,6 +168,10 @@ export function playEnterTransition(): Promise<void> {
 
     return Promise.all(tasks).then(() => {
       transitioning = false;
+      if (watchdogTimer) {
+        clearTimeout(watchdogTimer);
+        watchdogTimer = undefined;
+      }
       clearTransitionRootStyles();
       const hash = pendingScrollHash;
       pendingScrollHash = null;
