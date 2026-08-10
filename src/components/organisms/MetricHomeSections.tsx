@@ -300,9 +300,18 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
         </h2>
 
         <div className="metric-services__layout">
-          <p className="metric-services__subtitle" data-reveal>
-            {services.subtitle}
-          </p>
+          <div className="metric-services__aside">
+            <p className="metric-services__subtitle" data-reveal>
+              {services.subtitle}
+            </p>
+            <TransitionLink
+              href={localePath(locale, "/#contact")}
+              className="metric-cta metric-cta--on-accent metric-services__cta"
+              data-reveal
+            >
+              <span className="metric-cta__label">{services.cta}</span>
+            </TransitionLink>
+          </div>
 
           <div className="metric-services__list" data-reveal-group>
             {services.items.map((item) => (
@@ -327,14 +336,6 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
               </article>
             ))}
           </div>
-
-          <TransitionLink
-            href={localePath(locale, "/#contact")}
-            className="metric-cta metric-cta--on-accent metric-services__cta"
-            data-reveal
-          >
-            <span className="metric-cta__label">{services.cta}</span>
-          </TransitionLink>
         </div>
       </PageContainer>
     </section>
