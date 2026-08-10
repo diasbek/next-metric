@@ -480,7 +480,7 @@ export const enAdmin: AdminMessages = {
       savedHint: "Saved. Refresh the agency page to see the changes.",
       foundedYear: "Founded year (on banner)",
       foundedIn: "Founded in {year}",
-      previewLabel: "Preview · /agency/ · {locale}",
+      previewLabel: "Preview · /#workflow · {locale}",
       contentSection: "Content · {label}",
       titleLine1Label: "Title — line 1",
       titleLine2Label: "Title — line 2",

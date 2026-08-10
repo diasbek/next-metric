@@ -11,10 +11,7 @@ export async function ContactsPageView({ locale }: ContactsPageViewProps) {
   const page = await getLocalePageProps(locale);
 
   return (
-    <SiteLayout
-      locale={locale}
-      contactSubtitle={page.content.ui.contactPageSubtitle}
-    >
+    <SiteLayout locale={locale}>
       <ContactsPageSection {...page} />
     </SiteLayout>
   );

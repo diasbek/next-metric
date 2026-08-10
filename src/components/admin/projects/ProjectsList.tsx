@@ -8,8 +8,8 @@ import {
   useOrderedItems,
   usePersistReorder,
 } from "@/components/admin/dnd";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { useSearchParams } from "next/navigation";
+import { useMemo, useState, type CSSProperties } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   createProjectAction,
   reorderProjectsAction,
@@ -100,10 +100,17 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
 
 export function ProjectsList({ projects, embedded = false }: Props) {
   const t = useAdminT();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [filter, setFilterState] = useState<StatusFilter>(() =>
     parseWorksStatus(searchParams.get("status")),
   );
+  const filterFromUrl = parseWorksStatus(searchParams.get("status"));
+  const [filterUrlSnapshot, setFilterUrlSnapshot] = useState(filterFromUrl);
+  if (filterFromUrl !== filterUrlSnapshot) {
+    setFilterUrlSnapshot(filterFromUrl);
+    setFilterState(filterFromUrl);
+  }
   const [q, setQ] = useState("");
   const [ordered, setOrdered] = useOrderedItems(projects);
   const { pending, saved, onDragEnd } = usePersistReorder(
@@ -112,10 +119,6 @@ export function ProjectsList({ projects, embedded = false }: Props) {
     setOrdered,
     reorderProjectsAction,
   );
-
-  useEffect(() => {
-    setFilterState(parseWorksStatus(searchParams.get("status")));
-  }, [searchParams]);
 
   const setFilter = (next: StatusFilter) => {
     setFilterState(next);
@@ -137,7 +140,7 @@ export function ProjectsList({ projects, embedded = false }: Props) {
   }, [ordered, filter, q]);
 
   const openProject = (id: string) => {
-    window.location.assign(`/admin/works/${id}/`);
+    router.push(`/admin/works/${id}/`);
   };
 
   const hint: CSSProperties = { color: "#888", margin: "8px 0 0" };

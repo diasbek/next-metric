@@ -39,3 +39,5 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 - [ ] Telegram webhook: `https://metric.agency/api/telegram/webhook/?secret=…`
 - [ ] Google Search Console + Yandex Webmaster → `https://metric.agency`
 - [ ] Purge CDN / cache for `metric.agency`
+- [ ] Confirm CDN does **not** long-cache HTML/RSC — `next.config.ts` already sets `Cache-Control: max-age=0, s-maxage=0, must-revalidate` on `/:path*` so post-deploy chunk hashes cannot 404 as `text/plain`
+- [ ] Admin media uploads use browser → Supabase path (`browser-upload`); avoid Server Action uploads on VPS (`fetch failed`)

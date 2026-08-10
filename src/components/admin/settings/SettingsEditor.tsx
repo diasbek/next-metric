@@ -139,8 +139,8 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
   const [ogLoading, setOgLoading] = useState(true);
 
   useEffect(() => {
-    setOgLoading(true);
     const timer = window.setTimeout(() => {
+      setOgLoading(true);
       const params = new URLSearchParams();
       if (currentSeo.title.trim()) params.set("title", currentSeo.title.trim());
       if (currentSeo.description.trim()) {

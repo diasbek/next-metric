@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { resetScrollPosition, resetScrollPositionAfterPaint } from "@/utils/scroll";
+import { settleScrollAfterNavigation } from "@/utils/scroll";
 
 interface GsapProviderProps {
   children: React.ReactNode;
@@ -47,7 +47,8 @@ export function GsapProvider({ children }: GsapProviderProps) {
   }, []);
 
   useEffect(() => {
-    resetScrollPosition();
+    // Preserve / repair in-page hash targets across route changes.
+    settleScrollAfterNavigation();
 
     const reduced = prefersReducedMotion();
     if (!reduced) {
@@ -78,18 +79,13 @@ export function GsapProvider({ children }: GsapProviderProps) {
           if (cancelled) return;
           cleanup = initAnimations(pathname);
           markReady();
+          settleScrollAfterNavigation();
         } catch {
           const { showAllRevealTargets } = await import("@/animations/gsap");
           if (cancelled) return;
           showAllRevealTargets();
-          document
-            .querySelectorAll<HTMLElement>(
-              '[data-site-header][data-header-variant="hero"]',
-            )
-            .forEach((header) => {
-              header.classList.add("is-scrolled", "is-logo-docked");
-            });
           markReady();
+          settleScrollAfterNavigation();
         }
         return;
       }
@@ -100,14 +96,8 @@ export function GsapProvider({ children }: GsapProviderProps) {
         const { showAllRevealTargets } = await import("@/animations/gsap");
         if (cancelled || initStarted) return;
         showAllRevealTargets();
-        document
-          .querySelectorAll<HTMLElement>(
-            '[data-site-header][data-header-variant="hero"]',
-          )
-          .forEach((header) => {
-            header.classList.add("is-scrolled", "is-logo-docked");
-          });
         markReady();
+        settleScrollAfterNavigation();
       }, 2000);
 
       try {
@@ -121,7 +111,6 @@ export function GsapProvider({ children }: GsapProviderProps) {
         }
 
         await playEnterTransition();
-        resetScrollPositionAfterPaint();
         if (cancelled) {
           resetPageTransition();
           clearFallback();
@@ -144,7 +133,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
         }
 
         cleanup = initAnimations(pathname);
-        resetScrollPositionAfterPaint();
+        settleScrollAfterNavigation();
         markReady();
       } catch {
         clearFallback();
@@ -157,6 +146,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
         if (cancelled) return;
         resetPageTransition();
         showAllRevealTargets();
+        settleScrollAfterNavigation();
         markReady();
       }
     };

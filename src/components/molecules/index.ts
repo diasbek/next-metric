@@ -1,6 +1,5 @@
 export { ProjectCard, ProjectTag } from "./ProjectCard";
 export { ContactForm } from "./ContactForm";
-export { MobileMenu, useMobileMenu } from "./MobileMenu";
 export { FilterDropdown } from "./FilterDropdown";
 export { BeforeAfterSlider } from "./BeforeAfterSlider";
 export { FAQAccordion } from "./FAQAccordion";

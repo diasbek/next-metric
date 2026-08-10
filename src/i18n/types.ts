@@ -88,6 +88,8 @@ export interface SiteContent {
     howWeWork: string;
     whyUsTitle: string;
     otherWorks: string;
+    reviewsTitle: string;
+    listingDesignLabel: string;
     beforeAfterLabel: string;
     agencyTagline: string;
     teamTitle: string;

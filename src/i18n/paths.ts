@@ -15,13 +15,15 @@ function localePathWithoutHash(locale: Locale, path: string): string {
 
 export function localePath(locale: Locale, path: string): string {
   if (path.includes("#")) {
-    const [base = "/", hash = ""] = path.split("#");
+    const hashIndex = path.indexOf("#");
+    const base = path.slice(0, hashIndex) || "/";
+    const hash = path.slice(hashIndex + 1).split("#")[0] ?? "";
     const localizedBase = localePathWithoutHash(locale, base || "/");
     const withSlash =
       localizedBase.endsWith("/") || localizedBase === "/"
         ? localizedBase
         : `${localizedBase}/`;
-    return `${withSlash}#${hash}`;
+    return hash ? `${withSlash}#${hash}` : withSlash;
   }
 
   return localePathWithoutHash(locale, path);
@@ -46,7 +48,8 @@ export function stripLocalePrefix(pathname: string): {
 }
 
 export function switchLocalePath(pathname: string, targetLocale: Locale) {
-  const { path } = stripLocalePrefix(pathname);
+  const withoutHash = pathname.split("#")[0] ?? pathname;
+  const { path } = stripLocalePrefix(withoutHash);
   return localePath(targetLocale, path);
 }
 

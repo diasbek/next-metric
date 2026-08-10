@@ -112,12 +112,14 @@ export function LeadsBoard({ leads: initialLeads }: Props) {
   const [statusFilter, setStatusFilterState] = useState<LeadStatus | "all">(() =>
     parseStatusParam(searchParams.get("status")),
   );
+  const statusFromUrl = parseStatusParam(searchParams.get("status"));
+  const [statusUrlSnapshot, setStatusUrlSnapshot] = useState(statusFromUrl);
+  if (statusFromUrl !== statusUrlSnapshot) {
+    setStatusUrlSnapshot(statusFromUrl);
+    setStatusFilterState(statusFromUrl);
+  }
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
   const snapshotRef = useRef(leads);
-
-  useEffect(() => {
-    setStatusFilterState(parseStatusParam(searchParams.get("status")));
-  }, [searchParams]);
 
   useEffect(() => {
     const mq = window.matchMedia(`(min-width: ${ADMIN_MD_BREAKPOINT}px)`);

@@ -1,13 +1,19 @@
 import { Flip } from "gsap/Flip";
 import { gsap, prefersReducedMotion, registerGsapPlugins } from "./gsap";
-import { resetScrollPosition, resetScrollPositionAfterPaint } from "@/utils/scroll";
+import {
+  getHashFromHref,
+  isSameDocumentPath,
+  navigateSameDocumentHash,
+  resetScrollPosition,
+  settleScrollAfterNavigation,
+} from "@/utils/scroll";
 
-const FLIP_SELECTOR =
-  "[data-flip-id], [data-header-logo-mark], [data-page-transition-root]";
+const FLIP_SELECTOR = "[data-flip-id], [data-page-transition-root]";
 
 let transitioning = false;
 let pendingEnterTransition = false;
 let pendingFlipState: ReturnType<typeof Flip.getState> | null = null;
+let pendingScrollHash: string | null = null;
 let activeTweens: gsap.core.Animation[] = [];
 
 // GSAP supports onKill at runtime; it is omitted from CallbackType in the bundled types.
@@ -43,6 +49,7 @@ export function resetPageTransition(): void {
   killTransitionTweens();
   pendingEnterTransition = false;
   pendingFlipState = null;
+  pendingScrollHash = null;
   clearTransitionRootStyles();
 }
 
@@ -145,7 +152,9 @@ export function playEnterTransition(): Promise<void> {
     return Promise.all(tasks).then(() => {
       transitioning = false;
       clearTransitionRootStyles();
-      resetScrollPositionAfterPaint();
+      const hash = pendingScrollHash;
+      pendingScrollHash = null;
+      settleScrollAfterNavigation(hash ? `#${hash}` : undefined);
     });
   } catch {
     resetPageTransition();
@@ -154,21 +163,34 @@ export function playEnterTransition(): Promise<void> {
 }
 
 export async function navigateWithTransition(
-  _href: string,
+  href: string,
   navigate: () => void,
 ): Promise<void> {
   if (transitioning) return;
 
+  const hash = getHashFromHref(href);
+  if (
+    hash &&
+    typeof window !== "undefined" &&
+    isSameDocumentPath(href, window.location.pathname)
+  ) {
+    navigateSameDocumentHash(hash);
+    return;
+  }
+
+  pendingScrollHash = hash;
+
   if (prefersReducedMotion()) {
     navigate();
-    resetScrollPositionAfterPaint();
+    settleScrollAfterNavigation(href);
     return;
   }
 
   const state = captureTransitionState();
   stashTransitionState(state);
   await playExitTransition();
-  resetScrollPosition();
+  // Keep scroll for hash targets — settleScrollAfterNavigation handles both cases.
+  if (!hash) resetScrollPosition();
   navigate();
-  resetScrollPositionAfterPaint();
+  settleScrollAfterNavigation(href);
 }

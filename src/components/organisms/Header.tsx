@@ -163,7 +163,3 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
   );
 }
 
-/** Kept for organism index compatibility with older imports. */
-export function HeroLogo() {
-  return null;
-}

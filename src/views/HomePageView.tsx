@@ -18,7 +18,7 @@ export async function HomePageView({ locale }: HomePageViewProps) {
   const page = await getLocalePageProps(locale);
 
   return (
-    <SiteLayout locale={locale} headerVariant="hero" showContact={false}>
+    <SiteLayout locale={locale} headerVariant="hero">
       <MetricHeroSection locale={locale} />
       <MetricCategoriesSection locale={locale} />
       <MetricCaseStudiesSection locale={locale} />

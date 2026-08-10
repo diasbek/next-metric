@@ -8,6 +8,7 @@ import {
   showAllRevealTargets,
 } from "./gsap";
 import { initGlobalReveals } from "./reveals";
+import { initBeforeAfterSliders } from "./before-after";
 
 export { showAllRevealTargets } from "./gsap";
 
@@ -67,7 +68,7 @@ function initCtaHovers(): Cleanup {
   return () => cleanups.forEach((fn) => fn());
 }
 
-/** Public Metric site — hero entrance, scroll reveals, CTA hover. */
+/** Public Metric site — hero entrance, scroll reveals, CTA hover, before/after. */
 export function initAnimations(_pathname: string): Cleanup {
   if (typeof window === "undefined") return () => {};
 
@@ -84,6 +85,7 @@ export function initAnimations(_pathname: string): Cleanup {
     cleanups.push(initHeroEntrance());
     cleanups.push(initGlobalReveals());
     cleanups.push(initCtaHovers());
+    cleanups.push(initBeforeAfterSliders());
   });
 
   requestAnimationFrame(() => scheduleScrollTriggerRefresh(0));

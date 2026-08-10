@@ -1,5 +1,4 @@
-export { Header, HeroLogo } from "./Header";
-export { HeroSection } from "./HeroSection";
+export { Header } from "./Header";
 export { WorksSection } from "./WorksSection";
 export { WorksListingSection } from "./WorksListingSection";
 export { WorkCaseSection } from "./WorkCaseSection";

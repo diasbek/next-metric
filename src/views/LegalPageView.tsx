@@ -47,7 +47,7 @@ export function LegalPageView({
   const cta = getMetricHome(locale).footer.startCta;
 
   return (
-    <SiteLayout locale={locale} headerVariant="compact" showContact>
+    <SiteLayout locale={locale} headerVariant="compact">
       <div className="bg-white py-16 md:py-24">
         <PageContainer>
           <h1 className="font-display max-w-3xl text-[clamp(40px,6vw,90px)] text-foreground">

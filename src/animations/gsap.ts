@@ -39,18 +39,11 @@ export function showAllRevealTargets(): void {
     img.style.transform = "none";
   });
 
-  document.querySelectorAll<HTMLElement>("[data-header-logo]").forEach((logo) => {
-    const header = logo.closest<HTMLElement>("[data-site-header]");
-    // Hero page: navbar mark stays hidden until `.is-logo-docked` — never force a dual logo.
-    if (
-      header?.getAttribute("data-header-variant") === "hero" &&
-      !header.classList.contains("is-logo-docked")
-    ) {
-      return;
-    }
-    logo.style.visibility = "visible";
-    logo.style.opacity = "1";
-    logo.style.pointerEvents = "";
+  document.querySelectorAll<HTMLElement>(".metric-hero__copy, .metric-hero__visual, .metric-hero__trust").forEach((el) => {
+    el.classList.add("is-revealed");
+    el.style.visibility = "visible";
+    el.style.opacity = "1";
+    el.style.transform = "none";
   });
 }
 

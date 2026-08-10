@@ -89,6 +89,8 @@ export const deContent: SiteContent = {
     howWeWork: "So arbeiten wir",
     whyUsTitle: "Warum Metric",
     otherWorks: "Weitere Projekte",
+    reviewsTitle: "Bewertungen",
+    listingDesignLabel: "Amazon Listing Design",
     beforeAfterLabel: "Vorher / Nachher",
     agencyTagline: "Amazon-Design, das konvertiert",
     teamTitle: "Team",

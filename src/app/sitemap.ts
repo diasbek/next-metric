@@ -7,7 +7,13 @@ import { localePath } from "@/i18n/paths";
 import { SITE_CONFIG } from "@/utils/consts";
 import { isIndexableDeployment } from "@/utils/seo/indexing";
 
-const staticPaths = ["/", "/agency/", "/works/", "/services/", "/contacts/"];
+const staticPaths = [
+  "/",
+  "/works/",
+  "/privacy/",
+  "/newsletter/",
+  "/careers/",
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isIndexableDeployment()) {
@@ -37,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${base}${localizedPath}`,
         lastModified: staticLastModified,
         changeFrequency: path === "/" || path === "/works/" ? "weekly" : "monthly",
-        priority: path === "/" ? 1 : 0.9,
+        priority: path === "/" ? 1 : path === "/works/" ? 0.9 : 0.5,
       });
     }
 
@@ -47,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${base}${localizedPath}`,
         lastModified: new Date(item.updated_at),
         changeFrequency: "monthly",
-        priority: item.slug === "sushi-moto" ? 0.8 : 0.7,
+        priority: 0.7,
       });
     }
   }

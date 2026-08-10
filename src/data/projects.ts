@@ -108,11 +108,7 @@ export const projects: Project[] = [
     description: "Listing and A+ system for a growing Amazon brand",
     image: "/images/metric/cases/case-2.jpg",
     tags: ["Listing", "Agriculture", "Premium A+"],
-    sphere: "Home",
-    featured: true,
-    quote: "All performance figures have risen significantly",
-    author: "Louis Bierbaum",
-    role: "CRAFTUS, Mitgründer & Geschäftsführer",
+    sphere: "Agriculture",
     caseStudy: {
       year: "2026",
       task: "Create a coherent visual system across listing and A+ Content.",

@@ -121,7 +121,7 @@ const metricHomeEn = {
   },
   workflow: {
     id: "workflow",
-    title: "That’s how Metric are made",
+    title: "That’s how Metric is made",
     subtitle: "Unique visual worlds — hand-drawn.",
     cta: "Let’s Talk",
     note: "We’d be happy to present more projects in a personal call.",
@@ -222,7 +222,32 @@ const metricHomeDe = {
       "Erfahren Sie, wie strategische Listing-Bilder und A+ Content Marken mehr Aufmerksamkeit, Klarheit und Conversion gebracht haben.",
     moreLabel: "Mehr Projekte",
     viewLabel: "Case Study ansehen",
-    items: metricHomeEn.caseStudies.items,
+    items: [
+      {
+        slug: "matolux",
+        tags: ["Listing", "Agriculture", "Premium A+"],
+        quote: "Eure Ideen machen wirklich den Unterschied",
+        author: "Markus Pfister",
+        role: "MATOLUX, Mitgründer & Geschäftsführer",
+        image: "/images/metric/cases/case-1.jpg",
+      },
+      {
+        slug: "craftus",
+        tags: ["Listing", "Agriculture", "Premium A+"],
+        quote: "Alle Performance-Kennzahlen sind deutlich gestiegen",
+        author: "Louis Bierbaum",
+        role: "CRAFTUS, Mitgründer & Geschäftsführer",
+        image: "/images/metric/cases/case-2.jpg",
+      },
+      {
+        slug: "tobias",
+        tags: ["Listing", "Home", "Premium A+"],
+        quote: "Die Conversion-Rate hat sich um das Eineinhalbfache erhöht",
+        author: "Tobias Fraikin",
+        role: "Brand founder",
+        image: "/images/metric/cases/case-3.jpg",
+      },
+    ],
   },
   services: {
     ...metricHomeEn.services,

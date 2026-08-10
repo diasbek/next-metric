@@ -90,11 +90,18 @@ export function AdminNotificationsMenu() {
   };
 
   useEffect(() => {
-    void loadNotifications();
+    const frame = requestAnimationFrame(() => {
+      void loadNotifications();
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    if (open) void loadNotifications();
+    if (!open) return;
+    const frame = requestAnimationFrame(() => {
+      void loadNotifications();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [open]);
 
   const placeMenu = () => {
@@ -109,11 +116,12 @@ export function AdminNotificationsMenu() {
 
   useEffect(() => {
     if (!open) return;
-    placeMenu();
+    const frame = requestAnimationFrame(() => placeMenu());
     const onReposition = () => placeMenu();
     window.addEventListener("resize", onReposition);
     window.addEventListener("scroll", onReposition, true);
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("resize", onReposition);
       window.removeEventListener("scroll", onReposition, true);
     };

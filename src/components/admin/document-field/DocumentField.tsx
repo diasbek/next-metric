@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useEffect,
   useId,
   useMemo,
   useState,
@@ -60,11 +59,13 @@ export function DocumentField({
   const resolvedHint = hint ?? t.common.fileHint;
   const inputId = useId();
   const [url, setUrl] = useState(currentUrl);
+  const [urlSource, setUrlSource] = useState(currentUrl);
   const [pending, setPending] = useState<File | null>(null);
 
-  useEffect(() => {
+  if (currentUrl !== urlSource) {
+    setUrlSource(currentUrl);
     setUrl(currentUrl);
-  }, [currentUrl]);
+  }
 
   const setUrlSynced = (next: string) => {
     setUrl(next);

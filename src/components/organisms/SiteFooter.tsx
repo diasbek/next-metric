@@ -6,16 +6,17 @@ import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
 import { getMetricHome } from "@/data/metric-home";
 import { ContactForm } from "@/components/molecules/ContactForm";
+import type { PublicCaptchaConfig } from "@/lib/cms/settings";
 
 interface SiteFooterProps {
   locale: Locale;
   content: SiteContent;
+  captcha: PublicCaptchaConfig;
 }
 
-export function SiteFooter({ locale, content }: SiteFooterProps) {
+export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
   const { site, ui } = content;
   const footer = getMetricHome(locale).footer;
-  const privacy = footer.links[0];
   const socialMap = {
     instagram: site.social.instagram,
     linkedin: site.social.linkedin ?? "#",
@@ -99,18 +100,11 @@ export function SiteFooter({ locale, content }: SiteFooterProps) {
               {ui.contactSubtitle}
             </p>
           </div>
-          <ContactForm locale={locale} ui={ui} />
+          <ContactForm locale={locale} ui={ui} captcha={captcha} />
         </div>
 
         <div className="site-footer__bottom">
           <p>© 2026 {site.name}</p>
-          {privacy ? (
-            <TransitionLink
-              href={localePath(locale, privacy.href)}
-            >
-              {privacy.label}
-            </TransitionLink>
-          ) : null}
         </div>
       </PageContainer>
     </footer>

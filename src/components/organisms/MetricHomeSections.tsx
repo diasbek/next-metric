@@ -161,10 +161,6 @@ export function MetricHeroSection({ locale }: { locale: Locale }) {
   );
 }
 
-export function MetricTrustSection() {
-  return null;
-}
-
 export function MetricCategoriesSection({ locale = "en" }: { locale?: Locale }) {
   const { categories } = getMetricHome(locale);
   return (
