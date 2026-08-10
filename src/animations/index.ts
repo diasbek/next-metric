@@ -27,12 +27,12 @@ function initHeroEntrance(): Cleanup {
 
   const tween = gsap.fromTo(
     targets,
-    { autoAlpha: 0, y: 28 },
+    { autoAlpha: 0, y: 16 },
     {
       autoAlpha: 1,
       y: 0,
-      duration: 0.95,
-      stagger: 0.12,
+      duration: 0.55,
+      stagger: 0.05,
       ease: "power3.out",
       clearProps: CLEAR_MOTION_PROPS,
       onComplete: () => {

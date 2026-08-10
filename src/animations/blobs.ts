@@ -2,11 +2,12 @@ import { gsap, MOTION_OK, registerGsapPlugins, runMatchMedia } from "./gsap";
 
 /**
  * Soft ambient blob drift — same motion model as next-timsol services
- * (8s linear boomerang, scaled to section size).
+ * (5s linear boomerang, scaled to section size).
  */
 const DESIGN_W = 1512;
 const DESIGN_H = 982;
-const DURATION = 8;
+const DURATION = 5;
+const TRAVEL_SCALE = 1.15;
 
 const BLOB_TRAVEL = [
   { x: -489, y: 811 },
@@ -42,8 +43,8 @@ export function initBlobAnimations(): () => void {
         gsap.set(blob, { x: 0, y: 0, force3D: true });
         tweens.push(
           gsap.to(blob, {
-            x: travel.x * sx,
-            y: travel.y * sy,
+            x: travel.x * sx * TRAVEL_SCALE,
+            y: travel.y * sy * TRAVEL_SCALE,
             duration: DURATION,
             ease: "none",
             repeat: -1,

@@ -286,7 +286,7 @@ body {
   user-select: none;
   transform: translateZ(0);
   contain: layout paint;
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 @media (min-width: 1024px) {
@@ -300,21 +300,21 @@ body {
   left: 55%;
   top: -35%;
   filter: blur(90px);
-  opacity: 0.35;
+  opacity: 0.45;
 }
 
 .metric-hero-blob--b {
   left: 48%;
   top: 45%;
   filter: blur(70px);
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .metric-hero-blob--c {
   left: 70%;
   top: 15%;
   filter: blur(110px);
-  opacity: 0.28;
+  opacity: 0.38;
 }
 
 @media (min-width: 1024px) {

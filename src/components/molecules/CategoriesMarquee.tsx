@@ -14,7 +14,7 @@ function getReducedMotion() {
 }
 
 type CategoriesMarqueeProps = {
-  images: string[];
+  images: readonly string[];
 };
 
 function CardStrip({
@@ -22,7 +22,7 @@ function CardStrip({
   keyPrefix,
   inert,
 }: {
-  images: string[];
+  images: readonly string[];
   keyPrefix: string;
   inert?: boolean;
 }) {
