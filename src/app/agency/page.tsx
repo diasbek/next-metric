@@ -1,6 +1,5 @@
-import { createAgencyPage } from "@/i18n/create-pages";
+import { redirect } from "next/navigation";
 
-const { generateMetadata, Page } = createAgencyPage("ru");
-
-export { generateMetadata };
-export default Page;
+export default function AgencyRedirect() {
+  redirect("/#workflow");
+}

@@ -50,7 +50,7 @@ export async function saveTestimonialAction(formData: FormData) {
     })
     .eq("id", id);
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     await supabase.from("testimonial_translations").upsert({
       testimonial_id: id,
       locale,
@@ -74,7 +74,7 @@ export async function createTestimonialAction() {
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
   await supabase.from("testimonial_translations").insert(
-    (["ru", "uz", "en"] as const).map((locale) => ({
+    (["en", "de"] as const).map((locale) => ({
       testimonial_id: data.id,
       locale,
       role: "",

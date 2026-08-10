@@ -9,9 +9,9 @@ import { SITE_CONFIG } from "@/utils/consts";
 export const ORGANIZATION_ID = `${SITE_CONFIG.url}/#organization`;
 export const WEBSITE_ID = `${SITE_CONFIG.url}/#website`;
 
-const ADDRESS_LOCALITY = "Ташкент";
+const ADDRESS_LOCALITY = "Tashkent";
 const ADDRESS_COUNTRY = "UZ";
-const STREET_ADDRESS = "ул. Асака, 3, Мирзо-Улугбекский район";
+const STREET_ADDRESS = SITE_CONFIG.address.join(", ");
 
 function absoluteUrl(path: string) {
   if (!path) return SITE_CONFIG.url;
@@ -34,15 +34,21 @@ export function getOrganizationSchema() {
     url: SITE_CONFIG.url,
     description: SITE_CONFIG.description,
     telephone: SITE_CONFIG.phone,
-    logo: absoluteUrl("/images/logo/metric-footer.svg"),
-    image: absoluteUrl("/og-image/"),
+    logo: absoluteUrl("/images/metric/logo/metric-logo.svg"),
+    image: absoluteUrl("/og/ru/home/"),
     address: {
       "@type": "PostalAddress",
       streetAddress: STREET_ADDRESS,
       addressLocality: ADDRESS_LOCALITY,
       addressCountry: ADDRESS_COUNTRY,
     },
-    sameAs: [SITE_CONFIG.social.telegram, SITE_CONFIG.social.instagram],
+    sameAs: [
+      SITE_CONFIG.social.instagram,
+      SITE_CONFIG.social.linkedin,
+      SITE_CONFIG.social.x,
+      SITE_CONFIG.social.facebook,
+      SITE_CONFIG.social.telegram,
+    ].filter(Boolean),
   };
 }
 
@@ -53,7 +59,7 @@ export function getWebSiteSchema() {
     name: SITE_CONFIG.name,
     url: SITE_CONFIG.url,
     description: SITE_CONFIG.description,
-    inLanguage: "ru",
+    inLanguage: "en",
     publisher: { "@id": ORGANIZATION_ID },
   };
 }
@@ -66,7 +72,7 @@ export function getWebPageSchema({
   title,
   description,
   path,
-  locale = "ru",
+  locale = "en",
   dateModified,
 }: {
   title: string;
@@ -118,7 +124,7 @@ export function getFaqPageSchema(items: FAQItem[]) {
 
 export function getProjectListSchema(
   projects: Project[],
-  locale: Locale = "ru",
+  locale: Locale = "en",
   listName = "Портфолио METRIC",
 ) {
   return {
@@ -133,7 +139,7 @@ export function getProjectListSchema(
   };
 }
 
-export function getCreativeWorkSchema(project: Project, locale: Locale = "ru") {
+export function getCreativeWorkSchema(project: Project, locale: Locale = "en") {
   const path = localePath(locale, `/works/${project.slug}/`);
   const url = absoluteUrl(path);
 
@@ -149,13 +155,9 @@ export function getCreativeWorkSchema(project: Project, locale: Locale = "ru") {
   };
 }
 
-export function getServicesCatalogSchema(services: Service[], locale: Locale = "ru") {
+export function getServicesCatalogSchema(services: Service[], locale: Locale = "en") {
   const catalogName =
-    locale === "uz"
-      ? "METRIC xizmatlari"
-      : locale === "en"
-        ? "METRIC services"
-        : "Услуги METRIC";
+    locale === "de" ? "METRIC Leistungen" : "METRIC services";
 
   return {
     "@type": "OfferCatalog",
@@ -172,7 +174,7 @@ export function getServicesCatalogSchema(services: Service[], locale: Locale = "
   };
 }
 
-export function getLocalBusinessSchema(locale: Locale = "ru") {
+export function getLocalBusinessSchema(locale: Locale = "en") {
   const path = localePath(locale, "/contacts/");
 
   return {
@@ -200,7 +202,7 @@ export function getPageJsonLd({
   path,
   breadcrumbs,
   extra = [],
-  locale = "ru",
+  locale = "en",
   dateModified,
 }: {
   title: string;

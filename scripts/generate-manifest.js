@@ -16,11 +16,11 @@ function generateManifestContent(site) {
       display: "standalone",
       display_override: ["standalone", "browser"],
       orientation: "any",
-      background_color: "#000000",
-      theme_color: site.themeColor || "#2600ff",
-      lang: site.defaultLocale || "ru",
+      background_color: "#ffffff",
+      theme_color: site.themeColor || "#ff3c82",
+      lang: site.defaultLocale || "en",
       dir: "ltr",
-      categories: ["business", "design"],
+      categories: ["business", "design", "marketing"],
       icons: [
         {
           src: "/icons/icon-16.png",

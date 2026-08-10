@@ -1,13 +1,13 @@
 import * as Yup from "yup";
 
-export const ADMIN_LOCALES = ["ru", "uz", "en"] as const;
+export const ADMIN_LOCALES = ["en", "de"] as const;
 export type AdminLocaleCode = (typeof ADMIN_LOCALES)[number];
 
 const optionalTrimmed = Yup.string().trim().default("");
 
 export const statusSchema = Yup.mixed<"draft" | "published">()
   .oneOf(["draft", "published"])
-  .required("Выберите статус");
+  .required("Select a status");
 
 export const sortOrderSchema = Yup.number()
   .transform((_value, original) => {
@@ -16,35 +16,33 @@ export const sortOrderSchema = Yup.number()
     }
     return Number(original);
   })
-  .typeError("Порядок должен быть числом")
-  .integer("Порядок — целое число")
-  .min(0, "Порядок не может быть отрицательным")
-  .max(9999, "Порядок слишком большой")
-  .required("Укажите порядок");
+  .typeError("Order must be a number")
+  .integer("Order must be an integer")
+  .min(0, "Order cannot be negative")
+  .max(9999, "Order is too large")
+  .required("Enter an order");
 
 export const requiredLabel = (label: string) =>
-  Yup.string().trim().required(`Заполните поле «${label}»`);
+  Yup.string().trim().required(`Fill in “${label}”`);
 
-/** Team member — RU is required when publishing. */
+/** Team member — EN is required when publishing. */
 export const teamMemberSchema = Yup.object({
   status: statusSchema,
   sort_order: sortOrderSchema,
   is_director: Yup.boolean().default(false),
   image_object_position: optionalTrimmed,
-  ru_name: Yup.string().trim().when("status", {
+  en_name: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Имя (RU) обязательно для публикации"),
+    then: (s) => s.required("Name (EN) is required to publish"),
     otherwise: (s) => s.default(""),
   }),
-  ru_role: Yup.string().trim().when("status", {
+  en_role: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Роль (RU) обязательна для публикации"),
+    then: (s) => s.required("Role (EN) is required to publish"),
     otherwise: (s) => s.default(""),
   }),
-  uz_name: optionalTrimmed,
-  uz_role: optionalTrimmed,
-  en_name: optionalTrimmed,
-  en_role: optionalTrimmed,
+  de_name: optionalTrimmed,
+  de_role: optionalTrimmed,
 });
 
 export type TeamMemberFormValues = Yup.InferType<typeof teamMemberSchema>;
@@ -52,20 +50,18 @@ export type TeamMemberFormValues = Yup.InferType<typeof teamMemberSchema>;
 export const faqItemSchema = Yup.object({
   status: statusSchema,
   sort_order: sortOrderSchema,
-  ru_question: Yup.string().trim().when("status", {
+  en_question: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Вопрос (RU) обязателен"),
+    then: (s) => s.required("Question (EN) is required"),
     otherwise: (s) => s.default(""),
   }),
-  ru_answer: Yup.string().trim().when("status", {
+  en_answer: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Ответ (RU) обязателен"),
+    then: (s) => s.required("Answer (EN) is required"),
     otherwise: (s) => s.default(""),
   }),
-  uz_question: optionalTrimmed,
-  uz_answer: optionalTrimmed,
-  en_question: optionalTrimmed,
-  en_answer: optionalTrimmed,
+  de_question: optionalTrimmed,
+  de_answer: optionalTrimmed,
 });
 
 export const serviceSchema = Yup.object({
@@ -73,55 +69,47 @@ export const serviceSchema = Yup.object({
   sort_order: sortOrderSchema,
   service_key: Yup.string()
     .trim()
-    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Ключ: латиница, цифры и дефисы")
-    .required("Укажите service_key"),
-  ru_title: Yup.string().trim().when("status", {
+    .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Key: lowercase letters, numbers, hyphens")
+    .required("Enter service_key"),
+  en_title: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Название (RU) обязательно"),
+    then: (s) => s.required("Title (EN) is required"),
     otherwise: (s) => s.default(""),
   }),
-  ru_short: optionalTrimmed,
-  ru_full: optionalTrimmed,
-  ru_price: optionalTrimmed,
-  ru_duration: optionalTrimmed,
-  uz_title: optionalTrimmed,
-  uz_short: optionalTrimmed,
-  uz_full: optionalTrimmed,
-  uz_price: optionalTrimmed,
-  uz_duration: optionalTrimmed,
-  en_title: optionalTrimmed,
   en_short: optionalTrimmed,
   en_full: optionalTrimmed,
   en_price: optionalTrimmed,
   en_duration: optionalTrimmed,
+  de_title: optionalTrimmed,
+  de_short: optionalTrimmed,
+  de_full: optionalTrimmed,
+  de_price: optionalTrimmed,
+  de_duration: optionalTrimmed,
 });
 
 export const processStepSchema = Yup.object({
   status: statusSchema,
   sort_order: sortOrderSchema,
-  step_number: Yup.string().trim().required("Укажите номер шага"),
-  ru_title: Yup.string().trim().when("status", {
+  step_number: Yup.string().trim().required("Enter step number"),
+  en_title: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Заголовок (RU) обязателен"),
+    then: (s) => s.required("Title (EN) is required"),
     otherwise: (s) => s.default(""),
   }),
-  ru_description: optionalTrimmed,
-  uz_title: optionalTrimmed,
-  uz_description: optionalTrimmed,
-  en_title: optionalTrimmed,
   en_description: optionalTrimmed,
+  de_title: optionalTrimmed,
+  de_description: optionalTrimmed,
 });
 
 export const benefitSchema = Yup.object({
   status: statusSchema,
   sort_order: sortOrderSchema,
-  ru_label: Yup.string().trim().when("status", {
+  en_label: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Текст (RU) обязателен"),
+    then: (s) => s.required("Text (EN) is required"),
     otherwise: (s) => s.default(""),
   }),
-  uz_label: optionalTrimmed,
-  en_label: optionalTrimmed,
+  de_label: optionalTrimmed,
 });
 
 export const testimonialSchema = Yup.object({
@@ -131,45 +119,42 @@ export const testimonialSchema = Yup.object({
   logo_rounded: Yup.mixed<"" | "full" | "lg">()
     .oneOf(["", "full", "lg"])
     .default(""),
-  ru_role: optionalTrimmed,
-  ru_quote: Yup.string().trim().when("status", {
+  en_role: optionalTrimmed,
+  en_quote: Yup.string().trim().when("status", {
     is: "published",
-    then: (s) => s.required("Цитата (RU) обязательна"),
+    then: (s) => s.required("Quote (EN) is required"),
     otherwise: (s) => s.default(""),
   }),
-  uz_role: optionalTrimmed,
-  uz_quote: optionalTrimmed,
-  en_role: optionalTrimmed,
-  en_quote: optionalTrimmed,
+  de_role: optionalTrimmed,
+  de_quote: optionalTrimmed,
 });
 
 const contactsLocaleSchema = Yup.object({
-  address_lines: Yup.string().trim().required("Укажите адрес"),
+  address_lines: Yup.string().trim().required("Enter an address"),
   presentation_url: optionalTrimmed,
   brief_url: optionalTrimmed,
 });
 
 export const contactsSchema = Yup.object({
-  phone: Yup.string().trim().required("Укажите телефон"),
-  email: Yup.string().trim().email("Некорректный email").default(""),
+  phone: Yup.string().trim().required("Enter a phone number"),
+  email: Yup.string().trim().email("Invalid email").default(""),
   telegram_url: Yup.string()
     .trim()
     .transform((v) => (v ? v : undefined))
-    .url("Некорректный URL Telegram")
+    .url("Invalid Telegram URL")
     .notRequired(),
   instagram_url: Yup.string()
     .trim()
     .transform((v) => (v ? v : undefined))
-    .url("Некорректный URL Instagram")
+    .url("Invalid Instagram URL")
     .notRequired(),
-  ru: contactsLocaleSchema,
-  uz: contactsLocaleSchema,
   en: contactsLocaleSchema,
+  de: contactsLocaleSchema,
 });
 
 export const loginSchema = Yup.object({
-  email: Yup.string().trim().email("Некорректный email").required("Введите email"),
-  password: Yup.string().min(1, "Введите пароль").required("Введите пароль"),
+  email: Yup.string().trim().email("Invalid email").required("Enter email"),
+  password: Yup.string().min(1, "Enter password").required("Enter password"),
 });
 
 export function yupToFieldErrors(

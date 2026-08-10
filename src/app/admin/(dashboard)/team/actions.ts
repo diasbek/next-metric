@@ -70,7 +70,7 @@ export async function saveTeamMemberAction(formData: FormData) {
       .eq("id", id);
     if (updateError) return adminFail(updateError.message);
 
-    for (const locale of ["ru", "uz", "en"] as const) {
+    for (const locale of ["en", "de"] as const) {
       const { error } = await supabase.from("team_member_translations").upsert({
         member_id: id,
         locale,
@@ -81,10 +81,10 @@ export async function saveTeamMemberAction(formData: FormData) {
     }
 
     if (status === "published") {
-      const ruName = String(formData.get("ru_name") ?? "").trim();
-      const ruRole = String(formData.get("ru_role") ?? "").trim();
+      const ruName = String(formData.get("en_name") ?? "").trim();
+      const ruRole = String(formData.get("en_role") ?? "").trim();
       if (!ruName || !ruRole) {
-        return adminFail("Для публикации нужны имя и роль на RU");
+        return adminFail("need name and role in EN");
       }
     }
 
@@ -112,7 +112,7 @@ export async function createTeamMemberAction() {
     const { error: trError } = await supabase
       .from("team_member_translations")
       .insert(
-        (["ru", "uz", "en"] as const).map((locale) => ({
+        (["en", "de"] as const).map((locale) => ({
           member_id: data.id,
           locale,
           name: "New member",

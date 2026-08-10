@@ -41,7 +41,7 @@ export type AdminMessages = {
     ready: string;
     delete: string;
     cancel: string;
-    copyFromRu: string;
+    copyFromEn: string;
     actionFailed: string;
     retry: string;
     reload: string;
@@ -100,7 +100,7 @@ export type AdminMessages = {
     logoRoundedCircle: string;
     folderDefault: string;
     editingLocale: string;
-    fillRuFirst: string;
+    fillEnFirst: string;
     uploadNetworkError: string;
   };
   roles: {

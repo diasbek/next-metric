@@ -15,8 +15,8 @@ type AdminI18nValue = {
 };
 
 const AdminI18nContext = createContext<AdminI18nValue>({
-  locale: "ru",
-  t: getAdminMessages("ru"),
+  locale: "en",
+  t: getAdminMessages("en"),
 });
 
 export function AdminI18nProvider({

@@ -18,7 +18,7 @@ export async function saveBenefitAction(formData: FormData) {
     })
     .eq("id", id);
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     await supabase.from("benefit_translations").upsert({
       benefit_id: id,
       locale,
@@ -41,7 +41,7 @@ export async function createBenefitAction() {
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
   await supabase.from("benefit_translations").insert(
-    (["ru", "uz", "en"] as const).map((locale) => ({
+    (["en", "de"] as const).map((locale) => ({
       benefit_id: data.id,
       locale,
       label: "New benefit",

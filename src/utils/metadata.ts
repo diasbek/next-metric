@@ -4,7 +4,7 @@ import type { Locale } from "@/i18n/config";
 import { getRobotsMetadata } from "./seo/indexing";
 import { OG_IMAGE_DIMENSIONS } from "./og/paths";
 
-const DEFAULT_OG_IMAGE = "/og/ru/home/";
+const DEFAULT_OG_IMAGE = "/og/en/home/";
 
 export function createPageMetadata(
   title: string,
@@ -46,7 +46,7 @@ export function createPageMetadata(
       description,
       url,
       siteName: SITE_CONFIG.name,
-      locale: options?.ogLocale ?? "ru_RU",
+      locale: options?.ogLocale ?? "en_US",
       type: options?.type ?? "website",
       ...(modifiedTime ? { modifiedTime } : {}),
       images: [
@@ -100,7 +100,7 @@ export const rootMetadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: SITE_CONFIG.name,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
   icons: {
     icon: [
@@ -124,7 +124,7 @@ export const rootMetadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "ru_RU",
+    locale: "en_US",
     url: SITE_CONFIG.url,
     siteName: SITE_CONFIG.name,
     title: SITE_CONFIG.title,
@@ -157,8 +157,8 @@ export const rootMetadata: Metadata = {
 };
 
 export const notFoundMetadata: Metadata = {
-  title: "Страница не найдена — METRIC",
-  description: "Запрошенная страница не существует.",
+  title: "Page not found — METRIC",
+  description: "The requested page does not exist.",
   robots: {
     index: false,
     follow: false,

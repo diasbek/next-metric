@@ -24,7 +24,7 @@ export default async function AdminWorksPage() {
         <ProjectsList
           embedded
           projects={projects.map((project) => {
-            const ru = project.project_translations.find((t) => t.locale === "ru");
+            const ru = project.project_translations.find((t) => t.locale === "en");
             return {
               id: project.id,
               slug: project.slug,

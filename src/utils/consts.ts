@@ -3,38 +3,38 @@ import { getCanonicalSiteUrl } from "./seo/indexing";
 
 export const SITE_CONFIG = {
   name: "METRIC",
-  title: "METRIC — брендинговое агентство",
+  title: "METRIC — Amazon listing images & A+ Content",
   description:
-    "Брендинговое агентство в Ташкенте. Логотип, фирменный стиль и брендбук для сильных брендов.",
+    "Strategic Amazon listing images and A+ Content designed to communicate value, inspire confidence, and turn attention into sales.",
   url: getCanonicalSiteUrl(),
-  phone: "+998 90 000 00 00",
+  phone: "+987 778 99 88",
   email: getPublicEnv("NEXT_PUBLIC_CONTACT_EMAIL", "hello@metric.agency"),
-  address: [
-    "Узбекистан, Ташкент",
-  ],
+  address: ["Uzbekistan, Tashkent, Street"],
   map: {
-    // GeoJSON / Yandex order kept for CMS consistency: [lng, lat]
-    // Leaflet converts to [lat, lng] in OfficeMap.
     center: [69.279737, 41.311151] as [number, number],
     zoom: 15,
   },
   social: {
     telegram: "https://t.me/metricagency",
     instagram: "https://www.instagram.com/metricagency",
+    linkedin: "https://www.linkedin.com/",
+    x: "https://x.com/",
+    facebook: "https://www.facebook.com/",
   },
   files: {
     presentation: "/files/presentation.pdf",
     brief: "/files/brief.pdf",
   },
   nav: [
-    { label: "Агентство", href: "/agency/" },
-    { label: "Работы", href: "/works/" },
-    { label: "Услуги", href: "/services/" },
-    { label: "Контакты", href: "/contacts/" },
+    { label: "Services", href: "/#services" },
+    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Projects", href: "/#projects" },
+    { label: "Workflow", href: "/#workflow" },
+    { label: "FAQ", href: "/#faq" },
   ],
-  locales: ["ru", "uz", "en"] as const,
-  defaultLocale: "ru" as const,
-  themeColor: "#2600ff",
+  locales: ["en", "de"] as const,
+  defaultLocale: "en" as const,
+  themeColor: "#ff3c82",
   analytics: {
     yandexMetrikaId: getPublicEnv("NEXT_PUBLIC_YM_ID"),
     googleAnalyticsId: getPublicEnv("NEXT_PUBLIC_GA_ID"),
@@ -51,25 +51,24 @@ export const SITE_CONFIG = {
 
 export const PAGE_META = {
   home: {
-    title: "METRIC — брендинговое агентство",
+    title: "METRIC — Amazon listing images & A+ Content",
     description:
-      "Каждый бренд — это история. Логотип, фирменный стиль и брендбук в Ташкенте.",
+      "On Amazon, customers buy with their eyes first. Strategic listing images and A+ Content that turn attention into sales.",
   },
   agency: {
-    title: "Агентство — METRIC",
-    description:
-      "Брендинговая студия из Ташкента. Помогаем бизнесу выглядеть профессионально.",
+    title: "About — METRIC",
+    description: "Amazon design partner for listing images, A+ Content, and Brand Stores.",
   },
   works: {
-    title: "Работы — METRIC",
-    description: "Портфолио брендинговых проектов METRIC.",
+    title: "Projects — METRIC",
+    description: "Amazon listing and A+ Content case studies by METRIC.",
   },
   services: {
-    title: "Услуги — METRIC",
-    description: "Логотип, фирменный стиль и брендбук. Цены и сроки.",
+    title: "Services — METRIC",
+    description: "Product images, A+ Content, Ad Banner, and Brand Store design.",
   },
   contacts: {
-    title: "Контакты — METRIC",
-    description: "Свяжитесь с нами. Ответим в течение часа.",
+    title: "Contact — METRIC",
+    description: "Start your Amazon design project with METRIC.",
   },
 } as const;

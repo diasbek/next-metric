@@ -133,7 +133,7 @@ function CardFace({
 
 export function ServicesEditor({ items, initialEditId = null, embedded = false }: Props) {
   const t = useAdminT();
-  const [boardLocale, setBoardLocale] = useState<AdminLocale>("ru");
+  const [boardLocale, setBoardLocale] = useState<AdminLocale>("en");
   const [selectedId, setSelectedId] = useState<string | null>(initialEditId);
   const [ordered, setOrdered] = useOrderedItems(items);
   const { pending, saved, onDragEnd } = usePersistReorder(
@@ -264,7 +264,7 @@ function ServiceEditPanel({
   onClose: () => void;
 }) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(item);
   const [busy, setBusy] = useState(false);
   const tr = draft.translations[locale];
@@ -280,9 +280,9 @@ function ServiceEditPanel({
     }));
   };
 
-  const copyFromRu = () => {
-    if (locale === "ru") return;
-    const ru = draft.translations.ru;
+  const copyFromEn = () => {
+    if (locale === "en") return;
+    const ru = draft.translations.en;
     setDraft((prev) => ({
       ...prev,
       translations: {
@@ -432,9 +432,9 @@ function ServiceEditPanel({
           </label>
         </div>
 
-        {locale !== "ru" ? (
-          <button type="button" style={adminBtn} onClick={copyFromRu}>
-            {t.common.copyFromRu}
+        {locale !== "en" ? (
+          <button type="button" style={adminBtn} onClick={copyFromEn}>
+            {t.common.copyFromEn}
           </button>
         ) : null}
 

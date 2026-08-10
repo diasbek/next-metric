@@ -11,3 +11,12 @@ export { ProcessSection } from "./ProcessSection";
 export { WhyUsSection } from "./WhyUsSection";
 export { ContactSection } from "./ContactSection";
 export { SiteFooter } from "./SiteFooter";
+export {
+  MetricHeroSection,
+  MetricTrustSection,
+  MetricCategoriesSection,
+  MetricCaseStudiesSection,
+  MetricServicesSection,
+  MetricWorkflowSection,
+} from "./MetricHomeSections";
+export { MetricFaqSection } from "./MetricFaqSection";

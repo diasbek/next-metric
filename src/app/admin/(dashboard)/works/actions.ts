@@ -28,7 +28,7 @@ export async function createProjectAction() {
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
   await supabase.from("project_translations").insert(
-    (["ru", "uz", "en"] as const).map((locale) => ({
+    (["en", "de"] as const).map((locale) => ({
       project_id: data.id,
       locale,
       title: "New project",
@@ -88,7 +88,7 @@ export async function saveProjectAction(formData: FormData) {
 
   if (error) return adminFail(error.message);
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     await supabase.from("project_translations").upsert({
       project_id: id,
       locale,

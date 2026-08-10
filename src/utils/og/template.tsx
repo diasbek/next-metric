@@ -4,7 +4,7 @@ export interface OgTemplateProps {
   title: string;
   description: string;
   eyebrow: string;
-  /** Real METRIC wordmark as data URL (PNG/SVG). */
+  /** Real METRIC wordmark as PNG data URL. */
   logoDataUrl: string;
   imageDataUrl?: string;
   siteUrl?: string;
@@ -26,7 +26,7 @@ export function OgTemplate({
         display: "flex",
         width: "100%",
         height: "100%",
-        background: "#000000",
+        background: "#ffffff",
         fontFamily: "Inter Tight",
       }}
     >
@@ -44,10 +44,10 @@ export function OgTemplate({
           src={logoDataUrl}
           alt="METRIC"
           width={280}
-          height={86}
+          height={64}
           style={{
             width: 280,
-            height: 86,
+            height: 64,
             objectFit: "contain",
             objectPosition: "left center",
           }}
@@ -62,10 +62,10 @@ export function OgTemplate({
           <div
             style={{
               marginBottom: 20,
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: 500,
-              color: "#2600FF",
-              letterSpacing: "0.14em",
+              color: "#ff3c82",
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
             }}
           >
@@ -76,7 +76,7 @@ export function OgTemplate({
               marginBottom: 20,
               fontSize: titleSize,
               fontWeight: 500,
-              color: "#FAFAFA",
+              color: "#090909",
               lineHeight: 1.05,
               letterSpacing: "-0.03em",
             }}
@@ -88,7 +88,7 @@ export function OgTemplate({
               maxWidth: 520,
               fontSize: 24,
               fontWeight: 400,
-              color: "rgba(255,255,255,0.68)",
+              color: "rgba(9,9,9,0.62)",
               lineHeight: 1.35,
             }}
           >
@@ -99,7 +99,7 @@ export function OgTemplate({
         <div
           style={{
             fontSize: 20,
-            color: "rgba(255,255,255,0.45)",
+            color: "rgba(9,9,9,0.45)",
           }}
         >
           {siteUrl}
@@ -114,7 +114,7 @@ export function OgTemplate({
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          background: "#2600FF",
+          background: "#ff3c82",
         }}
       >
         {imageDataUrl ? (
@@ -135,13 +135,13 @@ export function OgTemplate({
           <img
             src={logoDataUrl}
             alt=""
-            width={380}
-            height={116}
+            width={320}
+            height={72}
             style={{
-              width: 380,
-              height: 116,
+              width: 320,
+              height: 72,
               objectFit: "contain",
-              opacity: 0.18,
+              opacity: 0.25,
             }}
           />
         )}

@@ -72,7 +72,7 @@ export async function saveSettingsAction(formData: FormData) {
     ),
   });
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     for (const pageKey of ["home", "agency", "works", "services", "contacts"] as const) {
       await supabase.from("page_seo").upsert({
         locale,
@@ -130,7 +130,7 @@ export async function testTelegramNotifyAction() {
     name: "Test METRIC",
     phone: "+998 00 000 00 00",
     message: "Test notification from admin settings",
-    locale: "ru",
+    locale: "en",
   });
 
   const settings = await getSiteSettings();

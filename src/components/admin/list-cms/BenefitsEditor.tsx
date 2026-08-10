@@ -114,7 +114,7 @@ function CardFace({
 
 export function BenefitsEditor({ items, initialEditId = null, embedded = false }: Props) {
   const t = useAdminT();
-  const [boardLocale, setBoardLocale] = useState<AdminLocale>("ru");
+  const [boardLocale, setBoardLocale] = useState<AdminLocale>("en");
   const [selectedId, setSelectedId] = useState<string | null>(initialEditId);
   const selected = useMemo(
     () => items.find((i) => i.id === selectedId) ?? null,
@@ -191,7 +191,7 @@ export function BenefitsEditor({ items, initialEditId = null, embedded = false }
 
 function BenefitPanel({ item, onClose }: { item: BenefitDraft; onClose: () => void }) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(item);
   const [busy, setBusy] = useState(false);
   const tr = draft.translations[locale];
@@ -236,7 +236,7 @@ function BenefitPanel({ item, onClose }: { item: BenefitDraft; onClose: () => vo
             style={adminInput}
           />
         </label>
-        {locale !== "ru" ? (
+        {locale !== "en" ? (
           <button
             type="button"
             style={adminBtn}
@@ -245,12 +245,12 @@ function BenefitPanel({ item, onClose }: { item: BenefitDraft; onClose: () => vo
                 ...prev,
                 translations: {
                   ...prev.translations,
-                  [locale]: { ...prev.translations.ru, locale },
+                  [locale]: { ...prev.translations.en, locale },
                 },
               }))
             }
           >
-            {t.common.copyFromRu}
+            {t.common.copyFromEn}
           </button>
         ) : null}
         <MetaFields

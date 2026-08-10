@@ -32,14 +32,14 @@ export function HomeWhyUsEditor({
   saved = false,
 }: Props) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(initialTitles);
   const current = draft[locale];
 
-  const copyFromRu = () => {
+  const copyFromEn = () => {
     setDraft((prev) => ({
       ...prev,
-      [locale]: { ...prev.ru },
+      [locale]: { ...prev.en },
     }));
   };
 
@@ -84,9 +84,9 @@ export function HomeWhyUsEditor({
               {item.short}
             </button>
           ))}
-          {locale !== "ru" ? (
-            <button type="button" style={adminBtn} onClick={copyFromRu}>
-              {t.common.copyFromRu}
+          {locale !== "en" ? (
+            <button type="button" style={adminBtn} onClick={copyFromEn}>
+              {t.common.copyFromEn}
             </button>
           ) : null}
         </div>

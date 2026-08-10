@@ -6,7 +6,7 @@ import { useMemo, useState, type CSSProperties } from "react";
 import { saveAgencyAction } from "@/app/admin/(dashboard)/agency/actions";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
 
-type LocaleCode = "ru" | "uz" | "en";
+type LocaleCode = "en" | "de";
 
 type LocaleDraft = {
   titleLine1: string;
@@ -23,9 +23,8 @@ type Props = {
 };
 
 const LOCALES: Array<{ code: LocaleCode; label: string; short: string }> = [
-  { code: "ru", label: "Русский", short: "RU" },
-  { code: "uz", label: "O‘zbekcha", short: "UZ" },
   { code: "en", label: "English", short: "EN" },
+  { code: "de", label: "Deutsch", short: "DE" },
 ];
 
 const input: CSSProperties = {
@@ -49,7 +48,7 @@ const btn: CSSProperties = {
 
 export function AgencyEditor({ foundedYear, translations, saved, embedded }: Props) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<LocaleCode>("ru");
+  const [locale, setLocale] = useState<LocaleCode>("en");
   const [year, setYear] = useState(foundedYear);
   const [draft, setDraft] = useState(translations);
 
@@ -91,11 +90,11 @@ export function AgencyEditor({ foundedYear, translations, saved, embedded }: Pro
     }));
   };
 
-  const copyFromRu = () => {
-    if (locale === "ru") return;
+  const copyFromEn = () => {
+    if (locale === "en") return;
     setDraft((prev) => ({
       ...prev,
-      [locale]: { ...prev.ru },
+      [locale]: { ...prev.en },
     }));
   };
 
@@ -137,9 +136,9 @@ export function AgencyEditor({ foundedYear, translations, saved, embedded }: Pro
             {item.short}
           </button>
         ))}
-        {locale !== "ru" ? (
-          <button type="button" style={btn} onClick={copyFromRu}>
-            {t.common.copyFromRu}
+        {locale !== "en" ? (
+          <button type="button" style={btn} onClick={copyFromEn}>
+            {t.common.copyFromEn}
           </button>
         ) : null}
       </div>

@@ -21,7 +21,7 @@ export type CmsTag = (typeof CMS_TAGS)[number];
 
 type PathEntry = [string, "layout" | "page"];
 
-const LOCALES = ["", "/uz", "/en"] as const;
+const LOCALES = ["", "/de"] as const;
 
 function localePaths(
   suffix: string,

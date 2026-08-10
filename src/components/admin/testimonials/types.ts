@@ -1,13 +1,12 @@
-export type AdminLocale = "ru" | "uz" | "en";
+export type AdminLocale = "en" | "de";
 
 export const ADMIN_LOCALES: Array<{
   code: AdminLocale;
   label: string;
   short: string;
 }> = [
-  { code: "ru", label: "Русский", short: "RU" },
-  { code: "uz", label: "O‘zbekcha", short: "UZ" },
   { code: "en", label: "English", short: "EN" },
+  { code: "de", label: "Deutsch", short: "DE" },
 ];
 
 export type TestimonialTranslationDraft = {

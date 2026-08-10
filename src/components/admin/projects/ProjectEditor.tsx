@@ -65,7 +65,7 @@ function isLocaleFilled(tr: ProjectTranslationDraft): boolean {
 
 export function ProjectEditor({ project, library }: Props) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(project);
   const [coverPreview, setCoverPreview] = useState(project.cover_image);
   const tr = draft.translations[locale];

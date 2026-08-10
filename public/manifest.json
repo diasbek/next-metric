@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "METRIC — брендинговое агентство",
+  "name": "METRIC — Amazon listing images & A+ Content",
   "short_name": "METRIC",
-  "description": "Брендинговое агентство в Ташкенте. Логотип, фирменный стиль и брендбук для сильных брендов.",
+  "description": "Strategic Amazon listing images and A+ Content designed to communicate value, inspire confidence, and turn attention into sales.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -11,13 +11,14 @@
     "browser"
   ],
   "orientation": "any",
-  "background_color": "#000000",
-  "theme_color": "#2600ff",
-  "lang": "ru",
+  "background_color": "#ffffff",
+  "theme_color": "#ff3c82",
+  "lang": "en",
   "dir": "ltr",
   "categories": [
     "business",
-    "design"
+    "design",
+    "marketing"
   ],
   "icons": [
     {

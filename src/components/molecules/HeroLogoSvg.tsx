@@ -44,7 +44,7 @@ function LogoLetters() {
     <text
       x={0}
       y={230}
-      fontFamily="var(--font-inter-tight), 'Inter Tight', system-ui, sans-serif"
+      fontFamily="var(--font-archivo), Archivo, system-ui, sans-serif"
       fontSize={240}
       fontWeight={500}
       letterSpacing="-0.04em"
@@ -74,7 +74,7 @@ function SoftFadeStops({ invert }: { invert?: boolean }) {
 }
 
 export function HeroLogoSvg({
-  color = "#2600FF",
+  color = "#ff3c82",
   idPrefix = "hero-blue",
   showBlur = false,
 }: HeroLogoSvgProps) {

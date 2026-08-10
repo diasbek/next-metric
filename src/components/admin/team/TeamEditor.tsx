@@ -237,7 +237,7 @@ function SortableMember({
 
 export function TeamEditor({ items, initialEditId = null, embedded = false }: Props) {
   const t = useAdminT();
-  const [boardLocale, setBoardLocale] = useState<AdminLocale>("ru");
+  const [boardLocale, setBoardLocale] = useState<AdminLocale>("en");
   const [selectedId, setSelectedId] = useState<string | null>(initialEditId);
   const [ordered, setOrdered] = useState(items);
   const [pending, startTransition] = useTransition();
@@ -477,7 +477,7 @@ function TeamEditPanel({
 }) {
   const t = useAdminT();
   const supabaseConfig = useAdminSupabaseConfig();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [previewImage, setPreviewImage] = useState(item.image);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -488,12 +488,10 @@ function TeamEditPanel({
     sort_order: item.sort_order,
     is_director: item.is_director,
     image_object_position: item.image_object_position ?? "",
-    ru_name: item.translations.ru.name,
-    ru_role: item.translations.ru.role,
-    uz_name: item.translations.uz.name,
-    uz_role: item.translations.uz.role,
     en_name: item.translations.en.name,
     en_role: item.translations.en.role,
+    de_name: item.translations.de.name,
+    de_role: item.translations.de.role,
   };
 
   return (
@@ -536,7 +534,7 @@ function TeamEditPanel({
           fd.set("sort_order", String(values.sort_order));
           fd.set("image_object_position", values.image_object_position);
           if (values.is_director) fd.set("is_director", "on");
-          for (const code of ["ru", "uz", "en"] as const) {
+          for (const code of ["en", "de"] as const) {
             fd.set(`${code}_name`, values[`${code}_name` as const]);
             fd.set(`${code}_role`, values[`${code}_role` as const]);
           }
@@ -578,20 +576,15 @@ function TeamEditPanel({
             image_object_position: values.image_object_position,
             image: previewImage,
             translations: {
-              ru: {
-                locale: "ru",
-                name: values.ru_name,
-                role: values.ru_role,
-              },
-              uz: {
-                locale: "uz",
-                name: values.uz_name,
-                role: values.uz_role,
-              },
               en: {
                 locale: "en",
                 name: values.en_name,
                 role: values.en_role,
+              },
+              de: {
+                locale: "de",
+                name: values.de_name,
+                role: values.de_role,
               },
             },
           };
@@ -664,16 +657,16 @@ function TeamEditPanel({
                 placeholder={t.profile.jobTitlePlaceholder}
               />
 
-              {locale !== "ru" ? (
+              {locale !== "en" ? (
                 <button
                   type="button"
                   style={btn}
                   onClick={() => {
-                    void setFieldValue(`${locale}_name`, values.ru_name);
-                    void setFieldValue(`${locale}_role`, values.ru_role);
+                    void setFieldValue(`${locale}_name`, values.en_name);
+                    void setFieldValue(`${locale}_role`, values.en_role);
                   }}
                 >
-                  {t.common.copyFromRu}
+                  {t.common.copyFromEn}
                 </button>
               ) : (
                 <p style={{ margin: 0, fontSize: 12, color: "#666" }}>

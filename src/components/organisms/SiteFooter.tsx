@@ -1,10 +1,11 @@
+import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { SiteLogoMark } from "@/components/molecules/SiteLogoMark";
-import { SiteNav } from "@/components/molecules/SiteNav";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
+import { metricHome } from "@/data/metric-home";
+import { ContactForm } from "@/components/molecules/ContactForm";
 
 interface SiteFooterProps {
   locale: Locale;
@@ -13,49 +14,89 @@ interface SiteFooterProps {
 
 export function SiteFooter({ locale, content }: SiteFooterProps) {
   const { site, ui } = content;
+  const socialMap = {
+    instagram: site.social.instagram,
+    linkedin: site.social.linkedin ?? "#",
+    x: site.social.x ?? "#",
+    facebook: site.social.facebook ?? "#",
+  };
 
   return (
-    <footer className="site-footer bg-black" data-reveal>
+    <footer id="contact" className="site-footer" data-reveal>
       <PageContainer>
-        <div className="site-footer__inner" data-reveal-group>
-          <TransitionLink
-            href={localePath(locale, "/")}
-            aria-label={site.name}
-            className="site-footer__logo"
-          >
-            <SiteLogoMark idPrefix="footer" />
-          </TransitionLink>
-
-          <SiteNav
-            locale={locale}
-            items={site.nav}
-            variant="footer"
-            ariaLabel={ui.navAria}
-            className="site-footer__nav"
-          />
-
-          <div className="site-footer__social">
-            <a
-              href={site.social.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-footer__social-link"
-              aria-label={`Telegram — ${site.name}`}
+        <div className="site-footer__grid">
+          <div className="space-y-6">
+            <TransitionLink
+              href={localePath(locale, "/")}
+              aria-label={site.name}
+              className="relative block h-10 w-[160px]"
             >
-              Telegram
-            </a>
-            <a
-              href={site.social.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-footer__social-link"
-              aria-label={`Instagram — ${site.name}`}
-            >
-              Instagram
-            </a>
+              <Image
+                src="/images/metric/logo/metric-logo.svg"
+                alt={site.name}
+                fill
+                className="object-contain object-left"
+              />
+            </TransitionLink>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[18px]">
+              {metricHome.footer.cities.map((city) => (
+                <span key={city} className="text-foreground">
+                  {city}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <p className="site-footer__copyright">© 2026 {site.name}</p>
+          <div className="site-footer__links">
+            {metricHome.footer.links.map((link) => (
+              <a key={link.label} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="site-footer__links">
+            {metricHome.footer.social.map((item) => (
+              <a
+                key={item.label}
+                href={socialMap[item.key]}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-[color:var(--muted)]">{ui.phoneLabel}</p>
+              <a href={`tel:${site.phone.replace(/\s+/g, "")}`} className="text-[22px] font-medium tracking-tight">
+                {site.phone}
+              </a>
+            </div>
+            <div>
+              <p className="text-sm text-[color:var(--muted)]">{ui.addressLabel}</p>
+              <p className="text-[18px] tracking-tight">{site.address.join(", ")}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-14 rounded-[32px] bg-[color:var(--surface)] p-6 md:p-10">
+          <div className="mb-6 max-w-xl">
+            <h2 className="font-display text-[clamp(28px,4vw,48px)] text-foreground">
+              {metricHome.footer.startCta}
+            </h2>
+            <p className="mt-3 text-[18px] text-[color:var(--muted)]">
+              {ui.contactSubtitle}
+            </p>
+          </div>
+          <ContactForm locale={locale} ui={ui} />
+        </div>
+
+        <div className="site-footer__bottom">
+          <p>© 2026 {site.name}</p>
+          <a href="#">{metricHome.footer.links[0]?.label}</a>
         </div>
       </PageContainer>
     </footer>

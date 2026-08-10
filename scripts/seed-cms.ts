@@ -2,18 +2,16 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
-import { ruContent } from "@/i18n/locales/ru";
-import { uzContent } from "@/i18n/locales/uz";
 import { enContent } from "@/i18n/locales/en";
+import { deContent } from "@/i18n/locales/de";
 import type { Project } from "@/data/projects";
 import type { SiteContent } from "@/i18n/types";
 
-type Locale = "ru" | "uz" | "en";
+type Locale = "en" | "de";
 
 const locales: Record<Locale, SiteContent> = {
-  ru: ruContent,
-  uz: uzContent,
   en: enContent,
+  de: deContent,
 };
 
 function requireEnv(...keys: string[]) {
@@ -44,7 +42,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
 
   let order = 0;
   for (const [slug, variants] of bySlug) {
-    const base = variants.ru ?? Object.values(variants)[0]!;
+    const base = variants.en ?? Object.values(variants)[0]!;
     const { data: project, error } = await supabase
       .from("projects")
       .upsert(
@@ -179,7 +177,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedServices(supabase: ReturnType<typeof admin>) {
-  const keys = locales.ru.services.map((s) => s.id);
+  const keys = locales.en.services.map((s) => s.id);
   let order = 0;
   for (const key of keys) {
     const { data: service, error } = await supabase
@@ -217,7 +215,7 @@ async function seedFaq(supabase: ReturnType<typeof admin>) {
   await supabase.from("faq_translations").delete().neq("locale", "");
   await supabase.from("faq_items").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
-  for (let i = 0; i < locales.ru.faq.length; i++) {
+  for (let i = 0; i < locales.en.faq.length; i++) {
     const { data: item, error } = await supabase
       .from("faq_items")
       .insert({ sort_order: i, status: "published" })
@@ -237,7 +235,7 @@ async function seedFaq(supabase: ReturnType<typeof admin>) {
       if (trError) throw new Error(`faq tr ${i}/${locale}: ${trError.message}`);
     }
   }
-  console.log(`faq: ${locales.ru.faq.length}`);
+  console.log(`faq: ${locales.en.faq.length}`);
 }
 
 async function seedProcess(supabase: ReturnType<typeof admin>) {
@@ -247,8 +245,8 @@ async function seedProcess(supabase: ReturnType<typeof admin>) {
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
-  for (let i = 0; i < locales.ru.processSteps.length; i++) {
-    const ru = locales.ru.processSteps[i];
+  for (let i = 0; i < locales.en.processSteps.length; i++) {
+    const ru = locales.en.processSteps[i];
     const { data: step, error } = await supabase
       .from("process_steps")
       .insert({ step_number: ru.number, sort_order: i, status: "published" })
@@ -268,7 +266,7 @@ async function seedProcess(supabase: ReturnType<typeof admin>) {
       if (trError) throw new Error(`process tr ${i}/${locale}: ${trError.message}`);
     }
   }
-  console.log(`process: ${locales.ru.processSteps.length}`);
+  console.log(`process: ${locales.en.processSteps.length}`);
 }
 
 async function seedBenefits(supabase: ReturnType<typeof admin>) {
@@ -278,7 +276,7 @@ async function seedBenefits(supabase: ReturnType<typeof admin>) {
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
-  for (let i = 0; i < locales.ru.benefits.length; i++) {
+  for (let i = 0; i < locales.en.benefits.length; i++) {
     const { data: benefit, error } = await supabase
       .from("benefits")
       .insert({ sort_order: i, status: "published" })
@@ -297,7 +295,7 @@ async function seedBenefits(supabase: ReturnType<typeof admin>) {
       if (trError) throw new Error(`benefit tr ${i}/${locale}: ${trError.message}`);
     }
   }
-  console.log(`benefits: ${locales.ru.benefits.length}`);
+  console.log(`benefits: ${locales.en.benefits.length}`);
 }
 
 async function seedTeam(supabase: ReturnType<typeof admin>) {
@@ -307,7 +305,7 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
-  const director = locales.ru.agency.director;
+  const director = locales.en.agency.director;
   const { data: dir, error: dirError } = await supabase
     .from("team_members")
     .insert({
@@ -330,8 +328,8 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
     });
   }
 
-  for (let i = 0; i < locales.ru.agency.team.length; i++) {
-    const ru = locales.ru.agency.team[i];
+  for (let i = 0; i < locales.en.agency.team.length; i++) {
+    const ru = locales.en.agency.team[i];
     const { data: member, error } = await supabase
       .from("team_members")
       .insert({
@@ -355,7 +353,7 @@ async function seedTeam(supabase: ReturnType<typeof admin>) {
       });
     }
   }
-  console.log(`team: ${1 + locales.ru.agency.team.length}`);
+  console.log(`team: ${1 + locales.en.agency.team.length}`);
 }
 
 async function seedTestimonials(supabase: ReturnType<typeof admin>) {
@@ -365,8 +363,8 @@ async function seedTestimonials(supabase: ReturnType<typeof admin>) {
     .delete()
     .neq("id", "00000000-0000-0000-0000-000000000000");
 
-  for (let i = 0; i < locales.ru.agency.testimonials.length; i++) {
-    const ru = locales.ru.agency.testimonials[i];
+  for (let i = 0; i < locales.en.agency.testimonials.length; i++) {
+    const ru = locales.en.agency.testimonials[i];
     const { data: item, error } = await supabase
       .from("testimonials")
       .insert({
@@ -392,13 +390,13 @@ async function seedTestimonials(supabase: ReturnType<typeof admin>) {
       });
     }
   }
-  console.log(`testimonials: ${locales.ru.agency.testimonials.length}`);
+  console.log(`testimonials: ${locales.en.agency.testimonials.length}`);
 }
 
 async function seedAgency(supabase: ReturnType<typeof admin>) {
   const { error } = await supabase.from("agency_content").upsert({
     id: 1,
-    founded_year: locales.ru.agency.foundedYear,
+    founded_year: locales.en.agency.foundedYear,
   });
   if (error) throw new Error(`agency_content: ${error.message}`);
 
@@ -433,7 +431,7 @@ async function seedHomeWhyUs(supabase: ReturnType<typeof admin>) {
 }
 
 async function seedSettingsAndSeo(supabase: ReturnType<typeof admin>) {
-  const site = locales.ru.site;
+  const site = locales.en.site;
   const { error } = await supabase.from("site_settings").upsert({
     id: 1,
     phone: site.phone,

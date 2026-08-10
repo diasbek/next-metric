@@ -68,9 +68,8 @@ function toBenefitDraft(row: {
 }
 
 const DEFAULT_WHY_US: WhyUsTitleDraft = {
-  ru: { titleLine1: "Почему", titleLine2: "выбирают нас" },
-  uz: { titleLine1: "Nega bizni", titleLine2: "tanlashadi" },
   en: { titleLine1: "Why choose", titleLine2: "us" },
+  de: { titleLine1: "Warum uns", titleLine2: "wählen" },
 };
 
 export default async function AdminHomePageEditor({

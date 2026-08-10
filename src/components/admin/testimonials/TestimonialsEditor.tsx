@@ -288,7 +288,7 @@ function CardFace({
 
 export function TestimonialsEditor({ items, initialEditId = null, embedded = false }: Props) {
   const t = useAdminT();
-  const [boardLocale, setBoardLocale] = useState<AdminLocale>("ru");
+  const [boardLocale, setBoardLocale] = useState<AdminLocale>("en");
   const [selectedId, setSelectedId] = useState<string | null>(initialEditId);
   const [ordered, setOrdered] = useOrderedItems(items);
   const { pending, saved, onDragEnd } = usePersistReorder(
@@ -417,7 +417,7 @@ function TestimonialEditPanel({
 }) {
   const t = useAdminT();
   const supabaseConfig = useAdminSupabaseConfig();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(item);
   const [busy, setBusy] = useState(false);
 
@@ -434,9 +434,9 @@ function TestimonialEditPanel({
     }));
   };
 
-  const copyFromRu = () => {
-    if (locale === "ru") return;
-    const ru = draft.translations.ru;
+  const copyFromEn = () => {
+    if (locale === "en") return;
+    const ru = draft.translations.en;
     setDraft((prev) => ({
       ...prev,
       translations: {
@@ -638,13 +638,13 @@ function TestimonialEditPanel({
           />
         </label>
 
-        {locale !== "ru" ? (
-          <button type="button" style={btn} onClick={copyFromRu}>
-            {t.common.copyFromRu}
+        {locale !== "en" ? (
+          <button type="button" style={btn} onClick={copyFromEn}>
+            {t.common.copyFromEn}
           </button>
         ) : (
           <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
-            {t.common.fillRuFirst}
+            {t.common.fillEnFirst}
           </p>
         )}
 

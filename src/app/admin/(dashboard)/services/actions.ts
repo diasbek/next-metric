@@ -19,7 +19,7 @@ export async function saveServiceAction(formData: FormData) {
     })
     .eq("id", id);
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     await supabase.from("service_translations").upsert({
       service_id: id,
       locale,
@@ -50,7 +50,7 @@ export async function createServiceAction() {
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
   await supabase.from("service_translations").insert(
-    (["ru", "uz", "en"] as const).map((locale) => ({
+    (["en", "de"] as const).map((locale) => ({
       service_id: data.id,
       locale,
       title: "New service",

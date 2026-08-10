@@ -14,7 +14,7 @@ export async function saveAgencyAction(formData: FormData) {
     founded_year: String(formData.get("founded_year") ?? "2019"),
   });
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     const line1 = String(formData.get(`${locale}_title_line_1`) ?? "").trim();
     const line2 = String(formData.get(`${locale}_title_line_2`) ?? "").trim();
     // Public /agency uses titleLines as H1 — keep `title` in sync for SEO/admin

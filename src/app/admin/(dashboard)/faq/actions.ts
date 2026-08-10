@@ -32,7 +32,7 @@ export async function saveFaqAction(formData: FormData) {
       .eq("id", faqId);
   }
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     await supabase.from("faq_translations").upsert({
       faq_id: faqId,
       locale,
@@ -56,7 +56,7 @@ export async function createFaqAction() {
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
   await supabase.from("faq_translations").insert(
-    (["ru", "uz", "en"] as const).map((locale) => ({
+    (["en", "de"] as const).map((locale) => ({
       faq_id: data.id,
       locale,
       question: "New question",

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter_Tight } from "next/font/google";
+import { Archivo } from "next/font/google";
 import "./globals.css";
 import { GsapProviderLazy } from "@/components/animations/GsapProviderLazy";
 import { SiteAnalytics } from "@/components/analytics";
@@ -15,15 +15,15 @@ export const dynamic = "force-dynamic";
 
 export const viewport: Viewport = {
   themeColor: SITE_CONFIG.themeColor,
-  colorScheme: "dark",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
 
-const interTight = Inter_Tight({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500"],
-  variable: "--font-inter-tight",
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-archivo",
   display: "swap",
   preload: true,
   adjustFontFallback: true,
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ...(typeof rootMetadata.other === "object" && rootMetadata.other
         ? rootMetadata.other
         : {}),
-      "theme-color": "#2600ff",
+      "theme-color": SITE_CONFIG.themeColor,
       ...(analytics.googleSiteVerification
         ? { "google-site-verification": analytics.googleSiteVerification }
         : {}),
@@ -54,19 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ru"
-      className={interTight.variable}
-      suppressHydrationWarning
-    >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              '(function(){try{var m=window.matchMedia("(prefers-reduced-motion: reduce)");if(!m.matches)document.documentElement.classList.add("gsap-pending");}catch(e){}})();',
-          }}
-        />
-      </head>
+    <html lang="en" className={archivo.variable} suppressHydrationWarning>
       <body className="antialiased">
         <JsonLd data={getGlobalJsonLdGraph()} />
         <GsapProviderLazy>{children}</GsapProviderLazy>

@@ -1,4 +1,4 @@
-import { defaultLocale, type Locale } from "./config";
+import { defaultLocale, locales, type Locale } from "./config";
 
 function normalizePath(path: string) {
   if (!path || path === "/") return "/";
@@ -6,11 +6,25 @@ function normalizePath(path: string) {
   return withLeading.endsWith("/") ? withLeading : `${withLeading}/`;
 }
 
-export function localePath(locale: Locale, path: string) {
+function localePathWithoutHash(locale: Locale, path: string): string {
   const normalized = normalizePath(path);
   if (locale === defaultLocale) return normalized;
   if (normalized === "/") return `/${locale}/`;
   return `/${locale}${normalized}`;
+}
+
+export function localePath(locale: Locale, path: string): string {
+  if (path.includes("#")) {
+    const [base = "/", hash = ""] = path.split("#");
+    const localizedBase = localePathWithoutHash(locale, base || "/");
+    const withSlash =
+      localizedBase.endsWith("/") || localizedBase === "/"
+        ? localizedBase
+        : `${localizedBase}/`;
+    return `${withSlash}#${hash}`;
+  }
+
+  return localePathWithoutHash(locale, path);
 }
 
 export function stripLocalePrefix(pathname: string): {
@@ -19,17 +33,16 @@ export function stripLocalePrefix(pathname: string): {
 } {
   const normalized = pathname.endsWith("/") ? pathname : `${pathname}/`;
 
-  if (normalized === "/uz/" || normalized.startsWith("/uz/")) {
-    const path = normalized.slice(3) || "/";
-    return { locale: "uz", path: normalizePath(path) };
+  for (const locale of locales) {
+    if (locale === defaultLocale) continue;
+    const prefix = `/${locale}/`;
+    if (normalized === prefix || normalized.startsWith(prefix)) {
+      const path = normalized.slice(prefix.length - 1) || "/";
+      return { locale, path: normalizePath(path) };
+    }
   }
 
-  if (normalized === "/en/" || normalized.startsWith("/en/")) {
-    const path = normalized.slice(3) || "/";
-    return { locale: "en", path: normalizePath(path) };
-  }
-
-  return { locale: "ru", path: normalizePath(normalized) };
+  return { locale: defaultLocale, path: normalizePath(normalized) };
 }
 
 export function switchLocalePath(pathname: string, targetLocale: Locale) {
@@ -39,10 +52,13 @@ export function switchLocalePath(pathname: string, targetLocale: Locale) {
 
 export function getLocalizedAlternates(path: string) {
   const normalized = normalizePath(path);
-
-  return {
-    ru: localePath("ru", normalized),
-    uz: localePath("uz", normalized),
-    en: localePath("en", normalized),
+  const alternates: Record<string, string> = {
+    "x-default": localePath(defaultLocale, normalized),
   };
+
+  for (const locale of locales) {
+    alternates[locale] = localePath(locale, normalized);
+  }
+
+  return alternates;
 }

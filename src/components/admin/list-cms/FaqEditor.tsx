@@ -122,7 +122,7 @@ function CardFace({
 
 export function FaqEditor({ items, initialEditId = null, embedded = false }: Props) {
   const t = useAdminT();
-  const [boardLocale, setBoardLocale] = useState<AdminLocale>("ru");
+  const [boardLocale, setBoardLocale] = useState<AdminLocale>("en");
   const [selectedId, setSelectedId] = useState<string | null>(initialEditId);
   const [ordered, setOrdered] = useOrderedItems(items);
   const { pending, saved, onDragEnd } = usePersistReorder(
@@ -195,7 +195,7 @@ export function FaqEditor({ items, initialEditId = null, embedded = false }: Pro
 
 function FaqPanel({ item, onClose }: { item: FaqDraft; onClose: () => void }) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(item);
   const [busy, setBusy] = useState(false);
   const tr = draft.translations[locale];
@@ -261,7 +261,7 @@ function FaqPanel({ item, onClose }: { item: FaqDraft; onClose: () => void }) {
             style={{ ...adminInput, resize: "vertical" }}
           />
         </label>
-        {locale !== "ru" ? (
+        {locale !== "en" ? (
           <button
             type="button"
             style={adminBtn}
@@ -270,12 +270,12 @@ function FaqPanel({ item, onClose }: { item: FaqDraft; onClose: () => void }) {
                 ...prev,
                 translations: {
                   ...prev.translations,
-                  [locale]: { ...prev.translations.ru, locale },
+                  [locale]: { ...prev.translations.en, locale },
                 },
               }))
             }
           >
-            {t.common.copyFromRu}
+            {t.common.copyFromEn}
           </button>
         ) : null}
         <MetaFields

@@ -30,7 +30,7 @@ export function useAdminSupabaseConfig(): AdminSupabaseConfig {
 
 export function AdminProviders({
   children,
-  locale = "ru",
+  locale = "en",
   messages,
   supabaseUrl = "",
   supabasePublishableKey = "",

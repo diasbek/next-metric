@@ -5,28 +5,28 @@ export interface FAQItem {
 
 export const faqItems: FAQItem[] = [
   {
-    question: "Сколько стоит логотип?",
+    question: "How much does an Amazon design project cost?",
     answer:
-      "Стоимость зависит от объёма работ. Логотип — от 8 млн сум, фирменный стиль — от 12 млн, брендбук — от 32 млн. Точную цену обсудим после брифа.",
+      "Pricing depends on deliverables and complexity. After a short brief we share a clear estimate for listing images, A+ Content, Brand Store, or a full package.",
   },
   {
-    question: "Как долго делается логотип?",
+    question: "How long does a project take?",
     answer:
-      "Логотип — 3–5 дней, фирменный стиль — 7–10 дней, брендбук — 14–20 дней. Сроки зависят от сложности и скорости согласований.",
+      "Most projects take between 7 and 14 business days, depending on the number of deliverables, project complexity, and the speed of feedback. Larger projects involving 3D production, Premium A+ Content, or Brand Store design may require additional time.",
   },
   {
-    question: "Можно ли запатентовать логотип?",
+    question: "Can you work without professional product photos?",
     answer:
-      "Да. Мы разрабатываем оригинальные знаки, пригодные для регистрации товарного знака. Перед сдачей проверяем уникальность концепции.",
+      "Yes. We can work from existing packshots, reference boards, or arrange a shoot brief. Many projects start with limited assets and still ship a polished listing set.",
   },
   {
-    question: "Какие файлы вы передаёте?",
+    question: "What services do you provide?",
     answer:
-      "Передаём все исходники: векторные файлы (AI, EPS, SVG), растровые версии (PNG, JPG), файлы для печати и цифровых носителей.",
+      "Product images, A+ Content, Ad Banner creatives, and Brand Store design — built as one consistent visual system for Amazon.",
   },
   {
-    question: "Вы работаете с другими городами?",
+    question: "How does the design process work?",
     answer:
-      "Да, работаем удалённо по всему Узбекистану и за рубежом. Бриф, согласования и передача файлов — онлайн.",
+      "Brief → concept → production → revisions → final delivery. You get clear milestones, structured feedback rounds, and files ready for Seller Central.",
   },
 ];

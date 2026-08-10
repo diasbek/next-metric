@@ -22,25 +22,18 @@ export function getWorkOgImagePath(locale: Locale, slug: string): string {
 }
 
 export const ogEyebrows: Record<Locale, Record<OgPageKey, string>> = {
-  ru: {
-    home: "Брендинговое агентство",
-    agency: "Агентство",
-    works: "Работы",
-    services: "Услуги",
-    contacts: "Контакты",
-  },
-  uz: {
-    home: "Brending agentligi",
-    agency: "Agentlik",
-    works: "Ishlar",
-    services: "Xizmatlar",
-    contacts: "Kontaktlar",
-  },
   en: {
-    home: "Branding agency",
-    agency: "Agency",
-    works: "Works",
+    home: "Amazon design",
+    agency: "About",
+    works: "Projects",
     services: "Services",
-    contacts: "Contacts",
+    contacts: "Contact",
+  },
+  de: {
+    home: "Amazon Design",
+    agency: "Über uns",
+    works: "Projekte",
+    services: "Leistungen",
+    contacts: "Kontakt",
   },
 };

@@ -84,7 +84,7 @@ const fieldset: CSSProperties = {
 export function SettingsEditor({ settings, seo, flash }: Props) {
   const t = useAdminT();
   const [tab, setTab] = useState<Tab>("integrations");
-  const [seoLocale, setSeoLocale] = useState<AdminLocale>("ru");
+  const [seoLocale, setSeoLocale] = useState<AdminLocale>("en");
   const [seoPage, setSeoPage] = useState<(typeof PAGE_KEYS)[number]["key"]>("home");
   const [seoDraft, setSeoDraft] = useState(() => {
     const map: Record<
@@ -405,10 +405,10 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
               <p style={{ margin: 0, fontSize: 13, color: "#8ab4f8" }}>
                 {snippetHost}
                 {seoPage === "home"
-                  ? seoLocale === "ru"
+                  ? seoLocale === "en"
                     ? "/"
                     : `/${seoLocale}/`
-                  : seoLocale === "ru"
+                  : seoLocale === "en"
                     ? `/${seoPage}/`
                     : `/${seoLocale}/${seoPage}/`}
               </p>

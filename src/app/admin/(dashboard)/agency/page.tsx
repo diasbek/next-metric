@@ -118,7 +118,7 @@ export default async function AdminAgencyPage({
   const params = await searchParams;
   const section = params.section ?? "about";
   const supabase = createSupabaseAdminClient();
-  const locales = ["ru", "uz", "en"] as const;
+  const locales = ["en", "de"] as const;
 
   const emptyAboutTranslations = Object.fromEntries(
     locales.map((locale) => [

@@ -22,6 +22,9 @@ export interface SiteContent {
     social: {
       telegram: string;
       instagram: string;
+      linkedin?: string;
+      x?: string;
+      facebook?: string;
     };
     files: {
       presentation: string;

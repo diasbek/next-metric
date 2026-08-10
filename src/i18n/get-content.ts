@@ -1,7 +1,6 @@
 import type { Locale } from "./config";
-import { ruContent } from "./locales/ru";
-import { uzContent } from "./locales/uz";
 import { enContent } from "./locales/en";
+import { deContent } from "./locales/de";
 import type { SiteContent } from "./types";
 import type { Project } from "@/data/projects";
 import {
@@ -12,9 +11,8 @@ import {
 import { getCmsExtras } from "@/lib/cms/content";
 
 const contentByLocale: Record<Locale, SiteContent> = {
-  ru: ruContent,
-  uz: uzContent,
   en: enContent,
+  de: deContent,
 };
 
 /** Old handles that should never ship; prefer current brand social URLs. */
@@ -63,7 +61,7 @@ export async function getNextProjects(locale: Locale, slug: string, count = 2) {
 export async function getAllProjectSlugs(): Promise<string[]> {
   const fromCms = await getAllPublishedSlugsFromCms();
   if (fromCms.length > 0) return fromCms.map((row) => row.slug);
-  return ruContent.projects.map((project) => project.slug);
+  return enContent.projects.map((project) => project.slug);
 }
 
 /** Merge CMS entities into locale content when available. */

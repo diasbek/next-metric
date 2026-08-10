@@ -89,6 +89,37 @@ const nextConfig: NextConfig = {
         destination: "https://metric.agency/:path*",
         permanent: true,
       },
+      // Legacy TIMSOL locale prefixes → EN (default, unprefixed)
+      {
+        source: "/en",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/en/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+      {
+        source: "/uz",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/uz/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+      {
+        source: "/ru",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/ru/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
     ];
   },
   async headers() {

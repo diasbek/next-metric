@@ -1,17 +1,16 @@
 export const sphereFilters = [
-  "Все",
-  "Рестораны",
-  "Ритейл",
-  "Медицина",
-  "Образование",
-  "Детские товары",
+  "All",
+  "Agriculture",
+  "Home",
+  "Beauty",
+  "Electronics",
 ] as const;
 
 export const directionFilters = [
-  "Все",
-  "Логотип",
-  "Брендинг",
-  "Фирменный стиль",
+  "All",
+  "Listing",
+  "Premium A+",
+  "Brand Store",
 ] as const;
 
 export type SphereFilter = (typeof sphereFilters)[number];

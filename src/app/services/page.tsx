@@ -1,6 +1,5 @@
-import { createServicesPage } from "@/i18n/create-pages";
+import { redirect } from "next/navigation";
 
-const { generateMetadata, Page } = createServicesPage("ru");
-
-export { generateMetadata };
-export default Page;
+export default function ServicesRedirect() {
+  redirect("/#services");
+}

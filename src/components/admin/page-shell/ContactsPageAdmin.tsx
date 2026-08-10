@@ -40,7 +40,7 @@ const btn: CSSProperties = {
 
 export function ContactsPageAdmin({ contacts, translations, saved }: Props) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("ru");
+  const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(translations);
   const current = draft[locale];
 
@@ -51,14 +51,14 @@ export function ContactsPageAdmin({ contacts, translations, saved }: Props) {
     }));
   };
 
-  const copyFromRu = () => {
-    if (locale === "ru") return;
+  const copyFromEn = () => {
+    if (locale === "en") return;
     setDraft((prev) => ({
       ...prev,
       [locale]: {
-        address_lines: prev.ru.address_lines,
-        presentation_url: prev.ru.presentation_url,
-        brief_url: prev.ru.brief_url,
+        address_lines: prev.en.address_lines,
+        presentation_url: prev.en.presentation_url,
+        brief_url: prev.en.brief_url,
       },
     }));
   };
@@ -153,16 +153,16 @@ export function ContactsPageAdmin({ contacts, translations, saved }: Props) {
               {item.short}
             </button>
           ))}
-          {locale !== "ru" ? (
-            <button type="button" style={btn} onClick={copyFromRu}>
-              {t.common.copyFromRu}
+          {locale !== "en" ? (
+            <button type="button" style={btn} onClick={copyFromEn}>
+              {t.common.copyFromEn}
             </button>
           ) : null}
         </div>
 
         <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
           {t.common.localized} · {locale.toUpperCase()} · /
-          {locale === "ru" ? "" : `${locale}/`}
+          {locale === "en" ? "" : `${locale}/`}
           contacts/
         </p>
 

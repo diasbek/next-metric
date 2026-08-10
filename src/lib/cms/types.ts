@@ -1,6 +1,6 @@
 import type { CaseBlock, CaseStudy, Project } from "@/data/projects";
 
-export type CmsLocale = "ru" | "uz" | "en";
+export type CmsLocale = "en" | "de";
 export type PublishStatus = "draft" | "published";
 export type LeadStatus = "new" | "read" | "archived";
 export type MediaKind = "hero" | "gallery" | "before" | "after" | "cover";
@@ -180,7 +180,7 @@ export function mapProjectRow(
 ): Project | null {
   const tr =
     row.project_translations.find((t) => t.locale === locale) ??
-    row.project_translations.find((t) => t.locale === "ru");
+    row.project_translations.find((t) => t.locale === "en");
   if (!tr) return null;
 
   const hero = row.project_media

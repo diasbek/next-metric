@@ -23,7 +23,7 @@ export async function saveProcessStepAction(formData: FormData) {
     })
     .eq("id", id);
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     await supabase.from("process_step_translations").upsert({
       step_id: id,
       locale,
@@ -47,7 +47,7 @@ export async function createProcessStepAction() {
   if (error || !data) return adminFail(error?.message ?? "Create failed");
 
   await supabase.from("process_step_translations").insert(
-    (["ru", "uz", "en"] as const).map((locale) => ({
+    (["en", "de"] as const).map((locale) => ({
       step_id: data.id,
       locale,
       title: "New step",

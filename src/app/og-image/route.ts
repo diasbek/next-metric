@@ -6,15 +6,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
-/** Legacy default OG image → RU home. */
+/** Legacy default OG image → EN home. */
 export async function GET() {
-  const content = await getResolvedContent("ru");
+  const content = await getResolvedContent("en");
   const meta = content.pageMeta.home;
 
   const image = await renderOgImageResponse({
     title: meta.title.replace(/ — METRIC$/i, ""),
     description: meta.description,
-    eyebrow: ogEyebrows.ru.home,
+    eyebrow: ogEyebrows.en.home,
     siteUrl: (() => {
       try {
         return new URL(content.site.url).hostname;

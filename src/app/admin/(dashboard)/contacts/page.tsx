@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ContactsPageAdmin } from "@/components/admin/page-shell/ContactsPageAdmin";
 import type { CmsLocale } from "@/lib/cms/types";
 
-const LOCALES: CmsLocale[] = ["ru", "uz", "en"];
+const LOCALES: CmsLocale[] = ["en", "de"];
 
 const emptyLocale = {
   address_lines: "",
@@ -29,7 +29,7 @@ export default async function AdminContactsPage({
     LOCALES.map((locale) => {
       const row = translations?.find((t) => t.locale === locale);
       const fallbackAddress =
-        locale === "ru" ? (settings?.address_lines ?? []) : [];
+        locale === "en" ? (settings?.address_lines ?? []) : [];
       return [
         locale,
         {
@@ -39,10 +39,10 @@ export default async function AdminContactsPage({
           ).join("\n"),
           presentation_url:
             row?.presentation_url ||
-            (locale === "ru" ? (settings?.presentation_url ?? "") : ""),
+            (locale === "en" ? (settings?.presentation_url ?? "") : ""),
           brief_url:
             row?.brief_url ||
-            (locale === "ru" ? (settings?.brief_url ?? "") : ""),
+            (locale === "en" ? (settings?.brief_url ?? "") : ""),
         },
       ];
     }),

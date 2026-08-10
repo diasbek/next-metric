@@ -9,30 +9,39 @@ export interface Service {
 
 export const services: Service[] = [
   {
-    id: "logo",
-    title: "Логотип",
-    shortDescription: "знак и логотип, который работает на любом носителе",
+    id: "product-images",
+    title: "Product images",
+    shortDescription: "Main and secondary Amazon listing images that sell",
     fullDescription:
-      "Разрабатываем знак и логотип, который работает на любом носителе — от визитки до вывески. 2 концепции на выбор, все исходники в финале.",
-    price: "От 8 млн сум",
-    duration: "3–5 дней",
+      "Strategic Amazon listing images designed to communicate value, inspire confidence, and turn attention into sales.",
+    price: "Custom",
+    duration: "7–14 days",
   },
   {
-    id: "identity",
-    title: "Фирменный стиль",
-    shortDescription: "визитки, бланки, аватарки, паттерны",
+    id: "aplus",
+    title: "A+ Content",
+    shortDescription: "Premium A+ modules that deepen the story",
     fullDescription:
-      "Логотип плюс визитка, бланк, аватарки, паттерн. Всё, что нужно для единого образа компании.",
-    price: "От 12 млн сум",
-    duration: "7–10 дней",
+      "A+ and Premium A+ Content that clarifies benefits and builds brand trust on the product detail page.",
+    price: "Custom",
+    duration: "7–14 days",
   },
   {
-    id: "brandbook",
-    title: "Брендбук",
-    shortDescription: "правила использования бренда в одном документе",
+    id: "ad-banner",
+    title: "Ad-Banner",
+    shortDescription: "Advertising creatives aligned with your listing",
     fullDescription:
-      "Полный документ с правилами использования бренда. Цвета, шрифты, отступы, примеры применения — всё в одном месте.",
-    price: "От 32 млн сум",
-    duration: "14–20 дней",
+      "Ad banners and campaign creatives built as one consistent visual system with your listing.",
+    price: "Custom",
+    duration: "5–10 days",
+  },
+  {
+    id: "brandstore",
+    title: "BrandStore",
+    shortDescription: "Amazon Brand Store experiences",
+    fullDescription:
+      "Brand Store design that extends your listing system into a full Amazon brand destination.",
+    price: "Custom",
+    duration: "10–20 days",
   },
 ];

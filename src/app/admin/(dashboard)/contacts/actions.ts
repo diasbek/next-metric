@@ -17,7 +17,7 @@ function linesFromForm(formData: FormData, key: string) {
 
 async function resolveDocUrl(
   formData: FormData,
-  locale: "ru" | "uz" | "en",
+  locale: "en" | "de",
   kind: "presentation" | "brief",
 ): Promise<string> {
   const fileKey = `${locale}_${kind}_file`;
@@ -41,26 +41,23 @@ export async function saveContactsAction(formData: FormData) {
   const supabase = createSupabaseAdminClient();
   const current = await getSiteSettings();
 
-  let urls: Record<"ru" | "uz" | "en", { presentation: string; brief: string }>;
+  let urls: Record<"en" | "de", { presentation: string; brief: string }>;
   try {
-    const [ruP, ruB, uzP, uzB, enP, enB] = await Promise.all([
-      resolveDocUrl(formData, "ru", "presentation"),
-      resolveDocUrl(formData, "ru", "brief"),
-      resolveDocUrl(formData, "uz", "presentation"),
-      resolveDocUrl(formData, "uz", "brief"),
+    const [enP, enB, deP, deB] = await Promise.all([
       resolveDocUrl(formData, "en", "presentation"),
       resolveDocUrl(formData, "en", "brief"),
+      resolveDocUrl(formData, "de", "presentation"),
+      resolveDocUrl(formData, "de", "brief"),
     ]);
     urls = {
-      ru: { presentation: ruP, brief: ruB },
-      uz: { presentation: uzP, brief: uzB },
       en: { presentation: enP, brief: enB },
+      de: { presentation: deP, brief: deB },
     };
   } catch (err) {
     return adminFail(err instanceof Error ? err.message : "Upload failed");
   }
 
-  const ruAddress = linesFromForm(formData, "ru_address_lines");
+  const enAddress = linesFromForm(formData, "en_address_lines");
 
   const { error: settingsError } = await supabase.from("site_settings").upsert({
     id: 1,
@@ -68,9 +65,9 @@ export async function saveContactsAction(formData: FormData) {
     email: String(formData.get("email") ?? ""),
     telegram_url: String(formData.get("telegram_url") ?? ""),
     instagram_url: String(formData.get("instagram_url") ?? ""),
-    presentation_url: urls.ru.presentation,
-    brief_url: urls.ru.brief,
-    address_lines: ruAddress,
+    presentation_url: urls.en.presentation,
+    brief_url: urls.en.brief,
+    address_lines: enAddress,
     telegram_bot_token: current?.telegram_bot_token ?? null,
     telegram_chat_ids: current?.telegram_chat_ids ?? [],
     telegram_notify_enabled: current?.telegram_notify_enabled ?? false,
@@ -86,7 +83,7 @@ export async function saveContactsAction(formData: FormData) {
   });
   if (settingsError) return adminFail(settingsError.message);
 
-  for (const locale of ["ru", "uz", "en"] as const) {
+  for (const locale of ["en", "de"] as const) {
     const { error } = await supabase.from("site_settings_translations").upsert({
       locale,
       address_lines: linesFromForm(formData, `${locale}_address_lines`),

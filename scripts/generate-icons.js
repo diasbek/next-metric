@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Regenerates METRIC favicons + PWA icons from a vector T mark.
+ * Regenerates METRIC favicons + PWA icons from the pink M mark.
  * Usage: node scripts/generate-icons.js
  */
 const fs = require("fs");
@@ -12,44 +12,46 @@ const PUB = path.join(ROOT, "public");
 const ICONS = path.join(PUB, "icons");
 const APP = path.join(ROOT, "src", "app");
 
-const BLUE = "#2600FF";
+const PINK = "#FF3C82";
 const WHITE = "#FFFFFF";
 
-/** Full-bleed T for small favicons / browser tabs. */
+/** Brand M path from Figma logo (original viewBox ~0 0 53.26 42). */
+const M_PATH =
+  "M53.2564 1.06299V40.3547C53.2564 40.9286 52.7973 41.3877 52.2234 41.3877H41.6257C41.0518 41.3877 40.5927 40.9286 40.5927 40.3547V27.7676C40.5927 26.8876 39.5597 26.3903 38.9093 26.9642L28.6942 35.3428L21.578 41.1582C20.8894 41.732 19.8946 41.2347 19.8946 40.3547V28.418C19.8946 27.8441 19.4355 27.385 18.8616 27.385C18.6321 27.385 18.4025 27.4615 18.2112 27.6146C18.173 27.6146 18.173 27.6528 18.173 27.6528L7.88133 36.108L1.68339 41.1582C0.994734 41.732 0 41.2347 0 40.3547V35.3428V26.6964C0 26.3903 0.153036 26.0842 0.382589 25.8929L18.2495 11.2398C18.9381 10.6659 19.9329 11.1633 19.9329 12.0433V23.98C19.9329 24.5539 20.392 25.013 20.9659 25.013C21.1954 25.013 21.425 24.9364 21.578 24.8217C21.6163 24.8217 21.6163 24.7834 21.6545 24.7452L40.6309 9.21211L51.573 0.221301C52.2234 -0.314322 53.2564 0.183041 53.2564 1.06299Z";
+
+/** Full-bleed M for small favicons / browser tabs. */
 function svgAny(size) {
-  const pad = size * 0.14;
-  const barH = size * 0.158;
-  const stemW = size * 0.202;
-  const x0 = pad;
-  const x1 = size - pad;
-  const y0 = pad;
-  const barBottom = y0 + barH;
-  const stemLeft = (size - stemW) / 2;
-  const stemRight = stemLeft + stemW;
-  const y1 = size - pad;
+  const pad = size * 0.18;
+  const inner = size - pad * 2;
+  const scale = Math.min(inner / 53.2564, inner / 42);
+  const tw = 53.2564 * scale;
+  const th = 42 * scale;
+  const tx = (size - tw) / 2;
+  const ty = (size - th) / 2;
   return Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" fill="${BLUE}"/>
-  <path fill="${WHITE}" d="M${x0} ${y0}H${x1}V${barBottom}H${stemRight}V${y1}H${stemLeft}V${barBottom}H${x0}Z"/>
+  <rect width="${size}" height="${size}" fill="${PINK}"/>
+  <g transform="translate(${tx} ${ty}) scale(${scale})">
+    <path fill="${WHITE}" d="${M_PATH}"/>
+  </g>
 </svg>`);
 }
 
 /** Maskable: keep mark inside ~80% safe zone (Android adaptive icons). */
 function svgMaskable(size) {
   const pad = size * 0.22;
-  const barH = size * 0.12;
-  const stemW = size * 0.16;
-  const x0 = pad;
-  const x1 = size - pad;
-  const y0 = pad;
-  const barBottom = y0 + barH;
-  const stemLeft = (size - stemW) / 2;
-  const stemRight = stemLeft + stemW;
-  const y1 = size - pad;
+  const inner = size - pad * 2;
+  const scale = Math.min(inner / 53.2564, inner / 42);
+  const tw = 53.2564 * scale;
+  const th = 42 * scale;
+  const tx = (size - tw) / 2;
+  const ty = (size - th) / 2;
   return Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" fill="${BLUE}"/>
-  <path fill="${WHITE}" d="M${x0} ${y0}H${x1}V${barBottom}H${stemRight}V${y1}H${stemLeft}V${barBottom}H${x0}Z"/>
+  <rect width="${size}" height="${size}" fill="${PINK}"/>
+  <g transform="translate(${tx} ${ty}) scale(${scale})">
+    <path fill="${WHITE}" d="${M_PATH}"/>
+  </g>
 </svg>`);
 }
 
@@ -91,6 +93,7 @@ async function writePng(svg, outPath) {
 async function main() {
   fs.mkdirSync(ICONS, { recursive: true });
   fs.mkdirSync(path.join(PUB, "images"), { recursive: true });
+  fs.mkdirSync(path.join(PUB, "images", "logo"), { recursive: true });
 
   const sizes = [16, 32, 48, 180, 192, 512];
   for (const size of sizes) {
@@ -113,7 +116,7 @@ async function main() {
   // Next.js App Router file convention (served as /icon.png)
   await writePng(svgAny(32), path.join(APP, "icon.png"));
 
-  console.log("Generated icons in public/icons, favicon.ico, apple-icon.png");
+  console.log("Generated Metric icons in public/icons, favicon.ico, apple-icon.png");
 }
 
 main().catch((err) => {

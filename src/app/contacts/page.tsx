@@ -1,6 +1,5 @@
-import { createContactsPage } from "@/i18n/create-pages";
+import { redirect } from "next/navigation";
 
-const { generateMetadata, Page } = createContactsPage("ru");
-
-export { generateMetadata };
-export default Page;
+export default function ContactsRedirect() {
+  redirect("/#contact");
+}

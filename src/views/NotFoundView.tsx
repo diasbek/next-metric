@@ -8,26 +8,19 @@ interface NotFoundViewProps {
   locale?: Locale;
 }
 
-export function NotFoundView({ locale = "ru" }: NotFoundViewProps) {
+export function NotFoundView({ locale = "en" }: NotFoundViewProps) {
   const { ui } = getContent(locale);
 
   return (
-    <SiteLayout locale={locale} showContact={false}>
-      <section
-        className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-28 text-center text-white"
-        data-scroll-section
-      >
-        <h1 className="text-6xl font-medium" data-split-title>
+    <SiteLayout locale={locale}>
+      <section className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-28 text-center">
+        <h1 className="font-display text-[clamp(64px,10vw,120px)] text-foreground">
           404
         </h1>
-        <p className="mt-4 text-xl text-white/70" data-reveal>
-          {ui.notFoundTitle}
-        </p>
+        <p className="mt-4 text-xl text-[color:var(--muted)]">{ui.notFoundTitle}</p>
         <TransitionLink
           href={localePath(locale, "/")}
-          className="mt-8 border border-white px-8 py-4 text-lg"
-          data-reveal
-          data-reveal-delay="0.15"
+          className="metric-cta metric-cta--solid mt-8"
         >
           {ui.backHome}
         </TransitionLink>

@@ -15,11 +15,12 @@ const FONT_DIR = path.join(
   "files",
 );
 
-const LOGO_SVG_PATH = path.join(
+const LOGO_PNG_PATH = path.join(
   PUBLIC_DIR,
   "images",
+  "metric",
   "logo",
-  "metric-hero-sharp.svg",
+  "metric-wordmark-og.png",
 );
 
 let logoDataUrlCache: string | null = null;
@@ -63,22 +64,11 @@ function loadFonts() {
   return fontsCache;
 }
 
-/** Rasterize the real METRIC wordmark (hero SVG) to a white PNG data URL. */
+/** Load pre-rasterized METRIC wordmark for OG chrome. */
 export async function getOgLogoDataUrl(): Promise<string> {
   if (logoDataUrlCache) return logoDataUrlCache;
 
-  // Match HeroLogoSvg crop (letter bounds), recolor to white for OG chrome.
-  const svg = fs
-    .readFileSync(LOGO_SVG_PATH, "utf8")
-    .replace(/viewBox="[^"]+"/, 'viewBox="0 0 1200 280"')
-    .replace(/#2600FF/gi, "#FAFAFA")
-    .replace(/fill="#2600FF"/gi, 'fill="#FAFAFA"');
-
-  const png = await sharp(Buffer.from(svg))
-    .resize({ width: 840, withoutEnlargement: false })
-    .png()
-    .toBuffer();
-
+  const png = fs.readFileSync(LOGO_PNG_PATH);
   logoDataUrlCache = `data:image/png;base64,${png.toString("base64")}`;
   return logoDataUrlCache;
 }

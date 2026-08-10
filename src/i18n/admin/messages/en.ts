@@ -41,7 +41,7 @@ export const enAdmin: AdminMessages = {
     ready: "Done",
     delete: "Delete",
     cancel: "Cancel",
-    copyFromRu: "Copy from RU",
+    copyFromEn: "Copy from EN",
     actionFailed: "Action failed. Please try again.",
     retry: "Retry",
     reload: "Reload",
@@ -101,8 +101,8 @@ export const enAdmin: AdminMessages = {
     folderDefault: "uploads",
     editingLocale:
       "Editing: {locale}. Other languages are saved separately.",
-    fillRuFirst:
-      "Fill in RU first — then copy to UZ/EN and adjust the translation.",
+    fillEnFirst:
+      "Fill in EN first — then copy to DE and adjust the translation.",
     uploadNetworkError:
       "Could not upload the file (network). Check your internet and try again.",
   },

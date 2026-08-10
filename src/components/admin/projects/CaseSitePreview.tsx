@@ -32,7 +32,7 @@ export function CaseSitePreview({ draft, locale }: Props) {
   const viewportWidth = device === "desktop" ? 380 : 280;
   const scale = viewportWidth / designWidth;
   const publicPath =
-    locale === "ru"
+    locale === "en"
       ? `/works/${draft.slug}/`
       : `/${locale}/works/${draft.slug}/`;
 
@@ -181,7 +181,7 @@ export function CaseSitePreview({ draft, locale }: Props) {
           src={
             draft.og_image ||
             getWorkOgImagePath(
-              locale === "uz" || locale === "en" ? locale : "ru",
+              locale,
               draft.slug,
             )
           }

@@ -15,6 +15,8 @@ export interface CaseStudy {
   task: string;
   solution: string;
   heroImage?: string;
+  metricLabel?: string;
+  metricValue?: string;
   blocks: CaseBlock[];
 }
 
@@ -36,130 +38,122 @@ export interface Project {
   featured?: boolean;
   caseStudy?: CaseStudy;
   seo?: ProjectSeo;
+  quote?: string;
+  author?: string;
+  role?: string;
 }
 
-export const projects: Project[] = [
-  {
-    slug: "sushi-moto",
-    title: "Sushi Moto",
-    description: "Суши-ресторан с характером",
-    image: "/images/projects/sushi-moto.webp",
-    tags: ["Логотип", "Брендинг"],
-    sphere: "Рестораны",
-    featured: true,
-    caseStudy: {
-      year: "2025",
-      task: "Создать узнаваемый образ суши-ресторана с характером и запоминающейся айдентикой.",
-      solution:
-        "Разработали логотип с персонажем сумо, фирменный стиль, носители и визуальную систему для ресторанной сети.",
-      heroImage: "/images/case-studies/sushi-moto/hero.jpg",
-      blocks: [
-        {
-          id: "ba",
-          type: "before_after",
-          beforeImage: "/images/case-studies/sushi-moto/gallery-4.jpg",
-          afterImage: "/images/case-studies/sushi-moto/gallery-5.jpg",
-        },
-        {
-          id: "gal",
-          type: "gallery",
-          images: [
-            "/images/case-studies/sushi-moto/gallery-1.jpg",
-            "/images/case-studies/sushi-moto/gallery-2.jpg",
-            "/images/case-studies/sushi-moto/gallery-3.jpg",
-            "/images/case-studies/sushi-moto/gallery-4.jpg",
-            "/images/case-studies/sushi-moto/gallery-5.jpg",
-            "/images/case-studies/sushi-moto/gallery-6.jpg",
-          ],
-        },
-      ],
-    },
-  },
-  {
-    slug: "kidi-mart",
-    title: "Kidi Mart",
-    description: "Сеть магазинов для мам и детей",
-    image: "/images/projects/kidi-mart.webp",
-    tags: ["Логотип", "Фирменный стиль"],
-    sphere: "Детские товары",
-  },
-  {
-    slug: "murad",
-    title: "Murad",
-    description: "Поставщик медицинского оборудования для клиник и больниц.",
-    image: "/images/projects/murad.webp",
-    tags: ["Логотип", "Брендинг"],
-    sphere: "Медицина",
-  },
-  {
-    slug: "nazif",
-    title: "Nazif",
-    description: "Сеть магазинов для мам и детей",
-    image: "/images/projects/nazif.webp",
-    tags: ["Логотип", "Фирменный стиль"],
-    sphere: "Ритейл",
-  },
-  {
-    slug: "magic-toys",
-    title: "Magic Toys",
-    description: "Магазин детских игрушек.",
-    image: "/images/projects/magic-toys.webp",
-    tags: ["Логотип", "Фирменный стиль"],
-    sphere: "Детские товары",
-  },
-  {
-    slug: "difo",
-    title: "Difo",
-    description: "Учебный центр",
-    image: "/images/projects/difo.webp",
-    tags: ["Логотип", "Брендинг"],
-    sphere: "Образование",
-  },
-  {
-    slug: "eap",
-    title: "EAP",
-    description: "Поставщик медицинского оборудования для клиник и больниц.",
-    image: "/images/projects/eap.webp",
-    tags: ["Логотип", "Брендинг"],
-    sphere: "Медицина",
-  },
-];
-
-export function getProjectBySlug(slug: string): Project | undefined {
-  return projects.find((p) => p.slug === slug);
-}
-
-export function getNextProjects(slug: string, count = 2): Project[] {
-  const index = projects.findIndex((p) => p.slug === slug);
-  if (index === -1) return projects.slice(0, count);
-  const next = projects.slice(index + 1, index + 1 + count);
-  if (next.length < count) {
-    return [...next, ...projects.slice(0, count - next.length)];
-  }
-  return next;
-}
-
-/** Extract YouTube video id from common URL shapes. */
-export function parseYoutubeId(url: string): string | null {
-  const raw = url.trim();
-  if (!raw) return null;
+export function youtubeEmbedUrl(url: string): string | null {
   try {
-    const u = new URL(raw);
-    if (u.hostname.includes("youtu.be")) {
-      return u.pathname.replace(/^\//, "").split("/")[0] || null;
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = parsed.pathname.replace(/^\//, "");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
     }
-    if (u.searchParams.get("v")) return u.searchParams.get("v");
-    const embed = u.pathname.match(/\/embed\/([^/]+)/);
-    if (embed?.[1]) return embed[1];
-    const shorts = u.pathname.match(/\/shorts\/([^/]+)/);
-    if (shorts?.[1]) return shorts[1];
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      const id = parsed.searchParams.get("v");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
   } catch {
     return null;
   }
   return null;
 }
 
-export function youtubeEmbedUrl(url: string): string | null {
-  const id = parseYoutubeId(url);
-  return id ? `https://www.youtube.com/embed/${id}` : null;
-}
+export const projects: Project[] = [
+  {
+    slug: "matolux",
+    title: "MATOLUX",
+    description: "Amazon listing redesign with Premium A+ Content",
+    image: "/images/metric/cases/case-1.jpg",
+    tags: ["Listing", "Agriculture", "Premium A+"],
+    sphere: "Agriculture",
+    featured: true,
+    quote: "Your ideas really do make all the difference",
+    author: "Markus Pfister",
+    role: "MATOLUX, Mitgründer & Geschäftsführer",
+    caseStudy: {
+      year: "2026",
+      task: "Rebuild the Amazon listing visuals to communicate value and lift conversion.",
+      solution:
+        "Delivered a full Metric redesign: main images, lifestyle frames, Premium A+ modules, and consistent brand storytelling.",
+      heroImage: "/images/metric/cases/case-1.jpg",
+      metricLabel: "Click-through rate:",
+      metricValue: "+132% CTR",
+      blocks: [
+        {
+          id: "gal",
+          type: "gallery",
+          images: [
+            "/images/metric/cases/case-1.jpg",
+            "/images/metric/categories/cat-1.jpg",
+            "/images/metric/categories/cat-2.jpg",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "craftus",
+    title: "CRAFTUS",
+    description: "Listing and A+ system for a growing Amazon brand",
+    image: "/images/metric/cases/case-2.jpg",
+    tags: ["Listing", "Agriculture", "Premium A+"],
+    sphere: "Home",
+    featured: true,
+    quote: "All performance figures have risen significantly",
+    author: "Louis Bierbaum",
+    role: "CRAFTUS, Mitgründer & Geschäftsführer",
+    caseStudy: {
+      year: "2026",
+      task: "Create a coherent visual system across listing and A+ Content.",
+      solution:
+        "Designed conversion-focused images and Premium A+ modules that clarified benefits and strengthened brand trust.",
+      heroImage: "/images/metric/cases/case-2.jpg",
+      metricLabel: "Click-through rate:",
+      metricValue: "+98% CTR",
+      blocks: [
+        {
+          id: "gal",
+          type: "gallery",
+          images: [
+            "/images/metric/cases/case-2.jpg",
+            "/images/metric/categories/cat-3.jpg",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "tobias",
+    title: "Home Essentials",
+    description: "Conversion-led Amazon visuals",
+    image: "/images/metric/cases/case-3.jpg",
+    tags: ["Listing", "Home", "Premium A+"],
+    sphere: "Home",
+    featured: true,
+    quote: "The conversion rate has increased by one and a half times",
+    author: "Tobias Fraikin",
+    role: "Brand founder",
+    caseStudy: {
+      year: "2026",
+      task: "Improve listing clarity and conversion with stronger visuals.",
+      solution:
+        "Produced a Metric image set that highlights product benefits and drives higher conversion.",
+      heroImage: "/images/metric/cases/case-3.jpg",
+      metricLabel: "Conversion:",
+      metricValue: "+1.5×",
+      blocks: [
+        {
+          id: "gal",
+          type: "gallery",
+          images: [
+            "/images/metric/cases/case-3.jpg",
+            "/images/metric/categories/cat-4.jpg",
+          ],
+        },
+      ],
+    },
+  },
+];

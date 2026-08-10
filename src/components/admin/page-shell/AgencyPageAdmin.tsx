@@ -31,7 +31,7 @@ const FaqEditor = dynamic(
   { ssr: false },
 );
 
-type LocaleCode = "ru" | "uz" | "en";
+type LocaleCode = "en" | "de";
 type LocaleDraft = {
   titleLine1: string;
   titleLine2: string;
