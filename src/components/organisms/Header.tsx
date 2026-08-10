@@ -132,10 +132,15 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
             <span className="text-xl font-semibold tracking-tight">{site.name}</span>
             <button
               type="button"
-              className="text-lg"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15"
+              aria-label={ui.closeMenu}
               onClick={() => setOpen(false)}
             >
-              {ui.closeMenu}
+              <span className="sr-only">{ui.closeMenu}</span>
+              <span className="relative block size-5" aria-hidden>
+                <span className="absolute left-1/2 top-1/2 block h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-foreground" />
+                <span className="absolute left-1/2 top-1/2 block h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-foreground" />
+              </span>
             </button>
           </div>
           <SiteNav
