@@ -238,11 +238,11 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
           <p className="metric-case-studies__subtitle">{caseStudies.subtitle}</p>
         </div>
 
-        <div className="mt-12 space-y-5 md:mt-16 md:space-y-5" data-reveal-group>
+        <div className="metric-case-studies__list" data-reveal-group>
           {caseStudies.items.map((item) => (
             <article key={item.slug} className="metric-case-card" data-reveal>
               <div className="metric-case-card__body">
-                <div className="flex flex-wrap gap-[5px]">
+                <div className="metric-case-card__tags">
                   {item.tags.map((tag) => (
                     <span key={tag} className="metric-pill border-foreground text-foreground">
                       {tag}
@@ -250,15 +250,11 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
                   ))}
                 </div>
                 <div>
-                  <h3 className="font-display text-[clamp(28px,4vw,60px)] leading-[0.9] tracking-[-0.02em] text-foreground">
+                  <h3 className="metric-case-card__quote font-display">
                     {item.quote}
                   </h3>
-                  <p className="mt-8 text-[clamp(22px,2vw,32px)] font-medium tracking-[-0.02em] text-foreground">
-                    {item.author}
-                  </p>
-                  <p className="mt-5 text-[clamp(16px,1.5vw,24px)] tracking-[-0.02em] text-foreground">
-                    {item.role}
-                  </p>
+                  <p className="metric-case-card__author">{item.author}</p>
+                  <p className="metric-case-card__role">{item.role}</p>
                 </div>
                 <TransitionLink
                   href={localePath(locale, `/works/${item.slug}/`)}
@@ -280,7 +276,7 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
           ))}
         </div>
 
-        <div className="mt-10 flex justify-center" data-reveal>
+        <div className="metric-case-studies__more" data-reveal>
           <TransitionLink
             href={localePath(locale, "/works/")}
             className="metric-cta metric-cta--skew-outline"

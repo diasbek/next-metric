@@ -105,7 +105,7 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
             />
             <TransitionLink
               href={contactPath}
-              className="metric-cta metric-cta--outline hidden sm:inline-flex"
+              className="metric-cta metric-cta--outline site-header__cta"
             >
               <span className="metric-cta__label">{home.footer.startCta}</span>
             </TransitionLink>

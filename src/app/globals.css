@@ -727,52 +727,148 @@ body {
 
 .metric-case-card {
   display: grid;
+  grid-template-areas:
+    "media"
+    "body";
   overflow: hidden;
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-xl);
   background: var(--surface);
 }
 
 @media (min-width: 1024px) {
   .metric-case-card {
     grid-template-columns: 1fr 1.05fr;
+    grid-template-areas: "body media";
     min-height: 600px;
+    border-radius: var(--radius-2xl);
   }
 }
 
 .metric-case-card__body {
+  grid-area: body;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 40px;
-  padding: 32px;
+  gap: 20px;
+  padding: 20px;
 }
 
 @media (min-width: 768px) {
   .metric-case-card__body {
+    gap: 28px;
+    padding: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .metric-case-card__body {
+    gap: 40px;
     padding: 50px;
   }
 }
 
 .metric-case-card__media {
+  grid-area: media;
   position: relative;
-  margin: 20px;
-  min-height: 280px;
+  margin: 16px 16px 0;
+  min-height: 220px;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: 20px;
+}
+
+@media (min-width: 768px) {
+  .metric-case-card__media {
+    margin: 20px 20px 0;
+    min-height: 280px;
+    border-radius: 24px;
+  }
 }
 
 @media (min-width: 1024px) {
   .metric-case-card__media {
     margin: 50px 50px 50px 0;
     min-height: auto;
+    aspect-ratio: auto;
     height: calc(100% - 100px);
     align-self: center;
+    border-radius: 30px;
+  }
+}
+
+.metric-case-card__quote {
+  font-size: clamp(24px, 6vw, 60px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-case-card__author {
+  margin-top: 16px;
+  font-size: clamp(18px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-case-card__role {
+  margin-top: 8px;
+  font-size: clamp(14px, 1.8vw, 24px);
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+@media (min-width: 1024px) {
+  .metric-case-card__author {
+    margin-top: 32px;
+  }
+
+  .metric-case-card__role {
+    margin-top: 20px;
+  }
+}
+
+.metric-case-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.metric-case-card__tags .metric-pill {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .metric-case-card__tags .metric-pill {
+    padding: 16px 20px;
+    font-size: 20px;
+  }
+}
+
+.metric-case-studies__list {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .metric-case-studies__list {
+    margin-top: 48px;
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .metric-case-studies__list {
+    margin-top: 64px;
   }
 }
 
 .metric-case-studies__header {
   display: grid;
-  gap: 24px;
+  gap: 12px;
 }
 
 @media (min-width: 1024px) {
@@ -785,7 +881,7 @@ body {
 
 .metric-case-studies__title {
   max-width: 734px;
-  font-size: clamp(40px, 6vw, 100px);
+  font-size: clamp(32px, 8vw, 100px);
   line-height: 0.9;
   letter-spacing: -0.02em;
   color: var(--foreground);
@@ -793,8 +889,8 @@ body {
 
 .metric-case-studies__subtitle {
   max-width: 430px;
-  font-size: clamp(16px, 1.5vw, 24px);
-  line-height: 1.2;
+  font-size: clamp(14px, 3.4vw, 24px);
+  line-height: 1.25;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
@@ -802,6 +898,18 @@ body {
 @media (min-width: 1024px) {
   .metric-case-studies__subtitle {
     justify-self: end;
+  }
+}
+
+.metric-case-studies__more {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .metric-case-studies__more {
+    margin-top: 40px;
   }
 }
 
@@ -1036,6 +1144,12 @@ body {
   flex-shrink: 0;
 }
 
+/* Keep header CTA off the closed mobile bar — `.metric-cta` otherwise
+   overrides Tailwind `hidden` via display:inline-flex. */
+.site-header__cta {
+  display: none;
+}
+
 @media (min-width: 1024px) {
   .site-header__nav {
     display: flex;
@@ -1043,6 +1157,10 @@ body {
 
   .site-header__menu-btn {
     display: none !important;
+  }
+
+  .site-header__cta {
+    display: inline-flex;
   }
 }
 
@@ -1100,7 +1218,7 @@ body {
 }
 
 .site-nav__link--mobile {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 500;
 }
 
@@ -1355,14 +1473,14 @@ body {
   inset: 0;
   z-index: 60;
   background: #fff;
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .mobile-menu-panel a {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 500;
   letter-spacing: -0.02em;
 }
