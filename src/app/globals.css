@@ -928,16 +928,32 @@ body {
   padding: 28px;
 }
 
-/* Motion helpers */
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(24px);
+/* Motion helpers
+   Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
+   content after scroll reveals complete — do not use that pattern. */
+html.gsap-pending [data-reveal]:not(.is-revealed),
+html.gsap-pending [data-reveal-group] > *:not(.is-revealed) {
+  visibility: hidden;
+}
+
+[data-reveal].is-revealed,
+[data-reveal-group] > *.is-revealed,
+[data-clip-reveal].is-revealed {
+  visibility: visible !important;
+  clip-path: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
+  [data-reveal],
+  [data-reveal-group] > *,
+  [data-split-title],
+  [data-clip-reveal],
+  [data-border-draw],
+  [data-counter] {
+    visibility: visible;
     opacity: 1;
     transform: none;
+    clip-path: none;
   }
 
   .metric-cta--skew:hover,
