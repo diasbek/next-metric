@@ -83,19 +83,27 @@ body {
 }
 
 /* —— Metric CTAs ——
-   One system: skewX(-18deg) shell + counter-skew label.
-   Variants: primary pink, dark fill, outline pink, outline dark, on-accent. */
+   Rounded parallelogram: skew shell + counter-skew label.
+   Prefer <Button variant size /> — CSS classes remain for GSAP / legacy. */
 .metric-cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: var(--cta-height);
-  padding: 0 28px;
+  padding: 0 48px;
   border: none;
-  border-radius: 0;
+  border-radius: var(--cta-radius);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: skewX(var(--cta-skew));
+  box-shadow: none;
   transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
@@ -103,41 +111,43 @@ body {
   opacity: 0.92;
 }
 
+.metric-cta:disabled,
+.metric-cta.is-loading {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .metric-cta__label {
   display: inline-block;
   transform: skewX(18deg);
 }
 
-.metric-cta--skew,
-.metric-cta--skew-dark,
-.metric-cta--skew-outline,
-.metric-cta--outline,
-.metric-cta--on-accent {
-  position: relative;
+/* Sizes */
+.metric-cta--sm {
+  min-height: 44px;
+  padding: 0 28px;
+  font-size: 18px;
+}
+
+.metric-cta--md {
   min-height: 48px;
   padding: 0 48px;
-  transform: skewX(-18deg);
-  box-shadow: none;
+  font-size: 20px;
+}
+
+.metric-cta--lg {
+  min-height: 56px;
+  padding: 0 56px;
+  font-size: 22px;
 }
 
 /* Primary fill pink (hero / workflow). */
+.metric-cta--primary,
 .metric-cta--skew,
 .metric-cta--solid {
   color: #fff;
   background: var(--accent);
   box-shadow: 0 10px 30px rgba(255, 60, 130, 0.22);
-}
-
-.metric-cta--solid {
-  /* Alias kept for a few call sites — same as --skew. */
-  transform: skewX(-18deg);
-  min-height: 48px;
-  padding: 0 48px;
-}
-
-.metric-cta--solid .metric-cta__label {
-  display: inline-block;
-  transform: skewX(18deg);
 }
 
 /* White fill on accent surfaces (services). */
@@ -153,6 +163,7 @@ body {
 }
 
 /* Case-study / secondary — filled black parallelogram. */
+.metric-cta--dark-fill,
 .metric-cta--skew-dark,
 .metric-cta--dark.metric-cta--skew {
   width: auto;
@@ -163,11 +174,13 @@ body {
   box-shadow: none;
 }
 
+.metric-cta--dark-fill:hover,
 .metric-cta--skew-dark:hover {
   opacity: 0.92;
 }
 
 /* "More Projects" — outline dark parallelogram. */
+.metric-cta--outline-dark,
 .metric-cta--skew-outline {
   width: auto;
   min-width: 220px;
@@ -177,6 +190,7 @@ body {
   box-shadow: inset 0 0 0 1.5px var(--dark);
 }
 
+.metric-cta--outline-dark:hover,
 .metric-cta--skew-outline:hover {
   opacity: 1;
   background: color-mix(in srgb, var(--dark) 4%, transparent);
@@ -197,11 +211,19 @@ body {
   background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
-/* Legacy dark fill without skew — prefer --skew-dark. */
-.metric-cta--dark:not(.metric-cta--skew) {
-  background: var(--dark);
-  color: #fff;
-  border-radius: 999px;
+/* Size + outlineAccent: keep nav proportions when size=sm is set. */
+.metric-cta--outline.metric-cta--sm {
+  min-height: 44px;
+  padding: 0 28px;
+  font-size: 18px;
+}
+
+.metric-cta--dark-fill.metric-cta--sm,
+.metric-cta--skew-dark.metric-cta--sm,
+.metric-cta--outline-dark.metric-cta--sm,
+.metric-cta--skew-outline.metric-cta--sm {
+  min-width: 0;
+  padding: 0 28px;
 }
 
 .metric-pill {
@@ -740,6 +762,11 @@ body {
   padding-inline: var(--page-padding);
 }
 
+.metric-categories__track-wrap--marquee {
+  overflow: hidden;
+  padding-inline: 0;
+}
+
 .metric-categories__track {
   display: flex;
   gap: 24px;
@@ -747,6 +774,28 @@ body {
   padding-bottom: 8px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+}
+
+.metric-categories__track--marquee {
+  display: flex;
+  width: max-content;
+  gap: 0;
+  overflow: visible;
+  padding-bottom: 0;
+  scroll-snap-type: none;
+  animation: metric-categories-marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.metric-categories__seq {
+  display: flex;
+  flex-shrink: 0;
+  gap: 24px;
+  padding-right: 24px;
+}
+
+.metric-categories__track-wrap--marquee:hover .metric-categories__track--marquee {
+  animation-play-state: paused;
 }
 
 .metric-categories__track::-webkit-scrollbar {
@@ -766,6 +815,23 @@ body {
 @media (min-width: 768px) {
   .metric-categories__card {
     flex-basis: min(28vw, 320px);
+  }
+}
+
+@keyframes metric-categories-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    /* One full sequence (50% of duplicated track) — seamless loop. */
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-categories__track--marquee {
+    animation: none;
+    will-change: auto;
   }
 }
 
@@ -1056,25 +1122,24 @@ body {
     display: grid;
     grid-template-columns: minmax(460px, 0.46fr) minmax(0, 1fr);
     column-gap: clamp(24px, 2vw, 40px);
-    align-items: stretch;
+    align-items: start;
   }
 
   .metric-services__aside {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: flex-start;
-    gap: 40px;
-    min-height: 100%;
+    gap: 28px;
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    z-index: 2;
+    width: 100%;
   }
 
   .metric-services__aside-copy {
     display: flex;
     flex-direction: column;
     gap: 28px;
-    position: sticky;
-    top: calc(var(--header-height) + 24px);
-    z-index: 1;
     width: 100%;
   }
 
@@ -1093,6 +1158,12 @@ body {
   .metric-services__title-line--end {
     display: block;
     white-space: nowrap;
+  }
+
+  .metric-services__cta {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
   }
 
   .metric-services__list {
@@ -1870,7 +1941,6 @@ body {
 }
 
 .contact-form__submit.metric-cta {
-  border-radius: 0;
   width: fit-content;
 }
 
@@ -1974,6 +2044,134 @@ body {
 
 .metric-case {
   padding-block: 40px 80px;
+}
+
+.metric-case--modal {
+  padding-block: 8px 48px;
+}
+
+.metric-case--modal .page-container {
+  max-width: none;
+  width: 100%;
+  padding-inline: 0;
+}
+
+/* Case detail modal — Figma MacBook Pro 14" - 16 (2015:280) */
+.case-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+
+.case-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(9, 9, 9, 0.48);
+}
+
+.case-modal__dialog {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  padding: 0;
+  pointer-events: none;
+}
+
+.case-modal__close {
+  pointer-events: auto;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--dark);
+  box-shadow: 0 8px 28px rgba(9, 9, 9, 0.18);
+  cursor: pointer;
+  transform: translateX(-50%);
+}
+
+.case-modal__close:hover {
+  background: color-mix(in srgb, #fff 92%, var(--dark));
+}
+
+.case-modal__close-icon {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 400;
+  transform: translateY(-1px);
+}
+
+.case-modal__panel {
+  pointer-events: auto;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 1024px) {
+  .case-modal {
+    padding: 48px 60px 40px;
+  }
+
+  .case-modal__dialog {
+    width: min(1392px, calc(100vw - 120px));
+    height: auto;
+    max-height: calc(100dvh - 88px);
+  }
+
+  .case-modal__close {
+    top: 0;
+    width: 64px;
+    height: 64px;
+  }
+
+  .case-modal__panel {
+    margin-top: 80px;
+    width: 100%;
+    height: auto;
+    max-height: calc(100dvh - 128px);
+    border-radius: var(--radius-xl);
+    padding-inline: 40px;
+  }
+
+  .metric-case--modal {
+    padding-block: 40px 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-modal__backdrop,
+  .case-modal__panel {
+    transition: none;
+  }
 }
 
 .metric-legal__inner {
@@ -2183,12 +2381,7 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
     clip-path: none;
   }
 
-  .metric-cta--skew:hover,
-  .metric-cta--skew-dark:hover,
-  .metric-cta--skew-outline:hover,
-  .metric-cta--outline:hover,
-  .metric-cta--on-accent:hover,
-  .metric-cta--solid:hover,
+  .metric-cta:hover,
   .metric-work-card:hover {
     transform: none;
   }

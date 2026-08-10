@@ -28,6 +28,8 @@
   --radius-pill: 62px;
 
   --cta-height: 48px;
+  --cta-radius: 12px;
+  --cta-skew: -18deg;
   --header-height: 88px;
   --glass: rgba(245, 245, 245, 0.3);
 }

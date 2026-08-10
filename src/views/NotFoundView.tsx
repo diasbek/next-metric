@@ -1,4 +1,4 @@
-import { TransitionLink } from "@/components/atoms/TransitionLink";
+import { Button } from "@/components/atoms/Button";
 import type { Locale } from "@/i18n/config";
 import { getContent } from "@/i18n/get-content";
 import { localePath } from "@/i18n/paths";
@@ -18,12 +18,9 @@ export function NotFoundView({ locale = "en" }: NotFoundViewProps) {
           404
         </h1>
         <p className="mt-4 text-xl text-[color:var(--muted)]">{ui.notFoundTitle}</p>
-        <TransitionLink
-          href={localePath(locale, "/")}
-          className="metric-cta metric-cta--skew mt-8"
-        >
-          <span className="metric-cta__label">{ui.backHome}</span>
-        </TransitionLink>
+        <Button href={localePath(locale, "/")} variant="primary" className="mt-8">
+          {ui.backHome}
+        </Button>
       </section>
     </SiteLayout>
   );

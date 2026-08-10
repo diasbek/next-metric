@@ -11,6 +11,7 @@ import {
 } from "react";
 import Image from "next/image";
 import Script from "next/script";
+import { Button } from "@/components/atoms/Button";
 import type { SiteContent } from "@/i18n/types";
 import type { PublicCaptchaConfig } from "@/lib/cms/settings";
 import {
@@ -380,19 +381,20 @@ export function ContactForm({
         {statusLabel}
       </p>
 
-      <button
+      <Button
         type="submit"
+        variant="primary"
         disabled={loading}
         className={[
-          "metric-cta metric-cta--skew contact-form__submit",
+          "contact-form__submit",
           submitted ? "is-success" : "",
           loading ? "is-loading" : "",
         ]
           .filter(Boolean)
           .join(" ")}
       >
-        <span className="metric-cta__label">{statusLabel}</span>
-      </button>
+        {statusLabel}
+      </Button>
     </form>
   );
 }

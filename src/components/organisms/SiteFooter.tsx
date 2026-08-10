@@ -30,13 +30,16 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
   return (
     <footer id="contact" className="site-footer">
       <PageContainer>
-        <div className="site-footer__form" data-reveal>
-          <div className="site-footer__form-copy">
-            <h2 className="site-footer__form-title font-display">{footer.startCta}</h2>
-            <p className="site-footer__form-subtitle">{ui.contactSubtitle}</p>
+        {/* TEMP: CTA contact form hidden — restore site-footer__form block when ready */}
+        {false ? (
+          <div className="site-footer__form" data-reveal>
+            <div className="site-footer__form-copy">
+              <h2 className="site-footer__form-title font-display">{footer.startCta}</h2>
+              <p className="site-footer__form-subtitle">{ui.contactSubtitle}</p>
+            </div>
+            <ContactForm locale={locale} ui={ui} captcha={captcha} />
           </div>
-          <ContactForm locale={locale} ui={ui} captcha={captcha} />
-        </div>
+        ) : null}
 
         <div className="site-footer__main" data-reveal>
           <TransitionLink

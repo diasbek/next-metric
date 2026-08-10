@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { getMetricHome } from "@/data/metric-home";
@@ -51,11 +52,9 @@ export function WorksListingSection({ locale, content }: LocalePageProps) {
                 </div>
                 <h2 className="metric-work-card__title">{project.title}</h2>
                 <p className="metric-work-card__desc">{project.description}</p>
-                <span className="metric-cta metric-cta--skew-dark mt-6 inline-flex">
-                  <span className="metric-cta__label">
-                    {home.caseStudies.viewLabel}
-                  </span>
-                </span>
+                <Button as="span" variant="dark" className="mt-6 inline-flex">
+                  {home.caseStudies.viewLabel}
+                </Button>
               </div>
             </TransitionLink>
           ))}

@@ -1,5 +1,8 @@
 export { ProjectCard, ProjectTag } from "./ProjectCard";
 export { ContactForm } from "./ContactForm";
+export { CaseDetailModal } from "./CaseDetailModal";
+export { CaseDetailModalPage } from "./CaseDetailModalPage";
+export { CategoriesMarquee } from "./CategoriesMarquee";
 export { FilterDropdown } from "./FilterDropdown";
 export { BeforeAfterSlider } from "./BeforeAfterSlider";
 export { FAQAccordion } from "./FAQAccordion";

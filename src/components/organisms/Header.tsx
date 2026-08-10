@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { Button } from "@/components/atoms/Button";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { SiteNav } from "@/components/molecules/SiteNav";
@@ -96,12 +97,14 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
           />
 
           <div className="flex items-center gap-3">
-            <TransitionLink
+            <Button
               href={contactPath}
-              className="metric-cta metric-cta--outline site-header__cta"
+              variant="outlineAccent"
+              size="sm"
+              className="site-header__cta"
             >
-              <span className="metric-cta__label">{home.footer.startCta}</span>
-            </TransitionLink>
+              {home.footer.startCta}
+            </Button>
             <button
               type="button"
               className="site-header__menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-foreground/15 lg:hidden"
@@ -143,13 +146,15 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
             ariaLabel={ui.navAria}
             onNavigate={() => setOpen(false)}
           />
-          <TransitionLink
+          <Button
             href={contactPath}
-            className="metric-cta metric-cta--outline w-full"
+            variant="outlineAccent"
+            size="sm"
+            className="w-full"
             onClick={() => setOpen(false)}
           >
-            <span className="metric-cta__label">{home.footer.startCta}</span>
-          </TransitionLink>
+            {home.footer.startCta}
+          </Button>
         </div>
       ) : null}
     </>

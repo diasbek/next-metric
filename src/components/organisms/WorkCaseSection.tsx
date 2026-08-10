@@ -1,6 +1,6 @@
 import Image from "next/image";
+import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
 import { getMetricHome } from "@/data/metric-home";
 import type { Project } from "@/data/projects";
@@ -14,12 +14,15 @@ interface WorkCaseSectionProps {
   locale: Locale;
   content: SiteContent;
   project: Project;
+  /** Full page (default) or content inside desktop case modal. */
+  presentation?: "page" | "modal";
 }
 
 export async function WorkCaseSection({
   locale,
   content,
   project,
+  presentation = "page",
 }: WorkCaseSectionProps) {
   const { ui } = content;
   const home = getMetricHome(locale);
@@ -47,7 +50,11 @@ export async function WorkCaseSection({
   ];
 
   return (
-    <article className="metric-case">
+    <article
+      className={
+        presentation === "modal" ? "metric-case metric-case--modal" : "metric-case"
+      }
+    >
       <PageContainer>
         <header className="metric-case__intro" data-reveal>
           <div className="metric-case__intro-copy">
@@ -241,12 +248,9 @@ export async function WorkCaseSection({
             <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
               {ui.otherWorks}
             </h2>
-            <TransitionLink
-              href={localePath(locale, "/works/")}
-              className="metric-cta metric-cta--skew-outline"
-            >
-              <span className="metric-cta__label">{home.caseStudies.moreLabel}</span>
-            </TransitionLink>
+            <Button href={localePath(locale, "/works/")} variant="outline">
+              {home.caseStudies.moreLabel}
+            </Button>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
             {nextProjects.slice(0, 2).map((item) => (
@@ -264,14 +268,13 @@ export async function WorkCaseSection({
                   <h3 className="metric-work-card__title">
                     {item.quote ?? item.description}
                   </h3>
-                  <TransitionLink
+                  <Button
                     href={localePath(locale, `/works/${item.slug}/`)}
-                    className="metric-cta metric-cta--skew-dark mt-6"
+                    variant="dark"
+                    className="mt-6"
                   >
-                    <span className="metric-cta__label">
-                      {home.caseStudies.viewLabel}
-                    </span>
-                  </TransitionLink>
+                    {home.caseStudies.viewLabel}
+                  </Button>
                 </div>
               </article>
             ))}

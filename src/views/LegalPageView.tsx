@@ -1,5 +1,5 @@
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { TransitionLink } from "@/components/atoms/TransitionLink";
+import { Button } from "@/components/atoms/Button";
 import { SiteLayout } from "@/components/templates";
 import type { Locale } from "@/i18n/config";
 import { getMetricHome } from "@/data/metric-home";
@@ -58,12 +58,13 @@ export function LegalPageView({
               {content.title}
             </h1>
             <p className="metric-legal__body">{content.body}</p>
-            <TransitionLink
+            <Button
               href={localePath(locale, "/#contact")}
-              className="metric-cta metric-cta--skew mt-10"
+              variant="primary"
+              className="mt-10"
             >
-              <span className="metric-cta__label">{home.footer.startCta}</span>
-            </TransitionLink>
+              {home.footer.startCta}
+            </Button>
           </div>
         </PageContainer>
       </div>

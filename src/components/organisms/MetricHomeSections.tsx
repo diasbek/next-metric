@@ -1,6 +1,7 @@
 import Image from "next/image";
+import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { TransitionLink } from "@/components/atoms/TransitionLink";
+import { CategoriesMarquee } from "@/components/molecules/CategoriesMarquee";
 import { getMetricHome } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -112,12 +113,9 @@ export function MetricHeroSection({ locale }: { locale: Locale }) {
               <span className="block">{hero.titleLine2}</span>
             </h1>
             <p className="metric-hero__subtitle">{hero.subtitle}</p>
-            <TransitionLink
-              href={localePath(locale, "/#contact")}
-              className="metric-cta metric-cta--skew"
-            >
-              <span className="metric-cta__label">{hero.cta}</span>
-            </TransitionLink>
+            <Button href={localePath(locale, "/#contact")} variant="primary" size="lg">
+              {hero.cta}
+            </Button>
           </div>
 
           <div className="metric-hero__visual" aria-hidden>
@@ -214,15 +212,7 @@ export function MetricCategoriesSection({ locale = "en" }: { locale?: Locale }) 
         </h2>
       </PageContainer>
 
-      <div className="metric-categories__track-wrap">
-        <div className="metric-categories__track" data-reveal-group>
-          {categories.images.map((src) => (
-            <div key={src} className="metric-categories__card" data-reveal>
-              <Image src={src} alt="" fill className="object-cover" sizes="320px" />
-            </div>
-          ))}
-        </div>
-      </div>
+      <CategoriesMarquee images={categories.images} />
     </section>
   );
 }
@@ -261,12 +251,13 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
                   <p className="metric-case-card__author">{item.author}</p>
                   <p className="metric-case-card__role">{item.role}</p>
                 </div>
-                <TransitionLink
+                <Button
                   href={localePath(locale, `/works/${item.slug}/`)}
-                  className="metric-cta metric-cta--skew-dark w-fit"
+                  variant="dark"
+                  className="w-fit"
                 >
-                  <span className="metric-cta__label">{caseStudies.viewLabel}</span>
-                </TransitionLink>
+                  {caseStudies.viewLabel}
+                </Button>
               </div>
               <div className="metric-case-card__media">
                 <Image
@@ -282,12 +273,9 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
         </div>
 
         <div className="metric-case-studies__more" data-reveal>
-          <TransitionLink
-            href={localePath(locale, "/works/")}
-            className="metric-cta metric-cta--skew-outline"
-          >
-            <span className="metric-cta__label">{caseStudies.moreLabel}</span>
-          </TransitionLink>
+          <Button href={localePath(locale, "/works/")} variant="outline">
+            {caseStudies.moreLabel}
+          </Button>
         </div>
       </PageContainer>
     </section>
@@ -323,13 +311,14 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
               </p>
             </div>
 
-            <TransitionLink
+            <Button
               href={localePath(locale, "/#contact")}
-              className="metric-cta metric-cta--on-accent metric-services__cta"
+              variant="onAccent"
+              className="metric-services__cta"
               data-reveal
             >
-              <span className="metric-cta__label">{services.cta}</span>
-            </TransitionLink>
+              {services.cta}
+            </Button>
           </div>
 
           <div className="metric-services__list" data-reveal-group>
@@ -430,12 +419,9 @@ export function MetricWorkflowSection({ locale }: { locale: Locale }) {
 
         <div className="metric-workflow__cta" data-reveal>
           <p className="metric-workflow__note">{workflow.note}</p>
-          <TransitionLink
-            href={localePath(locale, "/#contact")}
-            className="metric-cta metric-cta--skew"
-          >
-            <span className="metric-cta__label">{workflow.cta}</span>
-          </TransitionLink>
+          <Button href={localePath(locale, "/#contact")} variant="primary">
+            {workflow.cta}
+          </Button>
         </div>
       </PageContainer>
     </section>

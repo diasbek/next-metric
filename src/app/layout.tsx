@@ -50,14 +50,19 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en" className={archivo.variable} suppressHydrationWarning>
       <body className="antialiased">
         <JsonLd data={getGlobalJsonLdGraph()} />
-        <GsapProviderLazy>{children}</GsapProviderLazy>
+        <GsapProviderLazy>
+          {children}
+          {modal}
+        </GsapProviderLazy>
         <SiteAnalytics />
         <PwaRegister />
       </body>
