@@ -289,49 +289,41 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
       <PageContainer className="metric-services__inner">
         <div className="metric-services__layout">
           <div className="metric-services__aside">
-            <div className="metric-services__aside-copy">
-              <h2 className="metric-services__title font-display" data-reveal>
-                {services.titleLines.map((line) => (
-                  <span key={line} className="metric-services__title-line">
-                    {line}
-                  </span>
-                ))}
-                <span className="metric-services__title-line metric-services__title-line--end">
-                  {services.titleSuffix ? (
-                    <span className="metric-services__title-suffix">
-                      {services.titleSuffix}
-                      {"\u00A0"}
-                    </span>
-                  ) : null}
-                  <span className="metric-services__bracket">{services.titleBracket}</span>
+            <h2 className="metric-services__title font-display" data-reveal>
+              {services.titleLines.map((line) => (
+                <span key={line} className="metric-services__title-line">
+                  {line}
                 </span>
-              </h2>
+              ))}
+              <span className="metric-services__title-line metric-services__title-line--end">
+                {services.titleSuffix ? (
+                  <span className="metric-services__title-suffix">
+                    {services.titleSuffix}
+                    {"\u00A0"}
+                  </span>
+                ) : null}
+                <span className="metric-services__bracket">{services.titleBracket}</span>
+              </span>
+            </h2>
+
+            <div className="metric-services__pin">
               <p className="metric-services__subtitle" data-reveal>
                 {services.subtitle}
               </p>
+              <Button
+                href={localePath(locale, "/#contact")}
+                variant="onAccent"
+                className="metric-services__cta"
+                data-reveal
+              >
+                {services.cta}
+              </Button>
             </div>
-
-            <Button
-              href={localePath(locale, "/#contact")}
-              variant="onAccent"
-              className="metric-services__cta"
-              data-reveal
-            >
-              {services.cta}
-            </Button>
           </div>
 
           <div className="metric-services__list" data-reveal-group>
             {services.items.map((item) => (
               <article key={item.n} className="metric-services-card" data-reveal>
-                <div className="metric-services-card__head">
-                  <span className="metric-services-card__num" aria-hidden>
-                    {item.n}
-                  </span>
-                  <span className="metric-services-card__label">
-                    <span className="metric-services-card__label-text">{item.title}</span>
-                  </span>
-                </div>
                 <div className="metric-services-card__media">
                   <Image
                     src={item.image}
@@ -340,6 +332,19 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
                     className="metric-services-card__img object-contain"
                     sizes="(max-width: 1024px) 90vw, 560px"
                   />
+                </div>
+                <div className="metric-services-card__head">
+                  <span className="metric-services-card__num" aria-hidden>
+                    {item.n}
+                  </span>
+                  <Button
+                    as="span"
+                    variant="onAccent"
+                    size="lg"
+                    className="metric-services-card__label"
+                  >
+                    {item.title}
+                  </Button>
                 </div>
               </article>
             ))}

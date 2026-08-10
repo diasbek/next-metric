@@ -810,6 +810,9 @@ body {
   border-radius: var(--radius-md);
   scroll-snap-align: start;
   background: #fff;
+  cursor: pointer;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 @media (min-width: 768px) {
@@ -1057,11 +1060,8 @@ body {
   gap: 24px;
 }
 
-.metric-services__aside {
-  display: contents;
-}
-
-.metric-services__aside-copy {
+.metric-services__aside,
+.metric-services__pin {
   display: contents;
 }
 
@@ -1108,6 +1108,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: visible;
 }
 
 .metric-services__cta {
@@ -1122,24 +1123,14 @@ body {
     display: grid;
     grid-template-columns: minmax(460px, 0.46fr) minmax(0, 1fr);
     column-gap: clamp(24px, 2vw, 40px);
-    align-items: start;
+    align-items: stretch;
   }
 
   .metric-services__aside {
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 28px;
-    position: sticky;
-    top: calc(var(--header-height) + 24px);
-    z-index: 2;
-    width: 100%;
-  }
-
-  .metric-services__aside-copy {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
+    align-items: stretch;
     width: 100%;
   }
 
@@ -1150,9 +1141,13 @@ body {
     order: unset;
   }
 
+  /* Title sits in normal flow and scrolls away behind the sticky pin. */
   .metric-services__title {
+    position: relative;
+    z-index: 0;
     font-size: clamp(40px, 3.5vw, 68px);
     max-width: 100%;
+    margin-bottom: 28px;
   }
 
   .metric-services__title-line--end {
@@ -1160,48 +1155,104 @@ body {
     white-space: nowrap;
   }
 
+  .metric-services__pin {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    height: calc(100dvh - var(--header-height) - 72px);
+    max-height: calc(100dvh - var(--header-height) - 72px);
+    box-sizing: border-box;
+    padding-bottom: 8px;
+    /* Pull up over the title so it scrolls behind this zone. */
+    margin-top: calc(-1 * var(--services-title-h, 220px) - 28px);
+    padding-top: calc(var(--services-title-h, 220px) + 28px);
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .metric-services__pin > * {
+    pointer-events: auto;
+  }
+
+  .metric-services__subtitle {
+    max-width: 430px;
+    padding: 10px 8px 10px 0;
+    background: var(--accent);
+  }
+
+  .metric-services.is-services-title-away .metric-services__pin {
+    margin-top: 0;
+    padding-top: 0;
+    transition:
+      margin-top 0.35s ease,
+      padding-top 0.35s ease;
+  }
+
+  .metric-services__pin {
+    transition:
+      margin-top 0.35s ease,
+      padding-top 0.35s ease;
+  }
+
   .metric-services__cta {
     position: relative;
     z-index: 2;
     flex-shrink: 0;
+    margin-top: auto;
   }
 
   .metric-services__list {
     gap: 30px;
+    /* Explicitly drive the grid row height. */
+    min-height: calc(4 * 400px + 3 * 30px);
   }
 }
 
 .metric-services-card {
   position: relative;
-  display: grid;
-  grid-template-areas:
-    "media"
-    "head";
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   overflow: hidden;
   border-radius: 20px;
   background: rgba(245, 245, 245, 0.3);
-  padding: 16px;
+  padding: 14px;
 }
 
 @media (min-width: 1024px) {
   .metric-services-card {
+    /* Let tilted mockups sit like Figma — clipped glass hid the art. */
+    display: grid;
     grid-template-areas: "head";
     height: 400px;
     padding: 30px;
     border-radius: 24px;
     gap: 0;
+    overflow: visible;
   }
 }
 
 .metric-services-card__head {
-  grid-area: head;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 0;
+  /* Extra gap: skewX pulls the label’s left edge back toward the number. */
+  gap: 16px;
   z-index: 2;
   width: fit-content;
+  order: 2;
+}
+
+@media (min-width: 1024px) {
+  .metric-services-card__head {
+    grid-area: head;
+    order: unset;
+    gap: 28px;
+  }
 }
 
 .metric-services-card__num {
@@ -1217,7 +1268,7 @@ body {
   letter-spacing: -0.02em;
   flex-shrink: 0;
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 @media (min-width: 1024px) {
@@ -1228,59 +1279,58 @@ body {
   }
 }
 
-.metric-services-card__label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* Title chip — separate parallelogram, not fused into the number circle. */
+.metric-services-card__label.metric-cta {
   min-height: 44px;
-  padding: 0 22px 0 18px;
-  color: var(--dark);
-  background: #fff;
+  padding: 0 22px;
   font-size: 16px;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  transform: skewX(-18deg);
-  margin-left: -10px;
+  margin-left: 0;
+  cursor: default;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.metric-services-card__label-text {
-  display: inline-block;
-  transform: skewX(18deg);
+.metric-services-card__label.metric-cta:hover {
+  opacity: 1;
+  background: #fff;
 }
 
 @media (min-width: 1024px) {
-  .metric-services-card__label {
+  .metric-services-card__label.metric-cta {
     min-height: 65px;
-    padding: 0 36px 0 28px;
+    padding: 0 36px;
     font-size: 32px;
-    margin-left: -14px;
   }
 }
 
 .metric-services-card__media {
-  grid-area: media;
   position: relative;
+  order: 1;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 12px;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 @media (min-width: 1024px) {
   .metric-services-card__media {
     position: absolute;
-    right: -4%;
-    bottom: -22%;
-    width: 70%;
-    height: 115%;
+    order: unset;
+    right: 0;
+    bottom: -6%;
+    width: 58%;
+    height: 108%;
     aspect-ratio: auto;
     border-radius: 12px;
     pointer-events: none;
     overflow: visible;
+    background: transparent;
+    z-index: 1;
   }
 
   .metric-services-card__img {
-    transform: rotate(-4deg) scale(1.02);
+    transform: rotate(-3.3deg) scale(1.02);
     transform-origin: center center;
   }
 }
@@ -1512,6 +1562,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  align-items: flex-start;
 }
 
 .site-nav--mobile {
@@ -1548,7 +1599,9 @@ body {
 }
 
 .site-nav__link--footer {
-  font-size: 18px;
+  font-size: 16px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .site-nav__link--mobile {
@@ -1651,9 +1704,10 @@ body {
   color: var(--accent);
 }
 
+/* Footer — Figma desktop 2015:832 / mobile 2020:4 */
 .site-footer {
   background: #fff;
-  padding-block: clamp(48px, 6vw, 72px) 32px;
+  padding-block: clamp(40px, 6vw, 60px) 28px;
   scroll-margin-top: var(--header-height);
 }
 
@@ -1686,57 +1740,55 @@ body {
 
 .site-footer__main {
   display: grid;
-  gap: 40px;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 40px;
   align-items: start;
+}
+
+.site-footer__logo {
+  grid-column: 1 / -1;
+  display: block;
+  width: min(160px, 42vw);
+  max-width: 100%;
+}
+
+.site-footer__nav {
+  justify-self: start;
+}
+
+.site-footer__contact {
+  display: grid;
+  gap: 40px;
+  justify-self: start;
 }
 
 @media (min-width: 1024px) {
   .site-footer__main {
-    grid-template-columns: minmax(180px, 1fr) auto minmax(200px, 1fr);
-    column-gap: 48px;
-    min-height: 180px;
+    grid-template-columns: minmax(200px, 1fr) auto minmax(220px, 280px);
+    column-gap: clamp(48px, 8vw, 160px);
+    row-gap: 0;
   }
-}
 
-.site-footer__logo {
-  display: block;
-  width: 213px;
-  max-width: 100%;
+  .site-footer__logo {
+    grid-column: auto;
+    width: 213px;
+  }
+
+  .site-footer__nav {
+    padding-top: 14px;
+  }
+
+  .site-footer__contact {
+    justify-self: end;
+    padding-top: 14px;
+  }
 }
 
 .site-footer__logo-img {
   display: block;
   width: 100%;
   height: auto;
-}
-
-.site-footer__cities {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  font-size: 16px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--foreground);
-}
-
-@media (min-width: 1024px) {
-  .site-footer__cities {
-    justify-self: center;
-    padding-top: 4px;
-  }
-}
-
-.site-footer__contact {
-  display: grid;
-  gap: 40px;
-}
-
-@media (min-width: 1024px) {
-  .site-footer__contact {
-    justify-self: end;
-    padding-top: 4px;
-  }
 }
 
 .site-footer__contact-block {
@@ -1761,24 +1813,70 @@ body {
 }
 
 .site-footer__bottom {
-  margin-top: clamp(48px, 8vw, 140px);
+  margin-top: 48px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px 32px;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 48px;
   font-size: 16px;
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
-.site-footer__legal,
 .site-footer__meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px 40px;
+  justify-content: center;
+  gap: 12px 24px;
+  order: 1;
+}
+
+.site-footer__link--newsletter {
+  order: -1;
+}
+
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  width: 100%;
+  order: 2;
+}
+
+.site-footer__copy {
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .site-footer__bottom {
+    margin-top: 140px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 40px;
+  }
+
+  .site-footer__meta {
+    order: 2;
+    justify-content: flex-end;
+    gap: 16px 24px;
+    max-width: none;
+  }
+
+  .site-footer__link--newsletter {
+    order: 0;
+  }
+
+  .site-footer__legal {
+    order: 1;
+    width: auto;
+    justify-content: flex-start;
+    gap: 40px;
+  }
 }
 
 .site-footer__legal a,
@@ -2382,7 +2480,8 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
   }
 
   .metric-cta:hover,
-  .metric-work-card:hover {
+  .metric-work-card:hover,
+  .metric-categories__card:hover {
     transform: none;
   }
 }

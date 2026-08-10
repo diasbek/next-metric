@@ -71,6 +71,144 @@ function initCtaHovers(): Cleanup {
   return () => cleanups.forEach((fn) => fn());
 }
 
+/** Quick GSAP jiggle on category marquee cards. */
+function initCategoryCardHovers(): Cleanup {
+  const cards = Array.from(
+    document.querySelectorAll<HTMLElement>(".metric-categories__card"),
+  );
+  if (!cards.length) return () => {};
+
+  const cleanups: Cleanup[] = [];
+  cards.forEach((el) => {
+    const onEnter = () => {
+      gsap.killTweensOf(el);
+      gsap
+        .timeline({ defaults: { overwrite: "auto" } })
+        .to(el, {
+          y: -10,
+          scale: 1.045,
+          rotation: gsap.utils.random(-2.4, -1.2),
+          duration: 0.18,
+          ease: "power2.out",
+        })
+        .to(el, {
+          rotation: gsap.utils.random(1.2, 2.4),
+          duration: 0.12,
+          ease: "power1.inOut",
+        })
+        .to(el, {
+          rotation: 0,
+          duration: 0.22,
+          ease: "power2.out",
+        });
+    };
+    const onLeave = () => {
+      gsap.killTweensOf(el);
+      gsap.to(el, {
+        y: 0,
+        scale: 1,
+        rotation: 0,
+        duration: 0.28,
+        ease: "power2.out",
+        overwrite: true,
+      });
+    };
+    el.addEventListener("pointerenter", onEnter);
+    el.addEventListener("pointerleave", onLeave);
+    cleanups.push(() => {
+      el.removeEventListener("pointerenter", onEnter);
+      el.removeEventListener("pointerleave", onLeave);
+      gsap.killTweensOf(el);
+      gsap.set(el, { clearProps: "transform" });
+    });
+  });
+
+  return () => cleanups.forEach((fn) => fn());
+}
+
+/** Measure title height and collapse sticky pin offset once title scrolls away. */
+function initServicesTitlePin(): Cleanup {
+  const section = document.getElementById("services");
+  const title = section?.querySelector<HTMLElement>(".metric-services__title");
+  if (!section || !title) return () => {};
+
+  const headerOffset =
+    parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--header-height",
+      ),
+    ) || 88;
+
+  const measure = () => {
+    section.style.setProperty(
+      "--services-title-h",
+      `${Math.ceil(title.getBoundingClientRect().height)}px`,
+    );
+  };
+
+  const update = () => {
+    const away = title.getBoundingClientRect().bottom < headerOffset + 8;
+    section.classList.toggle("is-services-title-away", away);
+  };
+
+  measure();
+  update();
+
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", measure);
+  window.addEventListener("resize", update);
+
+  return () => {
+    window.removeEventListener("scroll", update);
+    window.removeEventListener("resize", measure);
+    window.removeEventListener("resize", update);
+    section.classList.remove("is-services-title-away");
+    section.style.removeProperty("--services-title-h");
+  };
+}
+
+/** Soft lift + nudge on Services glass cards. */
+function initServiceCardHovers(): Cleanup {
+  const cards = Array.from(
+    document.querySelectorAll<HTMLElement>(".metric-services-card"),
+  );
+  if (!cards.length) return () => {};
+
+  const cleanups: Cleanup[] = [];
+  cards.forEach((el) => {
+    const onEnter = () => {
+      gsap.killTweensOf(el);
+      gsap.to(el, {
+        y: -6,
+        scale: 1.015,
+        duration: 0.28,
+        ease: "power2.out",
+        overwrite: true,
+      });
+    };
+    const onLeave = () => {
+      gsap.killTweensOf(el);
+      gsap.to(el, {
+        y: 0,
+        scale: 1,
+        duration: 0.3,
+        ease: "power2.out",
+        overwrite: true,
+      });
+    };
+    el.addEventListener("pointerenter", onEnter);
+    el.addEventListener("pointerleave", onLeave);
+    cleanups.push(() => {
+      el.removeEventListener("pointerenter", onEnter);
+      el.removeEventListener("pointerleave", onLeave);
+      gsap.killTweensOf(el);
+      gsap.set(el, { clearProps: "transform" });
+    });
+  });
+
+  return () => cleanups.forEach((fn) => fn());
+}
+
 /** Public Metric site — hero entrance, scroll reveals, CTA hover, before/after. */
 export function initAnimations(_pathname: string): Cleanup {
   if (typeof window === "undefined") return () => {};
@@ -89,6 +227,9 @@ export function initAnimations(_pathname: string): Cleanup {
     cleanups.push(initBlobAnimations());
     cleanups.push(initGlobalReveals());
     cleanups.push(initCtaHovers());
+    cleanups.push(initCategoryCardHovers());
+    cleanups.push(initServiceCardHovers());
+    cleanups.push(initServicesTitlePin());
     cleanups.push(initBeforeAfterSliders());
   });
 

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
+import { SiteNav } from "@/components/molecules/SiteNav";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
@@ -14,9 +15,19 @@ interface SiteFooterProps {
   captcha: PublicCaptchaConfig;
 }
 
+/** Figma footer nav order (differs from header). */
+const FOOTER_NAV_HREFS = [
+  "/#services",
+  "/#case-studies",
+  "/#projects",
+  "/#workflow",
+  "/#faq",
+] as const;
+
 export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
   const { site, ui } = content;
-  const footer = getMetricHome(locale).footer;
+  const home = getMetricHome(locale);
+  const footer = home.footer;
   const socialMap = {
     instagram: site.social.instagram,
     linkedin: site.social.linkedin ?? "#",
@@ -26,6 +37,11 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
 
   const privacyLink = footer.links.find((link) => link.href.includes("privacy"));
   const utilityLinks = footer.links.filter((link) => !link.href.includes("privacy"));
+
+  const navItems = FOOTER_NAV_HREFS.flatMap((href) => {
+    const item = home.nav.find((entry) => entry.href === href);
+    return item ? [{ label: item.label, path: item.href }] : [];
+  });
 
   return (
     <footer id="contact" className="site-footer">
@@ -56,11 +72,13 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
             />
           </TransitionLink>
 
-          <div className="site-footer__cities" aria-label="Locations">
-            {footer.cities.map((city) => (
-              <span key={city}>{city}</span>
-            ))}
-          </div>
+          <SiteNav
+            locale={locale}
+            items={navItems}
+            variant="footer"
+            ariaLabel={ui.navAria}
+            className="site-footer__nav"
+          />
 
           <div className="site-footer__contact">
             <div className="site-footer__contact-block">
@@ -84,15 +102,6 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
         </div>
 
         <div className="site-footer__bottom" data-reveal>
-          <div className="site-footer__legal">
-            <p>© 2026 {site.name}</p>
-            {privacyLink ? (
-              <TransitionLink href={localePath(locale, privacyLink.href)}>
-                {privacyLink.label}
-              </TransitionLink>
-            ) : null}
-          </div>
-
           <div className="site-footer__meta">
             {footer.social.map((item) => (
               <a
@@ -105,10 +114,30 @@ export function SiteFooter({ locale, content, captcha }: SiteFooterProps) {
               </a>
             ))}
             {utilityLinks.map((link) => (
-              <TransitionLink key={link.label} href={localePath(locale, link.href)}>
+              <TransitionLink
+                key={link.label}
+                href={localePath(locale, link.href)}
+                className={
+                  link.href.includes("newsletter")
+                    ? "site-footer__link--newsletter"
+                    : undefined
+                }
+              >
                 {link.label}
               </TransitionLink>
             ))}
+          </div>
+
+          <div className="site-footer__legal">
+            <p className="site-footer__copy">© 2026 {site.name}</p>
+            {privacyLink ? (
+              <TransitionLink
+                href={localePath(locale, privacyLink.href)}
+                className="site-footer__privacy"
+              >
+                {privacyLink.label}
+              </TransitionLink>
+            ) : null}
           </div>
         </div>
       </PageContainer>
