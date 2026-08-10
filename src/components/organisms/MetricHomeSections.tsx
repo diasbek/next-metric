@@ -292,37 +292,49 @@ export function MetricCaseStudiesSection({ locale }: { locale: Locale }) {
 export function MetricServicesSection({ locale }: { locale: Locale }) {
   const { services } = getMetricHome(locale);
   return (
-    <section id={services.id} className="metric-services bg-accent text-white">
+    <section id={services.id} className="metric-services">
       <PageContainer className="metric-services__inner">
-        <div className="metric-services__grid">
-          <div data-reveal>
-            <h2 className="metric-services__title font-display text-white">
-              {services.title}{" "}
-              <span className="metric-services__bracket">{services.titleBracket}</span>
-            </h2>
-            <p className="metric-services__subtitle">
-              {services.subtitle}
-            </p>
-            <TransitionLink
-              href={localePath(locale, "/#contact")}
-              className="metric-cta metric-cta--on-accent mt-10"
-            >
-              <span className="metric-cta__label">{services.cta}</span>
-            </TransitionLink>
-          </div>
+        <h2 className="metric-services__title font-display" data-reveal>
+          {services.title}{" "}
+          <span className="metric-services__bracket">{services.titleBracket}</span>
+        </h2>
+
+        <div className="metric-services__layout">
+          <p className="metric-services__subtitle" data-reveal>
+            {services.subtitle}
+          </p>
+
           <div className="metric-services__list" data-reveal-group>
             {services.items.map((item) => (
-              <div key={item.n} className="metric-services-item" data-reveal>
-                <span className="font-display text-[48px] text-white/90">{item.n}</span>
-                <p className="text-[clamp(22px,2vw,36px)] font-medium tracking-[-0.02em]">
-                  {item.title}
-                </p>
-                <div className="relative h-20 w-full overflow-hidden rounded-xl bg-white/10 md:h-28">
-                  <Image src={item.image} alt="" fill className="object-cover" sizes="280px" />
+              <article key={item.n} className="metric-services-card" data-reveal>
+                <div className="metric-services-card__head">
+                  <span className="metric-services-card__num" aria-hidden>
+                    {item.n}
+                  </span>
+                  <span className="metric-services-card__label">
+                    <span className="metric-services-card__label-text">{item.title}</span>
+                  </span>
                 </div>
-              </div>
+                <div className="metric-services-card__media">
+                  <Image
+                    src={item.image}
+                    alt=""
+                    fill
+                    className="metric-services-card__img object-cover"
+                    sizes="(max-width: 1024px) 90vw, 560px"
+                  />
+                </div>
+              </article>
             ))}
           </div>
+
+          <TransitionLink
+            href={localePath(locale, "/#contact")}
+            className="metric-cta metric-cta--on-accent metric-services__cta"
+            data-reveal
+          >
+            <span className="metric-cta__label">{services.cta}</span>
+          </TransitionLink>
         </div>
       </PageContainer>
     </section>
