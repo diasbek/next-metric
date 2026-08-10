@@ -5,7 +5,6 @@ import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { SiteNav } from "@/components/molecules/SiteNav";
-import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
 import { localePath } from "@/i18n/paths";
@@ -97,12 +96,6 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
           />
 
           <div className="flex items-center gap-3">
-            <LanguageSwitcher
-              locale={locale}
-              ariaLabel={ui.langAria}
-              variant="dropdown"
-              className="hidden md:block"
-            />
             <TransitionLink
               href={contactPath}
               className="metric-cta metric-cta--outline site-header__cta"
@@ -157,11 +150,6 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
           >
             <span className="metric-cta__label">{home.footer.startCta}</span>
           </TransitionLink>
-          <LanguageSwitcher
-            locale={locale}
-            ariaLabel={ui.langAria}
-            variant="dropdown"
-          />
         </div>
       ) : null}
     </>
