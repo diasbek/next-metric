@@ -1032,13 +1032,17 @@ body {
   gap: 30px;
 }
 
+.site-header__menu-btn {
+  flex-shrink: 0;
+}
+
 @media (min-width: 1024px) {
   .site-header__nav {
     display: flex;
   }
 
   .site-header__menu-btn {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -1050,10 +1054,6 @@ body {
 
 .site-header__nav a:hover {
   color: var(--accent);
-}
-
-.site-nav--header {
-  display: contents;
 }
 
 .site-nav--footer {

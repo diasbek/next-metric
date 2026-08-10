@@ -111,7 +111,7 @@ export function Header({ locale, site, ui, variant = "compact" }: HeaderProps) {
             </TransitionLink>
             <button
               type="button"
-              className="site-header__menu-btn inline-flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15 lg:hidden"
+              className="site-header__menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-foreground/15 lg:hidden"
               aria-label={open ? ui.closeMenu : ui.openMenu}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
