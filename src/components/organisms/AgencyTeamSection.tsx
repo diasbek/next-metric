@@ -1,0 +1,55 @@
+import Image from "next/image";
+import { Divider } from "@/components/atoms";
+import type { LocalePageProps } from "@/i18n/props";
+
+export function AgencyTeamSection({ content }: LocalePageProps) {
+  const { agency, ui } = content;
+
+  return (
+    <section className="agency-team" data-scroll-section data-reveal-group="pop">
+      <Divider className="mb-0" />
+
+      <div className="agency-team__head">
+        <h2 className="agency-team__title text-h2 text-white" data-reveal>
+          {ui.teamTitle}
+        </h2>
+
+        <article className="agency-team__director" data-reveal>
+          <div className="agency-team__director-photo">
+            <Image
+              src={agency.director.image}
+              alt={agency.director.name}
+              width={900}
+              height={900}
+              className="agency-team__photo-img"
+              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 560px"
+              priority
+            />
+          </div>
+          <p className="agency-team__director-role">{agency.director.role}</p>
+          <p className="agency-team__director-name">{agency.director.name}</p>
+        </article>
+      </div>
+
+      <div className="agency-team__grid">
+        {agency.team.map((member, index) => (
+          <article key={member.name} className="agency-team__member" data-reveal>
+            <div className="agency-team__member-photo">
+              <Image
+                src={member.image}
+                alt={member.name}
+                width={720}
+                height={720}
+                className="agency-team__photo-img"
+                sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 360px"
+                loading={index < 2 ? "eager" : "lazy"}
+              />
+            </div>
+            <p className="agency-team__member-role">{member.role}</p>
+            <p className="agency-team__member-name">{member.name}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}

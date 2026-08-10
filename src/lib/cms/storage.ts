@@ -1,0 +1,352 @@
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getSupabaseUrl } from "@/lib/supabase/env";
+import sharp from "sharp";
+import { MEDIA_BUCKET, getPublicMediaUrl } from "@/lib/cms/storage-shared";
+
+export { MEDIA_BUCKET, getPublicMediaUrl } from "@/lib/cms/storage-shared";
+
+const ALLOWED_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+  "image/avif",
+]);
+
+const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
+const MAX_EDGE_PX = 1920;
+
+function sanitizeFilename(name: string) {
+  return name
+    .normalize("NFKD")
+    .replace(/[^\w.\-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^\.+/, "")
+    .slice(0, 80);
+}
+
+/** Extract storage object path from a public media URL, if it belongs to our bucket. */
+export function getStoragePathFromPublicUrl(url: string): string | null {
+  const marker = `/storage/v1/object/public/${MEDIA_BUCKET}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return decodeURIComponent(url.slice(idx + marker.length).split("?")[0] ?? "");
+}
+
+export type UploadMediaOptions = {
+  /** Folder inside the media bucket, e.g. projects/<id>/cover */
+  folder?: string;
+  /** Prefer a stable name prefix */
+  filenameHint?: string;
+  /** Long-edge limit after sharp (default 1920) */
+  maxEdge?: number;
+};
+
+/**
+ * Normalize uploads for the web: strip metadata, cap dimensions, prefer WebP.
+ * SVG/GIF pass through unchanged (animation / vectors).
+ */
+async function optimizeForWeb(
+  buffer: Buffer,
+  mime: string,
+  maxEdge = MAX_EDGE_PX,
+): Promise<{ buffer: Buffer; contentType: string; ext: string }> {
+  if (mime === "image/svg+xml" || mime === "image/gif") {
+    const ext = mime === "image/svg+xml" ? "svg" : "gif";
+    return { buffer, contentType: mime, ext };
+  }
+
+  const image = sharp(buffer, { failOn: "none" }).rotate();
+  const meta = await image.metadata();
+  const width = meta.width ?? maxEdge;
+  const height = meta.height ?? maxEdge;
+  const needsResize = width > maxEdge || height > maxEdge;
+
+  let pipeline = image;
+  if (needsResize) {
+    pipeline = pipeline.resize({
+      width: maxEdge,
+      height: maxEdge,
+      fit: "inside",
+      withoutEnlargement: true,
+    });
+  }
+
+  const webp = await pipeline.webp({ quality: 82, effort: 4 }).toBuffer();
+  return { buffer: webp, contentType: "image/webp", ext: "webp" };
+}
+
+export async function uploadMediaFile(
+  file: File,
+  options: UploadMediaOptions = {},
+): Promise<{ path: string; publicUrl: string }> {
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("Empty file");
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error("File too large (max 12 MB)");
+  }
+
+  const mime = file.type || "application/octet-stream";
+  if (!ALLOWED_MIME.has(mime) && !mime.startsWith("image/")) {
+    throw new Error(`Unsupported file type: ${mime}`);
+  }
+
+  const folder = (options.folder ?? "uploads").replace(/^\/+|\/+$/g, "");
+  const original = sanitizeFilename(file.name) || "image";
+  const base = options.filenameHint
+    ? sanitizeFilename(options.filenameHint)
+    : original.replace(/\.[^.]+$/, "");
+
+  const raw = Buffer.from(await file.arrayBuffer());
+  let optimized: { buffer: Buffer; contentType: string; ext: string };
+  try {
+    optimized = await optimizeForWeb(raw, mime, options.maxEdge ?? MAX_EDGE_PX);
+  } catch (err) {
+    throw new Error(
+      err instanceof Error
+        ? `Image processing failed: ${err.message}`
+        : "Image processing failed",
+    );
+  }
+  const path = `${folder}/${Date.now()}-${base}.${optimized.ext}`;
+
+  const supabase = createSupabaseAdminClient();
+  // Uint8Array avoids undici "fetch failed" quirks with Node Buffer bodies
+  const body = new Uint8Array(optimized.buffer);
+  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, body, {
+    contentType: optimized.contentType,
+    upsert: false,
+    cacheControl: "31536000",
+  });
+
+  if (error) throw new Error(describeStorageError(error.message));
+
+  return { path, publicUrl: getPublicMediaUrl(path) };
+}
+
+function describeStorageError(message: string): string {
+  const trimmed = message.trim() || "Storage upload failed";
+  if (/fetch failed/i.test(trimmed)) {
+    return "Не удалось загрузить файл в Supabase Storage (fetch failed). Обычно это сеть между сервером и Supabase — файл лучше грузить из браузера.";
+  }
+  return trimmed;
+}
+
+export async function deleteMediaByPublicUrl(url: string) {
+  const path = getStoragePathFromPublicUrl(url);
+  if (!path) return;
+  const supabase = createSupabaseAdminClient();
+  await supabase.storage.from(MEDIA_BUCKET).remove([path]);
+}
+
+export function isFileUpload(value: FormDataEntryValue | null): value is File {
+  return value instanceof File && value.size > 0;
+}
+
+export const LEAD_ATTACHMENTS_BUCKET = "lead-attachments";
+const MAX_LEAD_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+
+const LEAD_ATTACHMENT_MIME = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.oasis.opendocument.text",
+  "application/rtf",
+  "text/plain",
+  "text/rtf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+const LEAD_ATTACHMENT_EXT = new Set([
+  "pdf",
+  "doc",
+  "docx",
+  "odt",
+  "rtf",
+  "txt",
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "gif",
+]);
+
+function fileExt(name: string) {
+  const m = name.toLowerCase().match(/\.([a-z0-9]+)$/);
+  return m?.[1] ?? "";
+}
+
+export async function uploadLeadAttachment(
+  file: File,
+): Promise<{ path: string; publicUrl: string }> {
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("Empty file");
+  }
+  if (file.size > MAX_LEAD_ATTACHMENT_BYTES) {
+    throw new Error("File too large (max 10 MB)");
+  }
+
+  const mime = file.type || "application/octet-stream";
+  const ext = fileExt(file.name);
+  const mimeOk = LEAD_ATTACHMENT_MIME.has(mime);
+  const extOk = LEAD_ATTACHMENT_EXT.has(ext);
+  if (!mimeOk && !extOk) {
+    throw new Error("Unsupported file type");
+  }
+
+  const safeName = sanitizeFilename(file.name) || `file.${ext || "bin"}`;
+  const path = `leads/${Date.now()}-${safeName}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const contentType = mimeOk ? mime : "application/octet-stream";
+
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.storage
+    .from(LEAD_ATTACHMENTS_BUCKET)
+    .upload(path, buffer, {
+      contentType,
+      upsert: false,
+      cacheControl: "31536000",
+    });
+
+  if (error) throw new Error(error.message);
+
+  const publicUrl = `${getSupabaseUrl()}/storage/v1/object/public/${LEAD_ATTACHMENTS_BUCKET}/${path}`;
+  return { path, publicUrl };
+}
+
+export const SITE_FILES_BUCKET = "site-files";
+const MAX_SITE_FILE_BYTES = 50 * 1024 * 1024;
+
+const SITE_FILE_MIME = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.oasis.opendocument.text",
+  "application/rtf",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
+const SITE_FILE_EXT = new Set([
+  "pdf",
+  "doc",
+  "docx",
+  "odt",
+  "rtf",
+  "ppt",
+  "pptx",
+  "txt",
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+]);
+
+/** Upload public site docs (presentation / brief) — no image pipeline. */
+export async function uploadSiteDocument(
+  file: File,
+  options: { folder?: string; filenameHint?: string } = {},
+): Promise<{ path: string; publicUrl: string }> {
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("Empty file");
+  }
+  if (file.size > MAX_SITE_FILE_BYTES) {
+    throw new Error("File too large (max 50 MB)");
+  }
+
+  const mime = file.type || "application/octet-stream";
+  const ext = fileExt(file.name);
+  if (!SITE_FILE_MIME.has(mime) && !SITE_FILE_EXT.has(ext)) {
+    throw new Error("Unsupported file type");
+  }
+
+  const folder = (options.folder ?? "docs").replace(/^\/+|\/+$/g, "");
+  const base = options.filenameHint
+    ? sanitizeFilename(options.filenameHint)
+    : sanitizeFilename(file.name).replace(/\.[^.]+$/, "") || "document";
+  const finalExt = ext || "pdf";
+  const path = `${folder}/${Date.now()}-${base}.${finalExt}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const contentType = SITE_FILE_MIME.has(mime) ? mime : "application/octet-stream";
+
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.storage
+    .from(SITE_FILES_BUCKET)
+    .upload(path, new Uint8Array(buffer), {
+      contentType,
+      upsert: false,
+      cacheControl: "31536000",
+    });
+  if (error) throw new Error(error.message);
+
+  const publicUrl = `${getSupabaseUrl()}/storage/v1/object/public/${SITE_FILES_BUCKET}/${path}`;
+  return { path, publicUrl };
+}
+
+/** Recursively list object paths in the public media bucket (early-exit aware). */
+export async function listMediaFiles(
+  prefixOrOptions: string | { prefix?: string; maxFiles?: number } = "",
+  depth = 0,
+): Promise<string[]> {
+  const options =
+    typeof prefixOrOptions === "string"
+      ? { prefix: prefixOrOptions, maxFiles: 500 }
+      : {
+          prefix: prefixOrOptions.prefix ?? "",
+          maxFiles: prefixOrOptions.maxFiles ?? 500,
+        };
+
+  return walkMediaFiles(options.prefix, 0, options.maxFiles);
+}
+
+async function walkMediaFiles(
+  prefix: string,
+  depth: number,
+  maxFiles: number,
+  acc: string[] = [],
+): Promise<string[]> {
+  if (depth > 4 || acc.length >= maxFiles) return acc;
+
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase.storage.from(MEDIA_BUCKET).list(prefix, {
+    limit: 200,
+    sortBy: { column: "created_at", order: "desc" },
+  });
+  if (error || !data) return acc;
+
+  const folders: string[] = [];
+  for (const entry of data) {
+    if (!entry.name || entry.name === ".emptyFolderPlaceholder") continue;
+    const path = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const isFile =
+      Boolean(entry.metadata) ||
+      /\.(jpe?g|png|gif|webp|avif|svg)$/i.test(entry.name);
+
+    if (isFile) {
+      acc.push(path);
+      if (acc.length >= maxFiles) return acc;
+    } else {
+      folders.push(path);
+    }
+  }
+
+  for (const folder of folders) {
+    if (acc.length >= maxFiles) break;
+    await walkMediaFiles(folder, depth + 1, maxFiles, acc);
+  }
+  return acc;
+}
+
+/** Recent media for pickers — stops once enough files are collected. */
+export async function listRecentMediaFiles(limit = 48): Promise<string[]> {
+  return listMediaFiles({ maxFiles: limit });
+}

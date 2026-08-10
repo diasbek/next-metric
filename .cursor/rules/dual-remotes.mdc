@@ -1,0 +1,28 @@
+---
+description: Dual Git remotes — update when GitHub remotes exist
+alwaysApply: true
+---
+
+# Dual remotes (dev + production)
+
+When this project has **two** GitHub remotes, keep them in sync on every ship.
+
+| Remote | URL | Role |
+|--------|-----|------|
+| `origin` | `https://github.com/diasbek/next-metric.git` | Personal / working copy |
+| `minim` | `https://github.com/minimdesigngroup/next-metric.git` | **Production** (client org) — if used |
+
+## When the user asks to commit and push
+
+1. Create **one** commit locally as usual (do not duplicate commits).
+2. If both remotes exist, push **in parallel** to both:
+
+```bash
+git push origin HEAD &
+git push minim HEAD &
+wait
+```
+
+3. Report both push results (or one failure clearly).
+4. Do **not** push only to one remote unless the user explicitly says so.
+5. Never force-push unless the user explicitly requests it.

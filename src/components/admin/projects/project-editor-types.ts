@@ -1,0 +1,48 @@
+import type { AdminLocale } from "@/components/admin/ui/locales";
+import type { ProjectBlockType } from "@/lib/cms/types";
+
+export type ProjectTranslationDraft = {
+  locale: AdminLocale;
+  title: string;
+  description: string;
+  tags: string;
+  case_year: string;
+  case_task: string;
+  case_solution: string;
+  meta_title: string;
+  meta_description: string;
+  keywords: string;
+};
+
+export type ProjectMediaDraft = {
+  id: string;
+  kind: string;
+  url: string;
+  alt: string;
+  sort_order: number;
+  block_id: string | null;
+};
+
+export type ProjectBlockDraft = {
+  id: string;
+  type: ProjectBlockType;
+  sort_order: number;
+  youtube_url: string;
+};
+
+export type ProjectEditorData = {
+  id: string;
+  slug: string;
+  status: string;
+  sphere: string;
+  sort_order: number;
+  featured: boolean;
+  cover_image: string;
+  og_image: string;
+  seo_indexable: boolean;
+  translations: Record<AdminLocale, ProjectTranslationDraft>;
+  media: ProjectMediaDraft[];
+  blocks: ProjectBlockDraft[];
+};
+
+export type LibraryItem = { path: string; url: string };
