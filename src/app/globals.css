@@ -1146,28 +1146,57 @@ body {
   }
 }
 
+/* Workflow — Figma node 2015:833 */
 .metric-workflow__header {
   display: grid;
   gap: 16px;
-  align-items: end;
+  align-items: start;
 }
 
 @media (min-width: 1024px) {
   .metric-workflow__header {
-    grid-template-columns: 1fr minmax(200px, 240px);
-    gap: 40px;
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 220px);
+    column-gap: 40px;
+    align-items: start;
+  }
+
+  .metric-workflow__subtitle {
+    margin-top: clamp(72px, 8vw, 120px);
+    justify-self: end;
+    text-align: left;
   }
 }
 
 .metric-workflow__title {
-  font-size: clamp(40px, 7vw, 100px);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: clamp(42px, 8vw, 120px);
   line-height: 0.9;
   letter-spacing: -0.02em;
-  max-width: 14ch;
+  color: var(--foreground);
+}
+
+.metric-workflow__title-line {
+  display: block;
+}
+
+.metric-workflow__title-line--brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.2vw, 18px);
+}
+
+.metric-workflow__mark {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(36px, 6.5vw, 96px);
+  height: auto;
 }
 
 .metric-workflow__subtitle {
-  font-size: clamp(18px, 1.6vw, 24px);
+  max-width: 220px;
+  font-size: clamp(16px, 1.6vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--foreground);
@@ -1175,29 +1204,34 @@ body {
 
 .metric-workflow__grid {
   display: grid;
-  gap: 24px;
+  gap: 20px;
   align-items: start;
+  margin-top: clamp(40px, 5vw, 64px);
 }
 
 @media (min-width: 1024px) {
   .metric-workflow__grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
   }
 }
 
 .metric-workflow-card {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 24px;
-  min-height: 100%;
-  padding: 20px;
+  min-height: clamp(420px, 52vw, 548px);
+  padding: 20px 20px 30px;
   border-radius: 20px;
   background: var(--surface);
+  overflow: hidden;
 }
 
 .metric-workflow-card--media-bottom {
-  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 30px;
+  padding-top: 30px;
 }
 
 @media (min-width: 1024px) {
@@ -1211,14 +1245,27 @@ body {
   width: 100%;
   aspect-ratio: 410 / 259;
   overflow: hidden;
-  border-radius: 12px;
+}
+
+.metric-workflow-card--media-bottom .metric-workflow-card__media {
+  margin-top: auto;
+  aspect-ratio: 386 / 249;
+}
+
+.metric-workflow-card__img {
+  mix-blend-mode: multiply;
 }
 
 .metric-workflow-card__copy {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 0 10px 10px;
+  padding: 0 10px;
+}
+
+.metric-workflow-card--media-bottom .metric-workflow-card__copy {
+  gap: 30px;
+  padding: 0 10px;
 }
 
 .metric-workflow-card__title {

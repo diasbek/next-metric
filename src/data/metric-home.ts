@@ -128,7 +128,8 @@ const metricHomeEn = {
   },
   workflow: {
     id: "workflow",
-    title: "That’s how Metric are made",
+    titleLine1: "That’s how",
+    titleLine2: "Metric are made",
     subtitle: "Unique visual worlds — hand-drawn.",
     cta: "Let’s Talk",
     note: "We’d be happy to present more projects in a personal call.",
@@ -142,7 +143,7 @@ const metricHomeEn = {
       {
         title: "A consistent bestseller and Amazon’s Choice",
         body: "Achieving a consistent conversion rate of 41% through image content tailored to the target audience and relevant to customers",
-        image: "/images/metric/workflow/wf-2.jpg",
+        image: "/images/metric/workflow/wf-2.png",
         layout: "media-bottom" as const,
       },
       {
@@ -285,7 +286,8 @@ const metricHomeDe = {
   },
   workflow: {
     ...metricHomeEn.workflow,
-    title: "So entsteht Metric",
+    titleLine1: "So entsteht",
+    titleLine2: "Metric",
     subtitle: "Einzigartige Bildwelten — handgezeichnet.",
     cta: "Lass uns sprechen",
     note: "Gerne stellen wir weitere Projekte in einem persönlichen Gespräch vor.",
@@ -299,7 +301,7 @@ const metricHomeDe = {
       {
         title: "Ein konsistenter Bestseller und Amazon’s Choice",
         body: "Konstante Conversion-Rate von 41% durch zielgruppengerechte Bildinhalte, die für Kunden relevant sind.",
-        image: "/images/metric/workflow/wf-2.jpg",
+        image: "/images/metric/workflow/wf-2.png",
         layout: "media-bottom" as const,
       },
       {

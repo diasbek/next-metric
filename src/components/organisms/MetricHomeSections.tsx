@@ -349,31 +349,66 @@ export function MetricWorkflowSection({ locale }: { locale: Locale }) {
       <PageContainer>
         <div className="metric-workflow__header" data-reveal>
           <h2 className="metric-workflow__title font-display text-foreground">
-            {workflow.title}
+            <span className="metric-workflow__title-line">{workflow.titleLine1}</span>
+            <span className="metric-workflow__title-line metric-workflow__title-line--brand">
+              <Image
+                src="/images/metric/icons/metric-m.svg"
+                alt=""
+                width={123}
+                height={95}
+                className="metric-workflow__mark"
+                aria-hidden
+              />
+              <span>{workflow.titleLine2}</span>
+            </span>
           </h2>
           <p className="metric-workflow__subtitle">{workflow.subtitle}</p>
         </div>
-        <div className="metric-workflow__grid mt-12" data-reveal-group>
-          {workflow.cards.map((card, index) => (
-            <article
-              key={card.title}
-              className={`metric-workflow-card metric-workflow-card--${card.layout}${
-                index === 1 ? " metric-workflow-card--offset" : ""
-              }`}
-              data-reveal
-            >
+
+        <div className="metric-workflow__grid" data-reveal-group>
+          {workflow.cards.map((card, index) => {
+            const media = (
               <div className="metric-workflow-card__media">
-                <Image src={card.image} alt="" fill className="object-contain" sizes="450px" />
+                <Image
+                  src={card.image}
+                  alt=""
+                  fill
+                  className="metric-workflow-card__img object-contain"
+                  sizes="(max-width: 1024px) 90vw, 450px"
+                />
               </div>
+            );
+            const copy = (
               <div className="metric-workflow-card__copy">
-                <h3 className="metric-workflow-card__title font-display">
-                  {card.title}
-                </h3>
+                <h3 className="metric-workflow-card__title font-display">{card.title}</h3>
                 <p className="metric-workflow-card__body">{card.body}</p>
               </div>
-            </article>
-          ))}
+            );
+
+            return (
+              <article
+                key={card.title}
+                className={`metric-workflow-card metric-workflow-card--${card.layout}${
+                  index === 1 ? " metric-workflow-card--offset" : ""
+                }`}
+                data-reveal
+              >
+                {card.layout === "media-bottom" ? (
+                  <>
+                    {copy}
+                    {media}
+                  </>
+                ) : (
+                  <>
+                    {media}
+                    {copy}
+                  </>
+                )}
+              </article>
+            );
+          })}
         </div>
+
         <div className="metric-workflow__cta" data-reveal>
           <p className="metric-workflow__note">{workflow.note}</p>
           <TransitionLink
