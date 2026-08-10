@@ -299,28 +299,30 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
   return (
     <section id={services.id} className="metric-services">
       <PageContainer className="metric-services__inner">
-        <h2 className="metric-services__title font-display" data-reveal>
-          {services.titleLines.map((line) => (
-            <span key={line} className="metric-services__title-line">
-              {line}
-            </span>
-          ))}
-          <span className="metric-services__title-line metric-services__title-line--end">
-            {services.titleSuffix ? (
-              <span className="metric-services__title-suffix">
-                {services.titleSuffix}
-                {"\u00A0"}
-              </span>
-            ) : null}
-            <span className="metric-services__bracket">{services.titleBracket}</span>
-          </span>
-        </h2>
-
         <div className="metric-services__layout">
           <div className="metric-services__aside">
-            <p className="metric-services__subtitle" data-reveal>
-              {services.subtitle}
-            </p>
+            <div className="metric-services__aside-copy">
+              <h2 className="metric-services__title font-display" data-reveal>
+                {services.titleLines.map((line) => (
+                  <span key={line} className="metric-services__title-line">
+                    {line}
+                  </span>
+                ))}
+                <span className="metric-services__title-line metric-services__title-line--end">
+                  {services.titleSuffix ? (
+                    <span className="metric-services__title-suffix">
+                      {services.titleSuffix}
+                      {"\u00A0"}
+                    </span>
+                  ) : null}
+                  <span className="metric-services__bracket">{services.titleBracket}</span>
+                </span>
+              </h2>
+              <p className="metric-services__subtitle" data-reveal>
+                {services.subtitle}
+              </p>
+            </div>
+
             <TransitionLink
               href={localePath(locale, "/#contact")}
               className="metric-cta metric-cta--on-accent metric-services__cta"
@@ -346,7 +348,7 @@ export function MetricServicesSection({ locale }: { locale: Locale }) {
                     src={item.image}
                     alt=""
                     fill
-                    className="metric-services-card__img object-cover"
+                    className="metric-services-card__img object-contain"
                     sizes="(max-width: 1024px) 90vw, 560px"
                   />
                 </div>
