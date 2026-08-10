@@ -11,6 +11,7 @@ import {
   getHashFromHref,
   isSameDocumentPath,
   navigateSameDocumentHash,
+  navigateSameDocumentTop,
 } from "@/utils/scroll";
 
 type TransitionLinkProps = ComponentProps<typeof Link>;
@@ -41,9 +42,15 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
           event.metaKey ||
           event.ctrlKey ||
           event.shiftKey ||
-          event.altKey ||
-          isTransitioning()
+          event.altKey
         ) {
+          return;
+        }
+
+        // Block native navigation while a page transition runs — otherwise
+        // Next Link falls through and can stack hashes / flash white.
+        if (isTransitioning()) {
+          event.preventDefault();
           return;
         }
 
@@ -51,13 +58,19 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
         if (!url || url.startsWith("http")) return;
 
         const hash = getHashFromHref(url);
+        const sameDoc = url.startsWith("#") || isSameDocumentPath(url, pathname);
 
         // Same-document section links: never use Next router / page transitions.
-        // router.push("/#x") while already on "/#y" stacks hashes and can leave
-        // the exit fade stuck (white screen).
-        if (hash && (url.startsWith("#") || isSameDocumentPath(url, pathname))) {
+        if (hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentHash(hash);
+          return;
+        }
+
+        // Logo / home on the current page: clear hash + scroll top, no transition.
+        if (!hash && sameDoc) {
+          event.preventDefault();
+          navigateSameDocumentTop();
           return;
         }
 

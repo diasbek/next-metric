@@ -81,13 +81,44 @@ function resolveHashTarget(hash: string): HTMLElement | null {
   return document.getElementById(id);
 }
 
+function getScrollMarginTop(el: HTMLElement): number {
+  const raw = getComputedStyle(el).scrollMarginTop;
+  const value = Number.parseFloat(raw);
+  return Number.isFinite(value) ? value : 0;
+}
+
+/** Absolute Y for an element, respecting CSS scroll-margin-top. */
+function getHashScrollTop(el: HTMLElement): number {
+  return Math.max(
+    0,
+    window.scrollY + el.getBoundingClientRect().top - getScrollMarginTop(el),
+  );
+}
+
+/**
+ * Cancel an in-flight CSS/smooth window scroll.
+ * Chrome often ignores a new `behavior:"smooth"` scrollTo while another is
+ * still animating — hash updates but the page stays put.
+ */
+function stopOngoingWindowScroll(): void {
+  const y = window.scrollY;
+  window.scrollTo({ top: y, left: 0, behavior: "instant" });
+}
+
 export function scrollToHash(
   hash: string,
   behavior: ScrollBehavior = "smooth",
 ): boolean {
   const el = resolveHashTarget(hash);
   if (!el) return false;
-  el.scrollIntoView({ behavior, block: "start" });
+
+  const top = getHashScrollTop(el);
+  if (behavior === "smooth") {
+    stopOngoingWindowScroll();
+  }
+  // Prefer window.scrollTo over scrollIntoView — more reliable with sticky
+  // headers + CSS scroll-behavior, and interruptible between nav clicks.
+  window.scrollTo({ top, left: 0, behavior });
   return true;
 }
 
@@ -99,12 +130,14 @@ export function scrollToHashAfterPaint(hash: string): void {
   const attempt = (): boolean => {
     const el = document.getElementById(id);
     if (!el) return false;
-    // "auto" defers to the page's CSS `scroll-behavior` (smooth here), so a
-    // "jump straight to it" call would silently animate over 1-2s instead —
-    // and get restarted/cut short by the next settle call in the boot
-    // sequence, landing well short of the target. "instant" always jumps,
-    // regardless of CSS.
-    el.scrollIntoView({ behavior: "instant", block: "start" });
+    // Always instant on boot/settle so CSS `scroll-behavior: smooth` cannot
+    // stretch the jump across multiple settle calls and land short.
+    stopOngoingWindowScroll();
+    window.scrollTo({
+      top: getHashScrollTop(el),
+      left: 0,
+      behavior: "instant",
+    });
     return true;
   };
 
@@ -143,9 +176,25 @@ export function sanitizeLocationHash(): string | null {
 export function navigateSameDocumentHash(hash: string): void {
   const clean = hash.replace(/^#/, "").split("#")[0]?.trim() ?? "";
   if (!clean) return;
-  window.history.pushState(null, "", buildSameDocumentHashUrl(clean));
-  emitLocationChange();
+  const nextUrl = buildSameDocumentHashUrl(clean);
+  const current =
+    `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (current !== nextUrl) {
+    window.history.pushState(null, "", nextUrl);
+    emitLocationChange();
+  }
   scrollToHash(clean, "smooth");
+}
+
+/** Clear hash and scroll to top on the current document (logo / home). */
+export function navigateSameDocumentTop(): void {
+  const path = `${window.location.pathname || "/"}${window.location.search || ""}`;
+  if (window.location.hash) {
+    window.history.pushState(null, "", path);
+    emitLocationChange();
+  }
+  stopOngoingWindowScroll();
+  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
 }
 
 /** Top of page or in-page hash, depending on the current location. */
