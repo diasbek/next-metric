@@ -145,8 +145,10 @@ export function isFileUpload(value: FormDataEntryValue | null): value is File {
   return value instanceof File && value.size > 0;
 }
 
+/** Private bucket — never expose a public URL for these; use createSignedUrl(). */
 export const LEAD_ATTACHMENTS_BUCKET = "metric-lead-attachments";
 const MAX_LEAD_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+const LEAD_ATTACHMENT_SIGNED_URL_TTL_SEC = 300;
 
 const LEAD_ATTACHMENT_MIME = new Set([
   "application/pdf",
@@ -183,7 +185,7 @@ function fileExt(name: string) {
 
 export async function uploadLeadAttachment(
   file: File,
-): Promise<{ path: string; publicUrl: string }> {
+): Promise<{ path: string }> {
   if (!(file instanceof File) || file.size === 0) {
     throw new Error("Empty file");
   }
@@ -215,8 +217,19 @@ export async function uploadLeadAttachment(
 
   if (error) throw new Error(error.message);
 
-  const publicUrl = `${getSupabaseUrl()}/storage/v1/object/public/${LEAD_ATTACHMENTS_BUCKET}/${path}`;
-  return { path, publicUrl };
+  return { path };
+}
+
+/** Admin-only: mint a short-lived URL to view/download a private lead attachment. */
+export async function getLeadAttachmentSignedUrl(path: string): Promise<string> {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase.storage
+    .from(LEAD_ATTACHMENTS_BUCKET)
+    .createSignedUrl(path, LEAD_ATTACHMENT_SIGNED_URL_TTL_SEC);
+  if (error || !data) {
+    throw new Error(error?.message ?? "Could not sign attachment URL");
+  }
+  return data.signedUrl;
 }
 
 export const SITE_FILES_BUCKET = "metric-site-files";

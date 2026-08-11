@@ -11,7 +11,7 @@ export default async function AdminLeadsPage() {
   const { data } = await supabase
     .from("metric_leads")
     .select(
-      "id, name, phone, message, attachment_url, status, locale, created_at",
+      "id, name, phone, message, attachment_path, status, locale, created_at, consent_at",
     )
     .order("created_at", { ascending: false })
     .limit(150);

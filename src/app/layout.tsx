@@ -3,6 +3,7 @@ import { Archivo } from "next/font/google";
 import "./globals.css";
 import { GsapProviderLazy } from "@/components/animations/GsapProviderLazy";
 import { SiteAnalytics } from "@/components/analytics";
+import { ConsentProvider, CookieConsentBanner } from "@/components/consent";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { rootMetadata } from "@/utils/metadata";
@@ -59,11 +60,14 @@ export default function RootLayout({
     <html lang="en" className={archivo.variable} suppressHydrationWarning>
       <body className="antialiased">
         <JsonLd data={getGlobalJsonLdGraph()} />
-        <GsapProviderLazy>
-          {children}
-          {modal}
-        </GsapProviderLazy>
-        <SiteAnalytics />
+        <ConsentProvider>
+          <GsapProviderLazy>
+            {children}
+            {modal}
+          </GsapProviderLazy>
+          <SiteAnalytics />
+          <CookieConsentBanner />
+        </ConsentProvider>
         <PwaRegister />
       </body>
     </html>

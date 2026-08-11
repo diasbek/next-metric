@@ -24,7 +24,7 @@ export function prefersReducedMotion(): boolean {
 export function showAllRevealTargets(): void {
   document
     .querySelectorAll<HTMLElement>(
-      "[data-reveal], [data-reveal-group], [data-reveal-group] > *, [data-split-title], [data-clip-reveal], [data-border-draw], [data-counter]",
+      "[data-reveal], [data-reveal-group], [data-reveal-group] > *, [data-split-title], [data-border-draw], [data-counter]",
     )
     .forEach((el) => {
       el.classList.add("is-revealed");

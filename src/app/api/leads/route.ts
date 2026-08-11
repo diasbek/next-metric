@@ -43,6 +43,7 @@ async function parseLeadPayload(request: NextRequest): Promise<{
   phone: string;
   message: string;
   locale: string;
+  consent: boolean;
   captchaToken: string;
   website: string;
   file: File | null;
@@ -57,6 +58,7 @@ async function parseLeadPayload(request: NextRequest): Promise<{
       phone: String(form.get("phone") ?? ""),
       message: String(form.get("message") ?? ""),
       locale: String(form.get("locale") ?? ""),
+      consent: String(form.get("consent") ?? "") === "true",
       captchaToken: String(form.get("captchaToken") ?? ""),
       website: String(form.get("website") ?? ""),
       file: isFileUpload(fileValue) ? fileValue : null,
@@ -77,6 +79,7 @@ async function parseLeadPayload(request: NextRequest): Promise<{
     phone?: string;
     message?: string;
     locale?: string;
+    consent?: boolean | string;
     captchaToken?: string;
     website?: string;
   };
@@ -91,6 +94,7 @@ async function parseLeadPayload(request: NextRequest): Promise<{
     phone: String(body.phone ?? ""),
     message: String(body.message ?? ""),
     locale: String(body.locale ?? ""),
+    consent: body.consent === true || body.consent === "true",
     captchaToken: String(body.captchaToken ?? ""),
     website: String(body.website ?? ""),
     file: null,
@@ -150,6 +154,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!payload.consent) {
+      return NextResponse.json(
+        { error: "Consent to the Privacy Policy is required" },
+        { status: 400 },
+      );
+    }
+
     const settings = (await getSiteSettings()) as DbSiteSettings | null;
     const captcha = await verifyCaptcha({
       settings,
@@ -165,11 +176,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let attachmentUrl: string | null = null;
+    let attachmentPath: string | null = null;
     if (payload.file) {
       try {
         const uploaded = await uploadLeadAttachment(payload.file);
-        attachmentUrl = uploaded.publicUrl;
+        attachmentPath = uploaded.path;
       } catch (err) {
         return NextResponse.json(
           {
@@ -188,7 +199,8 @@ export async function POST(request: NextRequest) {
       message,
       locale: locale || null,
       status: "new",
-      attachment_url: attachmentUrl,
+      attachment_path: attachmentPath,
+      consent_at: new Date().toISOString(),
     });
 
     if (error) {
@@ -203,7 +215,7 @@ export async function POST(request: NextRequest) {
       phone,
       message,
       locale: locale || null,
-      attachmentUrl,
+      hasAttachment: Boolean(attachmentPath),
     });
 
     return NextResponse.json({ ok: true });

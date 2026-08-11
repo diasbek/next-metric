@@ -1,8 +1,32 @@
+/*
+ * Fluid scale tokens.
+ *
+ * Minimum supported viewport width is 320px (old iPhone SE / narrow
+ * Android / foldable cover screens). Every clamp() below ramps
+ * continuously from that floor up to the 1512px design width (--container-max)
+ * instead of jumping at fixed breakpoints — this keeps in-between sizes
+ * (iPad portrait/landscape, small laptops) from feeling like they're
+ * stuck between two hard-coded states. Values hold flat past 1512px;
+ * see --breakpoint-2xl for large-screen (ultrawide/4K) tuning hooks.
+ */
 :root {
-  --page-padding: 20px;
+  --page-padding: clamp(20px, 20px + (100vw - 320px) * 0.03356, 60px);
   --container-max: 1512px;
-  --section-gap: 80px;
-  --section-gap-lg: 120px;
+  --breakpoint-2xl: 1800px;
+
+  /* Generic fluid spacing scale — building blocks for component gaps. */
+  --space-2xs: clamp(4px, 4px + (100vw - 320px) * 0.00336, 8px);
+  --space-xs: clamp(8px, 8px + (100vw - 320px) * 0.00336, 12px);
+  --space-sm: clamp(12px, 12px + (100vw - 320px) * 0.00336, 16px);
+  --space-md: clamp(16px, 16px + (100vw - 320px) * 0.00671, 24px);
+  --space-lg: clamp(24px, 24px + (100vw - 320px) * 0.01342, 40px);
+  --space-xl: clamp(32px, 32px + (100vw - 320px) * 0.02013, 56px);
+  --space-2xl: clamp(48px, 48px + (100vw - 320px) * 0.02685, 80px);
+
+  /* Replaces the old flat --section-gap / --section-gap-lg pair — one
+     fluid token spans the full range they used to cover (80px mobile
+     to 120px desktop, previously jumping at 1024px). */
+  --section-gap: clamp(80px, 80px + (100vw - 320px) * 0.03356, 120px);
 
   --text-display-xl: clamp(48px, 8vw, 120px);
   --text-display-lg: clamp(40px, 6vw, 100px);
@@ -32,16 +56,4 @@
   --cta-skew: -18deg;
   --header-height: 88px;
   --glass: rgba(245, 245, 245, 0.3);
-}
-
-@media (min-width: 768px) {
-  :root {
-    --page-padding: 40px;
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --page-padding: 60px;
-  }
 }

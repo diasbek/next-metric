@@ -72,6 +72,7 @@ export function ContactForm({
   const [phase, setPhase] = useState<"idle" | "uploading" | "sending">("idle");
   const [error, setError] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
+  const [consent, setConsent] = useState(false);
   const [values, setValues] = useState({ name: "", phone: "", message: "" });
   const [touched, setTouched] = useState<Record<FieldKey, boolean>>({
     name: false,
@@ -156,6 +157,12 @@ export function ContactForm({
       return;
     }
 
+    if (!consent) {
+      setError(ui.consentRequired);
+      setLoading(false);
+      return;
+    }
+
     try {
       setPhase(file ? "uploading" : "sending");
       const body = new FormData();
@@ -163,6 +170,7 @@ export function ContactForm({
       body.set("phone", values.phone.trim());
       body.set("message", values.message.trim());
       body.set("locale", locale ?? "");
+      body.set("consent", String(consent));
       body.set("captchaToken", captchaToken);
       body.set("website", String(new FormData(form).get("website") || ""));
       if (file) body.set("file", file);
@@ -183,6 +191,7 @@ export function ContactForm({
       setSubmitted(true);
       setValues({ name: "", phone: "", message: "" });
       setTouched({ name: false, phone: false, message: false });
+      setConsent(false);
       clearFile();
       form.reset();
       setCaptchaToken("");
@@ -364,6 +373,31 @@ export function ContactForm({
       captcha.siteKey ? (
         <div ref={widgetHostRef} className="contact-form__captcha" />
       ) : null}
+
+      <label className="contact-form__consent">
+        <input
+          type="checkbox"
+          name="consent"
+          checked={consent}
+          onChange={(e) => {
+            setConsent(e.target.checked);
+            if (submitted) setSubmitted(false);
+          }}
+          required
+        />
+        <span>
+          {ui.consentPrefix}{" "}
+          <a
+            href={locale === "de" ? "/de/privacy/" : "/privacy/"}
+            target="_blank"
+            rel="noreferrer"
+            className="contact-form__consent-link"
+          >
+            {ui.consentLinkLabel}
+          </a>
+          {ui.consentSuffix ? ` ${ui.consentSuffix}` : ""}.
+        </span>
+      </label>
 
       {error ? (
         <p className="contact-form__error" role="alert">

@@ -9,6 +9,8 @@ export type AuditAction =
   | "settings.update"
   | "settings.telegram_webhook"
   | "lead.status"
+  | "lead.delete"
+  | "lead.purge"
   | "content.update";
 
 export async function writeAuditLog(options: {

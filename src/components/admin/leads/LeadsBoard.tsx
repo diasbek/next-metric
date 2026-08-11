@@ -33,7 +33,12 @@ import {
   isAdminSuccess,
 } from "@/lib/cms/admin-redirect";
 import type { DbLead, LeadStatus } from "@/lib/cms/types";
-import { setLeadStatusAction } from "@/app/admin/(dashboard)/leads/actions";
+import {
+  deleteLeadAction,
+  getLeadAttachmentUrlAction,
+  purgeStaleLeadsAction,
+  setLeadStatusAction,
+} from "@/app/admin/(dashboard)/leads/actions";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
 import type { AdminMessages } from "@/i18n/admin/types";
 import { adminBtn, adminBtnPrimary } from "@/components/admin/ui/styles";
@@ -168,7 +173,8 @@ export function LeadsBoard({ leads: initialLeads }: Props) {
       "status",
       "locale",
       "created_at",
-      "attachment_url",
+      "consent_at",
+      "has_attachment",
     ];
     const rows = leads.map((lead) =>
       [
@@ -179,7 +185,8 @@ export function LeadsBoard({ leads: initialLeads }: Props) {
         lead.status,
         lead.locale ?? "",
         lead.created_at,
-        lead.attachment_url ?? "",
+        lead.consent_at ?? "",
+        lead.attachment_path ? "yes" : "no",
       ]
         .map((v) => csvEscape(String(v)))
         .join(","),
@@ -340,13 +347,38 @@ export function LeadsBoard({ leads: initialLeads }: Props) {
           </>
         }
         actions={
-          <a
-            href={csvHref}
-            download={`leads-${new Date().toISOString().slice(0, 10)}.csv`}
-            style={{ ...adminBtn, textDecoration: "none" }}
-          >
-            {t.leads.exportCsv}
-          </a>
+          <>
+            <button
+              type="button"
+              style={adminBtn}
+              onClick={() => {
+                const input = window.prompt(t.leads.purgePrompt, "365");
+                if (input === null) return;
+                const days = Number(input);
+                if (!Number.isFinite(days) || days <= 0) return;
+                if (!window.confirm(formatAdminMessage(t.leads.purgeConfirm, { n: days }))) {
+                  return;
+                }
+                startTransition(async () => {
+                  const result = await purgeStaleLeadsAction(days);
+                  if (isAdminFailure(result)) {
+                    adminToastError(result.error);
+                  } else if (isAdminSuccess(result)) {
+                    adminToastSuccess(result.message ?? t.leads.statusUpdated);
+                  }
+                });
+              }}
+            >
+              {t.leads.purgeOldLeads}
+            </button>
+            <a
+              href={csvHref}
+              download={`leads-${new Date().toISOString().slice(0, 10)}.csv`}
+              style={{ ...adminBtn, textDecoration: "none" }}
+            >
+              {t.leads.exportCsv}
+            </a>
+          </>
         }
       />
 
@@ -482,6 +514,24 @@ export function LeadsBoard({ leads: initialLeads }: Props) {
         onClose={() => setSelectedId(null)}
         onStatus={(status) => {
           if (selected) moveLead(selected.id, status);
+        }}
+        onDelete={(id) => {
+          const rollback = leads;
+          setLeads((prev) => prev.filter((lead) => lead.id !== id));
+          setSynced((prev) => prev.filter((lead) => lead.id !== id));
+          setSelectedId(null);
+          startTransition(async () => {
+            const result = await deleteLeadAction(id);
+            if (isAdminFailure(result)) {
+              adminToastError(result.error);
+              setLeads(rollback);
+              setSynced(rollback);
+              return;
+            }
+            if (isAdminSuccess(result)) {
+              adminToastSuccess(result.message ?? t.leads.deleted);
+            }
+          });
         }}
       />
     </div>
@@ -699,7 +749,7 @@ function LeadCardFace({
         >
           {lead.name}
         </strong>
-        {lead.attachment_url ? (
+        {lead.attachment_path ? (
           <span
             style={{
               fontSize: 10,
@@ -752,11 +802,13 @@ function LeadDetailPanel({
   statusLabel,
   onClose,
   onStatus,
+  onDelete,
 }: {
   lead: DbLead | null;
   statusLabel: (status: LeadStatus) => string;
   onClose: () => void;
   onStatus: (status: LeadStatus) => void;
+  onDelete: (id: string) => void;
 }) {
   const t = useAdminT();
   const tg = lead ? telegramDeepLink(lead.phone) : null;
@@ -810,6 +862,20 @@ function LeadDetailPanel({
                 {t.leads.openTelegram}
               </a>
             ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(t.common.confirmDelete)) onDelete(lead.id);
+              }}
+              style={{
+                ...adminBtn,
+                width: "100%",
+                color: "#f66",
+                borderColor: "#622",
+              }}
+            >
+              {t.leads.delete}
+            </button>
           </>
         ) : null
       }
@@ -831,24 +897,61 @@ function LeadDetailPanel({
               {lead.message || "—"}
             </p>
           </Field>
-          {lead.attachment_url ? (
+          {lead.attachment_path ? (
             <Field label={t.leads.attachment}>
-              <a
-                href={lead.attachment_url}
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: "#8cf" }}
-              >
-                {t.leads.openAttachment} ↗
-              </a>
+              <LeadAttachmentLink path={lead.attachment_path} />
             </Field>
           ) : null}
           <Field label={t.leads.locale}>
             {(lead.locale || "—").toUpperCase()}
           </Field>
+          <Field label={t.leads.consentAt}>
+            {lead.consent_at ? new Date(lead.consent_at).toLocaleString() : "—"}
+          </Field>
         </div>
       ) : null}
     </AdminDrawer>
+  );
+}
+
+function LeadAttachmentLink({ path }: { path: string }) {
+  const t = useAdminT();
+  const [pending, startAttachmentTransition] = useTransition();
+  const [error, setError] = useState("");
+
+  const open = () => {
+    setError("");
+    startAttachmentTransition(async () => {
+      const result = await getLeadAttachmentUrlAction(path);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      window.open(result.url, "_blank", "noopener,noreferrer");
+    });
+  };
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={open}
+        disabled={pending}
+        style={{
+          background: "none",
+          border: "none",
+          padding: 0,
+          color: "#8cf",
+          cursor: pending ? "default" : "pointer",
+          font: "inherit",
+        }}
+      >
+        {pending ? t.leads.attachmentLoading : `${t.leads.openAttachment} ↗`}
+      </button>
+      {error ? (
+        <p style={{ margin: "6px 0 0", fontSize: 12, color: "#f66" }}>{error}</p>
+      ) : null}
+    </div>
   );
 }
 

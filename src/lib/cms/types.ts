@@ -58,10 +58,12 @@ export type DbLead = {
   name: string;
   phone: string;
   message: string;
-  attachment_url: string | null;
+  /** Storage object path in the private metric-lead-attachments bucket. */
+  attachment_path: string | null;
   status: LeadStatus;
   locale: string | null;
   created_at: string;
+  consent_at?: string | null;
 };
 
 export type CaptchaProvider = "none" | "honeypot" | "turnstile" | "hcaptcha";

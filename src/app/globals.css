@@ -33,6 +33,8 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1512px;
+  /* Large-screen tuning hook (ultrawide/4K) — see --breakpoint-2xl in tokens.css. */
+  --breakpoint-2xl: 1800px;
 }
 
 html {
@@ -73,6 +75,16 @@ body {
   max-width: var(--container-max);
   padding-inline: var(--page-padding);
   width: 100%;
+}
+
+/* Large-screen policy: text-heavy sections stay capped at 1512px for
+   readability, but full-bleed visual sections (hero, categories marquee,
+   workflow) get a modest extra allowance past --breakpoint-2xl so
+   ultrawide/4K monitors don't feel like a letterboxed mobile layout. */
+@media (min-width: 1800px) {
+  .page-container--wide {
+    max-width: 1680px;
+  }
 }
 
 .font-display {
@@ -122,23 +134,25 @@ body {
   transform: skewX(18deg);
 }
 
-/* Sizes */
+/* Sizes — padding/font-size ramp fluidly from a 320px floor up to the
+   1512px design width instead of a fixed size, so a long label (e.g. the
+   hero CTA) can't force horizontal overflow on narrow phones. */
 .metric-cta--sm {
   min-height: 44px;
-  padding: 0 28px;
-  font-size: 18px;
+  padding: 0 clamp(16px, 16px + (100vw - 320px) * 0.01007, 28px);
+  font-size: clamp(16px, 16px + (100vw - 320px) * 0.00168, 18px);
 }
 
 .metric-cta--md {
   min-height: 48px;
-  padding: 0 48px;
-  font-size: 20px;
+  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02013, 48px);
+  font-size: clamp(17px, 17px + (100vw - 320px) * 0.00252, 20px);
 }
 
 .metric-cta--lg {
   min-height: 56px;
-  padding: 0 56px;
-  font-size: 22px;
+  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02685, 56px);
+  font-size: clamp(18px, 18px + (100vw - 320px) * 0.00336, 22px);
 }
 
 /* Primary fill pink (hero / workflow). */
@@ -167,8 +181,8 @@ body {
 .metric-cta--skew-dark,
 .metric-cta--dark.metric-cta--skew {
   width: auto;
-  min-width: 220px;
-  padding: 0 52px;
+  min-width: clamp(140px, 140px + (100vw - 320px) * 0.06711, 220px);
+  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   color: #fff;
   background: var(--dark);
   box-shadow: none;
@@ -183,8 +197,8 @@ body {
 .metric-cta--outline-dark,
 .metric-cta--skew-outline {
   width: auto;
-  min-width: 220px;
-  padding: 0 52px;
+  min-width: clamp(140px, 140px + (100vw - 320px) * 0.06711, 220px);
+  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   color: var(--dark);
   background: transparent;
   box-shadow: inset 0 0 0 1.5px var(--dark);
@@ -264,6 +278,12 @@ body {
   flex-direction: column;
   padding-block: 24px 32px;
   background: #fff;
+  /* Extend the hero (and its ambient blobs) up behind the sticky header at
+     every breakpoint, not just desktop — otherwise the transparent-at-top
+     navbar has nothing colorful behind it on mobile and just reads as a
+     flat white bar instead of matching the "see-through" desktop look. */
+  margin-top: calc(-1 * var(--header-height));
+  padding-top: var(--header-height);
 }
 
 /* Ambient pink blobs — same GSAP drift as next-timsol services. */
@@ -582,8 +602,6 @@ body {
 @media (min-width: 1024px) {
   .metric-hero {
     min-height: 100svh;
-    margin-top: calc(-1 * var(--header-height));
-    padding-top: var(--header-height);
     padding-bottom: 28px;
   }
 
@@ -697,25 +715,17 @@ body {
 }
 
 .metric-section {
+  /* --section-gap is a single fluid clamp (80px \u2192 120px, 320\u20131512px) —
+     no breakpoint override needed. */
   padding-block: var(--section-gap);
 }
 
-@media (min-width: 1024px) {
-  .metric-section {
-    padding-block: var(--section-gap-lg);
-  }
-}
-
 .metric-categories {
-  /* Tighter top padding so the headline sits closer to the viewport like Figma. */
-  padding-block: clamp(48px, 6vw, 80px) var(--section-gap);
+  /* Tighter top padding so the headline sits closer to the viewport like
+     Figma — fluid across the same 320\u20131512px range as --section-gap. */
+  padding-block: clamp(48px, 48px + (100vw - 320px) * 0.02013, 96px)
+    var(--section-gap);
   scroll-margin-top: var(--header-height);
-}
-
-@media (min-width: 1024px) {
-  .metric-categories {
-    padding-block: clamp(64px, 5vw, 96px) var(--section-gap-lg);
-  }
 }
 
 .metric-categories__title {
@@ -840,6 +850,13 @@ body {
 }
 
 .metric-case-card {
+  /* Container-query ready: this card's internal breakpoints are viewport-
+     based today (safe, since it's always full-width in a 1-column stack),
+     but containment lets it adapt correctly if it's ever reused inside a
+     narrower parent without a global rewrite — see --breakpoint-2xl notes
+     in tokens.css for the same forward-looking approach at the page level. */
+  container-type: inline-size;
+  container-name: case-card;
   display: grid;
   grid-template-areas:
     "media"
@@ -884,6 +901,13 @@ body {
 .metric-case-card__media {
   grid-area: media;
   position: relative;
+  /* Explicit width (not just min-width: 0) — a grid item with aspect-ratio
+     + min-height and width:auto uses the ratio-transferred size as its
+     preferred width and skips stretch, blowing out past the 1-column
+     track on narrow phones. calc() subtracts the inline margins below so
+     the border-box still lines up with them instead of double-counting. */
+  width: calc(100% - 32px);
+  min-width: 0;
   margin: 16px 16px 0;
   min-height: 220px;
   aspect-ratio: 4 / 3;
@@ -893,6 +917,7 @@ body {
 
 @media (min-width: 768px) {
   .metric-case-card__media {
+    width: calc(100% - 40px);
     margin: 20px 20px 0;
     min-height: 280px;
     border-radius: 24px;
@@ -1195,6 +1220,9 @@ body {
 }
 
 .metric-services-card {
+  /* Container-query ready — see .metric-case-card comment. */
+  container-type: inline-size;
+  container-name: services-card;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1387,6 +1415,21 @@ body {
   margin-top: clamp(40px, 5vw, 64px);
 }
 
+/* Intermediate 2-column tablet step (iPad portrait/landscape sits right at
+   this range) instead of jumping straight from a 1-column mobile stack to
+   the 3-column desktop grid at 1024px. The 3rd card spans both columns so
+   it doesn't sit alone in a half-empty row. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .metric-workflow__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .metric-workflow-card:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (min-width: 1024px) {
   .metric-workflow__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1395,6 +1438,9 @@ body {
 }
 
 .metric-workflow-card {
+  /* Container-query ready — see .metric-case-card comment. */
+  container-type: inline-size;
+  container-name: workflow-card;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1991,6 +2037,7 @@ body {
   .contact-form__field--message,
   .contact-form__upload-wrap,
   .contact-form__captcha,
+  .contact-form__consent,
   .contact-form__error,
   .contact-form__success,
   .contact-form__submit {
@@ -2050,6 +2097,35 @@ body {
 
 .contact-form__submit.metric-cta {
   width: fit-content;
+}
+
+.contact-form__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+  cursor: pointer;
+}
+
+.contact-form__consent input[type="checkbox"] {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.contact-form__consent-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.contact-form__consent-link:hover {
+  color: var(--accent);
 }
 
 .contact-form__error {
@@ -2121,6 +2197,10 @@ body {
 
 .metric-work-card__media {
   position: relative;
+  /* Defensive: no definite height is set here so aspect-ratio can't force
+     a preferred width the way it does on .metric-case-card__media, but
+     min-width: 0 keeps this safe if that ever changes. */
+  min-width: 0;
   margin: 20px 20px 0;
   aspect-ratio: 4 / 5;
   overflow: hidden;
@@ -2309,6 +2389,111 @@ body {
   color: var(--foreground);
 }
 
+/* Privacy policy — structured legal document (smaller, readable type;
+   the display-scale .metric-legal__title above stays for the H1). */
+.privacy-policy__inner {
+  max-width: 46rem;
+}
+
+.privacy-policy__title {
+  font-size: clamp(36px, 5vw, 64px);
+}
+
+.privacy-policy__updated {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.privacy-policy__lead {
+  margin-top: 24px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+.privacy-policy__section {
+  margin-top: 48px;
+}
+
+.privacy-policy__heading {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+
+.privacy-policy__paragraph {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--foreground);
+  margin-top: 12px;
+}
+
+.privacy-policy__list {
+  margin-top: 12px;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+  list-style: disc;
+}
+
+.privacy-policy__list li {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+.privacy-policy__table-wrap {
+  margin-top: 20px;
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--dark) 12%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.privacy-policy__table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.privacy-policy__table th,
+.privacy-policy__table td {
+  text-align: left;
+  padding: 12px 16px;
+  vertical-align: top;
+  border-bottom: 1px solid color-mix(in srgb, var(--dark) 8%, transparent);
+}
+
+.privacy-policy__table th {
+  background: var(--surface);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.privacy-policy__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.metric-legal__cookie-btn {
+  margin-top: 20px;
+  height: 44px;
+  padding-inline: 20px;
+  border-radius: var(--cta-radius);
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--foreground);
+  border: 1.5px solid color-mix(in srgb, var(--dark) 25%, transparent);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.metric-legal__cookie-btn:hover {
+  background: var(--surface);
+}
+
 .metric-case__intro {
   display: grid;
   gap: 28px;
@@ -2465,7 +2650,6 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
 
 [data-reveal].is-revealed,
 [data-reveal-group] > *.is-revealed,
-[data-clip-reveal].is-revealed,
 .metric-hero__copy.is-revealed,
 .metric-hero__visual.is-revealed,
 .metric-hero__trust.is-revealed {
@@ -2477,7 +2661,6 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
   [data-reveal],
   [data-reveal-group] > *,
   [data-split-title],
-  [data-clip-reveal],
   [data-border-draw],
   [data-counter],
   .metric-hero__copy,
@@ -2493,5 +2676,119 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
   .metric-work-card:hover,
   .metric-categories__card:hover {
     transform: none;
+  }
+}
+
+/* Cookie consent banner (GDPR) — fixed bottom bar, appears until a choice
+   is made; reopenable via "Manage cookies" on the privacy page. */
+.cookie-consent {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 200;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cookie-consent__inner {
+  pointer-events: auto;
+  width: min(100%, 920px);
+  background: var(--dark);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(9, 9, 9, 0.35);
+  padding: clamp(18px, 2.5vw, 28px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cookie-consent__copy {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.cookie-consent__title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+.cookie-consent__body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+}
+
+.cookie-consent__link {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cookie-consent__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cookie-consent__btn {
+  height: 44px;
+  padding-inline: 20px;
+  border-radius: var(--cta-radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cookie-consent__btn:hover {
+  transform: translateY(-1px);
+}
+
+.cookie-consent__btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+
+.cookie-consent__btn--ghost {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+.cookie-consent__close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.cookie-consent__close:hover {
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .cookie-consent__inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cookie-consent__actions {
+    justify-content: flex-end;
   }
 }

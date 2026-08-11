@@ -56,6 +56,10 @@ export interface SiteContent {
     name: string;
     phone: string;
     describeProject: string;
+    consentPrefix: string;
+    consentLinkLabel: string;
+    consentSuffix: string;
+    consentRequired: string;
     task: string;
     solution: string;
     nextProjects: string;

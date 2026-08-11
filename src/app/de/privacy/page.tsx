@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { LegalPageView } from "@/views/LegalPageView";
+import { PrivacyPolicyView } from "@/views/PrivacyPolicyView";
 
 export const metadata: Metadata = {
   title: "Datenschutz — METRIC",
-  description: "Datenschutz bei METRIC für Kontakt und Analytics.",
+  description: "Datenschutz bei METRIC für Kontakt und Analytics sowie Ihre DSGVO-Rechte.",
 };
 
 export default function DePrivacyPage() {
-  return <LegalPageView locale="de" page="privacy" />;
+  return <PrivacyPolicyView locale="de" />;
 }

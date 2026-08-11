@@ -333,9 +333,16 @@ export type AdminMessages = {
     message: string;
     attachment: string;
     openAttachment: string;
+    attachmentLoading: string;
     locale: string;
+    consentAt: string;
     moveTo: string;
     openTelegram: string;
+    delete: string;
+    deleted: string;
+    purgeOldLeads: string;
+    purgePrompt: string;
+    purgeConfirm: string;
     justNow: string;
     minutesAgo: string;
     hoursAgo: string;

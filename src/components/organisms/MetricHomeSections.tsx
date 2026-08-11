@@ -110,7 +110,7 @@ export function MetricHeroSection({
         ))}
       </div>
 
-      <PageContainer className="metric-hero__shell">
+      <PageContainer className="metric-hero__shell page-container--wide">
         <div className="metric-hero__main">
           <div className="metric-hero__copy">
             <h1 className="metric-hero__title">
@@ -178,7 +178,7 @@ export function MetricCategoriesSection({
   const { categories } = home;
   return (
     <section id="projects" className="metric-gradient-pink metric-section metric-categories">
-      <PageContainer>
+      <PageContainer className="page-container--wide">
         <h2
           className="metric-categories__title font-display text-white"
           data-reveal
@@ -279,7 +279,7 @@ export function MetricCaseStudiesSection({
                   {caseStudies.viewLabel}
                 </Button>
               </div>
-              <div className="metric-case-card__media js-parallax" data-clip-reveal>
+              <div className="metric-case-card__media js-parallax">
                 <Image
                   src={item.image}
                   alt={
@@ -326,8 +326,11 @@ export function MetricServicesSection({
           <span className="metric-services__title-line metric-services__title-line--end">
             {services.titleSuffix ? (
               <span className="metric-services__title-suffix">
-                {services.titleSuffix}
-                {"\u00A0"}
+                {/* Breakable space (not nbsp) — lets "suffix [bracket]" wrap
+                    onto separate lines on narrow phones instead of forcing
+                    overflow; desktop's white-space: nowrap keeps them glued
+                    where there's room. */}
+                {services.titleSuffix}{" "}
               </span>
             ) : null}
             <span className="metric-services__bracket">{services.titleBracket}</span>
@@ -397,7 +400,7 @@ export function MetricWorkflowSection({
   const { workflow } = home;
   return (
     <section id={workflow.id} className="metric-section metric-workflow">
-      <PageContainer>
+      <PageContainer className="page-container--wide">
         <div className="metric-workflow__header" data-reveal>
           <h2 className="metric-workflow__title font-display text-foreground">
             <span className="metric-workflow__title-line">{workflow.titleLine1}</span>
@@ -423,16 +426,16 @@ export function MetricWorkflowSection({
         >
           {workflow.cards.map((card, index) => {
             const media = (
-              <div
-                className="metric-workflow-card__media js-parallax"
-                data-clip-reveal
-              >
+              <div className="metric-workflow-card__media js-parallax">
                 <Image
                   src={card.image}
                   alt=""
                   fill
                   className="metric-workflow-card__img object-contain"
-                  sizes="(max-width: 1024px) 90vw, 450px"
+                  /* vw-relative (not a fixed px) — the workflow section can
+                     render up to 1680px wide on ultrawide/4K (page-container--wide),
+                     so a fixed 450px hint would under-serve resolution there. */
+                  sizes="(max-width: 1024px) 90vw, 33vw"
                 />
               </div>
             );

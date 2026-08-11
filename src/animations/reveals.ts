@@ -1,18 +1,11 @@
-import {
-  CLEAR_MOTION_PROPS,
-  DESKTOP_MQ,
-  gsap,
-  MOTION_OK,
-  registerGsapPlugins,
-  runMatchMedia,
-} from "./gsap";
+import { CLEAR_MOTION_PROPS, DESKTOP_MQ, gsap, MOTION_OK, registerGsapPlugins, runMatchMedia } from "./gsap";
 
 function markRevealed(targets: HTMLElement | HTMLElement[]): void {
   const list = Array.isArray(targets) ? targets : [targets];
   list.forEach((el) => el.classList.add("is-revealed"));
 }
 
-/** True when the element has already crossed a ScrollTrigger "top XX%" start. */
+/** True when the element has already crossed a reveal "top XX%" start. */
 function isPastRevealStart(el: HTMLElement, viewportPct = 88): boolean {
   const top = el.getBoundingClientRect().top;
   return top < (window.innerHeight * viewportPct) / 100;
@@ -24,6 +17,37 @@ function showImmediately(targets: HTMLElement | HTMLElement[]): void {
   markRevealed(list);
 }
 
+/**
+ * Fires `onEnter` once `el` scrolls into view.
+ *
+ * Deliberately NOT GSAP ScrollTrigger here: ScrollTrigger caches each
+ * trigger's start position and only recalculates it on an explicit
+ * refresh(). If a layout shift (responsive breakpoint change, image load,
+ * font swap) happens between that cache and the real scroll position, a
+ * `once: true` tween can miss its window entirely and never fire — leaving
+ * the element stuck at its pre-reveal faded/low-opacity state forever (the
+ * "some cards show up gray/pale" bug). IntersectionObserver has no such
+ * cache; it always reflects real DOM intersection, so it can't get stuck.
+ */
+function revealOnceVisible(el: HTMLElement, onEnter: () => void, viewportPct = 88): void {
+  if (isPastRevealStart(el, viewportPct)) {
+    onEnter();
+    return;
+  }
+  const rootMargin = `0px 0px -${100 - viewportPct}% 0px`;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        onEnter();
+        observer.disconnect();
+      });
+    },
+    { rootMargin, threshold: 0 },
+  );
+  observer.observe(el);
+}
+
 export function createReveals(): void {
   document
     // Skip items owned by a reveal-group — group tween handles them.
@@ -33,9 +57,6 @@ export function createReveals(): void {
       "[data-reveal]:not(.is-revealed):not([data-split-title]):not([data-reveal-group] > [data-reveal])",
     )
     .forEach((el) => {
-      // Hash jumps / settled scroll can leave mid-page targets already past
-      // the trigger. Animating from autoAlpha:0 then would hide them forever
-      // if ScrollTrigger mis-times the play. Show them immediately instead.
       if (isPastRevealStart(el, 88)) {
         showImmediately(el);
         return;
@@ -43,19 +64,21 @@ export function createReveals(): void {
 
       const y = Number(el.dataset.revealY ?? 40);
       const delay = Number(el.dataset.revealDelay ?? 0);
-      gsap.fromTo(
+      gsap.set(el, { autoAlpha: 0, y });
+      revealOnceVisible(
         el,
-        { autoAlpha: 0, y },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.9,
-          delay,
-          ease: "power3.out",
-          clearProps: CLEAR_MOTION_PROPS,
-          scrollTrigger: { trigger: el, start: "top 88%", once: true },
-          onComplete: () => markRevealed(el),
+        () => {
+          gsap.to(el, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.9,
+            delay,
+            ease: "power3.out",
+            clearProps: CLEAR_MOTION_PROPS,
+            onComplete: () => markRevealed(el),
+          });
         },
+        88,
       );
     });
 }
@@ -76,23 +99,28 @@ export function createRevealGroups(): void {
 
       const pop = group.dataset.revealGroup === "pop";
       const stagger = Number(group.dataset.revealStagger ?? (pop ? 0.08 : 0.1));
-      gsap.fromTo(
-        items,
-        pop ? { autoAlpha: 0, y: 26, scale: 0.8 } : { autoAlpha: 0, y: 48 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: pop ? 0.7 : 0.9,
-          ease: pop ? "back.out(1.7)" : "power3.out",
-          stagger,
-          clearProps: CLEAR_MOTION_PROPS,
-          scrollTrigger: { trigger: group, start: "top 85%", once: true },
-          onComplete: () => {
-            markRevealed(items);
-            group.classList.add("is-revealed");
-          },
+      // Whole card/item appears as one unit — no separate sub-element
+      // (e.g. its media) animating in on its own timing, so it can't look
+      // like it's assembling itself in pieces.
+      gsap.set(items, pop ? { autoAlpha: 0, y: 26, scale: 0.8 } : { autoAlpha: 0, y: 48 });
+      revealOnceVisible(
+        group,
+        () => {
+          gsap.to(items, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: pop ? 0.7 : 0.9,
+            ease: pop ? "back.out(1.7)" : "power3.out",
+            stagger,
+            clearProps: CLEAR_MOTION_PROPS,
+            onComplete: () => {
+              markRevealed(items);
+              group.classList.add("is-revealed");
+            },
+          });
         },
+        85,
       );
     });
 }
@@ -130,66 +158,51 @@ export function createCounters(): void {
       const target = Number(match[1]);
       const suffix = match[2] ?? "";
       const state = { value: 0 };
-      el.textContent = `0${suffix}`;
-      gsap.to(state, {
-        value: target,
-        duration: 1.4,
-        ease: "power2.out",
-        scrollTrigger: { trigger: el, start: "top 90%", once: true },
-        onUpdate() {
-          el.textContent = `${Math.round(state.value)}${suffix}`;
-        },
-        onComplete() {
-          el.textContent = raw;
-        },
-      });
-      gsap.fromTo(
-        el,
-        { scale: 0.7, autoAlpha: 0 },
-        {
-          scale: 1,
-          autoAlpha: 1,
-          duration: 0.7,
-          ease: "back.out(1.8)",
-          clearProps: CLEAR_MOTION_PROPS,
-          scrollTrigger: { trigger: el, start: "top 90%", once: true },
-        },
-      );
-    });
-}
 
-export function createClipReveals(): void {
-  document
-    .querySelectorAll<HTMLElement>("[data-clip-reveal]:not(.is-revealed)")
-    .forEach((el) => {
-      gsap.fromTo(
+      gsap.set(el, { scale: 0.7, autoAlpha: 0 });
+      revealOnceVisible(
         el,
-        { clipPath: "inset(0 100% 0 0)" },
-        {
-          clipPath: "inset(0 0% 0 0)",
-          duration: 1.2,
-          ease: "power3.inOut",
-          scrollTrigger: { trigger: el, start: "top 80%", once: true },
-          onComplete: () => {
-            el.classList.add("is-revealed");
-            gsap.set(el, { clearProps: "clipPath" });
-          },
+        () => {
+          el.textContent = `0${suffix}`;
+          gsap.to(state, {
+            value: target,
+            duration: 1.4,
+            ease: "power2.out",
+            onUpdate() {
+              el.textContent = `${Math.round(state.value)}${suffix}`;
+            },
+            onComplete() {
+              el.textContent = raw;
+            },
+          });
+          gsap.to(el, {
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.7,
+            ease: "back.out(1.8)",
+            clearProps: CLEAR_MOTION_PROPS,
+            onComplete: () => markRevealed(el),
+          });
         },
+        90,
       );
     });
 }
 
 export function createBorderDraws(): void {
-  document.querySelectorAll<HTMLElement>("[data-border-draw]").forEach((el) => {
-    gsap.fromTo(
+  document.querySelectorAll<HTMLElement>("[data-border-draw]:not(.is-revealed)").forEach((el) => {
+    gsap.set(el, { scaleX: 0, transformOrigin: "left center" });
+    revealOnceVisible(
       el,
-      { scaleX: 0, transformOrigin: "left center" },
-      {
-        scaleX: 1,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: { trigger: el, start: "top 88%", once: true },
+      () => {
+        gsap.to(el, {
+          scaleX: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          onComplete: () => markRevealed(el),
+        });
       },
+      88,
     );
   });
 }
@@ -201,7 +214,6 @@ export function initGlobalReveals(): () => void {
     createReveals();
     createRevealGroups();
     createCounters();
-    createClipReveals();
     createBorderDraws();
 
     const parallaxRevert = runMatchMedia(

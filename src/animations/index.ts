@@ -124,107 +124,11 @@ function initCtaHovers(): Cleanup {
   return () => cleanups.forEach((fn) => fn());
 }
 
-/** Quick GSAP jiggle on category marquee cards. */
-function initCategoryCardHovers(): Cleanup {
-  const cards = Array.from(
-    document.querySelectorAll<HTMLElement>(".metric-categories__card"),
-  );
-  if (!cards.length) return () => {};
-
-  const cleanups: Cleanup[] = [];
-  cards.forEach((el) => {
-    const onEnter = () => {
-      gsap.killTweensOf(el);
-      gsap
-        .timeline({ defaults: { overwrite: "auto" } })
-        .to(el, {
-          y: -10,
-          scale: 1.045,
-          rotation: gsap.utils.random(-2.4, -1.2),
-          duration: 0.18,
-          ease: "power2.out",
-        })
-        .to(el, {
-          rotation: gsap.utils.random(1.2, 2.4),
-          duration: 0.12,
-          ease: "power1.inOut",
-        })
-        .to(el, {
-          rotation: 0,
-          duration: 0.22,
-          ease: "power2.out",
-        });
-    };
-    const onLeave = () => {
-      gsap.killTweensOf(el);
-      gsap.to(el, {
-        y: 0,
-        scale: 1,
-        rotation: 0,
-        duration: 0.28,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    };
-    el.addEventListener("pointerenter", onEnter);
-    el.addEventListener("pointerleave", onLeave);
-    cleanups.push(() => {
-      el.removeEventListener("pointerenter", onEnter);
-      el.removeEventListener("pointerleave", onLeave);
-      gsap.killTweensOf(el);
-      gsap.set(el, { clearProps: "transform" });
-    });
-  });
-
-  return () => cleanups.forEach((fn) => fn());
-}
-
-/** Soft lift + nudge on Services glass cards. */
-function initServiceCardHovers(): Cleanup {
-  const cards = Array.from(
-    document.querySelectorAll<HTMLElement>(".metric-services-card"),
-  );
-  if (!cards.length) return () => {};
-
-  const cleanups: Cleanup[] = [];
-  cards.forEach((el) => {
-    const onEnter = () => {
-      gsap.killTweensOf(el);
-      gsap.to(el, {
-        y: -6,
-        scale: 1.015,
-        duration: 0.28,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    };
-    const onLeave = () => {
-      gsap.killTweensOf(el);
-      gsap.to(el, {
-        y: 0,
-        scale: 1,
-        duration: 0.3,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    };
-    el.addEventListener("pointerenter", onEnter);
-    el.addEventListener("pointerleave", onLeave);
-    cleanups.push(() => {
-      el.removeEventListener("pointerenter", onEnter);
-      el.removeEventListener("pointerleave", onLeave);
-      gsap.killTweensOf(el);
-      gsap.set(el, { clearProps: "transform" });
-    });
-  });
-
-  return () => cleanups.forEach((fn) => fn());
-}
-
+/** Card lifts + scales slightly; its image zooms in a bit further inside it. */
 function initHomepageCardHovers(): Cleanup {
   const cards = Array.from(
     document.querySelectorAll<HTMLElement>(
-      ".metric-case-card, .metric-workflow-card, .metric-hero__trust > *",
+      ".metric-case-card, .metric-workflow-card, .metric-services-card, .metric-categories__card, .metric-hero__trust > *",
     ),
   );
   const cleanups: Cleanup[] = [];
@@ -334,8 +238,6 @@ export function initAnimations(_pathname: string): Cleanup {
       runMatchMedia(FINE_POINTER, () => {
         const hoverCleanups = [
           initCtaHovers(),
-          initCategoryCardHovers(),
-          initServiceCardHovers(),
           initHomepageCardHovers(),
           initFaqHovers(),
         ];

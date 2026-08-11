@@ -7,10 +7,6 @@ import { localePath } from "@/i18n/paths";
 
 const copy = {
   en: {
-    privacy: {
-      title: "Privacy Policy",
-      body: "We respect your privacy. This page summarizes how METRIC handles contact form submissions and site analytics. For full details or data requests, email hello@metric.agency.",
-    },
     newsletter: {
       title: "Newsletter",
       body: "Subscribe to METRIC updates on Amazon listing design, A+ Content, and conversion-led visual systems. Reach out via the contact form to join the list.",
@@ -21,10 +17,6 @@ const copy = {
     },
   },
   de: {
-    privacy: {
-      title: "Datenschutz",
-      body: "Wir respektieren Ihre Privatsphäre. Diese Seite fasst zusammen, wie METRIC Kontaktformulare und Website-Analytics verarbeitet. Für Details oder Auskunftsersuchen: hello@metric.agency.",
-    },
     newsletter: {
       title: "Newsletter",
       body: "Erhalten Sie METRIC-Updates zu Amazon Listing-Design, A+ Content und conversionstarken Visuals. Melden Sie sich über das Kontaktformular für die Liste an.",

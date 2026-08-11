@@ -80,7 +80,8 @@ export type LeadNotifyPayload = {
   phone: string;
   message: string;
   locale?: string | null;
-  attachmentUrl?: string | null;
+  /** Attachments live in a private bucket — never send a raw URL here. */
+  hasAttachment?: boolean;
 };
 
 export async function notifyLeadViaTelegram(lead: LeadNotifyPayload) {
@@ -96,7 +97,7 @@ export async function notifyLeadViaTelegram(lead: LeadNotifyPayload) {
     `Телефон: ${lead.phone}`,
     lead.locale ? `Язык: ${lead.locale}` : null,
     lead.message ? `Сообщение:\n${lead.message}` : null,
-    lead.attachmentUrl ? `Файл: ${lead.attachmentUrl}` : null,
+    lead.hasAttachment ? "📎 Есть вложение — откройте в админ-панели" : null,
   ]
     .filter(Boolean)
     .join("\n");
