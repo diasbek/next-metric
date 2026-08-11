@@ -1,7 +1,3 @@
-import {
-  getSupabasePublishableKey,
-  getSupabaseUrl,
-} from "@/lib/supabase/env";
 import { getAdminMessages } from "@/i18n/admin";
 import { getAdminUiLocale } from "@/i18n/admin/get-admin-locale";
 import { AdminLoginForm } from "./login-form";
@@ -36,8 +32,6 @@ export default async function AdminLoginPage({
 
   return (
     <AdminLoginForm
-      supabaseUrl={getSupabaseUrl()}
-      supabasePublishableKey={getSupabasePublishableKey()}
       initialError={initialError}
       nextPath={safeNextPath(params.next)}
     />

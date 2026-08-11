@@ -57,6 +57,17 @@ async function main() {
     detail: bootstrap ? "set (needed for /admin/setup/)" : "missing",
   });
 
+  const adminEmail = present("CMS_ADMIN_EMAIL");
+  const adminPassword = present("CMS_ADMIN_PASSWORD");
+  checks.push({
+    ok: Boolean(adminEmail && adminPassword),
+    label: "CMS_ADMIN_EMAIL / PASSWORD",
+    detail:
+      adminEmail && adminPassword
+        ? `${adminEmail} (postbuild create:cms-admin)`
+        : "set on Hostinger so postbuild can create the owner",
+  });
+
   if (url && anon) {
     const pub = createClient(url, anon, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -109,19 +120,18 @@ async function main() {
   if (failed.length) {
     console.log("Next steps:");
     console.log(
-      "1. Open https://supabase.com/dashboard/project/dksqshrlnmtabrsuyyoz/settings/api",
+      "1. Open https://supabase.com/dashboard/project/ginhgueucvaqxhphplmy/settings/api-keys",
     );
-    console.log("2. Reveal service_role → paste into SUPABASE_SECRET_KEY in .env.local");
-    console.log("3. Restart `npm run dev`");
-    console.log("4. Open /admin/setup/ with CMS_BOOTSTRAP_SECRET from .env.local");
-    console.log("5. Optional: npm run seed:metric");
+    console.log("2. Reveal Secret / service_role → SUPABASE_SECRET_KEY (+ SUPABASE_API_KEY)");
+    console.log("3. Apply metric migrations in SQL Editor (or DATABASE_URL + npm run db:migrate)");
+    console.log("4. Set CMS_ADMIN_EMAIL + CMS_ADMIN_PASSWORD; npm run create:cms-admin");
+    console.log("5. Login at /admin/login/ (server-side — no browser → supabase.co)");
     process.exitCode = 1;
     return;
   }
 
   console.log("All checks passed.");
-  console.log("Admin: http://localhost:3000/admin/setup/ (if no owners yet)");
-  console.log("Home editor: http://localhost:3000/admin/metric-home/");
+  console.log("Login: /admin/login/  |  Setup: /admin/setup/  |  Home: /admin/metric-home/");
 }
 
 main().catch((error) => {

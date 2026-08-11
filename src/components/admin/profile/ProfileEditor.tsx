@@ -2,10 +2,9 @@
 
 import { HardNavForm } from "@/components/admin/HardNavForm";
 import { ImageField } from "@/components/admin/image-field";
-import { useAdminSupabaseConfig } from "@/components/admin/AdminProviders";
 import {
   formatUploadError,
-  uploadMediaInBrowser,
+  uploadMediaViaApi,
 } from "@/lib/cms/browser-upload";
 import {
   changePasswordAction,
@@ -57,7 +56,6 @@ function formatWhen(value: string | null): string {
 
 export function ProfileEditor({ profile, saved, passwordSaved }: Props) {
   const t = useAdminT();
-  const supabaseConfig = useAdminSupabaseConfig();
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
   const [displayName, setDisplayName] = useState(profile.display_name);
@@ -86,11 +84,9 @@ export function ProfileEditor({ profile, saved, passwordSaved }: Props) {
           const file = fileRef.current?.files?.[0];
           if (file) {
             try {
-              const uploaded = await uploadMediaInBrowser(file, {
+              const uploaded = await uploadMediaViaApi(file, {
                 folder: `admins/${profile.id}`,
                 filenameHint: "avatar",
-                url: supabaseConfig.url,
-                publishableKey: supabaseConfig.publishableKey,
               });
               formData.set("avatar_url", uploaded.publicUrl);
               formData.delete("avatar_file");

@@ -1,38 +1,17 @@
 "use client";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { MEDIA_BUCKET, getPublicMediaUrl } from "@/lib/cms/storage-shared";
-
-export type BrowserUploadOptions = {
+export type MediaUploadOptions = {
   folder?: string;
   filenameHint?: string;
-  /** Hostinger: pass runtime env from the server layout (may be missing at build). */
-  url?: string;
-  publishableKey?: string;
 };
 
-function sanitizeFilename(name: string) {
-  return name
-    .normalize("NFKD")
-    .replace(/[^\w.\-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^\.+/, "")
-    .slice(0, 80);
-}
-
-function fileExt(name: string) {
-  const m = name.toLowerCase().match(/\.([a-z0-9]+)$/);
-  return m?.[1] ?? "";
-}
-
 /**
- * Upload media from the browser (admin session + storage RLS `is_admin()`).
- * Avoids routing large binaries through the Next.js Server Action → Supabase hop,
- * which often fails on VPS with opaque "fetch failed".
+ * Upload media via Next.js `/api/admin/media` (same-origin).
+ * Session cookies authenticate; Supabase is only contacted from the server.
  */
-export async function uploadMediaInBrowser(
+export async function uploadMediaViaApi(
   file: File,
-  options: BrowserUploadOptions = {},
+  options: MediaUploadOptions = {},
 ): Promise<{ path: string; publicUrl: string }> {
   if (!(file instanceof File) || file.size === 0) {
     throw new Error("Empty file");
@@ -41,31 +20,42 @@ export async function uploadMediaInBrowser(
     throw new Error("File too large (max 12 MB)");
   }
 
-  const folder = (options.folder ?? "uploads").replace(/^\/+|\/+$/g, "");
-  const original = sanitizeFilename(file.name) || "image";
-  const base = options.filenameHint
-    ? sanitizeFilename(options.filenameHint)
-    : original.replace(/\.[^.]+$/, "");
-  const ext = fileExt(file.name) || (file.type === "image/webp" ? "webp" : "jpg");
-  const path = `${folder}/${Date.now()}-${base}.${ext}`;
+  const body = new FormData();
+  body.set("file", file);
+  if (options.folder) body.set("folder", options.folder);
+  if (options.filenameHint) body.set("filenameHint", options.filenameHint);
 
-  const supabase = createSupabaseBrowserClient({
-    url: options.url,
-    publishableKey: options.publishableKey,
-  });
-
-  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, file, {
-    contentType: file.type || "application/octet-stream",
-    upsert: false,
-    cacheControl: "31536000",
-  });
-
-  if (error) {
-    throw new Error(formatUploadError(error.message));
+  let res: Response;
+  try {
+    res = await fetch("/api/admin/media", {
+      method: "POST",
+      body,
+      credentials: "same-origin",
+    });
+  } catch {
+    throw new Error(
+      formatUploadError("", "Could not upload the file (network). Check your internet and try again."),
+    );
   }
 
-  return { path, publicUrl: getPublicMediaUrl(path, options.url) };
+  const payload = (await res.json().catch(() => null)) as
+    | { path?: string; publicUrl?: string; error?: string }
+    | null;
+
+  if (!res.ok || !payload?.path || !payload?.publicUrl) {
+    throw new Error(
+      formatUploadError(
+        payload?.error ?? `Upload failed (${res.status})`,
+        "Could not upload the file (network). Check your internet and try again.",
+      ),
+    );
+  }
+
+  return { path: payload.path, publicUrl: payload.publicUrl };
 }
+
+/** @deprecated Use uploadMediaViaApi — kept for import path compatibility during migration. */
+export const uploadMediaInBrowser = uploadMediaViaApi;
 
 export function formatUploadError(
   message: string,

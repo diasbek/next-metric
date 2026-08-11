@@ -44,10 +44,9 @@ import {
   type CSSProperties,
 } from "react";
 import { ImageField } from "@/components/admin/image-field";
-import { useAdminSupabaseConfig } from "@/components/admin/AdminProviders";
 import {
   formatUploadError,
-  uploadMediaInBrowser,
+  uploadMediaViaApi,
 } from "@/lib/cms/browser-upload";
 import {
   createTeamMemberAction,
@@ -476,7 +475,6 @@ function TeamEditPanel({
   onClose: () => void;
 }) {
   const t = useAdminT();
-  const supabaseConfig = useAdminSupabaseConfig();
   const [locale, setLocale] = useState<AdminLocale>("en");
   const [previewImage, setPreviewImage] = useState(item.image);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -546,11 +544,9 @@ function TeamEditPanel({
           const file = fileRef.current?.files?.[0];
           if (file) {
             try {
-              const uploaded = await uploadMediaInBrowser(file, {
+              const uploaded = await uploadMediaViaApi(file, {
                 folder: `team/${item.id}`,
                 filenameHint: "photo",
-                url: supabaseConfig.url,
-                publishableKey: supabaseConfig.publishableKey,
               });
               imageUrl = uploaded.publicUrl;
             } catch (err) {

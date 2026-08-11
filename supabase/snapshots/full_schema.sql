@@ -1,6 +1,6 @@
 -- AUTO-GENERATED — do not edit by hand
 -- Source: supabase/migrations/*.sql (2 files)
--- Generated: 2026-08-10T15:48:25.945Z
+-- Generated: 2026-08-11T01:24:28.514Z
 
 -- ============================================================================
 -- >>> 20260810120000_metric_prefixed_schema.sql

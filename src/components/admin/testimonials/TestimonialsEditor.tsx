@@ -6,7 +6,6 @@ import {
   hardNavCreate,
   runAdminMutation,
 } from "@/components/admin/HardNavForm";
-import { useAdminSupabaseConfig } from "@/components/admin/AdminProviders";
 import {
   ReorderStatus,
   SortableCard,
@@ -19,7 +18,7 @@ import {
 } from "@/components/admin/toast/AdminToaster";
 import {
   formatUploadError,
-  uploadMediaInBrowser,
+  uploadMediaViaApi,
 } from "@/lib/cms/browser-upload";
 
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
@@ -416,7 +415,6 @@ function TestimonialEditPanel({
   onClose: () => void;
 }) {
   const t = useAdminT();
-  const supabaseConfig = useAdminSupabaseConfig();
   const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(item);
   const [busy, setBusy] = useState(false);
@@ -474,20 +472,16 @@ function TestimonialEditPanel({
         : draft.logo_image;
 
       if (personFile) {
-        const uploaded = await uploadMediaInBrowser(personFile, {
+        const uploaded = await uploadMediaViaApi(personFile, {
           folder: `testimonials/${item.id}/person`,
           filenameHint: "person",
-          url: supabaseConfig.url,
-          publishableKey: supabaseConfig.publishableKey,
         });
         personImage = uploaded.publicUrl;
       }
       if (logoFile) {
-        const uploaded = await uploadMediaInBrowser(logoFile, {
+        const uploaded = await uploadMediaViaApi(logoFile, {
           folder: `testimonials/${item.id}/logo`,
           filenameHint: "logo",
-          url: supabaseConfig.url,
-          publishableKey: supabaseConfig.publishableKey,
         });
         logoImage = uploaded.publicUrl;
       }

@@ -1,100 +1,87 @@
 # Supabase (METRIC CMS)
 
-Portable SQL for bootstrapping the Metric CMS on any Supabase project.
+Portable SQL for bootstrapping Metric CMS tables (`metric_*`) on a Supabase project.
+**Target:** minim prod — shared with next-timsol.
 
 ## Active project
 
 | | |
 |--|--|
-| **Project ref** | `dksqshrlnmtabrsuyyoz` (Metric) |
-| **URL pattern** | `https://dksqshrlnmtabrsuyyoz.supabase.co` |
-| **Table prefix** | All CMS content tables use `metric_` (e.g. `metric_home`, `metric_leads`, `metric_projects`) |
-| **Media bucket** | `metric-media` |
+| **Project ref** | `ginhgueucvaqxhphplmy` (minim) |
+| **URL** | `https://ginhgueucvaqxhphplmy.supabase.co` |
+| **Table prefix** | Metric CMS: `metric_*` · Timsol CMS: unprefixed (coexist) |
+| **Auth** | Shared unprefixed `admin_users` / `is_admin()` |
+| **Media bucket** | `metric-media` (+ `lead-attachments`, `site-files`) |
 
-> **Note:** Project `ginhgueucvaqxhphplmy` was requested but is inaccessible from this workspace. Use the Metric project (`dksqshrlnmtabrsuyyoz`) for now. To point env at `ginhgueucvaqxhphplmy` later, update Supabase URL/keys and re-run the metric-prefixed migration + seed on that project.
+Dashboard: https://supabase.com/dashboard/project/ginhgueucvaqxhphplmy
 
-Auth helpers (`admin_users`, `is_admin()`) stay unprefixed.
+## Fresh Metric schema on minim
 
-## Fresh install (new projects)
-
-Apply **only** Metric-era migrations — do **not** run older unprefixed `20260714*` files on a fresh Metric project:
+Apply **only** Metric-era migrations (safe alongside existing Timsol tables):
 
 ```text
 supabase/migrations/20260810120000_metric_prefixed_schema.sql
 supabase/migrations/20260810130000_metric_storage_buckets.sql
 ```
 
-That creates `metric_*` tables, RLS, and buckets `metric-media`, `lead-attachments`, `site-files`.
+Do **not** re-run older unprefixed `20260714*` files — Timsol already has those shapes.
 
 ### Apply methods
 
-**A) Dashboard SQL Editor** — paste and run each Metric migration file in order.
+**A) Dashboard SQL Editor** (required if MCP has no org access)
 
-**B) This repo already applied them** on project `dksqshrlnmtabrsuyyoz` via MCP.
+1. Open https://supabase.com/dashboard/project/ginhgueucvaqxhphplmy/sql/new
+2. Paste and run each Metric migration file in order.
 
-**C) Bundle**
+**B) CLI with DB URL**
+
+```bash
+# Settings → Database → URI → DATABASE_URL in .env.local
+npm run db:migrate
+```
+
+**C) Bundle for paste**
 
 ```bash
 npm run db:migrations:bundle   # writes supabase/snapshots/full_schema.sql (Metric only)
 ```
 
-**D) CLI**
-
-```bash
-npx supabase link --project-ref dksqshrlnmtabrsuyyoz
-npx supabase db push
-```
-
-
 ## Env keys
 
-Copy into `.env.local` (see `.env.example`):
+Copy into `.env.local` / Hostinger (see `.env.example`):
 
 | Key | Purpose |
 |-----|---------|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://dksqshrlnmtabrsuyyoz.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://ginhgueucvaqxhphplmy.supabase.co` |
 | `SUPABASE_URL` | Same (server) |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable / anon key |
-| `SUPABASE_SECRET_KEY` | Service role (server / scripts only) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Same publishable as next-timsol |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Same anon as next-timsol |
+| `SUPABASE_SECRET_KEY` | Secret / service_role (server only) — **required** |
 
-Optional aliases: `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_API_KEY`.
-
-Update `next.config.ts` `images.remotePatterns` hostname to the project ref.
+Optional aliases: `SUPABASE_API_KEY`. Also set `CMS_ADMIN_EMAIL` / `CMS_ADMIN_PASSWORD` for postbuild `create:cms-admin`.
 
 ## After migrate
 
 ```bash
-# Seed Metric homepage + FAQ (preferred for this project)
 npm run seed:metric
-
-# Create CMS owner
-CMS_ADMIN_EMAIL=you@example.com CMS_ADMIN_PASSWORD='********' npm run create:cms-admin
+CMS_ADMIN_EMAIL=admin@minim.uz CMS_ADMIN_PASSWORD='********' npm run create:cms-admin
 # or open /admin/setup/
 ```
 
-Admin Metric homepage editor: **`/admin/metric-home/`** (draft | published status).
+Admin Metric homepage editor: **`/admin/metric-home/`**.
 
-Legacy `npm run seed:cms` targets older unprefixed content shapes and is not the Metric home path.
+Login is server-proxied (no browser → `*.supabase.co` Auth).
 
 ## What you get (`metric_` prefix)
 
 | Area | Objects |
 |------|---------|
-| Auth gate | `admin_users`, `is_admin()` |
+| Auth gate | `admin_users`, `is_admin()` (shared) |
 | Home | `metric_home`, `metric_home_translations` |
 | Projects | `metric_projects`, `metric_project_translations`, `metric_project_media`, `metric_project_blocks` |
 | Content | `metric_services`, `metric_faq_*`, process/benefits/agency/team/testimonials |
 | Site | `metric_site_settings`, `metric_page_seo`, `metric_leads` |
-| Storage | public bucket `metric-media` (images), RLS for admin write |
-
-## Security advisors (project `dksqshrlnmtabrsuyyoz`)
-
-Checked via Supabase advisors (security + performance). **No CRITICAL RLS findings.**
-
-Documented WARN-level notes (non-blocking):
-
-- `public.is_admin()` is `SECURITY DEFINER` and executable by `anon` / `authenticated` via RPC — intentional for RLS helpers; revoke execute from `anon` only if you harden further ([lint 0028](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable)).
-- Performance: `auth_rls_initplan` / multiple permissive policies on several tables — optimize later if needed; not CRITICAL.
+| Storage | `metric-media`, `lead-attachments`, `site-files` |
 
 ## Layout
 
@@ -102,8 +89,9 @@ Documented WARN-level notes (non-blocking):
 supabase/
   README.md
   migrations/
-    20260810120000_metric_prefixed_schema.sql   # ← use this for Metric
-    20260714*.sql                               # legacy unprefixed (do not apply on new Metric projects)
+    20260810120000_metric_prefixed_schema.sql   # ← Metric on minim
+    20260810130000_metric_storage_buckets.sql
+    20260714*.sql                               # Timsol-era (already on minim)
   snapshots/
-    full_schema.sql                             # legacy concatenated snapshot
+    full_schema.sql
 ```

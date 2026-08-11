@@ -3,10 +3,6 @@ import { AdminChrome, ADMIN_NAV_ITEMS } from "@/components/admin/chrome";
 import { canAccess, requireAdmin } from "@/lib/cms/auth";
 import { getAdminMessages } from "@/i18n/admin";
 import { getAdminUiLocale } from "@/i18n/admin/get-admin-locale";
-import {
-  getSupabasePublishableKey,
-  getSupabaseUrl,
-} from "@/lib/supabase/env";
 
 export default async function AdminDashboardLayout({
   children,
@@ -21,12 +17,7 @@ export default async function AdminDashboardLayout({
   );
 
   return (
-    <AdminProviders
-      locale={locale}
-      messages={t}
-      supabaseUrl={getSupabaseUrl()}
-      supabasePublishableKey={getSupabasePublishableKey()}
-    >
+    <AdminProviders locale={locale} messages={t}>
       <AdminChrome
         items={visibleNav}
         email={admin.email}

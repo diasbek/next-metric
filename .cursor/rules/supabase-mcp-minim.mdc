@@ -1,0 +1,16 @@
+---
+description: Use minim Supabase org/project for Metric MCP
+alwaysApply: true
+---
+
+# Supabase MCP (Metric / minim)
+
+| | |
+|--|--|
+| **Org** | [ytizyeciuatpkgtpohgr](https://supabase.com/dashboard/org/ytizyeciuatpkgtpohgr) (minim) |
+| **Project** | [ginhgueucvaqxhphplmy](https://supabase.com/dashboard/project/ginhgueucvaqxhphplmy) |
+| **MCP** | `project_ref=ginhgueucvaqxhphplmy` in `.cursor/mcp.json` |
+
+On OAuth, pick org **minim** (`ytizyeciuatpkgtpohgr`), not diasbek's personal org.
+
+Apply Metric DDL only on `ginhgueucvaqxhphplmy` (`metric_*` tables). Do not use `gclkufubbimlxkuurozv` or `dksqshrlnmtabrsuyyoz` for this app.
