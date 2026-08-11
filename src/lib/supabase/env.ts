@@ -1,15 +1,24 @@
 import { getEnv, requireEnv } from "@/utils/env";
 
-/** Public project URL (browser + server). */
+/**
+ * Project URL.
+ * Prefer non-NEXT_PUBLIC keys first so Hostinger/runtime env wins over
+ * values inlined into the Next bundle at build time.
+ */
 export function getSupabaseUrl(): string {
-  return getEnv("NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL");
+  return getEnv("SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL");
 }
 
-/** Publishable / anon key for browser clients. */
+/**
+ * Anon / publishable key for Auth + RLS clients.
+ * Prefer server runtime aliases, then legacy anon JWT, then publishable.
+ */
 export function getSupabasePublishableKey(): string {
   return getEnv(
-    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_PUBLISHABLE_KEY",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   );
 }
 
@@ -18,7 +27,6 @@ export function getSupabasePublishableKey(): string {
  * Never import this into Client Components.
  */
 export function getSupabaseSecretKey(): string {
-  // Hard guard: never read a NEXT_PUBLIC_ secret key alias
   if (process.env.NEXT_PUBLIC_SUPABASE_SECRET_KEY) {
     throw new Error(
       "Invalid env: NEXT_PUBLIC_SUPABASE_SECRET_KEY must not be set. Use SUPABASE_SECRET_KEY.",
@@ -40,13 +48,15 @@ export function getSupabaseSecretKey(): string {
 }
 
 export function requireSupabaseUrl(): string {
-  return requireEnv("NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL");
+  return requireEnv("SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL");
 }
 
 export function requireSupabasePublishableKey(): string {
   return requireEnv(
-    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_PUBLISHABLE_KEY",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   );
 }
 
@@ -64,4 +74,13 @@ export function hasSupabaseBrowserConfig(): boolean {
 
 export function hasSupabaseAdminConfig(): boolean {
   return Boolean(getSupabaseUrl() && getSupabaseSecretKey());
+}
+
+/** Hostname only — safe to return in API errors for Hostinger diagnosis. */
+export function getSupabaseHost(): string {
+  try {
+    return new URL(getSupabaseUrl()).host;
+  } catch {
+    return "";
+  }
 }
