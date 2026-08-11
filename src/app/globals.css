@@ -2783,12 +2783,36 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
 }
 
 @media (max-width: 640px) {
+  .cookie-consent {
+    padding: 10px;
+  }
+
   .cookie-consent__inner {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .cookie-consent__copy {
+    /* Reset the row-layout flex-basis (320px) — in a column flex container
+       that basis applies to height, not width, which was blowing up the
+       banner with a large empty gap below the text on mobile. */
+    flex: 1 1 auto;
+  }
+
+  .cookie-consent__title {
+    margin: 0 0 4px;
   }
 
   .cookie-consent__actions {
     justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .cookie-consent__btn {
+    flex: 1 1 auto;
+    height: 40px;
+    padding-inline: 14px;
   }
 }
