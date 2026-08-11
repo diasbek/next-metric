@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -44,17 +44,95 @@ function CardStrip({
   );
 }
 
+const AUTO_SCROLL_PX_PER_SEC = 34;
+const RESUME_AFTER_MS = 1500;
+
 /**
- * Infinite horizontal card loop for the categories strip.
- * Two identical sequences + CSS translate(-50%) keep the seam invisible.
- * Falls back to a normal overflow scroller when reduced-motion is on.
+ * Drives the infinite loop by nudging the track's real `scrollLeft` on a
+ * rAF loop and wrapping it once a full sequence has passed — NOT a CSS
+ * `transform: translate` keyframe on a duplicated track. That older
+ * approach fought with the browser's own touch/drag scrolling (nothing
+ * responded to a swipe, so cards could look like they were bunching up
+ * mid-gesture) and needed a brittle `:hover`-based pause that could get
+ * stuck on touch. Because this is a genuine scroll container, a finger
+ * drag or mouse wheel just scrolls it natively — we only need to pause our
+ * own nudging while that's happening and resume a moment after it ends.
  */
+function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let rafId = 0;
+    let lastTime = 0;
+    let loopWidth = 0;
+    let paused = false;
+    let resumeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const measure = () => {
+      // Two identical sequences back to back — half of the scrollable width
+      // is exactly one full loop.
+      loopWidth = track.scrollWidth / 2;
+    };
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(track);
+
+    const tick = (time: number) => {
+      if (lastTime && !paused && loopWidth > 0) {
+        const dt = time - lastTime;
+        track.scrollLeft += (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
+        if (track.scrollLeft >= loopWidth) {
+          track.scrollLeft -= loopWidth;
+        }
+      }
+      lastTime = time;
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
+    const pause = () => {
+      paused = true;
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = null;
+    };
+    const scheduleResume = () => {
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        lastTime = 0;
+        paused = false;
+      }, RESUME_AFTER_MS);
+    };
+
+    track.addEventListener("pointerdown", pause);
+    track.addEventListener("pointerup", scheduleResume);
+    track.addEventListener("pointercancel", scheduleResume);
+    track.addEventListener("wheel", pause, { passive: true });
+    track.addEventListener("wheel", scheduleResume, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+      if (resumeTimer) clearTimeout(resumeTimer);
+      track.removeEventListener("pointerdown", pause);
+      track.removeEventListener("pointerup", scheduleResume);
+      track.removeEventListener("pointercancel", scheduleResume);
+      track.removeEventListener("wheel", pause);
+      track.removeEventListener("wheel", scheduleResume);
+    };
+  }, [trackRef]);
+}
+
 export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotion,
     () => false,
   );
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useAutoScrollLoop(trackRef);
 
   if (reducedMotion) {
     return (
@@ -82,7 +160,7 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
       className="metric-categories__track-wrap metric-categories__track-wrap--marquee"
       data-reveal
     >
-      <div className="metric-categories__track metric-categories__track--marquee">
+      <div ref={trackRef} className="metric-categories__track metric-categories__track--marquee">
         <CardStrip images={images} keyPrefix="a" />
         <CardStrip images={images} keyPrefix="b" inert />
       </div>

@@ -785,17 +785,21 @@ body {
   padding-bottom: 8px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
+/* Auto-scroll loop is driven by JS nudging real `scrollLeft` (see
+   CategoriesMarquee.tsx) rather than a CSS transform keyframe on a
+   duplicated track. A genuine scroll container means a finger swipe or
+   mouse wheel scrolls it natively — no fighting with a transform, no
+   `:hover`-based pause that could get stuck on touch, no vw-rounded
+   sequence-width seam. */
 .metric-categories__track--marquee {
   display: flex;
-  width: max-content;
   gap: 0;
-  overflow: visible;
+  overflow-x: auto;
   padding-bottom: 0;
   scroll-snap-type: none;
-  animation: metric-categories-marquee 42s linear infinite;
-  will-change: transform;
 }
 
 .metric-categories__seq {
@@ -803,17 +807,6 @@ body {
   flex-shrink: 0;
   gap: 24px;
   padding-right: 24px;
-}
-
-/* Pause-on-hover only for real pointers. Plain `:hover` gets "stuck" on
-   touch — a tap (e.g. to swipe past the strip) can leave the browser
-   thinking the finger is still hovering, permanently freezing the loop
-   mid-transform, which is exactly the "broken/smeared" look reported on
-   small screens. */
-@media (hover: hover) and (pointer: fine) {
-  .metric-categories__track-wrap--marquee:hover .metric-categories__track--marquee {
-    animation-play-state: paused;
-  }
 }
 
 .metric-categories__track::-webkit-scrollbar {
@@ -836,23 +829,6 @@ body {
 @media (min-width: 768px) {
   .metric-categories__card {
     flex-basis: min(28vw, 320px);
-  }
-}
-
-@keyframes metric-categories-marquee {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    /* One full sequence (50% of duplicated track) — seamless loop. */
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .metric-categories__track--marquee {
-    animation: none;
-    will-change: auto;
   }
 }
 
