@@ -9,12 +9,13 @@ import {
 } from "@/components/admin/toast/AdminToaster";
 import { loginSchema } from "@/lib/cms/admin-schemas";
 import { useAdminT } from "@/i18n/admin";
-import { loginAdminAction } from "./actions";
 
 type AdminLoginFormProps = {
   initialError?: string;
   nextPath?: string;
 };
+
+type LoginApiResult = { ok: true } | { ok: false; error: string };
 
 export function AdminLoginForm({
   initialError = "",
@@ -43,10 +44,26 @@ export function AdminLoginForm({
         validationSchema={loginSchema}
         onSubmit={async (values, helpers) => {
           try {
-            const result = await loginAdminAction({
-              email: values.email.trim(),
-              password: values.password,
+            const res = await fetch("/api/admin/login/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Accept: "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify({
+                email: values.email.trim(),
+                password: values.password,
+              }),
             });
+
+            const result = (await res.json().catch(() => null)) as
+              | LoginApiResult
+              | null;
+
+            if (!result || typeof result !== "object" || !("ok" in result)) {
+              const msg = t.auth.loginFailed;
+              adminToastError(msg);
+              helpers.setStatus(msg);
+              return;
+            }
 
             if (!result.ok) {
               adminToastError(result.error);
