@@ -805,8 +805,15 @@ body {
   padding-right: 24px;
 }
 
-.metric-categories__track-wrap--marquee:hover .metric-categories__track--marquee {
-  animation-play-state: paused;
+/* Pause-on-hover only for real pointers. Plain `:hover` gets "stuck" on
+   touch — a tap (e.g. to swipe past the strip) can leave the browser
+   thinking the finger is still hovering, permanently freezing the loop
+   mid-transform, which is exactly the "broken/smeared" look reported on
+   small screens. */
+@media (hover: hover) and (pointer: fine) {
+  .metric-categories__track-wrap--marquee:hover .metric-categories__track--marquee {
+    animation-play-state: paused;
+  }
 }
 
 .metric-categories__track::-webkit-scrollbar {
