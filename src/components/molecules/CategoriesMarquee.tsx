@@ -45,7 +45,7 @@ function CardStrip({
 }
 
 const AUTO_SCROLL_PX_PER_SEC = 34;
-const RESUME_AFTER_MS = 1500;
+const RESUME_AFTER_MS = 1200;
 
 /**
  * Drives the infinite loop by nudging the track's real `scrollLeft` on a
@@ -57,6 +57,14 @@ const RESUME_AFTER_MS = 1500;
  * stuck on touch. Because this is a genuine scroll container, a finger
  * drag or mouse wheel just scrolls it natively — we only need to pause our
  * own nudging while that's happening and resume a moment after it ends.
+ *
+ * iOS Safari keeps gliding on momentum well after the finger lifts, so a
+ * fixed "resume N ms after pointerup" timer isn't enough — the rAF loop
+ * would start forcing scrollLeft again while the browser is still
+ * decelerating, fighting it and producing a stutter/jump. Instead, every
+ * native `scroll` event that happens *while paused* (i.e. one we didn't
+ * cause ourselves) pushes the resume timer back out, so we only resume
+ * once scrolling has actually gone quiet.
  */
 function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
   useEffect(() => {
@@ -82,44 +90,45 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
     const tick = (time: number) => {
       if (lastTime && !paused && loopWidth > 0) {
         const dt = time - lastTime;
-        track.scrollLeft += (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
-        if (track.scrollLeft >= loopWidth) {
-          track.scrollLeft -= loopWidth;
-        }
+        let next = track.scrollLeft + (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
+        if (next >= loopWidth) next -= loopWidth;
+        track.scrollLeft = next;
       }
       lastTime = time;
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
 
-    const pause = () => {
-      paused = true;
-      if (resumeTimer) clearTimeout(resumeTimer);
-      resumeTimer = null;
-    };
     const scheduleResume = () => {
       if (resumeTimer) clearTimeout(resumeTimer);
       resumeTimer = setTimeout(() => {
+        resumeTimer = null;
         lastTime = 0;
         paused = false;
       }, RESUME_AFTER_MS);
     };
+    const pause = () => {
+      paused = true;
+      scheduleResume();
+    };
+    const onNativeScroll = () => {
+      // Only a user/momentum-driven scroll gets here — while we're
+      // auto-scrolling ourselves `paused` is false, so our own writes to
+      // scrollLeft don't re-trigger this and fight the timer.
+      if (paused) scheduleResume();
+    };
 
     track.addEventListener("pointerdown", pause);
-    track.addEventListener("pointerup", scheduleResume);
-    track.addEventListener("pointercancel", scheduleResume);
     track.addEventListener("wheel", pause, { passive: true });
-    track.addEventListener("wheel", scheduleResume, { passive: true });
+    track.addEventListener("scroll", onNativeScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
       if (resumeTimer) clearTimeout(resumeTimer);
       track.removeEventListener("pointerdown", pause);
-      track.removeEventListener("pointerup", scheduleResume);
-      track.removeEventListener("pointercancel", scheduleResume);
       track.removeEventListener("wheel", pause);
-      track.removeEventListener("wheel", scheduleResume);
+      track.removeEventListener("scroll", onNativeScroll);
     };
   }, [trackRef]);
 }
