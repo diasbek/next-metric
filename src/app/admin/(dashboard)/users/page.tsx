@@ -21,13 +21,15 @@ export default async function AdminUsersPage({
   const t = getAdminMessages(uiLocale);
   const params = await searchParams;
   const supabase = createSupabaseAdminClient();
-  const { data: users } = await supabase
+  const { data: users, error: usersError } = await supabase
     .from("metric_admin_users")
-    .select("user_id, email, role, created_at, last_login_at, invited_by")
+    .select("user_id, email, role, created_at, last_login_at")
     .order("created_at", { ascending: true });
 
   const flash =
-    params.ok === "invited"
+    usersError
+      ? `Error: ${usersError.message}`
+      : params.ok === "invited"
       ? t.users.flashInvited
       : params.ok === "role"
         ? t.users.flashRole
@@ -70,7 +72,7 @@ export default async function AdminUsersPage({
         {flash ? (
           <p
             style={{
-              color: params.error ? "#f66" : "#6f6",
+              color: params.error || usersError ? "#f66" : "#6f6",
               margin: "12px 0 0",
             }}
           >

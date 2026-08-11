@@ -97,10 +97,13 @@ export async function deleteTestimonialAction(formData: FormData) {
 export async function reorderTestimonialsAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
   const { T } = await import("@/lib/cms/tables");
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const t = getAdminMessages(await getAdminUiLocale());
   return reorderCmsRows({
     table: T.testimonials,
     orderedIds,
     tags: ["cms", "testimonials"],
-    successMessage: "Порядок отзывов сохранён",
+    successMessage: t.common.orderSaved,
   });
 }

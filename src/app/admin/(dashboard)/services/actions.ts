@@ -76,10 +76,13 @@ export async function deleteServiceAction(formData: FormData) {
 export async function reorderServicesAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
   const { T } = await import("@/lib/cms/tables");
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const t = getAdminMessages(await getAdminUiLocale());
   return reorderCmsRows({
     table: T.services,
     orderedIds,
     tags: ["cms", "services"],
-    successMessage: "Порядок услуг сохранён",
+    successMessage: t.common.orderSaved,
   });
 }

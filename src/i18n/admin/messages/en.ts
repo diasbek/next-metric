@@ -414,6 +414,9 @@ export const enAdmin: AdminMessages = {
       noDirector: "No director — mark a member as Director in the editor.",
       extraDirectors: "{count} more director(s). The site shows the first one.",
       noPhoto: "No photo",
+      missing: "Member not found (maybe deleted). Close the panel and create again.",
+      created: "Draft member created",
+      deleted: "Member deleted",
     },
     services: {
       title: "Services catalog",
@@ -484,8 +487,9 @@ export const enAdmin: AdminMessages = {
     agency: {
       title: "Agency",
       description:
-        "Agency page: about, team, testimonials. Homepage FAQ is also editable under Home → FAQ.",
+        "Agency page: about, team, and testimonials. FAQ for the site is edited under Home.",
       sectionAbout: "About",
+      faqHomeHint: "Edit homepage FAQ questions here:",
       languageLabel: "Language",
       paragraphsEmpty: "Add paragraphs…",
       stats: "Stats",
@@ -494,7 +498,7 @@ export const enAdmin: AdminMessages = {
       savedHint: "Saved. Refresh the agency page to see the changes.",
       foundedYear: "Founded year (on banner)",
       foundedIn: "Founded in {year}",
-      previewLabel: "Preview · /#workflow · {locale}",
+      previewLabel: "Preview · /agency/ · {locale}",
       contentSection: "Content · {label}",
       titleLine1Label: "Title — line 1",
       titleLine2Label: "Title — line 2",
@@ -513,7 +517,7 @@ export const enAdmin: AdminMessages = {
     },
     project: {
       title: "Project",
-      description: "Sections as on the site. Edit one locale at a time. Locales: {filled}/3.",
+      description: "Sections as on the site. Edit one locale at a time. Locales: {filled}/2.",
       preview: "Case preview",
       caseText: "Case text",
       gallery: "Gallery",

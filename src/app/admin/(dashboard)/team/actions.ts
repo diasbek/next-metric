@@ -9,15 +9,17 @@ import { revalidateCms } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { isFileUpload, uploadMediaFile } from "@/lib/cms/storage";
+import { getAdminMessages } from "@/i18n/admin/get-admin-messages";
+import { getAdminUiLocale } from "@/i18n/admin/get-admin-locale";
 
 export async function saveTeamMemberAction(formData: FormData) {
   return runAdminAction(async () => {
     await requirePermission("content");
+    const t = getAdminMessages(await getAdminUiLocale());
     const supabase = createSupabaseAdminClient();
     const id = String(formData.get("id") ?? "").trim();
-    if (!id) return adminFail("Не указан id участника");
+    if (!id) return adminFail(t.common.actionFailed);
 
-    // Ensure member still exists (draft may have been deleted in another tab)
     const { data: existing, error: existingError } = await supabase
       .from("metric_team_members")
       .select("id")
@@ -25,9 +27,7 @@ export async function saveTeamMemberAction(formData: FormData) {
       .maybeSingle();
     if (existingError) return adminFail(existingError.message);
     if (!existing) {
-      return adminFail(
-        "Участник не найден (возможно, уже удалён). Закройте панель и создайте заново.",
-      );
+      return adminFail(t.pages.team.missing);
     }
 
     let image = String(formData.get("image") ?? "");
@@ -42,19 +42,19 @@ export async function saveTeamMemberAction(formData: FormData) {
         image = uploaded.publicUrl;
       } catch (err) {
         return adminFail(
-          err instanceof Error ? err.message : "Не удалось загрузить фото",
+          err instanceof Error ? err.message : t.common.uploadNetworkError,
         );
       }
     }
 
     const status = String(formData.get("status") ?? "draft");
     if (status !== "draft" && status !== "published") {
-      return adminFail("Некорректный статус");
+      return adminFail(t.common.actionFailed);
     }
 
     const sortOrder = Number(formData.get("sort_order") ?? 0);
     if (!Number.isFinite(sortOrder) || sortOrder < 0) {
-      return adminFail("Некорректный порядок");
+      return adminFail(t.common.actionFailed);
     }
 
     const { error: updateError } = await supabase
@@ -81,17 +81,17 @@ export async function saveTeamMemberAction(formData: FormData) {
     }
 
     if (status === "published") {
-      const ruName = String(formData.get("en_name") ?? "").trim();
-      const ruRole = String(formData.get("en_role") ?? "").trim();
-      if (!ruName || !ruRole) {
-        return adminFail("need name and role in EN");
+      const enName = String(formData.get("en_name") ?? "").trim();
+      const enRole = String(formData.get("en_role") ?? "").trim();
+      if (!enName || !enRole) {
+        return adminFail(t.common.fillEnFirst);
       }
     }
 
     revalidateCms(["cms", "team"]);
     return adminRedirect(
       `/admin/agency/?section=team&edit=${id}`,
-      "Участник команды сохранён",
+      t.common.saved,
     );
   });
 }
@@ -99,6 +99,7 @@ export async function saveTeamMemberAction(formData: FormData) {
 export async function createTeamMemberAction() {
   return runAdminAction(async () => {
     await requirePermission("content");
+    const t = getAdminMessages(await getAdminUiLocale());
     const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase
       .from("metric_team_members")
@@ -106,7 +107,7 @@ export async function createTeamMemberAction() {
       .select("id")
       .single();
     if (error || !data) {
-      return adminFail(error?.message ?? "Не удалось создать участника");
+      return adminFail(error?.message ?? t.common.actionFailed);
     }
 
     const { error: trError } = await supabase
@@ -124,7 +125,7 @@ export async function createTeamMemberAction() {
     revalidateCms(["cms", "team"]);
     return adminRedirect(
       `/admin/agency/?section=team&edit=${data.id}`,
-      "Черновик участника создан",
+      t.pages.team.created,
     );
   });
 }
@@ -132,25 +133,27 @@ export async function createTeamMemberAction() {
 export async function deleteTeamMemberAction(formData: FormData) {
   return runAdminAction(async () => {
     await requirePermission("content");
+    const t = getAdminMessages(await getAdminUiLocale());
     const id = String(formData.get("id") ?? "").trim();
-    if (!id) return adminFail("Не указан id");
+    if (!id) return adminFail(t.common.actionFailed);
 
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase.from("metric_team_members").delete().eq("id", id);
     if (error) return adminFail(error.message);
 
     revalidateCms(["cms", "team"]);
-    return adminRedirect("/admin/agency/?section=team", "Участник удалён");
+    return adminRedirect("/admin/agency/?section=team", t.pages.team.deleted);
   });
 }
 
 export async function reorderTeamMembersAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
   const { T } = await import("@/lib/cms/tables");
+  const t = getAdminMessages(await getAdminUiLocale());
   return reorderCmsRows({
     table: T.teamMembers,
     orderedIds,
     tags: ["cms", "team"],
-    successMessage: "Порядок команды сохранён",
+    successMessage: t.common.orderSaved,
   });
 }

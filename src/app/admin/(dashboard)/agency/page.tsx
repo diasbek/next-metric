@@ -1,7 +1,8 @@
+import { redirect } from "next/navigation";
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AgencyPageAdmin } from "@/components/admin/page-shell/AgencyPageAdmin";
-import { ADMIN_LOCALES as FAQ_LOCALES, type FaqDraft } from "@/components/admin/list-cms/types";
+import { EMBED } from "@/lib/cms/embeds";
 import {
   ADMIN_LOCALES as TEAM_LOCALES,
   type TeamMemberDraft,
@@ -81,34 +82,6 @@ function toTestimonialDraft(row: {
   };
 }
 
-function toFaqDraft(row: {
-  id: string;
-  sort_order: number;
-  status: string;
-  faq_translations?: Array<{ locale: string; question: string; answer: string }>;
-}): FaqDraft {
-  const translations = Object.fromEntries(
-    FAQ_LOCALES.map((locale) => {
-      const tr = row.faq_translations?.find((t) => t.locale === locale.code);
-      return [
-        locale.code,
-        {
-          locale: locale.code,
-          question: tr?.question ?? "",
-          answer: tr?.answer ?? "",
-        },
-      ];
-    }),
-  ) as FaqDraft["translations"];
-
-  return {
-    id: row.id,
-    sort_order: row.sort_order,
-    status: row.status,
-    translations,
-  };
-}
-
 export default async function AdminAgencyPage({
   searchParams,
 }: {
@@ -117,6 +90,12 @@ export default async function AdminAgencyPage({
   await requirePermission("content");
   const params = await searchParams;
   const section = params.section ?? "about";
+
+  if (section === "faq") {
+    const edit = params.edit ? `&edit=${encodeURIComponent(params.edit)}` : "";
+    redirect(`/admin/metric-home/?section=faq${edit}`);
+  }
+
   const supabase = createSupabaseAdminClient();
   const locales = ["en", "de"] as const;
 
@@ -131,7 +110,6 @@ export default async function AdminAgencyPage({
   let aboutTranslations = emptyAboutTranslations;
   let team: ReturnType<typeof toTeamDraft>[] = [];
   let testimonials: ReturnType<typeof toTestimonialDraft>[] = [];
-  let faq: ReturnType<typeof toFaqDraft>[] = [];
 
   if (section === "about") {
     const [{ data: content }, { data: translations }] = await Promise.all([
@@ -163,21 +141,15 @@ export default async function AdminAgencyPage({
   } else if (section === "team") {
     const { data: teamRows } = await supabase
       .from("metric_team_members")
-      .select("*, team_member_translations(*)")
+      .select(`*, ${EMBED.teamMemberTranslations}`)
       .order("sort_order");
     team = (teamRows ?? []).map(toTeamDraft);
   } else if (section === "testimonials") {
     const { data: testimonialRows } = await supabase
       .from("metric_testimonials")
-      .select("*, testimonial_translations(*)")
+      .select(`*, ${EMBED.testimonialTranslations}`)
       .order("sort_order");
     testimonials = (testimonialRows ?? []).map(toTestimonialDraft);
-  } else {
-    const { data: faqRows } = await supabase
-      .from("metric_faq_items")
-      .select("*, faq_translations(*)")
-      .order("sort_order");
-    faq = (faqRows ?? []).map(toFaqDraft);
   }
 
   return (
@@ -191,7 +163,6 @@ export default async function AdminAgencyPage({
       }}
       team={team}
       testimonials={testimonials}
-      faq={faq}
     />
   );
 }

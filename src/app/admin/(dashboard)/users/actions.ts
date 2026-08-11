@@ -57,7 +57,6 @@ export async function inviteAdminAction(formData: FormData) {
     user_id: user.id,
     email,
     role,
-    invited_by: actor.id,
   });
   if (upsertError) {
     return adminRedirect(`/admin/users/?error=${encodeURIComponent(upsertError.message)}`);

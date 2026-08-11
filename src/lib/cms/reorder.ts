@@ -28,7 +28,7 @@ export async function reorderCmsRows(options: {
   return runAdminAction(async () => {
     await requirePermission("content");
     const ids = options.orderedIds.map(String).filter(Boolean);
-    if (ids.length === 0) return adminFail("Пустой список для сортировки");
+    if (ids.length === 0) return adminFail("Empty list for reorder");
 
     const supabase = createSupabaseAdminClient();
     const results = await Promise.all(

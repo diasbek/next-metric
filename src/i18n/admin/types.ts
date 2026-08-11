@@ -375,6 +375,9 @@ export type AdminMessages = {
       noDirector: string;
       extraDirectors: string;
       noPhoto: string;
+      missing: string;
+      created: string;
+      deleted: string;
     };
     services: {
       title: string;
@@ -441,6 +444,7 @@ export type AdminMessages = {
       title: string;
       description: string;
       sectionAbout: string;
+      faqHomeHint: string;
       languageLabel: string;
       paragraphsEmpty: string;
       stats: string;

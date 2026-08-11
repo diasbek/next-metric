@@ -79,10 +79,13 @@ export async function deleteFaqAction(formData: FormData) {
 export async function reorderFaqAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
   const { T } = await import("@/lib/cms/tables");
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const t = getAdminMessages(await getAdminUiLocale());
   return reorderCmsRows({
     table: T.faqItems,
     orderedIds,
     tags: ["cms", "faq"],
-    successMessage: "Порядок FAQ сохранён",
+    successMessage: t.common.orderSaved,
   });
 }

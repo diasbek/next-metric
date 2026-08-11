@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** FAQ Q&A lives under Metric Home (also still available from Agency). */
+/** FAQ Q&A lives under Metric Home. */
 export default async function RedirectFaq({
   searchParams,
 }: {

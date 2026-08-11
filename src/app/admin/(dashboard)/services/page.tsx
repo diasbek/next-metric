@@ -1,5 +1,6 @@
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { EMBED } from "@/lib/cms/embeds";
 import { ServicesEditor } from "@/components/admin/services/ServicesEditor";
 import type { ServiceDraft } from "@/components/admin/services/types";
 import { ADMIN_LOCALES } from "@/components/admin/services/types";
@@ -58,7 +59,7 @@ export default async function AdminServicesPage({
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase
     .from("metric_services")
-    .select("*, service_translations(*)")
+    .select(`*, ${EMBED.serviceTranslations}`)
     .order("sort_order");
 
   const items = (data ?? []).map(toDraft);

@@ -6,6 +6,7 @@ import {
   ADMIN_LOCALES,
   type FaqDraft,
 } from "@/components/admin/list-cms/types";
+import { EMBED } from "@/lib/cms/embeds";
 
 function toFaqDraft(row: {
   id: string;
@@ -55,12 +56,12 @@ export default async function AdminMetricHomePage({
       supabase.from("metric_home_translations").select("locale, payload"),
       supabase
         .from("metric_projects")
-        .select("slug, status, project_translations(locale, title)")
+        .select(`slug, status, ${EMBED.projectTranslations}`)
         .order("sort_order"),
       section === "faq"
         ? supabase
             .from("metric_faq_items")
-            .select("*, faq_translations(*)")
+            .select(`*, ${EMBED.faqTranslations}`)
             .order("sort_order")
         : Promise.resolve({ data: null }),
     ]);

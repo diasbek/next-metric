@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { AdminPageShell } from "@/components/admin/page-shell/AdminPageShell";
-import type { FaqDraft } from "@/components/admin/list-cms/types";
 import type { TeamMemberDraft } from "@/components/admin/team/types";
 import type { TestimonialDraft } from "@/components/admin/testimonials/types";
+import { adminBtn } from "@/components/admin/ui/styles";
 import { useAdminT } from "@/i18n/admin";
 
 const AgencyEditor = dynamic(
@@ -23,11 +24,6 @@ const TestimonialsEditor = dynamic(
     import("@/components/admin/testimonials/TestimonialsEditor").then(
       (m) => m.TestimonialsEditor,
     ),
-  { ssr: false },
-);
-const FaqEditor = dynamic(
-  () =>
-    import("@/components/admin/list-cms/FaqEditor").then((m) => m.FaqEditor),
   { ssr: false },
 );
 
@@ -49,7 +45,6 @@ type Props = {
   };
   team: TeamMemberDraft[];
   testimonials: TestimonialDraft[];
-  faq: FaqDraft[];
 };
 
 export function AgencyPageAdmin({
@@ -58,14 +53,12 @@ export function AgencyPageAdmin({
   about,
   team,
   testimonials,
-  faq,
 }: Props) {
   const t = useAdminT();
   const sections = [
     { id: "about", label: t.pages.agency.sectionAbout },
     { id: "team", label: t.pages.team.title },
     { id: "testimonials", label: t.pages.testimonials.title },
-    { id: "faq", label: t.pages.faq.title },
   ];
   const active = sections.some((s) => s.id === section) ? section : "about";
 
@@ -77,6 +70,17 @@ export function AgencyPageAdmin({
       sections={sections}
       activeSection={active}
       basePath="/admin/agency/"
+      extra={
+        <p style={{ margin: "0 0 16px", fontSize: 13, color: "#888" }}>
+          {t.pages.agency.faqHomeHint}{" "}
+          <Link
+            href="/admin/metric-home/?section=faq"
+            style={{ ...adminBtn, textDecoration: "none", display: "inline-flex" }}
+          >
+            {t.pages.faq.title}
+          </Link>
+        </p>
+      }
     >
       {active === "about" ? (
         <AgencyEditor
@@ -91,9 +95,6 @@ export function AgencyPageAdmin({
       ) : null}
       {active === "testimonials" ? (
         <TestimonialsEditor items={testimonials} initialEditId={editId} embedded />
-      ) : null}
-      {active === "faq" ? (
-        <FaqEditor items={faq} initialEditId={editId} embedded />
       ) : null}
     </AdminPageShell>
   );

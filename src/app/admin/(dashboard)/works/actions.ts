@@ -189,6 +189,9 @@ export async function deleteProjectBlockAction(formData: FormData) {
 
 export async function reorderProjectBlocksAction(orderedIds: string[]) {
   await requirePermission("content");
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const t = getAdminMessages(await getAdminUiLocale());
   const supabase = createSupabaseAdminClient();
   await Promise.all(
     orderedIds.map((id, index) =>
@@ -196,7 +199,7 @@ export async function reorderProjectBlocksAction(orderedIds: string[]) {
     ),
   );
   revalidateCms(["cms", "projects"]);
-  return adminOk("Порядок блоков сохранён");
+  return adminOk(t.common.orderSaved);
 }
 
 export async function updateProjectBlockYoutubeAction(formData: FormData) {
@@ -339,10 +342,13 @@ export async function deleteProjectMediaAction(formData: FormData) {
 export async function reorderProjectsAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
   const { T } = await import("@/lib/cms/tables");
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const t = getAdminMessages(await getAdminUiLocale());
   return reorderCmsRows({
     table: T.projects,
     orderedIds,
     tags: ["cms", "projects"],
-    successMessage: "Порядок проектов сохранён",
+    successMessage: t.common.orderSaved,
   });
 }

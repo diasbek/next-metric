@@ -172,7 +172,7 @@ function SiteMemberCard({
             fontWeight: 600,
           }}
         >
-          {published ? t.common.published : t.common.draft} · {score.filled}/3
+          {published ? t.common.published : t.common.draft} · {score.filled}/{score.total}
         </span>
       </div>
       <p className={roleClass}>{tr.role.trim() || t.common.role}</p>
