@@ -59,20 +59,26 @@ export function MetricFaqSection({
   return (
     <section id={faq.id} className="metric-gradient-pink metric-section metric-faq">
       <PageContainer>
-        <div className="metric-faq__grid" data-reveal-group>
+        <div className="metric-faq__grid">
           <div data-reveal>
             <h2 className="metric-faq__title font-display text-white">
               {faq.title}
             </h2>
             <p className="metric-faq__subtitle">{faq.subtitle}</p>
           </div>
-          <div ref={listRef} className="metric-faq__list" data-reveal>
+          <div
+            ref={listRef}
+            className="metric-faq__list"
+            data-reveal-group="pop"
+            data-reveal-stagger="0.08"
+          >
             {items.map((item, index) => {
               const isOpen = open === index;
               return (
                 <div
                   key={item.question}
                   className={`faq-item${isOpen ? " is-open" : ""}`}
+                  data-reveal
                 >
                   <button
                     type="button"

@@ -249,7 +249,11 @@ export function MetricCaseStudiesSection({
           <p className="metric-case-studies__subtitle">{caseStudies.subtitle}</p>
         </div>
 
-        <div className="metric-case-studies__list" data-reveal-group>
+        <div
+          className="metric-case-studies__list"
+          data-reveal-group="pop"
+          data-reveal-stagger="0.12"
+        >
           {caseStudies.items.map((item) => (
             <article key={item.slug} className="metric-case-card" data-reveal>
               <div className="metric-case-card__body">
@@ -275,7 +279,7 @@ export function MetricCaseStudiesSection({
                   {caseStudies.viewLabel}
                 </Button>
               </div>
-              <div className="metric-case-card__media">
+              <div className="metric-case-card__media js-parallax" data-clip-reveal>
                 <Image
                   src={item.image}
                   alt={
@@ -345,7 +349,11 @@ export function MetricServicesSection({
             </Button>
           </div>
 
-          <div className="metric-services__list" data-reveal-group>
+          <div
+            className="metric-services__list"
+            data-reveal-group="pop"
+            data-reveal-stagger="0.1"
+          >
             {services.items.map((item) => (
               <article key={item.n} className="metric-services-card" data-reveal>
                 <div className="metric-services-card__media">
@@ -408,10 +416,17 @@ export function MetricWorkflowSection({
           <p className="metric-workflow__subtitle">{workflow.subtitle}</p>
         </div>
 
-        <div className="metric-workflow__grid" data-reveal-group>
+        <div
+          className="metric-workflow__grid"
+          data-reveal-group="pop"
+          data-reveal-stagger="0.12"
+        >
           {workflow.cards.map((card, index) => {
             const media = (
-              <div className="metric-workflow-card__media">
+              <div
+                className="metric-workflow-card__media js-parallax"
+                data-clip-reveal
+              >
                 <Image
                   src={card.image}
                   alt=""
