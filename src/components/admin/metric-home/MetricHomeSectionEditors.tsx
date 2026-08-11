@@ -546,12 +546,8 @@ export function HomeServicesSectionEditor({
         Home services block ({locale.toUpperCase()})
       </legend>
       <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-        This is the homepage “Everything your Amazon brand needs” section — not
-        the{" "}
-        <Link href="/admin/services/" style={{ color: "#8cf" }}>
-          /admin/services/
-        </Link>{" "}
-        catalog.
+        Homepage “Everything your Amazon brand needs” block — not a separate
+        services catalog page.
       </p>
       <Field title="Title line 1">
         <input

@@ -8,17 +8,15 @@ export default async function AdminHomePage() {
   const admin = await requireAdmin();
   const locale = await getAdminUiLocale();
   const t = getAdminMessages(locale);
-  // Session + RLS — dashboard must not crash when SUPABASE_SECRET_KEY is unset.
   const supabase = await createSupabaseServerClient();
 
-  const [projects, drafts, leads, services, audit] = await Promise.all([
+  const [projects, drafts, leads, audit] = await Promise.all([
     supabase.from("metric_projects").select("id", { count: "exact", head: true }),
     supabase
       .from("metric_projects")
       .select("id", { count: "exact", head: true })
       .eq("status", "draft"),
     supabase.from("metric_leads").select("id", { count: "exact", head: true }).eq("status", "new"),
-    supabase.from("metric_services").select("id", { count: "exact", head: true }),
     canAccess(admin.role, "audit")
       ? supabase
           .from("metric_admin_audit_log")
@@ -40,12 +38,10 @@ export default async function AdminHomePage() {
       value: String(leads.count ?? 0),
       href: "/admin/leads/?status=new",
     },
-    { label: t.dashboard.services, value: String(services.count ?? 0), href: "/admin/services/" },
   ];
 
   const shortcuts = [
     { label: t.dashboard.homePage, href: "/admin/home/" },
-    { label: t.dashboard.agencyPage, href: "/admin/agency/" },
     { label: t.dashboard.works, href: "/admin/works/" },
     { label: t.nav.leads, href: "/admin/leads/" },
     { label: t.dashboard.contacts, href: "/admin/contacts/" },

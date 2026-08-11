@@ -60,7 +60,7 @@ export async function saveTestimonialAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "testimonials"]);
-  return adminRedirect(`/admin/agency/?section=testimonials&edit=${id}`);
+  return adminRedirect(`/admin/home/`);
 }
 
 export async function createTestimonialAction() {
@@ -83,7 +83,7 @@ export async function createTestimonialAction() {
   );
 
   revalidateCms(["cms", "testimonials"]);
-  return adminRedirect(`/admin/agency/?section=testimonials&edit=${data.id}`);
+  return adminRedirect(`/admin/home/`);
 }
 
 export async function deleteTestimonialAction(formData: FormData) {
@@ -91,7 +91,7 @@ export async function deleteTestimonialAction(formData: FormData) {
   const supabase = createSupabaseAdminClient();
   await supabase.from("metric_testimonials").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "testimonials"]);
-  return adminRedirect("/admin/agency/?section=testimonials");
+  return adminRedirect("/admin/home/");
 }
 
 export async function reorderTestimonialsAction(orderedIds: string[]) {

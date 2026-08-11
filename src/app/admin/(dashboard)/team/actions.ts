@@ -90,7 +90,7 @@ export async function saveTeamMemberAction(formData: FormData) {
 
     revalidateCms(["cms", "team"]);
     return adminRedirect(
-      `/admin/agency/?section=team&edit=${id}`,
+      `/admin/home/`,
       t.common.saved,
     );
   });
@@ -124,7 +124,7 @@ export async function createTeamMemberAction() {
 
     revalidateCms(["cms", "team"]);
     return adminRedirect(
-      `/admin/agency/?section=team&edit=${data.id}`,
+      `/admin/home/`,
       t.pages.team.created,
     );
   });
@@ -142,7 +142,7 @@ export async function deleteTeamMemberAction(formData: FormData) {
     if (error) return adminFail(error.message);
 
     revalidateCms(["cms", "team"]);
-    return adminRedirect("/admin/agency/?section=team", t.pages.team.deleted);
+    return adminRedirect("/admin/home/", t.pages.team.deleted);
   });
 }
 
