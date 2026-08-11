@@ -757,8 +757,9 @@ body {
 
 .metric-categories__track-wrap {
   margin-top: clamp(40px, 4.5vw, 64px);
-  /* Bleed the scroller past the page gutters so cards reach the viewport edge. */
-  margin-inline: calc(var(--page-padding) * -1);
+  /* Rendered outside PageContainer (full section width already) — inset with
+     padding only. A negative margin here would bleed past the viewport edge
+     and force horizontal overflow on mobile. */
   padding-inline: var(--page-padding);
 }
 
