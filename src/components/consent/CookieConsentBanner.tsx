@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { useConsent } from "./ConsentContext";
 import { stripLocalePrefix } from "@/i18n/paths";
 
@@ -54,9 +55,9 @@ export function CookieConsentBanner() {
           </p>
           <p className="cookie-consent__body">
             {copy.body}{" "}
-            <a href={privacyHref} className="cookie-consent__link">
+            <TransitionLink href={privacyHref} className="cookie-consent__link">
               {copy.privacyLinkLabel}
-            </a>
+            </TransitionLink>
           </p>
         </div>
         <div className="cookie-consent__actions">
