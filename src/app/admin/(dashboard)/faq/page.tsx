@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+/** FAQ Q&A lives under Metric Home (also still available from Agency). */
 export default async function RedirectFaq({
   searchParams,
 }: {
@@ -7,5 +8,5 @@ export default async function RedirectFaq({
 }) {
   const params = await searchParams;
   const edit = params.edit ? `&edit=${encodeURIComponent(params.edit)}` : "";
-  redirect(`/admin/agency/?section=faq${edit}`);
+  redirect(`/admin/metric-home/?section=faq${edit}`);
 }

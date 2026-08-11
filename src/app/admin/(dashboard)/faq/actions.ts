@@ -42,7 +42,7 @@ export async function saveFaqAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "faq"]);
-  return adminRedirect(`/admin/agency/?section=faq&edit=${faqId}`);
+  return adminRedirect(`/admin/metric-home/?section=faq&edit=${faqId}`);
 }
 
 export async function createFaqAction() {
@@ -65,7 +65,7 @@ export async function createFaqAction() {
   );
 
   revalidateCms(["cms", "faq"]);
-  return adminRedirect(`/admin/agency/?section=faq&edit=${data.id}`);
+  return adminRedirect(`/admin/metric-home/?section=faq&edit=${data.id}`);
 }
 
 export async function deleteFaqAction(formData: FormData) {
@@ -73,13 +73,14 @@ export async function deleteFaqAction(formData: FormData) {
   const supabase = createSupabaseAdminClient();
   await supabase.from("metric_faq_items").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "faq"]);
-  return adminRedirect("/admin/agency/?section=faq");
+  return adminRedirect("/admin/metric-home/?section=faq");
 }
 
 export async function reorderFaqAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
+  const { T } = await import("@/lib/cms/tables");
   return reorderCmsRows({
-    table: "faq_items",
+    table: T.faqItems,
     orderedIds,
     tags: ["cms", "faq"],
     successMessage: "Порядок FAQ сохранён",

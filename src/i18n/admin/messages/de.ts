@@ -7,7 +7,7 @@ export const deAdmin: AdminMessages = {
     home: "Home",
     agency: "Agency",
     works: "Works",
-    services: "Services",
+    services: "Services catalog",
     contacts: "Contacts",
     leads: "Leads",
     media: "Media",
@@ -380,8 +380,19 @@ export const deAdmin: AdminMessages = {
     home: {
       title: "Home",
       description:
-        "Home page blocks: process and “Why choose us”. Works and services have their own pages.",
+        "Edit homepage sections 1:1 with the public site: hero, trust, categories, case studies, services, workflow, FAQ, nav and footer.",
       alsoOnHome: "Also on the home page:",
+      sectionHero: "Hero",
+      sectionTrust: "Trust",
+      sectionCategories: "Categories",
+      sectionCaseStudies: "Case studies",
+      sectionServices: "Services block",
+      sectionWorkflow: "Workflow",
+      sectionFaq: "FAQ",
+      sectionNavFooter: "Nav & footer",
+      sectionAdvanced: "Advanced JSON",
+      contactsSettingsHint:
+        "Phone, address, and social URLs are managed in Contacts / Settings — not duplicated in this payload.",
     },
     works: {
       title: "Works",
@@ -405,15 +416,15 @@ export const deAdmin: AdminMessages = {
       noPhoto: "No photo",
     },
     services: {
-      title: "Services",
+      title: "Services catalog",
       description:
-        "Service cards. Drag a card to reorder. Click to edit.",
+        "Service cards for the /services/ page. Drag a card to reorder. Click to edit. Homepage services block is under Home.",
       newItem: "New service",
       editTitle: "Edit service",
       empty: "No services yet.",
       titlePlaceholder: "Service title",
       shortPlaceholder: "Short description…",
-      sectionLabel: "Services",
+      sectionLabel: "Services catalog",
     },
     testimonials: {
       title: "Testimonials",
@@ -431,7 +442,7 @@ export const deAdmin: AdminMessages = {
     faq: {
       title: "FAQ",
       description:
-        "Questions on the agency page. Drag a card to reorder. Click to edit.",
+        "Questions and answers shown on the homepage FAQ section. Drag a card to reorder. Click to edit.",
       newItem: "New question",
       editTitle: "Edit FAQ",
       questionPlaceholder: "Question…",
@@ -440,8 +451,9 @@ export const deAdmin: AdminMessages = {
       answerLabel: "Answer",
     },
     process: {
-      title: "Process",
-      description: "Process steps on the home page. List position = step number on the site.",
+      title: "Process (legacy)",
+      description:
+        "Deprecated — not used on the Metric homepage. Use Home → Workflow instead.",
       newItem: "New step",
       editTitle: "Edit step",
       stepLabel: "Step {n}",
@@ -451,8 +463,9 @@ export const deAdmin: AdminMessages = {
       descriptionLabel: "Description",
     },
     benefits: {
-      title: "Why choose us",
-      description: "Section title and benefit list on the home page.",
+      title: "Why choose us (legacy)",
+      description:
+        "Deprecated — not used on the Metric homepage. Use Home sections instead.",
       newItem: "New benefit",
       editTitle: "Edit benefit",
       labelPlaceholder: "Benefit…",
@@ -466,11 +479,12 @@ export const deAdmin: AdminMessages = {
       previewLabel: "Title preview",
       saveTitle: "Save title",
       listTitle: "Bullet list",
-      listDescription: "Short lines with a slash on the home page.",
+      listDescription: "Legacy list — not rendered on Metric home.",
     },
     agency: {
       title: "Agency",
-      description: "Agency page content: about, team, testimonials, FAQ.",
+      description:
+        "Agency page: about, team, testimonials. Homepage FAQ is also editable under Home → FAQ.",
       sectionAbout: "About",
       languageLabel: "Language",
       paragraphsEmpty: "Add paragraphs…",

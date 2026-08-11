@@ -146,8 +146,9 @@ export async function deleteTeamMemberAction(formData: FormData) {
 
 export async function reorderTeamMembersAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
+  const { T } = await import("@/lib/cms/tables");
   return reorderCmsRows({
-    table: "team_members",
+    table: T.teamMembers,
     orderedIds,
     tags: ["cms", "team"],
     successMessage: "Порядок команды сохранён",

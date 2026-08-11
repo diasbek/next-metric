@@ -338,8 +338,9 @@ export async function deleteProjectMediaAction(formData: FormData) {
 
 export async function reorderProjectsAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
+  const { T } = await import("@/lib/cms/tables");
   return reorderCmsRows({
-    table: "projects",
+    table: T.projects,
     orderedIds,
     tags: ["cms", "projects"],
     successMessage: "Порядок проектов сохранён",

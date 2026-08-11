@@ -1,69 +1,58 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import dynamic from "next/dynamic";
+import { useState } from "react";
 import { HardNavForm } from "@/components/admin/HardNavForm";
-import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
+import { AdminPageShell } from "@/components/admin/page-shell/AdminPageShell";
 import { ADMIN_LOCALES, type AdminLocale } from "@/components/admin/ui/locales";
-import {
-  adminBtnPrimary,
-  adminInput,
-} from "@/components/admin/ui/styles";
+import { adminBtnPrimary } from "@/components/admin/ui/styles";
 import { saveMetricHomeAction } from "@/app/admin/(dashboard)/metric-home/actions";
+import type { FaqDraft } from "@/components/admin/list-cms/types";
+import {
+  isMetricHomeSection,
+  type MetricHomeSectionId,
+} from "@/components/admin/metric-home/helpers";
+import {
+  AdvancedJsonEditor,
+  CaseStudiesSectionEditor,
+  CategoriesSectionEditor,
+  FaqChromeEditor,
+  HeroSectionEditor,
+  HomeServicesSectionEditor,
+  NavFooterSectionEditor,
+  PublishBar,
+  SaveButton,
+  TrustSectionEditor,
+  WorkflowSectionEditor,
+  type ProjectOption,
+} from "@/components/admin/metric-home/MetricHomeSectionEditors";
 import { useAdminT } from "@/i18n/admin";
 
+const FaqEditor = dynamic(
+  () =>
+    import("@/components/admin/list-cms/FaqEditor").then((m) => m.FaqEditor),
+  { ssr: false },
+);
+
 type Props = {
+  section: string;
   status: "draft" | "published";
   payloads: { en: Record<string, unknown>; de: Record<string, unknown> };
+  projects: ProjectOption[];
+  faq: FaqDraft[];
+  faqEditId?: string | null;
   saved?: boolean;
 };
 
-const fieldset: CSSProperties = {
-  border: "1px solid #333",
-  padding: 16,
-  display: "grid",
-  gap: 12,
-  marginBottom: 16,
-};
-
-const label: CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  color: "#aaa",
-  marginBottom: 4,
-};
-
-function asRecord(value: unknown): Record<string, unknown> {
-  if (value && typeof value === "object" && !Array.isArray(value)) {
-    return value as Record<string, unknown>;
-  }
-  return {};
-}
-
-function readString(obj: Record<string, unknown>, key: string): string {
-  const v = obj[key];
-  return typeof v === "string" ? v : "";
-}
-
-function readStringArray(obj: Record<string, unknown>, key: string): string[] {
-  const v = obj[key];
-  return Array.isArray(v) ? v.map((item) => String(item ?? "")) : [];
-}
-
-function patchSection(
-  payload: Record<string, unknown>,
-  section: string,
-  patch: Record<string, unknown>,
-): Record<string, unknown> {
-  return {
-    ...payload,
-    [section]: {
-      ...asRecord(payload[section]),
-      ...patch,
-    },
-  };
-}
-
-export function MetricHomeAdmin({ status, payloads, saved = false }: Props) {
+export function MetricHomeAdmin({
+  section,
+  status,
+  payloads,
+  projects,
+  faq,
+  faqEditId = null,
+  saved = false,
+}: Props) {
   const t = useAdminT();
   const [locale, setLocale] = useState<AdminLocale>("en");
   const [publishStatus, setPublishStatus] = useState(status);
@@ -72,12 +61,23 @@ export function MetricHomeAdmin({ status, payloads, saved = false }: Props) {
     JSON.stringify(payloads.en, null, 2),
   );
 
+  const sections = [
+    { id: "hero", label: t.pages.home.sectionHero },
+    { id: "trust", label: t.pages.home.sectionTrust },
+    { id: "categories", label: t.pages.home.sectionCategories },
+    { id: "case-studies", label: t.pages.home.sectionCaseStudies },
+    { id: "services", label: t.pages.home.sectionServices },
+    { id: "workflow", label: t.pages.home.sectionWorkflow },
+    { id: "faq", label: t.pages.home.sectionFaq },
+    { id: "nav-footer", label: t.pages.home.sectionNavFooter },
+    { id: "advanced", label: t.pages.home.sectionAdvanced },
+  ];
+
+  const active: MetricHomeSectionId = isMetricHomeSection(section)
+    ? section
+    : "hero";
+
   const current = drafts[locale];
-  const hero = asRecord(current.hero);
-  const services = asRecord(current.services);
-  const faq = asRecord(current.faq);
-  const workflow = asRecord(current.workflow);
-  const serviceTitleLines = readStringArray(services, "titleLines");
 
   function updateLocalePayload(next: Record<string, unknown>) {
     setDrafts((prev) => ({ ...prev, [locale]: next }));
@@ -90,35 +90,46 @@ export function MetricHomeAdmin({ status, payloads, saved = false }: Props) {
   }
 
   return (
-    <div>
-      <AdminPageHeader
-        title={t.pages.home.title}
-        description="Homepage hero, services, FAQ chrome, workflow, and full JSON payload."
-      />
-
-      {saved ? (
-        <p style={{ color: "#7dffa0", marginBottom: 16 }}>{t.common.saved}</p>
-      ) : null}
-
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        {ADMIN_LOCALES.map((item) => (
-          <button
-            key={item.code}
-            type="button"
-            onClick={() => switchLocale(item.code)}
-            style={{
-              ...adminBtnPrimary,
-              background: locale === item.code ? "#2600ff" : "#1a1a1a",
-              borderColor: locale === item.code ? "#2600ff" : "#444",
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
+    <AdminPageShell
+      title={t.pages.home.title}
+      publicPath="/"
+      description={t.pages.home.description}
+      sections={sections}
+      activeSection={active}
+      basePath="/admin/metric-home/"
+      extra={
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            marginBottom: 16,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
+          {ADMIN_LOCALES.map((item) => (
+            <button
+              key={item.code}
+              type="button"
+              onClick={() => switchLocale(item.code)}
+              style={{
+                ...adminBtnPrimary,
+                background: locale === item.code ? "#2600ff" : "#1a1a1a",
+                borderColor: locale === item.code ? "#2600ff" : "#444",
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+          {saved ? (
+            <span style={{ color: "#7dffa0", fontSize: 13 }}>{t.common.saved}</span>
+          ) : null}
+        </div>
+      }
+    >
       <HardNavForm action={saveMetricHomeAction}>
         <input type="hidden" name="status" value={publishStatus} />
+        <input type="hidden" name="section" value={active} />
         <input
           type="hidden"
           name="en_payload"
@@ -130,264 +141,86 @@ export function MetricHomeAdmin({ status, payloads, saved = false }: Props) {
           value={JSON.stringify(drafts.de)}
         />
 
-        <fieldset style={fieldset}>
-          <legend style={{ padding: "0 6px", color: "#fff" }}>Publish</legend>
-          <label style={{ display: "grid", gap: 4 }}>
-            <span style={label}>Status</span>
-            <select
-              style={adminInput}
-              value={publishStatus}
-              onChange={(e) =>
-                setPublishStatus(
-                  e.target.value === "published" ? "published" : "draft",
-                )
-              }
-            >
-              <option value="draft">draft</option>
-              <option value="published">published</option>
-            </select>
-          </label>
-        </fieldset>
+        <PublishBar status={publishStatus} onChange={setPublishStatus} />
 
-        <fieldset style={fieldset}>
-          <legend style={{ padding: "0 6px", color: "#fff" }}>
-            Hero ({locale.toUpperCase()})
-          </legend>
-          <div>
-            <span style={label}>Title line 1</span>
-            <input
-              style={adminInput}
-              value={readString(hero, "titleLine1")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "hero", { titleLine1: e.target.value }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>Title line 2</span>
-            <input
-              style={adminInput}
-              value={readString(hero, "titleLine2")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "hero", { titleLine2: e.target.value }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>Subtitle</span>
-            <textarea
-              style={{ ...adminInput, minHeight: 80 }}
-              value={readString(hero, "subtitle")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "hero", { subtitle: e.target.value }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>CTA</span>
-            <input
-              style={adminInput}
-              value={readString(hero, "cta")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "hero", { cta: e.target.value }),
-                )
-              }
-            />
-          </div>
-        </fieldset>
-
-        <fieldset style={fieldset}>
-          <legend style={{ padding: "0 6px", color: "#fff" }}>
-            Services ({locale.toUpperCase()})
-          </legend>
-          <div>
-            <span style={label}>Title line 1</span>
-            <input
-              style={adminInput}
-              value={serviceTitleLines[0] ?? ""}
-              onChange={(e) => {
-                const lines = [...serviceTitleLines];
-                lines[0] = e.target.value;
-                updateLocalePayload(
-                  patchSection(current, "services", { titleLines: lines }),
-                );
-              }}
-            />
-          </div>
-          <div>
-            <span style={label}>Title line 2</span>
-            <input
-              style={adminInput}
-              value={serviceTitleLines[1] ?? ""}
-              onChange={(e) => {
-                const lines = [...serviceTitleLines];
-                lines[1] = e.target.value;
-                updateLocalePayload(
-                  patchSection(current, "services", { titleLines: lines }),
-                );
-              }}
-            />
-          </div>
-          <div>
-            <span style={label}>Subtitle</span>
-            <textarea
-              style={{ ...adminInput, minHeight: 80 }}
-              value={readString(services, "subtitle")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "services", {
-                    subtitle: e.target.value,
-                  }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>CTA</span>
-            <input
-              style={adminInput}
-              value={readString(services, "cta")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "services", { cta: e.target.value }),
-                )
-              }
-            />
-          </div>
-        </fieldset>
-
-        <fieldset style={fieldset}>
-          <legend style={{ padding: "0 6px", color: "#fff" }}>
-            FAQ chrome ({locale.toUpperCase()})
-          </legend>
-          <div>
-            <span style={label}>Title</span>
-            <input
-              style={adminInput}
-              value={readString(faq, "title")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "faq", { title: e.target.value }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>Subtitle</span>
-            <textarea
-              style={{ ...adminInput, minHeight: 80 }}
-              value={readString(faq, "subtitle")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "faq", { subtitle: e.target.value }),
-                )
-              }
-            />
-          </div>
-        </fieldset>
-
-        <fieldset style={fieldset}>
-          <legend style={{ padding: "0 6px", color: "#fff" }}>
-            Workflow ({locale.toUpperCase()})
-          </legend>
-          <div>
-            <span style={label}>Title line 1</span>
-            <input
-              style={adminInput}
-              value={readString(workflow, "titleLine1")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "workflow", {
-                    titleLine1: e.target.value,
-                  }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>Title line 2</span>
-            <input
-              style={adminInput}
-              value={readString(workflow, "titleLine2")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "workflow", {
-                    titleLine2: e.target.value,
-                  }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>Subtitle</span>
-            <input
-              style={adminInput}
-              value={readString(workflow, "subtitle")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "workflow", {
-                    subtitle: e.target.value,
-                  }),
-                )
-              }
-            />
-          </div>
-          <div>
-            <span style={label}>CTA</span>
-            <input
-              style={adminInput}
-              value={readString(workflow, "cta")}
-              onChange={(e) =>
-                updateLocalePayload(
-                  patchSection(current, "workflow", { cta: e.target.value }),
-                )
-              }
-            />
-          </div>
-        </fieldset>
-
-        <fieldset style={fieldset}>
-          <legend style={{ padding: "0 6px", color: "#fff" }}>
-            Full payload JSON ({locale.toUpperCase()}) — advanced
-          </legend>
-          <textarea
-            style={{
-              ...adminInput,
-              minHeight: 280,
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              fontSize: 12,
-            }}
-            value={jsonDraft}
-            onChange={(e) => {
-              const text = e.target.value;
-              setJsonDraft(text);
-              try {
-                const parsed = JSON.parse(text) as unknown;
-                if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-                  setDrafts((prev) => ({
-                    ...prev,
-                    [locale]: parsed as Record<string, unknown>,
-                  }));
-                }
-              } catch {
-                // keep typing until JSON is valid
-              }
-            }}
-            spellCheck={false}
+        {active === "hero" ? (
+          <HeroSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
           />
-        </fieldset>
+        ) : null}
+        {active === "trust" ? (
+          <TrustSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+          />
+        ) : null}
+        {active === "categories" ? (
+          <CategoriesSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+          />
+        ) : null}
+        {active === "case-studies" ? (
+          <CaseStudiesSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+            projects={projects}
+          />
+        ) : null}
+        {active === "services" ? (
+          <HomeServicesSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+          />
+        ) : null}
+        {active === "workflow" ? (
+          <WorkflowSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+          />
+        ) : null}
+        {active === "faq" ? (
+          <FaqChromeEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+          />
+        ) : null}
+        {active === "nav-footer" ? (
+          <NavFooterSectionEditor
+            locale={locale}
+            current={current}
+            update={updateLocalePayload}
+          />
+        ) : null}
+        {active === "advanced" ? (
+          <AdvancedJsonEditor
+            locale={locale}
+            value={jsonDraft}
+            onChange={(text, parsed) => {
+              setJsonDraft(text);
+              if (parsed) {
+                setDrafts((prev) => ({ ...prev, [locale]: parsed }));
+              }
+            }}
+          />
+        ) : null}
 
-        <button type="submit" style={adminBtnPrimary}>
-          {t.common.save}
-        </button>
+        <SaveButton />
       </HardNavForm>
-    </div>
+
+      {active === "faq" ? (
+        <div style={{ marginTop: 24 }}>
+          <FaqEditor items={faq} initialEditId={faqEditId} embedded />
+        </div>
+      ) : null}
+    </AdminPageShell>
   );
 }

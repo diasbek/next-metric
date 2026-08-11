@@ -9,13 +9,14 @@ import {
 import { revalidateCms, type CmsTag } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { T } from "@/lib/cms/tables";
 
 type ReorderTable =
-  | "faq_items"
-  | "testimonials"
-  | "services"
-  | "projects"
-  | "team_members";
+  | typeof T.faqItems
+  | typeof T.testimonials
+  | typeof T.services
+  | typeof T.projects
+  | typeof T.teamMembers;
 
 /** Persist 0-based sort_order for a list of ids. Used by admin DnD grids. */
 export async function reorderCmsRows(options: {

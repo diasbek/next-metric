@@ -75,8 +75,9 @@ export async function deleteServiceAction(formData: FormData) {
 
 export async function reorderServicesAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
+  const { T } = await import("@/lib/cms/tables");
   return reorderCmsRows({
-    table: "services",
+    table: T.services,
     orderedIds,
     tags: ["cms", "services"],
     successMessage: "Порядок услуг сохранён",

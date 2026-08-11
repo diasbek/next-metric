@@ -45,7 +45,8 @@ export default async function AdminHomePage() {
 
   const shortcuts = [
     { label: t.dashboard.homePage, href: "/admin/metric-home/" },
-    { label: t.dashboard.agencyPage, href: "/admin/agency/" },
+    { label: t.dashboard.works, href: "/admin/works/" },
+    { label: t.nav.leads, href: "/admin/leads/" },
     { label: t.dashboard.contacts, href: "/admin/contacts/" },
   ];
 

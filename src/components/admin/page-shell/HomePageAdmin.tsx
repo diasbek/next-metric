@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * @deprecated Legacy Timsol-style process / why-us homepage editor.
+ * Metric home content lives at `/admin/metric-home/`. Routes under
+ * `/admin/home|process|benefits` redirect there.
+ */
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { BenefitDraft, ProcessDraft } from "@/components/admin/list-cms/types";

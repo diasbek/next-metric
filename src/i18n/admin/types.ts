@@ -346,6 +346,16 @@ export type AdminMessages = {
       title: string;
       description: string;
       alsoOnHome: string;
+      sectionHero: string;
+      sectionTrust: string;
+      sectionCategories: string;
+      sectionCaseStudies: string;
+      sectionServices: string;
+      sectionWorkflow: string;
+      sectionFaq: string;
+      sectionNavFooter: string;
+      sectionAdvanced: string;
+      contactsSettingsHint: string;
     };
     works: {
       title: string;

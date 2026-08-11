@@ -96,8 +96,9 @@ export async function deleteTestimonialAction(formData: FormData) {
 
 export async function reorderTestimonialsAction(orderedIds: string[]) {
   const { reorderCmsRows } = await import("@/lib/cms/reorder");
+  const { T } = await import("@/lib/cms/tables");
   return reorderCmsRows({
-    table: "testimonials",
+    table: T.testimonials,
     orderedIds,
     tags: ["cms", "testimonials"],
     successMessage: "Порядок отзывов сохранён",

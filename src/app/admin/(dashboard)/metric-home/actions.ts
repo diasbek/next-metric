@@ -51,7 +51,12 @@ export async function saveMetricHomeAction(formData: FormData) {
       if (error) return adminFail(error.message);
     }
 
+    const section = String(formData.get("section") ?? "hero").trim() || "hero";
+
     revalidateCms(["cms", "home", "metric-home"]);
-    return adminRedirect("/admin/metric-home/?saved=1", t.common.saved);
+    return adminRedirect(
+      `/admin/metric-home/?section=${encodeURIComponent(section)}&saved=1`,
+      t.common.saved,
+    );
   });
 }
