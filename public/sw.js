@@ -1,5 +1,5 @@
 /* METRIC installability SW — network-first, keeps Chrome "Install app" criteria. */
-const CACHE = "metric-shell-v2";
+const CACHE = "metric-shell-v3";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
