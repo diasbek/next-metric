@@ -12,7 +12,6 @@
     "dev": "next dev",
     "prebuild": "node scripts/generate-manifest.js",
     "build": "next build",
-    "postbuild": "tsx scripts/create-cms-admin.ts --soft",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
