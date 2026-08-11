@@ -345,7 +345,6 @@ export type AdminMessages = {
     home: {
       title: string;
       description: string;
-      alsoOnHome: string;
       sectionHero: string;
       sectionTrust: string;
       sectionCategories: string;
@@ -410,35 +409,6 @@ export type AdminMessages = {
       answerPlaceholder: string;
       questionLabel: string;
       answerLabel: string;
-    };
-    process: {
-      title: string;
-      description: string;
-      newItem: string;
-      editTitle: string;
-      stepLabel: string;
-      titlePlaceholder: string;
-      descriptionPlaceholder: string;
-      titleLabel: string;
-      descriptionLabel: string;
-    };
-    benefits: {
-      title: string;
-      description: string;
-      newItem: string;
-      editTitle: string;
-      labelPlaceholder: string;
-      textLabel: string;
-      sectionTitle: string;
-      sectionTitleHint: string;
-      titleLine1Label: string;
-      titleLine2Label: string;
-      titleLine1Placeholder: string;
-      titleLine2Placeholder: string;
-      previewLabel: string;
-      saveTitle: string;
-      listTitle: string;
-      listDescription: string;
     };
     agency: {
       title: string;

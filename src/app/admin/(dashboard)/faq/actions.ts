@@ -42,7 +42,7 @@ export async function saveFaqAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "faq"]);
-  return adminRedirect(`/admin/metric-home/?section=faq&edit=${faqId}`);
+  return adminRedirect(`/admin/home/?section=faq&edit=${faqId}`);
 }
 
 export async function createFaqAction() {
@@ -65,7 +65,7 @@ export async function createFaqAction() {
   );
 
   revalidateCms(["cms", "faq"]);
-  return adminRedirect(`/admin/metric-home/?section=faq&edit=${data.id}`);
+  return adminRedirect(`/admin/home/?section=faq&edit=${data.id}`);
 }
 
 export async function deleteFaqAction(formData: FormData) {
@@ -73,7 +73,7 @@ export async function deleteFaqAction(formData: FormData) {
   const supabase = createSupabaseAdminClient();
   await supabase.from("metric_faq_items").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "faq"]);
-  return adminRedirect("/admin/metric-home/?section=faq");
+  return adminRedirect("/admin/home/?section=faq");
 }
 
 export async function reorderFaqAction(orderedIds: string[]) {

@@ -11,7 +11,4 @@ export const EMBED = {
     "testimonial_translations:metric_testimonial_translations(*)",
   projectTranslations:
     "project_translations:metric_project_translations(locale, title)",
-  processStepTranslations:
-    "process_step_translations:metric_process_step_translations(*)",
-  benefitTranslations: "benefit_translations:metric_benefit_translations(*)",
 } as const;

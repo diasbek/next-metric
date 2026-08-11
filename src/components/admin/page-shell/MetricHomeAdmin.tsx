@@ -6,7 +6,7 @@ import { HardNavForm } from "@/components/admin/HardNavForm";
 import { AdminPageShell } from "@/components/admin/page-shell/AdminPageShell";
 import { ADMIN_LOCALES, type AdminLocale } from "@/components/admin/ui/locales";
 import { adminBtnPrimary } from "@/components/admin/ui/styles";
-import { saveMetricHomeAction } from "@/app/admin/(dashboard)/metric-home/actions";
+import { saveMetricHomeAction } from "@/app/admin/(dashboard)/home/actions";
 import type { FaqDraft } from "@/components/admin/list-cms/types";
 import {
   isMetricHomeSection,
@@ -96,7 +96,7 @@ export function MetricHomeAdmin({
       description={t.pages.home.description}
       sections={sections}
       activeSection={active}
-      basePath="/admin/metric-home/"
+      basePath="/admin/home/"
       extra={
         <div
           style={{

@@ -80,23 +80,14 @@ export async function getResolvedContent(locale: Locale): Promise<SiteContent> {
   const hasCmsTitleLines = cmsAbout.titleLines.some((line) => line.trim().length > 0);
   const hasCmsParagraphs = cmsAbout.paragraphs.some((p) => p.trim().length > 0);
   const hasCmsStats = extras.agency.stats.length > 0;
-  const hasCmsWhyUsTitle = extras.whyUsTitleLines.some((line) => line.trim().length > 0);
 
   return {
     ...base,
     projects,
     services: extras.services.length ? extras.services : base.services,
     faq: extras.faq.length ? extras.faq : base.faq,
-    processSteps: extras.processSteps.length ? extras.processSteps : base.processSteps,
-    benefits: extras.benefits.length ? extras.benefits : base.benefits,
     sections: {
       ...base.sections,
-      whyUsTitleLines: hasCmsWhyUsTitle
-        ? ([
-            extras.whyUsTitleLines[0]?.trim() || base.sections.whyUsTitleLines[0],
-            extras.whyUsTitleLines[1]?.trim() || base.sections.whyUsTitleLines[1],
-          ] as [string, string])
-        : base.sections.whyUsTitleLines,
     },
     agency: {
       ...base.agency,

@@ -159,8 +159,5 @@ export const deContent: SiteContent = {
       { title: "A+ Content", cta: "Mehr erfahren" },
       { title: "Brand Store", cta: "Mehr erfahren" },
     ],
-    processTitle: ["So entsteht", "Metric"],
-    whyUs: "Warum Marken Metric wählen",
-    whyUsTitleLines: ["So entsteht", "Metric"],
   },
 };

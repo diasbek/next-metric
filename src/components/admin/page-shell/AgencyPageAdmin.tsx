@@ -74,7 +74,7 @@ export function AgencyPageAdmin({
         <p style={{ margin: "0 0 16px", fontSize: 13, color: "#888" }}>
           {t.pages.agency.faqHomeHint}{" "}
           <Link
-            href="/admin/metric-home/?section=faq"
+            href="/admin/home/?section=faq"
             style={{ ...adminBtn, textDecoration: "none", display: "inline-flex" }}
           >
             {t.pages.faq.title}

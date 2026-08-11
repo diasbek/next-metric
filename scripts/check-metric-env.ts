@@ -131,7 +131,7 @@ async function main() {
   }
 
   console.log("All checks passed.");
-  console.log("Login: /admin/login/  |  Setup: /admin/setup/  |  Home: /admin/metric-home/");
+  console.log("Login: /admin/login/  |  Setup: /admin/setup/  |  Home: /admin/home/");
 }
 
 main().catch((error) => {

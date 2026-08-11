@@ -55,7 +55,7 @@ export async function saveMetricHomeAction(formData: FormData) {
 
     revalidateCms(["cms", "home", "metric-home"]);
     return adminRedirect(
-      `/admin/metric-home/?section=${encodeURIComponent(section)}&saved=1`,
+      `/admin/home/?section=${encodeURIComponent(section)}&saved=1`,
       t.common.saved,
     );
   });

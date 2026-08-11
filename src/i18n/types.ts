@@ -1,6 +1,5 @@
 import type { FAQItem } from "@/data/faq";
 import type { CaseStudy, Project } from "@/data/projects";
-import type { ProcessStep } from "@/data/process";
 import type { Service } from "@/data/services";
 import type { Testimonial } from "@/data/agency";
 import type { PageKey } from "./config";
@@ -128,15 +127,10 @@ export interface SiteContent {
     testimonials: Testimonial[];
   };
   faq: FAQItem[];
-  benefits: string[];
-  processSteps: ProcessStep[];
   sphereFilters: readonly string[];
   directionFilters: readonly string[];
   sections: {
     servicesHome: { title: string; cta: string }[];
-    processTitle: [string, string];
-    whyUs: string;
-    whyUsTitleLines: [string, string];
   };
 }
 

@@ -238,66 +238,6 @@ async function seedFaq(supabase: ReturnType<typeof admin>) {
   console.log(`faq: ${locales.en.faq.length}`);
 }
 
-async function seedProcess(supabase: ReturnType<typeof admin>) {
-  await supabase.from("metric_process_step_translations").delete().neq("locale", "");
-  await supabase
-    .from("metric_process_steps")
-    .delete()
-    .neq("id", "00000000-0000-0000-0000-000000000000");
-
-  for (let i = 0; i < locales.en.processSteps.length; i++) {
-    const ru = locales.en.processSteps[i];
-    const { data: step, error } = await supabase
-      .from("metric_process_steps")
-      .insert({ step_number: ru.number, sort_order: i, status: "published" })
-      .select("id")
-      .single();
-    if (error || !step) throw new Error(`process ${i}: ${error?.message}`);
-
-    for (const locale of Object.keys(locales) as Locale[]) {
-      const item = locales[locale].processSteps[i];
-      if (!item) continue;
-      const { error: trError } = await supabase.from("metric_process_step_translations").insert({
-        step_id: step.id,
-        locale,
-        title: item.title,
-        description: item.description,
-      });
-      if (trError) throw new Error(`process tr ${i}/${locale}: ${trError.message}`);
-    }
-  }
-  console.log(`process: ${locales.en.processSteps.length}`);
-}
-
-async function seedBenefits(supabase: ReturnType<typeof admin>) {
-  await supabase.from("metric_benefit_translations").delete().neq("locale", "");
-  await supabase
-    .from("metric_benefits")
-    .delete()
-    .neq("id", "00000000-0000-0000-0000-000000000000");
-
-  for (let i = 0; i < locales.en.benefits.length; i++) {
-    const { data: benefit, error } = await supabase
-      .from("metric_benefits")
-      .insert({ sort_order: i, status: "published" })
-      .select("id")
-      .single();
-    if (error || !benefit) throw new Error(`benefit ${i}: ${error?.message}`);
-
-    for (const locale of Object.keys(locales) as Locale[]) {
-      const label = locales[locale].benefits[i];
-      if (!label) continue;
-      const { error: trError } = await supabase.from("metric_benefit_translations").insert({
-        benefit_id: benefit.id,
-        locale,
-        label,
-      });
-      if (trError) throw new Error(`benefit tr ${i}/${locale}: ${trError.message}`);
-    }
-  }
-  console.log(`benefits: ${locales.en.benefits.length}`);
-}
-
 async function seedTeam(supabase: ReturnType<typeof admin>) {
   await supabase.from("metric_team_member_translations").delete().neq("locale", "");
   await supabase
@@ -416,20 +356,6 @@ async function seedAgency(supabase: ReturnType<typeof admin>) {
   console.log("agency: ok");
 }
 
-async function seedHomeWhyUs(supabase: ReturnType<typeof admin>) {
-  for (const locale of Object.keys(locales) as Locale[]) {
-    const lines = locales[locale].sections.whyUsTitleLines;
-    const { error } = await supabase.from("metric_home_translations").upsert({
-      locale,
-      why_us_title_line_1: lines[0] ?? "",
-      why_us_title_line_2: lines[1] ?? "",
-      updated_at: new Date().toISOString(),
-    });
-    if (error) throw new Error(`home_translations ${locale}: ${error.message}`);
-  }
-  console.log("home why-us titles: ok");
-}
-
 async function seedSettingsAndSeo(supabase: ReturnType<typeof admin>) {
   const site = locales.en.site;
   const { error } = await supabase.from("metric_site_settings").upsert({
@@ -482,9 +408,6 @@ async function main() {
   await seedProjects(supabase);
   await seedServices(supabase);
   await seedFaq(supabase);
-  await seedProcess(supabase);
-  await seedBenefits(supabase);
-  await seedHomeWhyUs(supabase);
   await seedTeam(supabase);
   await seedTestimonials(supabase);
   await seedAgency(supabase);

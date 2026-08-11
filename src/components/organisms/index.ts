@@ -6,8 +6,6 @@ export { ServicesSection } from "./ServicesSection";
 export { ServicesPageSection } from "./ServicesPageSection";
 export { AgencyPageSection } from "./AgencyPageSection";
 export { ContactsPageSection } from "./ContactsPageSection";
-export { ProcessSection } from "./ProcessSection";
-export { WhyUsSection } from "./WhyUsSection";
 export { ContactSection } from "./ContactSection";
 export { SiteFooter } from "./SiteFooter";
 export {

@@ -2,7 +2,6 @@ import { createSupabasePublicClient, hasSupabasePublicConfig } from "@/lib/supab
 import type { Locale } from "@/i18n/config";
 import type { Service } from "@/data/services";
 import type { FAQItem } from "@/data/faq";
-import type { ProcessStep } from "@/data/process";
 import type { Testimonial } from "@/data/agency";
 import { unstable_cache } from "next/cache";
 
@@ -16,13 +15,10 @@ async function loadExtras(locale: Locale) {
     const [
       servicesRes,
       faqRes,
-      processRes,
-      benefitsRes,
       teamRes,
       testimonialsRes,
       agencyRes,
       agencyTrRes,
-      homeTrRes,
       settingsRes,
       settingsTrRes,
       seoRes,
@@ -38,16 +34,6 @@ async function loadExtras(locale: Locale) {
           .eq("status", "published")
           .order("sort_order"),
         supabase
-          .from("metric_process_steps")
-          .select("*, process_step_translations:metric_process_step_translations(*)")
-          .eq("status", "published")
-          .order("sort_order"),
-        supabase
-          .from("metric_benefits")
-          .select("*, benefit_translations:metric_benefit_translations(*)")
-          .eq("status", "published")
-          .order("sort_order"),
-        supabase
           .from("metric_team_members")
           .select("*, team_member_translations:metric_team_member_translations(*)")
           .eq("status", "published")
@@ -59,7 +45,6 @@ async function loadExtras(locale: Locale) {
           .order("sort_order"),
         supabase.from("metric_agency_content").select("*").eq("id", 1).maybeSingle(),
         supabase.from("metric_agency_translations").select("*").eq("locale", locale).maybeSingle(),
-        supabase.from("metric_home_translations").select("*").eq("locale", locale).maybeSingle(),
         supabase
           .from("metric_site_settings")
           .select(
@@ -103,29 +88,6 @@ async function loadExtras(locale: Locale) {
         return { question: tr.question, answer: tr.answer };
       })
       .filter(Boolean) as FAQItem[];
-
-    const processSteps: ProcessStep[] = (processRes.data ?? [])
-      .map((row) => {
-        const tr =
-          row.process_step_translations?.find((t: { locale: string }) => t.locale === locale) ??
-          row.process_step_translations?.[0];
-        if (!tr) return null;
-        return {
-          number: row.step_number,
-          title: tr.title,
-          description: tr.description,
-        };
-      })
-      .filter(Boolean) as ProcessStep[];
-
-    const benefits: string[] = (benefitsRes.data ?? [])
-      .map((row) => {
-        const tr =
-          row.benefit_translations?.find((t: { locale: string }) => t.locale === locale) ??
-          row.benefit_translations?.[0];
-        return tr?.label;
-      })
-      .filter(Boolean) as string[];
 
     const directorRow = (teamRes.data ?? []).find((m) => m.is_director);
     const team = (teamRes.data ?? [])
@@ -188,7 +150,6 @@ async function loadExtras(locale: Locale) {
 
     const agencyTr = agencyTrRes.data;
     const agencyContent = agencyRes.data;
-    const homeTr = homeTrRes.data;
 
     const pageSeo: Record<
       string,
@@ -205,12 +166,6 @@ async function loadExtras(locale: Locale) {
     return {
       services,
       faq,
-      processSteps,
-      benefits,
-      whyUsTitleLines: [
-        homeTr?.why_us_title_line_1 ?? "",
-        homeTr?.why_us_title_line_2 ?? "",
-      ] as [string, string],
       agency: {
         about: {
           title: agencyTr?.title ?? "",
@@ -253,8 +208,6 @@ export const getCmsExtras = (locale: Locale) =>
       "cms",
       "services",
       "faq",
-      "process",
-      "benefits",
       "home",
       "team",
       "testimonials",

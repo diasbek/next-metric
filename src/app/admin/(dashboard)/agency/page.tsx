@@ -93,7 +93,7 @@ export default async function AdminAgencyPage({
 
   if (section === "faq") {
     const edit = params.edit ? `&edit=${encodeURIComponent(params.edit)}` : "";
-    redirect(`/admin/metric-home/?section=faq${edit}`);
+    redirect(`/admin/home/?section=faq${edit}`);
   }
 
   const supabase = createSupabaseAdminClient();

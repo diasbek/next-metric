@@ -2,8 +2,6 @@ import { SITE_CONFIG, PAGE_META } from "@/utils/consts";
 import { projects } from "@/data/projects";
 import { services } from "@/data/services";
 import { faqItems } from "@/data/faq";
-import { benefits } from "@/data/benefits";
-import { processSteps } from "@/data/process";
 import { sphereFilters, directionFilters } from "@/data/filters";
 import {
   agencyDirector,
@@ -157,8 +155,6 @@ export const metricSiteContent: SiteContent = {
     testimonials: agencyTestimonials,
   },
   faq: faqItems,
-  benefits,
-  processSteps,
   sphereFilters,
   directionFilters,
   sections: {
@@ -167,8 +163,5 @@ export const metricSiteContent: SiteContent = {
       { title: "A+ Content", cta: "Learn more" },
       { title: "Brand Store", cta: "Learn more" },
     ],
-    processTitle: ["That’s how", "Metric is made"],
-    whyUs: "Why brands choose Metric",
-    whyUsTitleLines: ["That’s how", "Metric is made"],
   },
 };
