@@ -98,14 +98,14 @@ async function main() {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { count, error } = await admin
-      .from("admin_users")
+      .from("metric_admin_users")
       .select("user_id", { count: "exact", head: true });
     checks.push({
       ok: !error,
       label: "Admin client (service role)",
       detail: error
         ? error.message
-        : `admin_users=${count ?? 0} (0 → use /admin/setup/)`,
+        : `metric_admin_users=${count ?? 0} (0 → use /admin/setup/)`,
     });
   }
 

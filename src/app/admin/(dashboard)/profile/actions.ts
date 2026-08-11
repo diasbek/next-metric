@@ -42,7 +42,7 @@ export async function saveProfileAction(formData: FormData) {
     const bio = String(formData.get("bio") ?? "").trim();
 
     const { error } = await supabase
-      .from("admin_users")
+      .from("metric_admin_users")
       .update({
         display_name: displayName,
         job_title: jobTitle,
@@ -57,7 +57,7 @@ export async function saveProfileAction(formData: FormData) {
     await writeAuditLog({
       actor,
       action: "content.update",
-      entityType: "admin_users",
+      entityType: "metric_admin_users",
       entityId: actor.id,
       meta: { kind: "profile" },
     });
@@ -101,7 +101,7 @@ export async function changePasswordAction(formData: FormData) {
     await writeAuditLog({
       actor,
       action: "user.reset_password",
-      entityType: "admin_users",
+      entityType: "metric_admin_users",
       entityId: actor.id,
       meta: { kind: "self" },
     });

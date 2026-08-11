@@ -11,7 +11,7 @@ export default async function AdminProfilePage({
   const params = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .select(
       "email, role, display_name, job_title, bio, avatar_url, last_login_at, created_at",
     )

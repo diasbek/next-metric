@@ -53,7 +53,7 @@ export async function inviteAdminAction(formData: FormData) {
     });
   }
 
-  const { error: upsertError } = await supabase.from("admin_users").upsert({
+  const { error: upsertError } = await supabase.from("metric_admin_users").upsert({
     user_id: user.id,
     email,
     role,
@@ -66,7 +66,7 @@ export async function inviteAdminAction(formData: FormData) {
   await writeAuditLog({
     actor,
     action: "user.invite",
-    entityType: "admin_users",
+    entityType: "metric_admin_users",
     entityId: user.id,
     meta: { email, role },
   });
@@ -85,7 +85,7 @@ export async function changeAdminRoleAction(formData: FormData) {
 
   const supabase = createSupabaseAdminClient();
   const { data: target } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .select("user_id, role")
     .eq("user_id", userId)
     .maybeSingle();
@@ -98,7 +98,7 @@ export async function changeAdminRoleAction(formData: FormData) {
   }
 
   const { error } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .update({ role })
     .eq("user_id", userId);
   if (error) return adminRedirect(`/admin/users/?error=${encodeURIComponent(error.message)}`);
@@ -106,7 +106,7 @@ export async function changeAdminRoleAction(formData: FormData) {
   await writeAuditLog({
     actor,
     action: "user.role_change",
-    entityType: "admin_users",
+    entityType: "metric_admin_users",
     entityId: userId,
     meta: { from: target.role, to: role },
   });
@@ -123,7 +123,7 @@ export async function revokeAdminAction(formData: FormData) {
 
   const supabase = createSupabaseAdminClient();
   const { data: target } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .select("user_id, role, email")
     .eq("user_id", userId)
     .maybeSingle();
@@ -134,13 +134,13 @@ export async function revokeAdminAction(formData: FormData) {
     if (owners <= 1) return adminRedirect("/admin/users/?error=last-owner");
   }
 
-  await supabase.from("admin_users").delete().eq("user_id", userId);
+  await supabase.from("metric_admin_users").delete().eq("user_id", userId);
   // Keep auth user; revoke CMS access only
 
   await writeAuditLog({
     actor,
     action: "user.revoke",
-    entityType: "admin_users",
+    entityType: "metric_admin_users",
     entityId: userId,
     meta: { email: target.email },
   });
@@ -164,7 +164,7 @@ export async function resetAdminPasswordAction(formData: FormData) {
   await writeAuditLog({
     actor,
     action: "user.reset_password",
-    entityType: "admin_users",
+    entityType: "metric_admin_users",
     entityId: userId,
   });
 

@@ -1,7 +1,7 @@
-/** Canonical Metric CMS table names (content uses `metric_` prefix; auth does not). */
+/** Canonical Metric CMS table names — all Metric objects use `metric_` prefix. */
 export const T = {
-  adminUsers: "admin_users",
-  adminAuditLog: "admin_audit_log",
+  adminUsers: "metric_admin_users",
+  adminAuditLog: "metric_admin_audit_log",
   projects: "metric_projects",
   projectTranslations: "metric_project_translations",
   projectBlocks: "metric_project_blocks",
@@ -30,5 +30,7 @@ export const T = {
 
 export type MetricTable = (typeof T)[keyof typeof T];
 
-/** Public storage bucket for Metric CMS media. */
+/** Metric-only storage buckets (Timsol keeps unprefixed lead-attachments / site-files / media). */
 export const METRIC_MEDIA_BUCKET = "metric-media" as const;
+export const METRIC_LEAD_ATTACHMENTS_BUCKET = "metric-lead-attachments" as const;
+export const METRIC_SITE_FILES_BUCKET = "metric-site-files" as const;

@@ -9,8 +9,7 @@ alwaysApply: true
 |--|--|
 | **Org** | [ytizyeciuatpkgtpohgr](https://supabase.com/dashboard/org/ytizyeciuatpkgtpohgr) (minim) |
 | **Project** | [ginhgueucvaqxhphplmy](https://supabase.com/dashboard/project/ginhgueucvaqxhphplmy) |
-| **MCP** | `project_ref=ginhgueucvaqxhphplmy` in `.cursor/mcp.json` |
+| **Metric** | `metric_*` + `metric_is_admin()` + `metric-media` / `metric-lead-attachments` / `metric-site-files` |
+| **Timsol** | unprefixed + `is_admin()` + `lead-attachments` / `site-files` |
 
-On OAuth, pick org **minim** (`ytizyeciuatpkgtpohgr`), not diasbek's personal org.
-
-Apply Metric DDL only on `ginhgueucvaqxhphplmy` (`metric_*` tables). Do not use `gclkufubbimlxkuurozv` or `dksqshrlnmtabrsuyyoz` for this app.
+On OAuth pick org **minim**. Apply only Metric DDL (`metric_*`). Never mutate Timsol unprefixed tables from next-metric.

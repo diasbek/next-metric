@@ -20,7 +20,7 @@ export async function writeAuditLog(options: {
 }) {
   try {
     const supabase = createSupabaseAdminClient();
-    await supabase.from("admin_audit_log").insert({
+    await supabase.from("metric_admin_audit_log").insert({
       actor_id: options.actor.id,
       actor_email: options.actor.email,
       action: options.action,

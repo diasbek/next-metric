@@ -29,10 +29,12 @@ function listMigrations(): string[] {
     .filter((name) => name.endsWith(".sql"))
     .sort((a, b) => a.localeCompare(b));
 
-  // Metric fresh-install migrations only (skip legacy remaps like locales_en_de).
+  // Metric-era migrations only (skip Timsol legacy 20260714* and locales remaps).
   const metricOnly = all.filter(
     (name) =>
-      name.includes("metric_prefixed") || name.includes("metric_storage"),
+      name.includes("metric_prefixed") ||
+      name.includes("metric_storage") ||
+      name.includes("metric_auth"),
   );
   const files = metricOnly.length > 0 ? metricOnly : all;
 

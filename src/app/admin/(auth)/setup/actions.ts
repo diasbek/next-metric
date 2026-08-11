@@ -17,7 +17,7 @@ export async function canBootstrapAdmin(): Promise<boolean> {
   if (!bootstrapSecretConfigured()) return false;
   const supabase = createSupabaseAdminClient();
   const { count, error } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .select("user_id", { count: "exact", head: true });
   if (error) return false;
   return (count ?? 0) === 0;
@@ -55,7 +55,7 @@ export async function bootstrapAdminAction(formData: FormData) {
     return adminFail(error?.message ?? "Failed to create auth user");
   }
 
-  const { error: adminError } = await supabase.from("admin_users").insert({
+  const { error: adminError } = await supabase.from("metric_admin_users").insert({
     user_id: data.user.id,
     email,
     role: "owner",

@@ -9,7 +9,7 @@ const ENTITY_TYPE_KEYS: Record<string, keyof AdminMessages["audit"]> = {
   leads: "lead",
   site_settings: "settings",
   settings: "settings",
-  admin_users: "user",
+  metric_admin_users: "user",
   user: "user",
   media: "media",
   team: "team",

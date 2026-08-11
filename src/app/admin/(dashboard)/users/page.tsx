@@ -22,7 +22,7 @@ export default async function AdminUsersPage({
   const params = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: users } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .select("user_id, email, role, created_at, last_login_at, invited_by")
     .order("created_at", { ascending: true });
 

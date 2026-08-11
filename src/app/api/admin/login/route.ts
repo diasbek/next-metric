@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
   try {
     const adminClient = createSupabaseAdminClient();
     const { data: adminRow, error: adminError } = await adminClient
-      .from("admin_users")
+      .from("metric_admin_users")
       .select("user_id")
       .eq("user_id", data.user.id)
       .maybeSingle();

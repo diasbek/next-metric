@@ -76,7 +76,7 @@ async function main() {
     console.log("Updated existing auth user", user.id);
   }
 
-  const { error: adminError } = await supabase.from("admin_users").upsert({
+  const { error: adminError } = await supabase.from("metric_admin_users").upsert({
     user_id: user.id,
     email,
     role: "owner",

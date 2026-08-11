@@ -145,7 +145,7 @@ export function isFileUpload(value: FormDataEntryValue | null): value is File {
   return value instanceof File && value.size > 0;
 }
 
-export const LEAD_ATTACHMENTS_BUCKET = "lead-attachments";
+export const LEAD_ATTACHMENTS_BUCKET = "metric-lead-attachments";
 const MAX_LEAD_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 const LEAD_ATTACHMENT_MIME = new Set([
@@ -219,7 +219,7 @@ export async function uploadLeadAttachment(
   return { path, publicUrl };
 }
 
-export const SITE_FILES_BUCKET = "site-files";
+export const SITE_FILES_BUCKET = "metric-site-files";
 const MAX_SITE_FILE_BYTES = 50 * 1024 * 1024;
 
 const SITE_FILE_MIME = new Set([

@@ -70,7 +70,7 @@ export const getAdminSession = cache(async (): Promise<AdminUser | null> => {
     // Prefer the signed-in session (RLS allows own row) so a bad/missing
     // service role key does not block login after password sign-in.
     const { data: own } = await supabase
-      .from("admin_users")
+      .from("metric_admin_users")
       .select(ADMIN_SELECT)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -93,7 +93,7 @@ export async function getAdminByUserId(
     } = await supabase.auth.getUser();
     if (user?.id === userId) {
       const { data: own } = await supabase
-        .from("admin_users")
+        .from("metric_admin_users")
         .select(ADMIN_SELECT)
         .eq("user_id", userId)
         .maybeSingle();
@@ -107,7 +107,7 @@ export async function getAdminByUserId(
   try {
     const admin = createSupabaseAdminClient();
     const { data, error } = await admin
-      .from("admin_users")
+      .from("metric_admin_users")
       .select(ADMIN_SELECT)
       .eq("user_id", userId)
       .maybeSingle();
@@ -141,7 +141,7 @@ export async function requirePermission(
 export async function countOwners(): Promise<number> {
   const supabase = createSupabaseAdminClient();
   const { count } = await supabase
-    .from("admin_users")
+    .from("metric_admin_users")
     .select("user_id", { count: "exact", head: true })
     .eq("role", "owner");
   return count ?? 0;
@@ -152,7 +152,7 @@ export async function touchAdminLastLogin(userId: string) {
   try {
     const supabase = createSupabaseAdminClient();
     await supabase
-      .from("admin_users")
+      .from("metric_admin_users")
       .update({ last_login_at: new Date().toISOString() })
       .eq("user_id", userId);
   } catch {

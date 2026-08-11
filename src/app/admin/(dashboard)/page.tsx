@@ -21,7 +21,7 @@ export default async function AdminHomePage() {
     supabase.from("metric_services").select("id", { count: "exact", head: true }),
     canAccess(admin.role, "audit")
       ? supabase
-          .from("admin_audit_log")
+          .from("metric_admin_audit_log")
           .select("id, actor_email, action, created_at, entity_type")
           .order("created_at", { ascending: false })
           .limit(8)
