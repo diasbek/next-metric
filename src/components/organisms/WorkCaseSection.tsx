@@ -1,14 +1,37 @@
 import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
 import type { Project } from "@/data/projects";
-import { youtubeEmbedUrl } from "@/data/projects";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
+
+/** Flatten a case into an ordered 16:9 strip — images only, no gaps. */
+function caseStripImages(project: Project): string[] {
+  const seen = new Set<string>();
+  const images: string[] = [];
+  const push = (src?: string) => {
+    const url = src?.trim();
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    images.push(url);
+  };
+
+  for (const block of project.caseStudy?.blocks ?? []) {
+    if (block.type === "gallery") {
+      block.images.forEach(push);
+    }
+  }
+
+  if (!images.length) {
+    push(project.caseStudy?.heroImage);
+    push(project.image);
+  }
+
+  return images;
+}
 
 interface WorkCaseSectionProps {
   locale: Locale;
@@ -28,10 +51,7 @@ export async function WorkCaseSection({
   const home = await getMetricHomeResolved(locale);
   const caseStudy = project.caseStudy;
   const nextProjects = await getNextProjects(locale, project.slug);
-  const blocks = caseStudy?.blocks ?? [];
-  const galleryFallback =
-    caseStudy?.heroImage ? [caseStudy.heroImage] : [project.image];
-  const hasGalleryBlock = blocks.some((b) => b.type === "gallery");
+  const stripImages = caseStripImages(project);
 
   const authorName = project.author ?? project.title;
   const reviews = [
@@ -110,102 +130,33 @@ export async function WorkCaseSection({
           </div>
         )}
 
-        <section className="metric-case__stack mt-12 md:mt-16" data-reveal-group>
-          {!hasGalleryBlock
-            ? galleryFallback.map((src, index) => (
-                <div
-                  key={src}
-                  className="metric-case__stack-item"
-                  data-reveal
-                  data-reveal-delay={String(Math.min(index * 0.05, 0.2))}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
-                    quality={85}
-                    priority={index === 0}
-                  />
-                </div>
-              ))
-            : null}
-
-          {blocks.map((block, blockIndex) => {
-            if (block.type === "gallery") {
-              return block.images.map((src, index) => (
-                <div
-                  key={`${block.id}-${src}`}
-                  className="metric-case__stack-item"
-                  data-reveal
-                  data-reveal-delay={String(Math.min(index * 0.05, 0.2))}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
-                    quality={85}
-                    priority={blockIndex === 0 && index === 0}
-                  />
-                  {blockIndex === 0 && index === 0 && caseStudy?.metricValue ? (
-                    <div className="metric-glass absolute bottom-6 left-6 px-5 py-4 md:bottom-10 md:left-10">
-                      <p className="text-sm text-foreground/70">
-                        {caseStudy.metricLabel}
-                      </p>
-                      <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
-                        {caseStudy.metricValue}
-                      </p>
-                    </div>
-                  ) : null}
-                </div>
-              ));
-            }
-
-            if (block.type === "before_after") {
-              if (!block.beforeImage || !block.afterImage) return null;
-              return (
-                <div
-                  key={block.id}
-                  className="metric-case__stack-item metric-case__stack-item--slider"
-                  data-reveal
-                >
-                  <BeforeAfterSlider
-                    beforeImage={block.beforeImage}
-                    afterImage={block.afterImage}
-                    beforeLabel={ui.logoCompareBefore}
-                    afterLabel={ui.logoCompareAfter}
-                    compareAriaLabel={ui.beforeAfterLabel}
-                  />
-                </div>
-              );
-            }
-
-            if (block.type === "youtube") {
-              const embed = youtubeEmbedUrl(block.youtubeUrl);
-              if (!embed) return null;
-              return (
-                <div
-                  key={block.id}
-                  className="metric-case__stack-item metric-case__stack-item--video"
-                  data-reveal
-                >
-                  <iframe
-                    src={embed}
-                    title={project.title}
-                    className="absolute inset-0 h-full w-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              );
-            }
-
-            return null;
-          })}
-        </section>
+        {stripImages.length ? (
+          <section className="metric-case__stack mt-12 md:mt-16" data-reveal>
+            {stripImages.map((src, index) => (
+              <div key={`${src}-${index}`} className="metric-case__stack-item">
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
+                  quality={85}
+                  priority={index === 0}
+                />
+                {index === 0 && caseStudy?.metricValue ? (
+                  <div className="metric-glass absolute bottom-6 left-6 px-5 py-4 md:bottom-10 md:left-10">
+                    <p className="text-sm text-foreground/70">
+                      {caseStudy.metricLabel}
+                    </p>
+                    <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
+                      {caseStudy.metricValue}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </section>
+        ) : null}
 
         {project.quote ? (
           <section className="mt-16 md:mt-20" data-reveal>
@@ -262,7 +213,7 @@ export async function WorkCaseSection({
                     src={item.image}
                     alt={item.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     quality={85}
                   />

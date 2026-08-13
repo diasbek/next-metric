@@ -514,13 +514,6 @@ body {
   background: var(--accent);
   color: #fff;
   box-shadow: 0 12px 28px rgba(255, 60, 130, 0.35);
-  transform: skewX(var(--cta-skew));
-}
-
-.metric-hero__redesign-value,
-.metric-hero__redesign-delta,
-.metric-hero__redesign-caption {
-  transform: skewX(18deg);
 }
 
 .metric-hero__redesign-value {
@@ -2324,21 +2317,17 @@ body {
   overflow: hidden;
   border-radius: 32px;
   background: var(--surface);
-  transition: transform 0.25s ease;
-}
-
-.metric-work-card:hover {
-  transform: translateY(-4px);
 }
 
 .metric-work-card__media {
   position: relative;
-  /* Defensive: no definite height is set here so aspect-ratio can't force
-     a preferred width the way it does on .metric-case-card__media, but
-     min-width: 0 keeps this safe if that ever changes. */
   min-width: 0;
+  width: calc(100% - 40px);
   margin: 20px 20px 0;
-  aspect-ratio: 4 / 5;
+  /* Same source ratio as homepage case cards (case-*.jpg 3000×2347 /
+     2400×1878). 4/5 was taller than the photo and object-cover cropped it. */
+  aspect-ratio: 3000 / 2347;
+  height: auto;
   overflow: hidden;
   border-radius: 30px;
   background: #ddd;
@@ -2643,28 +2632,22 @@ body {
   }
 }
 
+/* One long case: 16:9 patches glued edge-to-edge, shared outer radius. */
 .metric-case__stack {
-  display: grid;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .metric-case__stack {
-    gap: 24px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
 }
 
 .metric-case__stack-item {
   position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-xl);
-  aspect-ratio: 16 / 10;
-  background: var(--surface);
-}
-
-.metric-case__stack-item--slider,
-.metric-case__stack-item--video {
+  width: 100%;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--surface);
 }
 
 .case-slider {

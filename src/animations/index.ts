@@ -122,20 +122,17 @@ function initCtaHovers(): Cleanup {
   return () => cleanups.forEach((fn) => fn());
 }
 
-/** Card lifts + scales slightly; its image zooms in a bit further inside it. */
+/** Card lifts + scales slightly. Images stay put — no inner zoom. */
 function initHomepageCardHovers(): Cleanup {
   const cards = Array.from(
     document.querySelectorAll<HTMLElement>(
-      ".metric-case-card, .metric-workflow-card, .metric-services-card, .metric-categories__card, .metric-hero__trust > *",
+      ".metric-case-card, .metric-workflow-card, .metric-services-card, .metric-categories__card, .metric-work-card, .metric-hero__trust > *",
     ),
   );
   const cleanups: Cleanup[] = [];
 
   cards.forEach((card) => {
-    const image = card.querySelector<HTMLElement>("img");
-    const targets = [card, image].filter(Boolean) as HTMLElement[];
     const onEnter = () => {
-      gsap.killTweensOf(targets);
       gsap.to(card, {
         y: -8,
         scale: 1.012,
@@ -143,17 +140,8 @@ function initHomepageCardHovers(): Cleanup {
         ease: "power3.out",
         overwrite: true,
       });
-      if (image) {
-        gsap.to(image, {
-          scale: 1.075,
-          duration: 0.65,
-          ease: "power3.out",
-          overwrite: true,
-        });
-      }
     };
     const onLeave = () => {
-      gsap.killTweensOf(targets);
       gsap.to(card, {
         y: 0,
         scale: 1,
@@ -161,22 +149,14 @@ function initHomepageCardHovers(): Cleanup {
         ease: "power2.out",
         overwrite: true,
       });
-      if (image) {
-        gsap.to(image, {
-          scale: 1,
-          duration: 0.48,
-          ease: "power2.out",
-          overwrite: true,
-        });
-      }
     };
     card.addEventListener("pointerenter", onEnter);
     card.addEventListener("pointerleave", onLeave);
     cleanups.push(() => {
       card.removeEventListener("pointerenter", onEnter);
       card.removeEventListener("pointerleave", onLeave);
-      gsap.killTweensOf(targets);
-      gsap.set(targets, { clearProps: "transform" });
+      gsap.killTweensOf(card);
+      gsap.set(card, { clearProps: "transform" });
     });
   });
 
