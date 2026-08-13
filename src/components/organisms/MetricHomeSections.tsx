@@ -7,6 +7,16 @@ import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 
+const WORKFLOW_IMAGE_SIZE: Record<string, readonly [number, number]> = {
+  "/images/metric/workflow/wf-1.png": [820, 518],
+  "/images/metric/workflow/wf-2.png": [772, 498],
+  "/images/metric/workflow/wf-3.png": [812, 590],
+};
+
+function workflowImageSize(src: string): readonly [number, number] {
+  return WORKFLOW_IMAGE_SIZE[src] ?? [820, 518];
+}
+
 function MetricTrustCards({ trust }: { trust: MetricHomeContent["trust"] }) {
   return (
     <div className="metric-hero__trust">
@@ -400,13 +410,15 @@ export function MetricWorkflowSection({
           data-reveal-stagger="0.12"
         >
           {workflow.cards.map((card, index) => {
+            const [imgW, imgH] = workflowImageSize(card.image);
             const media = (
-              <div className="metric-workflow-card__media js-parallax">
+              <div className="metric-workflow-card__media">
                 <Image
                   src={card.image}
                   alt=""
-                  fill
-                  className="metric-workflow-card__img object-contain"
+                  width={imgW}
+                  height={imgH}
+                  className="metric-workflow-card__img"
                   sizes="(max-width: 1024px) 90vw, 33vw"
                   quality={85}
                 />
