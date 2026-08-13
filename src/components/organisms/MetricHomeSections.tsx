@@ -111,7 +111,7 @@ export function MetricHeroSection({
         ))}
       </div>
 
-      <PageContainer className="metric-hero__shell page-container--wide">
+      <PageContainer className="metric-hero__shell">
         <div className="metric-hero__main">
           <div className="metric-hero__copy">
             <h1 className="metric-hero__title">
@@ -131,7 +131,7 @@ export function MetricHeroSection({
                 alt=""
                 fill
                 priority
-                sizes="(max-width: 1024px) 46vw, 284px"
+                sizes="(max-width: 1024px) 46vw, (max-width: 1799px) 284px, 480px"
                 quality={85}
                 className="object-cover"
               />
@@ -142,7 +142,7 @@ export function MetricHeroSection({
                 alt=""
                 fill
                 priority
-                sizes="(max-width: 1024px) 52vw, 318px"
+                sizes="(max-width: 1024px) 52vw, (max-width: 1799px) 318px, 540px"
                 quality={85}
                 className="object-cover"
               />
@@ -181,7 +181,7 @@ export function MetricCategoriesSection({
   const { categories } = home;
   return (
     <section id="projects" className="metric-gradient-pink metric-section metric-categories">
-      <PageContainer className="page-container--wide">
+      <PageContainer>
         <h2
           className="metric-categories__title font-display text-white"
           data-reveal
@@ -340,7 +340,7 @@ export function MetricServicesSection({
                     alt=""
                     fill
                     className="metric-services-card__img object-contain"
-                    sizes="(max-width: 1024px) 90vw, 560px"
+                    sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 560px, 900px"
                     quality={85}
                   />
                 </div>
@@ -376,7 +376,7 @@ export function MetricWorkflowSection({
   const { workflow } = home;
   return (
     <section id={workflow.id} className="metric-section metric-workflow">
-      <PageContainer className="page-container--wide">
+      <PageContainer>
         <div className="metric-workflow__header" data-reveal>
           <h2 className="metric-workflow__title font-display text-foreground">
             <span className="metric-workflow__title-line">{workflow.titleLine1}</span>
@@ -408,9 +408,6 @@ export function MetricWorkflowSection({
                   alt=""
                   fill
                   className="metric-workflow-card__img object-contain"
-                  /* vw-relative (not a fixed px) — the workflow section can
-                     render up to 1680px wide on ultrawide/4K (page-container--wide),
-                     so a fixed 450px hint would under-serve resolution there. */
                   sizes="(max-width: 1024px) 90vw, 33vw"
                   quality={85}
                 />

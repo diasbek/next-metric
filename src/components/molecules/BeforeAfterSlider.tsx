@@ -47,7 +47,7 @@ export function BeforeAfterSlider({
           alt={afterLabel}
           fill
           className="case-slider__image object-cover"
-          sizes="(max-width: 1512px) 100vw, 1392px"
+          sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
           quality={85}
           priority={false}
         />
@@ -57,7 +57,7 @@ export function BeforeAfterSlider({
             alt={beforeLabel}
             fill
             className="case-slider__image object-cover"
-            sizes="(max-width: 1512px) 100vw, 1392px"
+            sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
             quality={85}
             priority={false}
           />

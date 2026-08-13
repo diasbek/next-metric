@@ -3,15 +3,19 @@
  *
  * Minimum supported viewport width is 320px (old iPhone SE / narrow
  * Android / foldable cover screens). Every clamp() below ramps
- * continuously from that floor up to the 1512px design width (--container-max)
+ * continuously from that floor up to the 1512px Figma design width
  * instead of jumping at fixed breakpoints — this keeps in-between sizes
  * (iPad portrait/landscape, small laptops) from feeling like they're
- * stuck between two hard-coded states. Values hold flat past 1512px;
- * see --breakpoint-2xl for large-screen (ultrawide/4K) tuning hooks.
+ * stuck between two hard-coded states.
+ *
+ * Past 1512px the page shell keeps growing (one shared --container-max)
+ * up to 2560px so ultrawide / 4K monitors are not a letterboxed 1512
+ * strip. Spacing and type pick up again at --breakpoint-2xl.
  */
 :root {
   --page-padding: clamp(20px, 20px + (100vw - 320px) * 0.03356, 60px);
-  --container-max: 1512px;
+  /* 1512 at design width; 90vw past ~1680px; hard-cap 2560 on 4K. */
+  --container-max: max(1512px, min(90vw, 2560px));
   --breakpoint-2xl: 1800px;
 
   /* Generic fluid spacing scale — building blocks for component gaps. */
@@ -52,8 +56,27 @@
   --radius-pill: 62px;
 
   --cta-height: 48px;
-  --cta-radius: 12px;
+  /* Trapezoid / parallelogram radius scale. Swap --cta-radius to 0 / 4 / 8. */
+  --cta-radius-0: 0px;
+  --cta-radius-2: 2px;
+  --cta-radius-4: 4px;
+  --cta-radius-8: 8px;
+  --cta-radius: var(--cta-radius-2);
   --cta-skew: -18deg;
   --header-height: 88px;
   --glass: rgba(245, 245, 245, 0.3);
+}
+
+/* Second fluid stage: 1512 design → 4K. Padding / gaps / display type
+   resume scaling so a 2560px shell does not look like a blown-up 13". */
+@media (min-width: 1800px) {
+  :root {
+    --page-padding: clamp(60px, 3.4vw, 96px);
+    --section-gap: clamp(120px, 6vw, 180px);
+    --text-display-xl: clamp(120px, 6.4vw, 160px);
+    --text-display-lg: clamp(100px, 5.4vw, 132px);
+    --text-display: clamp(90px, 4.8vw, 120px);
+    --text-h2: clamp(60px, 3.2vw, 80px);
+    --text-h3: clamp(40px, 2.2vw, 52px);
+  }
 }

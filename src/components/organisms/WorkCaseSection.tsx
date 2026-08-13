@@ -124,7 +124,7 @@ export async function WorkCaseSection({
                     alt=""
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1512px) 100vw, 1392px"
+                    sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
                     quality={85}
                     priority={index === 0}
                   />
@@ -146,7 +146,7 @@ export async function WorkCaseSection({
                     alt=""
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1512px) 100vw, 1392px"
+                    sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
                     quality={85}
                     priority={blockIndex === 0 && index === 0}
                   />

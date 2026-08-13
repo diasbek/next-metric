@@ -35,7 +35,7 @@ function CardStrip({
             alt=""
             fill
             className="object-cover"
-            sizes="(max-width: 767px) 72vw, 320px"
+            sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, 420px"
             quality={85}
             draggable={false}
           />
@@ -155,7 +155,7 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
                 alt=""
                 fill
                 className="object-cover"
-                sizes="(max-width: 767px) 72vw, 320px"
+                sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, 420px"
                 quality={85}
                 draggable={false}
               />
