@@ -367,6 +367,10 @@ body {
   }
 }
 
+.metric-hero .metric-cta {
+  --cta-shadow: none;
+}
+
 .metric-hero__shell {
   position: relative;
   z-index: 1;
@@ -389,7 +393,7 @@ body {
   flex-direction: column;
   align-items: flex-start;
   gap: 28px;
-  max-width: 695px;
+  min-width: 0;
 }
 
 .metric-hero__title {
@@ -404,7 +408,7 @@ body {
 
 .metric-hero__subtitle {
   margin: 0;
-  max-width: 483px;
+  max-width: 70%;
   font-size: clamp(18px, 1.7vw, 24px);
   font-weight: 400;
   line-height: 1.2;
@@ -417,67 +421,88 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
+  overflow: visible;
 }
 
-/* Packed pair: height must follow this box’s width, not the parent
-   column. padding-bottom % is relative to the containing block — on a
-   wide/tall visual that stretched the pile to ~900px and flung the
-   plaques away from the photos. */
+/* Figma 2029:7 / 2030:10 — cards are a flattened export; plaques stay HTML. */
 .metric-hero__cluster {
   position: relative;
   flex: 0 0 auto;
   align-self: center;
-  width: min(92%, 360px);
+  width: 100%;
   height: auto;
-  aspect-ratio: 100 / 112;
+  aspect-ratio: 660 / 478;
+  container-type: inline-size;
+  --hero-tilt-tag: -8.04deg;
+  /* Figma 2029:7 — 10px / 4px at 660-wide cluster */
+  --hero-r-plaque: 1.515cqw;
+  --hero-r-tag: 0.606cqw;
 }
 
-.metric-hero__card {
+.metric-hero,
+.metric-hero__shell,
+.metric-hero__main,
+.metric-hero__cluster {
+  overflow: visible;
+}
+
+.metric-hero__cluster,
+.metric-hero__cluster :not(.metric-hero__cluster-shot) {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.metric-hero__cluster-shot {
   position: absolute;
-  overflow: hidden;
-  border-radius: 19px;
-  background: #fff;
-  box-shadow: 0 4px 32px rgba(131, 4, 108, 0.25);
+  inset: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 14px rgba(131, 4, 108, 0.14));
 }
 
-.metric-hero__card--left {
-  left: 0;
-  top: 18%;
-  width: 54%;
-  aspect-ratio: 3 / 4;
-  height: auto;
-  transform: rotate(-5.25deg);
-  z-index: 1;
-}
-
-.metric-hero__card--right {
-  left: 30%;
-  top: 2%;
-  width: 62%;
-  aspect-ratio: 3 / 4;
-  height: auto;
-  transform: rotate(7.19deg);
-  z-index: 2;
+.metric-hero__cluster-shot img {
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .metric-hero__badge {
   position: absolute;
-  left: -2%;
-  bottom: 24%;
+  left: 0;
+  top: 62.955%;
   z-index: 4;
-  width: 120px;
-  min-height: 118px;
-  padding: 14px 12px 12px;
-  border-radius: 10px;
-  background: rgba(245, 245, 245, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transform: rotate(-5.25deg);
+  width: 18.182%;
+  height: 24.686%;
+}
+
+.metric-hero__plaque {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--hero-r-plaque);
+  box-shadow: none !important;
+}
+
+.metric-hero__redesign-tag-glass .metric-hero__plaque {
+  border-radius: var(--hero-r-tag);
+}
+
+.metric-hero__plaque > div:first-of-type {
+  box-shadow: none !important;
+}
+
+.metric-hero__badge-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 2.12cqw;
 }
 
 .metric-hero__badge-value {
   margin: 0;
-  font-size: 40px;
+  font-size: 6.06cqw;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.06em;
@@ -485,66 +510,65 @@ body {
 }
 
 .metric-hero__badge-label {
-  margin: 4px 0 0;
-  max-width: 89px;
-  font-size: 16px;
+  margin: 0;
+  max-width: 13.5cqw;
+  font-size: 2.42cqw;
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
-.metric-hero__redesign {
-  position: absolute;
-  right: -6%;
-  bottom: 22%;
-  z-index: 5;
-  width: 138px;
-  transform: rotate(7.19deg);
-}
-
 .metric-hero__redesign-tag {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
+  position: absolute;
+  left: 79.098%;
+  top: 54.669%;
+  z-index: 6;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 28px;
-  margin-left: 10px;
-  margin-bottom: -6px;
-  padding: 4px 16px;
-  border-radius: var(--cta-radius);
-  background: rgba(245, 245, 245, 0.7);
-  backdrop-filter: blur(10px);
-  font-size: 13px;
+  width: 20.901%;
+  height: 9.5%;
+  font-size: 1.99cqw;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--foreground);
   white-space: nowrap;
+  transform: rotate(var(--hero-tilt-tag));
+}
+
+.metric-hero__redesign-tag-glass {
+  position: absolute;
+  inset: 12% 0;
+  z-index: 0;
   transform: skewX(var(--cta-skew));
+  pointer-events: none;
 }
 
 .metric-hero__redesign-tag > span {
+  position: relative;
+  z-index: 1;
   display: inline-block;
-  transform: skewX(18deg);
 }
 
 .metric-hero__redesign-card {
-  position: relative;
+  position: absolute;
+  left: 79.665%;
+  top: 62.623%;
+  z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  width: 129px;
-  min-height: 148px;
-  padding: 14px 12px;
-  border-radius: var(--cta-radius);
+  gap: 0.6cqw;
+  width: 19.545%;
+  height: 30.98%;
+  padding: 2.12cqw 2.12cqw 1.67cqw;
+  border-radius: var(--hero-r-plaque);
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 12px 28px rgba(255, 60, 130, 0.35);
 }
 
 .metric-hero__redesign-value {
   margin: 0;
-  font-size: 40px;
+  font-size: 6.06cqw;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.06em;
@@ -552,36 +576,48 @@ body {
 
 .metric-hero__redesign-delta {
   margin: 0;
-  font-size: 16px;
+  font-size: 2.38cqw;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.06em;
 }
 
 .metric-hero__redesign-caption {
-  margin: 8px 0 0;
-  max-width: 89px;
-  font-size: 16px;
+  margin: 1.21cqw 0 0;
+  max-width: 13.5cqw;
+  font-size: 2.42cqw;
   line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .metric-hero__trust {
   display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .metric-hero__trust-card {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 32px;
+  box-shadow: none !important;
+}
+
+.metric-hero__trust-card > div:first-of-type {
+  box-shadow: none !important;
+}
+
+.metric-hero__trust-inner {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 180px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
   padding: 28px;
-  border-radius: 32px;
-  background: rgba(245, 245, 245, 0.35);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
 }
 
 .metric-hero__trust-kicker,
@@ -623,14 +659,86 @@ body {
   margin-bottom: auto;
 }
 
-@media (min-width: 640px) {
-  .metric-hero__trust {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+@media (max-width: 1023px) {
+  /* Figma iPhone 16 (2015:564): visual at y=106.62, copy at 448, trust at 748. */
+  .metric-hero__shell {
+    gap: 59px;
+    padding-top: 19px;
+  }
+
+  .metric-hero__main {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+  }
+
+  .metric-hero__visual,
+  .metric-hero__copy {
+    width: calc(100% + 2 * var(--page-padding));
+    margin-inline: calc(-1 * var(--page-padding));
+    padding-inline: 16px;
+  }
+
+  .metric-hero__visual {
+    order: -1;
+    justify-content: stretch;
+    align-items: stretch;
+  }
+
+  .metric-hero__cluster {
+    width: 100%;
+    max-width: none;
+  }
+
+  .metric-hero__copy {
+    max-width: none;
+    gap: 24px;
+  }
+
+  .metric-hero__title {
+    font-size: 40px;
+  }
+
+  .metric-hero__subtitle {
+    max-width: none;
+    font-size: 16px;
+  }
+
+  .metric-hero .metric-cta--lg {
+    min-height: 48px;
+    width: 290px;
+    max-width: 100%;
+    padding: 0 24px;
+    font-size: 18px;
+  }
+
+  .metric-hero__trust-card {
+    min-height: 148px;
+    border-radius: 24px;
+  }
+
+  .metric-hero__trust-inner {
+    padding: 16px;
+  }
+
+  .metric-hero__trust-card:first-child,
+  .metric-hero__trust-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .metric-hero__trust-kicker,
+  .metric-hero__trust-copy {
+    font-size: 14px;
+  }
+
+  .metric-hero__trust-value {
+    font-size: 40px;
   }
 }
 
 @media (min-width: 1024px) {
+  /* Figma 2032:19 — one viewport column: copy|visual, then trust.
+     Columns share leftover width; cluster fits the visual cell. */
   .metric-hero {
     height: 100svh;
     max-height: 100svh;
@@ -645,8 +753,8 @@ body {
   }
 
   .metric-hero__main {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: clamp(12px, 1.5vw, 28px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(16px, 2.4vw, 40px);
     align-items: center;
     padding-top: 0;
     flex: 1 1 auto;
@@ -654,162 +762,60 @@ body {
   }
 
   .metric-hero__copy {
-    gap: clamp(18px, 2.6vh, 36px);
+    container-type: inline-size;
+    max-width: none;
+    gap: 5.75cqw;
   }
 
   .metric-hero__title {
-    font-size: clamp(48px, 9svh, 90px);
+    font-size: min(13cqw, 9svh);
+  }
+
+  .metric-hero__subtitle {
+    max-width: 70%;
+    font-size: min(3.45cqw, 2.2svh);
   }
 
   .metric-hero__visual {
+    container-type: size;
     height: 100%;
     justify-content: center;
     align-items: center;
     min-height: 0;
   }
 
-  /* Packed pair: hard-cap to the Figma 620×500 frame. Large/tall
-     viewports must not stretch the pile — leftover space stays around it. */
   .metric-hero__cluster {
     flex: 0 0 auto;
     align-self: center;
-    width: min(100%, 36vw, 620px);
-    max-width: 620px;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
     height: auto;
-    max-height: 500px;
     padding-bottom: 0;
-    aspect-ratio: 620 / 500;
   }
 
-  .metric-hero__card--left {
-    left: 2%;
-    top: 10%;
-    width: 52%;
-  }
-
-  .metric-hero__card--right {
-    left: 30%;
-    top: 0;
-    width: 58%;
-  }
-
-  .metric-hero__badge {
-    left: 0;
-    bottom: 26%;
-  }
-
-  .metric-hero__redesign {
-    right: -2%;
-    bottom: 22%;
+  @supports (width: 1cqh) {
+    .metric-hero__cluster {
+      width: min(100%, calc(100cqh * 660 / 478));
+    }
   }
 
   .metric-hero__trust {
-    /* Figma 450:291:291:290 — fr tracks so the row fills any
-       --container-max (1512 → 3840) instead of leaving a dead strip. */
     grid-template-columns: 1.55fr 1fr 1fr 1fr;
-    gap: 20px;
+    gap: clamp(12px, 1.3vw, 20px);
     flex-shrink: 0;
   }
 
   .metric-hero__trust-card {
     min-height: clamp(120px, 17svh, 220px);
+  }
+
+  .metric-hero__trust-inner {
     padding: clamp(16px, 2svh, 28px);
   }
-}
-
-@media (min-width: 1280px) {
-  .metric-hero__main {
-    grid-template-columns: minmax(0, 695px) minmax(0, 1fr);
-  }
-}
-
-@media (min-width: 1800px) {
-  .metric-hero__main {
-    grid-template-columns: minmax(0, min(42vw, 880px)) minmax(0, 1fr);
-  }
-
-  .metric-hero__copy {
-    max-width: min(42vw, 880px);
-  }
-
-  .metric-hero__title {
-    font-size: clamp(72px, 8svh, 132px);
-  }
-
-  .metric-hero__subtitle {
-    max-width: min(32vw, 680px);
-    font-size: clamp(22px, 1.2vw, 32px);
-  }
 
   .metric-hero__trust-value {
-    font-size: clamp(72px, 4.2vw, 96px);
-  }
-}
-
-@media (min-width: 2560px) {
-  .metric-hero__main {
-    grid-template-columns: minmax(0, min(38vw, 1100px)) minmax(0, 1fr);
-  }
-
-  .metric-hero__copy {
-    max-width: min(38vw, 1100px);
-  }
-
-  .metric-hero__title {
-    font-size: clamp(112px, 7.2svh, 160px);
-  }
-
-  .metric-hero__subtitle {
-    max-width: min(28vw, 820px);
-    font-size: clamp(28px, 1.1vw, 40px);
-  }
-
-  .metric-hero__trust-value {
-    font-size: clamp(96px, 3.6vw, 120px);
-  }
-}
-
-@media (max-height: 800px) and (min-width: 1024px) {
-  .metric-hero__title {
-    font-size: clamp(40px, 7.2svh, 64px);
-  }
-
-  .metric-hero__cluster {
-    width: min(100%, 36vw, 620px, 48svh);
-    max-width: min(620px, 48svh);
-    max-height: min(500px, calc(48svh * 500 / 620));
-  }
-}
-
-@media (max-width: 1023px) {
-  .metric-hero__redesign {
-    right: 2%;
-    bottom: 22%;
-    width: 112px;
-  }
-
-  .metric-hero__redesign-card {
-    width: 108px;
-    min-height: 120px;
-    padding: 10px 10px;
-  }
-
-  .metric-hero__redesign-value {
-    font-size: 32px;
-  }
-
-  .metric-hero__badge {
-    width: 96px;
-    min-height: 92px;
-    padding: 10px 8px;
-  }
-
-  .metric-hero__badge-value {
-    font-size: 28px;
-  }
-
-  .metric-hero__badge-label {
-    font-size: 13px;
+    font-size: clamp(48px, 5cqw, 80px);
   }
 }
 
@@ -957,8 +963,7 @@ body {
   will-change: transform;
 }
 
-.metric-categories__card img,
-.metric-hero__card img {
+.metric-categories__card img {
   width: 100%;
   height: 100%;
   object-fit: cover;

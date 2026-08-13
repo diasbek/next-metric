@@ -57,13 +57,13 @@
   --radius-pill: 62px;
 
   --cta-height: 48px;
-  /* Trapezoid / parallelogram radius scale. Swap --cta-radius to 0 / 4 / 8. */
+  /* Figma 2015:47 Rectangle 62 — 4px corners, shear atan(32.5/48). */
   --cta-radius-0: 0px;
   --cta-radius-2: 2px;
   --cta-radius-4: 4px;
   --cta-radius-8: 8px;
-  --cta-radius: var(--cta-radius-2);
-  --cta-skew: -18deg;
+  --cta-radius: var(--cta-radius-4);
+  --cta-skew: -34.11deg;
   --header-height: 88px;
   --glass: rgba(245, 245, 245, 0.3);
 }

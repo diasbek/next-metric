@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
+import { LiquidGlassPlaque } from "@/components/atoms/LiquidGlassPlaque";
 import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { CategoriesMarquee } from "@/components/molecules/CategoriesMarquee";
@@ -22,74 +23,77 @@ function MetricTrustCards({ trust }: { trust: MetricHomeContent["trust"] }) {
   return (
     <div className="metric-hero__trust">
       {trust.map((item, index) => (
-        <div
+        <LiquidGlassPlaque
           key={`${item.kind}-${"value" in item ? item.value : "label" in item ? item.label : index}`}
           className={`metric-hero__trust-card metric-hero__trust-card--${item.kind}`}
+          background="rgba(245, 245, 245, 0.3)"
         >
-          {item.kind === "spn" ? (
-            <>
-              <p className="metric-hero__trust-kicker">{item.label}</p>
-              <div className="metric-hero__trust-spn">
-                <Image
-                  src={item.icon}
-                  alt="Amazon SPN"
-                  width={160}
-                  height={48}
-                  className="h-12 w-auto object-contain object-left"
-                />
-              </div>
-              <p className="metric-hero__trust-copy">{item.text}</p>
-            </>
-          ) : null}
+          <div className="metric-hero__trust-inner">
+            {item.kind === "spn" ? (
+              <>
+                <p className="metric-hero__trust-kicker">{item.label}</p>
+                <div className="metric-hero__trust-spn">
+                  <Image
+                    src={item.icon}
+                    alt="Amazon SPN"
+                    width={160}
+                    height={48}
+                    className="h-12 w-auto object-contain object-left"
+                  />
+                </div>
+                <p className="metric-hero__trust-copy">{item.text}</p>
+              </>
+            ) : null}
 
-          {item.kind === "reviews" ? (
-            <>
-              <div className="metric-hero__trust-icon">
-                <Image
-                  src={item.icon}
-                  alt=""
-                  width={56}
-                  height={48}
-                  className="object-contain"
-                />
-              </div>
-              <p className="metric-hero__trust-copy metric-hero__trust-copy--bottom">
-                {item.label}
-              </p>
-            </>
-          ) : null}
+            {item.kind === "reviews" ? (
+              <>
+                <div className="metric-hero__trust-icon">
+                  <Image
+                    src={item.icon}
+                    alt=""
+                    width={56}
+                    height={48}
+                    className="object-contain"
+                  />
+                </div>
+                <p className="metric-hero__trust-copy metric-hero__trust-copy--bottom">
+                  {item.label}
+                </p>
+              </>
+            ) : null}
 
-          {item.kind === "rating" ? (
-            <>
-              <p className="metric-hero__trust-value">
-                {item.value}
-                <Image
-                  src="/images/metric/icons/star.svg"
-                  alt=""
-                  width={41}
-                  height={39}
-                  className="metric-hero__trust-star"
-                />
-              </p>
-              <p className="metric-hero__trust-copy metric-hero__trust-copy--bottom">
-                {item.labelLine1}
-                <br />
-                {item.labelLine2}
-              </p>
-            </>
-          ) : null}
+            {item.kind === "rating" ? (
+              <>
+                <p className="metric-hero__trust-value">
+                  {item.value}
+                  <Image
+                    src="/images/metric/icons/star.svg"
+                    alt=""
+                    width={41}
+                    height={39}
+                    className="metric-hero__trust-star"
+                  />
+                </p>
+                <p className="metric-hero__trust-copy metric-hero__trust-copy--bottom">
+                  {item.labelLine1}
+                  <br />
+                  {item.labelLine2}
+                </p>
+              </>
+            ) : null}
 
-          {item.kind === "stat" ? (
-            <>
-              <p className="metric-hero__trust-value">{item.value}</p>
-              <p className="metric-hero__trust-copy metric-hero__trust-copy--bottom">
-                {item.labelLine1}
-                <br />
-                {item.labelLine2}
-              </p>
-            </>
-          ) : null}
-        </div>
+            {item.kind === "stat" ? (
+              <>
+                <p className="metric-hero__trust-value">{item.value}</p>
+                <p className="metric-hero__trust-copy metric-hero__trust-copy--bottom">
+                  {item.labelLine1}
+                  <br />
+                  {item.labelLine2}
+                </p>
+              </>
+            ) : null}
+          </div>
+        </LiquidGlassPlaque>
       ))}
     </div>
   );
@@ -137,43 +141,39 @@ export function MetricHeroSection({
 
           <div className="metric-hero__visual" aria-hidden>
             <div className="metric-hero__cluster">
-              <div className="metric-hero__card metric-hero__card--left">
+              <div className="metric-hero__cluster-shot">
                 <Image
-                  src={hero.product1}
+                  src="/images/metric/hero/cluster.png"
                   alt=""
                   fill
                   priority
-                  sizes="(max-width: 1023px) 50vw, min(42vw, 900px)"
-                  quality={85}
-                  className="object-cover"
-                />
-              </div>
-              <div className="metric-hero__card metric-hero__card--right">
-                <Image
-                  src={hero.product2}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(max-width: 1023px) 55vw, min(42vw, 900px)"
-                  quality={85}
-                  className="object-cover"
+                  unoptimized
+                  className="object-contain"
                 />
               </div>
 
               <div className="metric-hero__badge">
-                <p className="metric-hero__badge-value">{hero.badgeValue}</p>
-                <p className="metric-hero__badge-label">{hero.badgeLabel}</p>
+                <LiquidGlassPlaque className="metric-hero__plaque">
+                  <div className="metric-hero__badge-inner">
+                    <p className="metric-hero__badge-value">{hero.badgeValue}</p>
+                    <p className="metric-hero__badge-label">{hero.badgeLabel}</p>
+                  </div>
+                </LiquidGlassPlaque>
               </div>
 
-              <div className="metric-hero__redesign">
-                <div className="metric-hero__redesign-tag">
-                  <span>{hero.redesignLabel}</span>
+              <div className="metric-hero__redesign-tag">
+                <div className="metric-hero__redesign-tag-glass">
+                  <LiquidGlassPlaque
+                    className="metric-hero__plaque"
+                    background="linear-gradient(90deg, #edd6e8, #f6d5c9)"
+                  />
                 </div>
-                <div className="metric-hero__redesign-card">
-                  <p className="metric-hero__redesign-value">{hero.redesignValue}</p>
-                  <p className="metric-hero__redesign-delta">{hero.redesignDelta}</p>
-                  <p className="metric-hero__redesign-caption">{hero.redesignCaption}</p>
-                </div>
+                <span>{hero.redesignLabel}</span>
+              </div>
+              <div className="metric-hero__redesign-card">
+                <p className="metric-hero__redesign-value">{hero.redesignValue}</p>
+                <p className="metric-hero__redesign-delta">{hero.redesignDelta}</p>
+                <p className="metric-hero__redesign-caption">{hero.redesignCaption}</p>
               </div>
             </div>
           </div>
