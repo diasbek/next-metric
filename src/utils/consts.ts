@@ -7,7 +7,7 @@ export const SITE_CONFIG = {
   description:
     "Strategic Amazon listing images and A+ Content designed to communicate value, inspire confidence, and turn attention into sales.",
   url: getCanonicalSiteUrl(),
-  // TODO: replace phone + social homepage stubs with real Metric contacts before launch.
+  // TODO: replace phone stub with the real Metric contact number before launch.
   phone: "+987 778 99 88",
   email: getPublicEnv("NEXT_PUBLIC_CONTACT_EMAIL", "hello@metric.agency"),
   address: ["Uzbekistan, Tashkent,", "Street"],
@@ -17,10 +17,8 @@ export const SITE_CONFIG = {
   },
   social: {
     telegram: "https://t.me/metricagency",
-    instagram: "https://www.instagram.com/metricagency",
-    linkedin: "https://www.linkedin.com/",
-    x: "https://x.com/",
-    facebook: "https://www.facebook.com/",
+    instagram: "https://www.instagram.com/metric.ecommerce/",
+    linkedin: "https://www.linkedin.com/company/metric-ecommerce-design/",
   },
   files: {
     presentation: "/files/presentation.pdf",

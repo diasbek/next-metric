@@ -22,6 +22,8 @@ const LEGACY_SOCIAL = new Set([
   "https://www.instagram.com/timsol",
   "https://t.me/timsolagency",
   "https://www.instagram.com/timsolagency",
+  "https://www.instagram.com/metricagency",
+  "https://www.linkedin.com/",
 ]);
 
 function resolveSocialUrl(cmsUrl: string | undefined, fallback: string): string {
@@ -147,6 +149,9 @@ export async function getResolvedContent(locale: Locale): Promise<SiteContent> {
                 extras.siteSettings.instagram_url,
                 base.site.social.instagram,
               ),
+              linkedin: base.site.social.linkedin,
+              x: base.site.social.x,
+              facebook: base.site.social.facebook,
             },
             files: {
               presentation:

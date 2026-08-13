@@ -3,6 +3,7 @@ export { ContactForm } from "./ContactForm";
 export { CaseDetailModal } from "./CaseDetailModal";
 export { CaseDetailModalPage } from "./CaseDetailModalPage";
 export { CategoriesMarquee } from "./CategoriesMarquee";
+export { MetricCaseCard } from "./MetricCaseCard";
 export { FilterDropdown } from "./FilterDropdown";
 export { BeforeAfterSlider } from "./BeforeAfterSlider";
 export { FAQAccordion } from "./FAQAccordion";

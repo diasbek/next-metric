@@ -170,8 +170,6 @@ const metricHomeEn = {
     social: [
       { label: "Instagram", key: "instagram" as const },
       { label: "LinkedIn", key: "linkedin" as const },
-      { label: "X", key: "x" as const },
-      { label: "Facebook", key: "facebook" as const },
     ],
     startCta: "Start Your Project",
   },

@@ -67,15 +67,14 @@ function initHeroEntrance(): Cleanup {
     )
     .fromTo(
       heroCards ?? [],
-      { autoAlpha: 0, y: 36, rotation: -2, scale: 0.94 },
+      { autoAlpha: 0, y: 28, scale: 0.97 },
       {
         autoAlpha: 1,
         y: 0,
-        rotation: 0,
         scale: 1,
-        duration: 0.72,
-        stagger: 0.1,
-        ease: "back.out(1.25)",
+        duration: 0.6,
+        stagger: 0.08,
+        ease: "power3.out",
         clearProps: CLEAR_MOTION_PROPS,
       },
       "-=0.45",

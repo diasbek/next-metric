@@ -49,6 +49,20 @@ export function ContactsPageSection({ content }: LocalePageProps) {
                 </a>
               </div>
 
+              {site.social.linkedin ? (
+                <div className="contacts-page__link-item">
+                  <p className="contacts-page__link-label">LinkedIn</p>
+                  <a
+                    href={site.social.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contacts-page__link-value"
+                  >
+                    {ui.instagramAction}
+                  </a>
+                </div>
+              ) : null}
+
               <div className="contacts-page__link-item">
                 <p className="contacts-page__link-label">{ui.phoneLabel}</p>
                 <a

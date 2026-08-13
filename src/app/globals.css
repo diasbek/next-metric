@@ -419,22 +419,20 @@ body {
 }
 
 .metric-hero__card--left {
-  left: 6%;
-  top: 16%;
-  width: 46%;
+  left: 10%;
+  top: 10%;
+  width: 50%;
   /* Source photos are 3:4 (3000×4000). Lock the box to that ratio so
      object-cover neither crops nor letterboxes as the viewport changes. */
   aspect-ratio: 3 / 4;
-  transform: rotate(-5.25deg);
   z-index: 2;
 }
 
 .metric-hero__card--right {
-  right: 0;
+  right: 6%;
   top: 0;
-  width: 52%;
+  width: 56%;
   aspect-ratio: 3 / 4;
-  transform: rotate(7.19deg);
   z-index: 1;
 }
 
@@ -472,8 +470,8 @@ body {
 
 .metric-hero__redesign {
   position: absolute;
-  right: -2%;
-  bottom: 14%;
+  right: 0;
+  bottom: 12%;
   z-index: 5;
   width: 138px;
 }
@@ -485,11 +483,11 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 28px;
-  margin-left: 8px;
+  margin-left: 10px;
   margin-bottom: -6px;
-  padding: 4px 14px;
-  transform: rotate(-8deg);
-  border-radius: 999px;
+  padding: 4px 16px;
+  /* Same parallelogram as .metric-cta; radius is half of --cta-radius (12 → 6). */
+  border-radius: calc(var(--cta-radius) / 2);
   background: rgba(245, 245, 245, 0.7);
   backdrop-filter: blur(10px);
   font-size: 13px;
@@ -497,6 +495,12 @@ body {
   letter-spacing: -0.02em;
   color: var(--foreground);
   white-space: nowrap;
+  transform: skewX(var(--cta-skew));
+}
+
+.metric-hero__redesign-tag > span {
+  display: inline-block;
+  transform: skewX(18deg);
 }
 
 .metric-hero__redesign-card {
@@ -507,10 +511,17 @@ body {
   width: 129px;
   min-height: 148px;
   padding: 14px 12px;
-  border-radius: 10px;
+  border-radius: calc(var(--cta-radius) / 2);
   background: var(--accent);
   color: #fff;
   box-shadow: 0 12px 28px rgba(255, 60, 130, 0.35);
+  transform: skewX(var(--cta-skew));
+}
+
+.metric-hero__redesign-value,
+.metric-hero__redesign-delta,
+.metric-hero__redesign-caption {
+  transform: skewX(18deg);
 }
 
 .metric-hero__redesign-value {
@@ -633,17 +644,17 @@ body {
   }
 
   .metric-hero__card--left {
-    left: 4%;
-    top: 12%;
-    width: min(46%, 284px);
+    left: 12%;
+    top: 8%;
+    width: min(50%, 280px);
     height: auto;
     aspect-ratio: 3 / 4;
   }
 
   .metric-hero__card--right {
-    right: 2%;
+    right: 8%;
     top: 0;
-    width: min(52%, 318px);
+    width: min(56%, 310px);
     height: auto;
     aspect-ratio: 3 / 4;
   }
@@ -753,17 +764,19 @@ body {
 
 .metric-categories__accent {
   position: relative;
-  display: inline;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
   white-space: nowrap;
 }
 
 .metric-categories__laurel {
-  display: inline-block;
-  width: clamp(28px, 3.6vw, 56px);
-  height: auto;
-  margin-left: 0.1em;
-  margin-right: 0.06em;
-  vertical-align: -0.08em;
+  display: block;
+  /* Size with the heading (em), not a capped px clamp — previously maxed
+     at 56px next to a 104px title, so the wreath read as a tiny superscript. */
+  height: 0.95em;
+  width: auto;
+  flex: 0 0 auto;
   pointer-events: none;
 }
 
@@ -902,6 +915,10 @@ body {
 .metric-case-card__media {
   grid-area: media;
   position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
   /* Explicit width (not just min-width: 0) — a grid item with aspect-ratio
      + min-height and width:auto uses the ratio-transferred size as its
      preferred width and skips stretch, blowing out past the 1-column
@@ -1010,6 +1027,10 @@ body {
   .metric-case-studies__list {
     margin-top: 64px;
   }
+}
+
+.metric-works .metric-case-studies__list {
+  margin-top: 0;
 }
 
 .metric-case-studies__header {
@@ -1123,7 +1144,7 @@ body {
   padding: 0.08em 0.12em 0.04em;
   border: 2px solid var(--dark);
   border-radius: 4px;
-  background: #fff;
+  background: transparent;
   color: var(--dark);
   white-space: nowrap;
   vertical-align: baseline;

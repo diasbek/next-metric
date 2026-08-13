@@ -28,11 +28,11 @@ const FOOTER_NAV_HREFS = [
 export function SiteFooter({ locale, content, captcha, home }: SiteFooterProps) {
   const { site, ui } = content;
   const footer = home.footer;
-  const socialMap = {
+  const socialMap: Record<string, string | undefined> = {
     instagram: site.social.instagram,
-    linkedin: site.social.linkedin ?? "#",
-    x: site.social.x ?? "#",
-    facebook: site.social.facebook ?? "#",
+    linkedin: site.social.linkedin,
+    x: site.social.x,
+    facebook: site.social.facebook,
   };
 
   const privacyLink = footer.links.find((link) => link.href.includes("privacy"));
@@ -103,16 +103,20 @@ export function SiteFooter({ locale, content, captcha, home }: SiteFooterProps) 
 
         <div className="site-footer__bottom" data-reveal>
           <div className="site-footer__meta">
-            {footer.social.map((item) => (
-              <a
-                key={item.label}
-                href={socialMap[item.key]}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {item.label}
-              </a>
-            ))}
+            {footer.social.map((item) => {
+              const href = socialMap[item.key];
+              if (!href) return null;
+              return (
+                <a
+                  key={item.label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.label}
+                </a>
+              );
+            })}
             {utilityLinks.map((link) => (
               <TransitionLink
                 key={link.label}

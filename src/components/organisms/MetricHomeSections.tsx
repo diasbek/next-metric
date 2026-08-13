@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { CategoriesMarquee } from "@/components/molecules/CategoriesMarquee";
+import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -210,8 +211,8 @@ export function MetricCategoriesSection({
                     <Image
                       src="/images/metric/icons/arrow.svg"
                       alt=""
-                      width={56}
-                      height={48}
+                      width={94}
+                      height={80}
                       className="metric-categories__laurel"
                       aria-hidden
                     />
@@ -257,45 +258,16 @@ export function MetricCaseStudiesSection({
           data-reveal-stagger="0.12"
         >
           {caseStudies.items.map((item) => (
-            <article key={item.slug} className="metric-case-card" data-reveal>
-              <div className="metric-case-card__body">
-                <div className="metric-case-card__tags">
-                  {item.tags.map((tag) => (
-                    <span key={tag} className="metric-pill border-foreground text-foreground">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div>
-                  <h3 className="metric-case-card__quote font-display">
-                    {item.quote}
-                  </h3>
-                  <p className="metric-case-card__author">{item.author}</p>
-                  <p className="metric-case-card__role">{item.role}</p>
-                </div>
-                <Button
-                  href={localePath(locale, `/works/${item.slug}/`)}
-                  variant="dark"
-                  className="w-fit"
-                >
-                  {caseStudies.viewLabel}
-                </Button>
-              </div>
-              <div className="metric-case-card__media">
-                <Image
-                  src={item.image}
-                  alt={
-                    "title" in item && typeof item.title === "string" && item.title
-                      ? item.title
-                      : item.author
-                  }
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1023px) 92vw, 42vw"
-                  quality={85}
-                />
-              </div>
-            </article>
+            <MetricCaseCard
+              key={item.slug}
+              href={localePath(locale, `/works/${item.slug}/`)}
+              tags={item.tags}
+              quote={item.quote}
+              author={item.author}
+              role={item.role}
+              image={item.image}
+              viewLabel={caseStudies.viewLabel}
+            />
           ))}
         </div>
 
