@@ -49,23 +49,11 @@ const AUTO_SCROLL_PX_PER_SEC = 34;
 const RESUME_AFTER_MS = 1200;
 
 /**
- * Drives the infinite loop by nudging the track's real `scrollLeft` on a
- * rAF loop and wrapping it once a full sequence has passed — NOT a CSS
- * `transform: translate` keyframe on a duplicated track. That older
- * approach fought with the browser's own touch/drag scrolling (nothing
- * responded to a swipe, so cards could look like they were bunching up
- * mid-gesture) and needed a brittle `:hover`-based pause that could get
- * stuck on touch. Because this is a genuine scroll container, a finger
- * drag or mouse wheel just scrolls it natively — we only need to pause our
- * own nudging while that's happening and resume a moment after it ends.
- *
- * iOS Safari keeps gliding on momentum well after the finger lifts, so a
- * fixed "resume N ms after pointerup" timer isn't enough — the rAF loop
- * would start forcing scrollLeft again while the browser is still
- * decelerating, fighting it and producing a stutter/jump. Instead, every
- * native `scroll` event that happens *while paused* (i.e. one we didn't
- * cause ourselves) pushes the resume timer back out, so we only resume
- * once scrolling has actually gone quiet.
+ * Infinite loop via `translate3d` on the track — not `scrollLeft`.
+ * iOS Safari often ignores programmatic `scrollLeft` on nested overflow
+ * containers (especially under a GSAP `data-reveal` transform), so the
+ * marquee looked frozen on phones. Transform animation runs everywhere;
+ * a finger/mouse drag pauses it, then it resumes after things go quiet.
  */
 function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
   useEffect(() => {
@@ -76,24 +64,30 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
     let rafId = 0;
     let lastTime = 0;
     let loopWidth = 0;
+    let offset = 0;
     let paused = false;
     let resumeTimer: ReturnType<typeof setTimeout> | null = null;
 
+    const seq = track.querySelector<HTMLElement>(".metric-categories__seq");
+
     const measure = () => {
-      // Two identical sequences back to back — half of the scrollable width
-      // is exactly one full loop.
-      loopWidth = track.scrollWidth / 2;
+      loopWidth = seq?.offsetWidth ?? 0;
     };
     measure();
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(track);
+    if (seq) resizeObserver.observe(seq);
+
+    const apply = () => {
+      track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    };
 
     const tick = (time: number) => {
       if (lastTime && !paused && loopWidth > 0) {
-        const dt = time - lastTime;
-        let next = track.scrollLeft + (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
-        if (next >= loopWidth) next -= loopWidth;
-        track.scrollLeft = next;
+        const dt = Math.min(time - lastTime, 48);
+        offset += (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
+        if (offset >= loopWidth) offset -= loopWidth;
+        apply();
       }
       lastTime = time;
       rafId = requestAnimationFrame(tick);
@@ -108,28 +102,22 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
         paused = false;
       }, RESUME_AFTER_MS);
     };
+
     const pause = () => {
       paused = true;
       scheduleResume();
     };
-    const onNativeScroll = () => {
-      // Only a user/momentum-driven scroll gets here — while we're
-      // auto-scrolling ourselves `paused` is false, so our own writes to
-      // scrollLeft don't re-trigger this and fight the timer.
-      if (paused) scheduleResume();
-    };
 
     track.addEventListener("pointerdown", pause);
     track.addEventListener("wheel", pause, { passive: true });
-    track.addEventListener("scroll", onNativeScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
       if (resumeTimer) clearTimeout(resumeTimer);
+      track.style.transform = "";
       track.removeEventListener("pointerdown", pause);
       track.removeEventListener("wheel", pause);
-      track.removeEventListener("scroll", onNativeScroll);
     };
   }, [trackRef]);
 }

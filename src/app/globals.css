@@ -815,11 +815,17 @@ body {
      padding only. A negative margin here would bleed past the viewport edge
      and force horizontal overflow on mobile. */
   padding-inline: var(--page-padding);
+  /* Room for GSAP hover lift (y: -8 + scale) so cards aren't clipped. */
+  padding-top: 16px;
+  padding-bottom: 12px;
 }
 
 .metric-categories__track-wrap--marquee {
   overflow: hidden;
   padding-inline: 0;
+  /* Pull the extra hover gutter back so section spacing stays the same. */
+  margin-top: calc(clamp(40px, 4.5vw, 64px) - 16px);
+  margin-bottom: -12px;
 }
 
 .metric-categories__track {
@@ -833,18 +839,17 @@ body {
   scrollbar-width: none;
 }
 
-/* Auto-scroll loop is driven by JS nudging real `scrollLeft` (see
-   CategoriesMarquee.tsx) rather than a CSS transform keyframe on a
-   duplicated track. A genuine scroll container means a finger swipe or
-   mouse wheel scrolls it natively — no fighting with a transform, no
-   `:hover`-based pause that could get stuck on touch, no vw-rounded
-   sequence-width seam. */
+/* Transform-based loop (see CategoriesMarquee.tsx) — overflow lives on the
+   wrap so a parent `overflow-x: auto` can't clip the hover lift. */
 .metric-categories__track--marquee {
   display: flex;
+  width: max-content;
   gap: 0;
-  overflow-x: auto;
+  overflow: visible;
   padding-bottom: 0;
   scroll-snap-type: none;
+  touch-action: pan-y;
+  will-change: transform;
 }
 
 .metric-categories__seq {
@@ -2360,13 +2365,14 @@ body {
 }
 
 .metric-case--modal {
-  padding-block: 8px 48px;
+  padding-block: 12px 32px;
 }
 
 .metric-case--modal .page-container {
   max-width: none;
   width: 100%;
-  padding-inline: 0;
+  padding-inline: max(20px, env(safe-area-inset-left, 0px))
+    max(20px, env(safe-area-inset-right, 0px));
 }
 
 /* Case detail modal — Figma MacBook Pro 14" - 16 (2015:280) */
@@ -2406,7 +2412,7 @@ body {
 .case-modal__close {
   pointer-events: auto;
   position: absolute;
-  top: 12px;
+  top: max(12px, env(safe-area-inset-top, 0px));
   left: 50%;
   z-index: 2;
   display: inline-flex;
@@ -2439,6 +2445,7 @@ body {
 
 .case-modal__panel {
   pointer-events: auto;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
   max-height: 100%;
@@ -2447,6 +2454,9 @@ body {
   -webkit-overflow-scrolling: touch;
   background: #fff;
   overscroll-behavior: contain;
+  /* Close button sits over the panel — keep copy/media clear of it and notches. */
+  padding-top: calc(68px + env(safe-area-inset-top, 0px));
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 1024px) {
@@ -2472,11 +2482,17 @@ body {
     height: auto;
     max-height: calc(100dvh - 128px);
     border-radius: var(--radius-xl);
-    padding-inline: 40px;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-inline: 48px;
   }
 
   .metric-case--modal {
     padding-block: 40px 64px;
+  }
+
+  .metric-case--modal .page-container {
+    padding-inline: 0;
   }
 }
 
