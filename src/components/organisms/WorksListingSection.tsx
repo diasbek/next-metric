@@ -7,7 +7,7 @@ import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 export async function WorksListingSection({ locale, content }: LocalePageProps) {
   const { projects, ui } = content;
   const home = await getMetricHomeResolved(locale);
-  const homeCaseBySlug = new Map(
+  const homeCaseBySlug = new Map<string, (typeof home.caseStudies.items)[number]>(
     home.caseStudies.items.map((item) => [item.slug, item]),
   );
 
