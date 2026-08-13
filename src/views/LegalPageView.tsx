@@ -1,9 +1,8 @@
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { Button } from "@/components/atoms/Button";
+import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
 import { SiteLayout } from "@/components/templates";
 import type { Locale } from "@/i18n/config";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
-import { localePath } from "@/i18n/paths";
 
 const copy = {
   en: {
@@ -50,13 +49,9 @@ export async function LegalPageView({
               {content.title}
             </h1>
             <p className="metric-legal__body">{content.body}</p>
-            <Button
-              href={localePath(locale, "/#contact")}
-              variant="primary"
-              className="mt-10"
-            >
+            <ProjectBriefCta variant="primary" className="mt-10">
               {home.footer.startCta}
-            </Button>
+            </ProjectBriefCta>
           </div>
         </PageContainer>
       </div>

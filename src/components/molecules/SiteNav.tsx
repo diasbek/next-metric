@@ -37,7 +37,7 @@ export function SiteNav({
   const pathname = usePathname();
   const hash = useLocationHash();
   const spyHash = useActiveSectionHash(items.map((item) => item.path));
-  const effectiveHash = spyHash ?? hash;
+  const effectiveHash = spyHash !== null ? spyHash : hash;
   const LinkComponent = TransitionLink;
 
   return (

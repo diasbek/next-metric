@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
+import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { CategoriesMarquee } from "@/components/molecules/CategoriesMarquee";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
@@ -129,9 +130,9 @@ export function MetricHeroSection({
               <span className="block">{hero.titleLine2}</span>
             </h1>
             <p className="metric-hero__subtitle">{hero.subtitle}</p>
-            <Button href={localePath(locale, "/#contact")} variant="primary" size="lg">
+            <ProjectBriefCta variant="primary" size="lg">
               {hero.cta}
-            </Button>
+            </ProjectBriefCta>
           </div>
 
           <div className="metric-hero__visual" aria-hidden>
@@ -330,9 +331,9 @@ export function MetricServicesSection({
               {services.subtitle}
             </p>
             <div className="metric-services__cta" data-reveal>
-              <Button href={localePath(locale, "/#contact")} variant="onAccent">
+              <ProjectBriefCta variant="onAccent">
                 {services.cta}
-              </Button>
+              </ProjectBriefCta>
             </div>
           </div>
 
@@ -350,7 +351,7 @@ export function MetricServicesSection({
                     fill
                     className="metric-services-card__img object-contain"
                     sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 560px, 900px"
-                    quality={85}
+                    quality={75}
                   />
                 </div>
                 <div className="metric-services-card__head">
@@ -420,7 +421,7 @@ export function MetricWorkflowSection({
                   height={imgH}
                   className="metric-workflow-card__img"
                   sizes="(max-width: 1024px) 90vw, 33vw"
-                  quality={85}
+                  quality={75}
                 />
               </div>
             );
@@ -457,9 +458,9 @@ export function MetricWorkflowSection({
 
         <div className="metric-workflow__cta" data-reveal>
           <p className="metric-workflow__note">{workflow.note}</p>
-          <Button href={localePath(locale, "/#contact")} variant="primary">
+          <ProjectBriefCta variant="primary">
             {workflow.cta}
-          </Button>
+          </ProjectBriefCta>
         </div>
       </PageContainer>
     </section>

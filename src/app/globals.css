@@ -1,16 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
 
-@font-face {
-  font-family: "Degular Display";
-  src:
-    url("/fonts/DegularDisplay-Semibold.woff2") format("woff2"),
-    url("/fonts/DegularDisplay-Semibold.woff") format("woff");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --background: #ffffff;
   --foreground: #090909;
@@ -18,7 +8,7 @@
   --surface: #f5f5f5;
   --muted: rgba(9, 9, 9, 0.6);
   --dark: #090909;
-  --font-display-stack: "Degular Display", var(--font-archivo), system-ui, sans-serif;
+  --font-display-stack: var(--font-archivo), system-ui, sans-serif;
 }
 
 @theme inline {
@@ -279,7 +269,6 @@ body {
 .metric-hero {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding-block: 24px 32px;
@@ -635,7 +624,6 @@ body {
     max-height: 100svh;
     min-height: 100svh;
     padding-bottom: clamp(16px, 2vh, 28px);
-    overflow: hidden;
   }
 
   .metric-hero__shell {
@@ -1469,8 +1457,11 @@ body {
   .metric-services-card__media {
     position: absolute;
     order: unset;
-    inset: 24px 0 24px auto;
-    width: 58%;
+    inset: unset;
+    top: 56px;
+    right: 0;
+    width: 62%;
+    height: calc(100% + 48px);
     aspect-ratio: auto;
     border-radius: 0;
     pointer-events: none;
@@ -1480,9 +1471,43 @@ body {
   }
 
   .metric-services-card__img {
-    /* Rotate around the window chrome so the top-left block stays whole. */
-    transform: rotate(-3.3deg);
+    /* Mockups sit large on the right and bleed out — card overflow clips. */
+    object-fit: contain;
+    object-position: left top;
+    transform: rotate(-3.6deg);
     transform-origin: left top;
+  }
+
+  /* Product images — wide listing, overflow right/bottom. */
+  .metric-services-card:nth-child(1) .metric-services-card__media {
+    top: 44px;
+    right: -7%;
+    width: 76%;
+    height: 112%;
+  }
+
+  /* A+ Content — tall stacked modules. */
+  .metric-services-card:nth-child(2) .metric-services-card__media {
+    top: 28px;
+    right: 2%;
+    width: 40%;
+    height: 132%;
+  }
+
+  /* Ad-Banner — search-result mockup. */
+  .metric-services-card:nth-child(3) .metric-services-card__media {
+    top: 36px;
+    right: -4%;
+    width: 54%;
+    height: 124%;
+  }
+
+  /* BrandStore — mobile storefront. */
+  .metric-services-card:nth-child(4) .metric-services-card__media {
+    top: 24px;
+    right: 4%;
+    width: 38%;
+    height: 138%;
   }
 }
 
@@ -2422,7 +2447,7 @@ body {
 .case-modal {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 220;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -2819,10 +2844,7 @@ body {
    Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
    content after scroll reveals complete — do not use that pattern. */
 html.gsap-pending [data-reveal]:not(.is-revealed),
-html.gsap-pending [data-reveal-group] > *:not(.is-revealed),
-html.gsap-pending .metric-hero__copy:not(.is-revealed),
-html.gsap-pending .metric-hero__visual:not(.is-revealed),
-html.gsap-pending .metric-hero__trust:not(.is-revealed) {
+html.gsap-pending [data-reveal-group] > *:not(.is-revealed) {
   visibility: hidden;
 }
 
@@ -2833,6 +2855,26 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
 .metric-hero__trust.is-revealed {
   visibility: visible !important;
   clip-path: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .metric-case-card,
+  .metric-workflow-card,
+  .metric-services-card,
+  .metric-categories__card,
+  .metric-work-card,
+  .metric-hero__trust > * {
+    transition: transform 0.32s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .metric-case-card:hover,
+  .metric-workflow-card:hover,
+  .metric-services-card:hover,
+  .metric-categories__card:hover,
+  .metric-work-card:hover,
+  .metric-hero__trust > *:hover {
+    transform: translateY(-8px) scale(1.012);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2851,10 +2893,215 @@ html.gsap-pending .metric-hero__trust:not(.is-revealed) {
   }
 
   .metric-cta:hover,
+  .metric-case-card:hover,
+  .metric-workflow-card:hover,
+  .metric-services-card:hover,
+  .metric-categories__card:hover,
   .metric-work-card:hover,
-  .metric-categories__card:hover {
+  .metric-hero__trust > *:hover {
     transform: none;
   }
+}
+
+/* Project brief modal — CTA “Start your project” */
+.project-brief {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+
+.project-brief__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(9, 9, 9, 0.52);
+}
+
+.project-brief__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 720px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-brief__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--dark);
+  box-shadow: 0 8px 24px rgba(9, 9, 9, 0.16);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.project-brief__close:hover {
+  background: color-mix(in srgb, #fff 92%, var(--dark));
+}
+
+.project-brief__panel {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: #fff;
+  border-radius: 28px;
+  padding: 28px 22px 32px;
+  box-shadow: 0 24px 80px rgba(9, 9, 9, 0.22);
+}
+
+@media (min-width: 768px) {
+  .project-brief {
+    align-items: center;
+    padding: 40px 24px;
+  }
+
+  .project-brief__panel {
+    padding: 40px 44px 44px;
+  }
+
+  .project-brief__close {
+    top: 18px;
+    right: 18px;
+  }
+}
+
+.project-brief__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 36px;
+  margin-bottom: 28px;
+}
+
+.project-brief__title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+
+.project-brief__subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.project-brief__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-brief__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.project-brief__label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.project-brief__num {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.project-brief__hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.project-brief__input--area {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.project-brief__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.project-brief__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.project-brief__option input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.project-brief__captcha {
+  min-height: 68px;
+}
+
+.project-brief__submit {
+  margin-top: 4px;
+}
+
+.project-brief__success {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0 8px;
+}
+
+.project-brief__success-title {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 44px);
+  letter-spacing: -0.03em;
+}
+
+.project-brief__success-body {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--muted);
 }
 
 /* Cookie consent banner (GDPR) — fixed bottom bar, appears until a choice

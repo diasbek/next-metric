@@ -6,7 +6,10 @@ interface GsapProviderLazyProps {
   children: React.ReactNode;
 }
 
-/** Client effects only — children (RSC) stay in the SSR HTML. */
+/**
+ * Thin client boundary so the layout can wrap RSC children.
+ * GSAP itself is imported inside GsapProvider effects / TransitionLink clicks.
+ */
 export function GsapProviderLazy({ children }: GsapProviderLazyProps) {
   return <GsapProvider>{children}</GsapProvider>;
 }

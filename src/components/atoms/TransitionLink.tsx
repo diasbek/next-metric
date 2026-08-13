@@ -4,15 +4,24 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ComponentProps } from "react";
 import {
-  isTransitioning,
-  navigateWithTransition,
-} from "@/animations/page-transition";
-import {
   getHashFromHref,
   isSameDocumentPath,
   navigateSameDocumentHash,
   navigateSameDocumentTop,
 } from "@/utils/scroll";
+
+type PageTransitionMod = typeof import("@/animations/page-transition");
+
+let transitionMod: PageTransitionMod | null = null;
+let transitionLoad: Promise<PageTransitionMod> | null = null;
+
+function loadPageTransition(): Promise<PageTransitionMod> {
+  transitionLoad ??= import("@/animations/page-transition").then((mod) => {
+    transitionMod = mod;
+    return mod;
+  });
+  return transitionLoad;
+}
 
 type TransitionLinkProps = ComponentProps<typeof Link>;
 
@@ -55,7 +64,7 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
 
         // Block native navigation while a page transition runs — otherwise
         // Next Link falls through and can stack hashes / flash white.
-        if (isTransitioning()) {
+        if (transitionMod?.isTransitioning()) {
           event.preventDefault();
           return;
         }
@@ -88,9 +97,12 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
         }
 
         event.preventDefault();
-        void navigateWithTransition(url, () =>
-          router.push(url, { scroll: false }),
-        );
+        void loadPageTransition().then((mod) => {
+          if (mod.isTransitioning()) return;
+          return mod.navigateWithTransition(url, () =>
+            router.push(url, { scroll: false }),
+          );
+        });
       }}
     />
   );

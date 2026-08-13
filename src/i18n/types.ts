@@ -60,6 +60,7 @@ export interface SiteContent {
     consentLinkLabel: string;
     consentSuffix: string;
     consentRequired: string;
+    captchaRequired: string;
     task: string;
     solution: string;
     nextProjects: string;
@@ -110,6 +111,41 @@ export interface SiteContent {
     breadcrumbServices: string;
     breadcrumbContacts: string;
     yearSuffix: string;
+  };
+  projectBrief: {
+    title: string;
+    subtitle: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    companyLabel: string;
+    companyPlaceholder: string;
+    linkLabel: string;
+    linkPlaceholder: string;
+    helpLabel: string;
+    helpHint: string;
+    helpRequired: string;
+    emailInvalid: string;
+    aboutLabel: string;
+    aboutPlaceholder: string;
+    submit: string;
+    submitting: string;
+    successTitle: string;
+    successBody: string;
+    closeLabel: string;
+    services: Record<
+      | "listingImages"
+      | "standardAplus"
+      | "premiumAplus"
+      | "brandStore"
+      | "viz3d"
+      | "redesign"
+      | "completeBrand"
+      | "ongoingSupport"
+      | "other",
+      string
+    >;
   };
   hero: {
     titleLines: [string, string];

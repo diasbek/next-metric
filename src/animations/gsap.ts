@@ -1,10 +1,7 @@
 import gsap from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { Flip } from "gsap/Flip";
-import { Observer } from "gsap/Observer";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
 let registered = false;
 let refreshTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -50,14 +47,7 @@ export function showAllRevealTargets(): void {
 export function registerGsapPlugins(): typeof gsap {
   if (typeof window === "undefined") return gsap;
   if (!registered) {
-    gsap.registerPlugin(
-      ScrollTrigger,
-      SplitText,
-      Flip,
-      Draggable,
-      Observer,
-      ScrollToPlugin,
-    );
+    gsap.registerPlugin(ScrollTrigger, Flip, Draggable);
     registered = true;
   }
   return gsap;
@@ -95,4 +85,4 @@ export function runMatchMedia(
   return () => mm.revert();
 }
 
-export { gsap, ScrollTrigger, Flip, Draggable, Observer, ScrollToPlugin, SplitText };
+export { gsap, ScrollTrigger, Flip, Draggable };

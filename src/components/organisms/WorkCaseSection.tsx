@@ -139,8 +139,8 @@ export async function WorkCaseSection({
                   alt=""
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1512px) 100vw, (max-width: 2560px) 90vw, 2560px"
-                  quality={85}
+                  sizes="100vw"
+                  quality={index === 0 ? 85 : 75}
                   priority={index === 0}
                 />
                 {index === 0 && caseStudy?.metricValue ? (
@@ -215,7 +215,7 @@ export async function WorkCaseSection({
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    quality={85}
+                    quality={75}
                   />
                 </div>
                 <div className="metric-work-card__body">

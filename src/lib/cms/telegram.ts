@@ -1,6 +1,7 @@
 import type { DbSiteSettings } from "@/lib/cms/types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSiteSettings } from "@/lib/cms/settings";
+import { PROJECT_BRIEF_PHONE_PLACEHOLDER } from "@/data/project-brief";
 import { SITE_CONFIG } from "@/utils/consts";
 
 const TELEGRAM_API = "https://api.telegram.org";
@@ -78,6 +79,7 @@ export async function sendTelegramMessage(
 export type LeadNotifyPayload = {
   name: string;
   phone: string;
+  email?: string | null;
   message: string;
   locale?: string | null;
   /** Attachments live in a private bucket — never send a raw URL here. */
@@ -94,7 +96,10 @@ export async function notifyLeadViaTelegram(lead: LeadNotifyPayload) {
   const text = [
     "🆕 Новая заявка METRIC",
     `Имя: ${lead.name}`,
-    `Телефон: ${lead.phone}`,
+    lead.email ? `Email: ${lead.email}` : null,
+    lead.phone && lead.phone !== PROJECT_BRIEF_PHONE_PLACEHOLDER
+      ? `Телефон: ${lead.phone}`
+      : null,
     lead.locale ? `Язык: ${lead.locale}` : null,
     lead.message ? `Сообщение:\n${lead.message}` : null,
     lead.hasAttachment ? "📎 Есть вложение — откройте в админ-панели" : null,

@@ -52,7 +52,7 @@ export type ResolvedAnalytics = {
   yandexWebmasterVerification: string;
 };
 
-export async function getResolvedAnalytics(): Promise<ResolvedAnalytics> {
+async function loadResolvedAnalytics(): Promise<ResolvedAnalytics> {
   const settings = await getSiteSettings();
   return {
     yandexMetrikaId:
@@ -76,3 +76,9 @@ export async function getResolvedAnalytics(): Promise<ResolvedAnalytics> {
       ),
   };
 }
+
+export const getResolvedAnalytics = unstable_cache(
+  loadResolvedAnalytics,
+  ["resolved-analytics"],
+  { tags: ["cms", "site_settings"], revalidate: false },
+);

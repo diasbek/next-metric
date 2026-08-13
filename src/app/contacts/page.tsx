@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function ContactsRedirect() {
-  redirect("/#contact");
+  redirect("/?brief=1");
 }

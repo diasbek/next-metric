@@ -111,7 +111,7 @@ export type DbPageSeo = {
 
 export type ProjectWithRelations = DbProject & {
   project_translations: DbProjectTranslation[];
-  project_media: DbProjectMedia[];
+  project_media?: DbProjectMedia[];
   project_blocks?: DbProjectBlock[];
 };
 
@@ -185,11 +185,12 @@ export function mapProjectRow(
     row.project_translations.find((t) => t.locale === "en");
   if (!tr) return null;
 
-  const hero = row.project_media
+  const media = row.project_media ?? [];
+  const hero = media
     .filter((m) => m.kind === "hero")
     .sort((a, b) => a.sort_order - b.sort_order)[0];
 
-  const blocks = buildBlocks(row.project_blocks, row.project_media);
+  const blocks = buildBlocks(row.project_blocks, media);
 
   let caseStudy: CaseStudy | undefined;
   const hasCaseCopy = Boolean(tr.case_year || tr.case_task || tr.case_solution);

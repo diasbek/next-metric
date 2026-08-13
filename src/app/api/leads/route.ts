@@ -16,11 +16,21 @@ import {
   isFileUpload,
   uploadLeadAttachment,
 } from "@/lib/cms/storage";
+import {
+  PROJECT_BRIEF_PHONE_PLACEHOLDER,
+  PROJECT_BRIEF_SERVICE_IDS,
+  PROJECT_BRIEF_SERVICE_LABELS,
+  type ProjectBriefServiceId,
+} from "@/data/project-brief";
 
 const MAX_NAME = 120;
 const MAX_PHONE = 40;
+const MAX_EMAIL = 160;
+const MAX_COMPANY = 160;
+const MAX_URL = 500;
 const MAX_MESSAGE = 4000;
 const MAX_BODY_BYTES = 32_768;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function allowedOrigins(): string[] {
   const extras = [
@@ -38,24 +48,49 @@ function allowedOrigins(): string[] {
   }
 }
 
-async function parseLeadPayload(request: NextRequest): Promise<{
+type LeadPayload = {
+  source: "contact" | "brief";
   name: string;
   phone: string;
+  email: string;
+  company: string;
+  productUrl: string;
+  services: string[];
   message: string;
   locale: string;
   consent: boolean;
   captchaToken: string;
   website: string;
   file: File | null;
-}> {
+};
+
+function parseServices(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw.map((item) => String(item).trim()).filter(Boolean);
+  }
+  if (typeof raw === "string" && raw.trim()) {
+    return raw
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+async function parseLeadPayload(request: NextRequest): Promise<LeadPayload> {
   const contentType = request.headers.get("content-type") ?? "";
 
   if (contentType.includes("multipart/form-data")) {
     const form = await request.formData();
     const fileValue = form.get("file");
     return {
+      source: String(form.get("source") ?? "") === "brief" ? "brief" : "contact",
       name: String(form.get("name") ?? ""),
       phone: String(form.get("phone") ?? ""),
+      email: String(form.get("email") ?? ""),
+      company: String(form.get("company") ?? ""),
+      productUrl: String(form.get("productUrl") ?? ""),
+      services: parseServices(form.getAll("services")),
       message: String(form.get("message") ?? ""),
       locale: String(form.get("locale") ?? ""),
       consent: String(form.get("consent") ?? "") === "true",
@@ -75,8 +110,13 @@ async function parseLeadPayload(request: NextRequest): Promise<{
   }
 
   let body: {
+    source?: string;
     name?: string;
     phone?: string;
+    email?: string;
+    company?: string;
+    productUrl?: string;
+    services?: unknown;
     message?: string;
     locale?: string;
     consent?: boolean | string;
@@ -90,8 +130,13 @@ async function parseLeadPayload(request: NextRequest): Promise<{
   }
 
   return {
+    source: body.source === "brief" ? "brief" : "contact",
     name: String(body.name ?? ""),
     phone: String(body.phone ?? ""),
+    email: String(body.email ?? ""),
+    company: String(body.company ?? ""),
+    productUrl: String(body.productUrl ?? ""),
+    services: parseServices(body.services),
     message: String(body.message ?? ""),
     locale: String(body.locale ?? ""),
     consent: body.consent === true || body.consent === "true",
@@ -99,6 +144,27 @@ async function parseLeadPayload(request: NextRequest): Promise<{
     website: String(body.website ?? ""),
     file: null,
   };
+}
+
+function formatBriefMessage(input: {
+  email: string;
+  company: string;
+  productUrl: string;
+  services: ProjectBriefServiceId[];
+  message: string;
+}): string {
+  const lines = [
+    `Email: ${input.email}`,
+    input.company ? `Company: ${input.company}` : null,
+    input.productUrl ? `Link: ${input.productUrl}` : null,
+    input.services.length
+      ? `Help with: ${input.services
+          .map((id) => PROJECT_BRIEF_SERVICE_LABELS[id])
+          .join(", ")}`
+      : null,
+    input.message ? `\n${input.message}` : null,
+  ].filter((line): line is string => Boolean(line));
+  return lines.join("\n");
 }
 
 export async function POST(request: NextRequest) {
@@ -143,11 +209,40 @@ export async function POST(request: NextRequest) {
     }
 
     const name = clampText(payload.name.trim(), MAX_NAME);
-    const phone = clampText(payload.phone.trim(), MAX_PHONE);
-    const message = clampText(payload.message.trim(), MAX_MESSAGE);
+    const email = clampText(payload.email.trim().toLowerCase(), MAX_EMAIL);
+    const company = clampText(payload.company.trim(), MAX_COMPANY);
+    const productUrl = clampText(payload.productUrl.trim(), MAX_URL);
     const locale = clampText(payload.locale.trim(), 8);
+    const allowedServices = new Set<string>(PROJECT_BRIEF_SERVICE_IDS);
+    const services = payload.services.filter((id): id is ProjectBriefServiceId =>
+      allowedServices.has(id),
+    );
 
-    if (!name || !phone) {
+    let phone = clampText(payload.phone.trim(), MAX_PHONE);
+    let message = clampText(payload.message.trim(), MAX_MESSAGE);
+
+    if (payload.source === "brief") {
+      if (!name || !email || !message) {
+        return NextResponse.json(
+          { error: "Name, email, and project details are required" },
+          { status: 400 },
+        );
+      }
+      if (!EMAIL_RE.test(email)) {
+        return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+      }
+      if (!services.length) {
+        return NextResponse.json(
+          { error: "Select at least one service" },
+          { status: 400 },
+        );
+      }
+      phone = phone || PROJECT_BRIEF_PHONE_PLACEHOLDER;
+      message = clampText(
+        formatBriefMessage({ email, company, productUrl, services, message }),
+        MAX_MESSAGE,
+      );
+    } else if (!name || !phone) {
       return NextResponse.json(
         { error: "Name and phone are required" },
         { status: 400 },
@@ -213,6 +308,7 @@ export async function POST(request: NextRequest) {
     void notifyLeadViaTelegram({
       name,
       phone,
+      email: email || null,
       message,
       locale: locale || null,
       hasAttachment: Boolean(attachmentPath),

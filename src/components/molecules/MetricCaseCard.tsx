@@ -49,7 +49,7 @@ export function MetricCaseCard({
           fill
           className="object-cover"
           sizes="(max-width: 1023px) 92vw, 42vw"
-          quality={85}
+          quality={75}
         />
       </TransitionLink>
     </article>

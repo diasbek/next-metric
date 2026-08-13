@@ -7,10 +7,10 @@ export const SITE_CONFIG = {
   description:
     "Strategic Amazon listing images and A+ Content designed to communicate value, inspire confidence, and turn attention into sales.",
   url: getCanonicalSiteUrl(),
-  // TODO: replace phone stub with the real Metric contact number before launch.
-  phone: "+987 778 99 88",
+  // Fallback only — live phone/address come from CMS site settings.
+  phone: getPublicEnv("NEXT_PUBLIC_CONTACT_PHONE", ""),
   email: getPublicEnv("NEXT_PUBLIC_CONTACT_EMAIL", "hello@metric.agency"),
-  address: ["Uzbekistan, Tashkent,", "Street"],
+  address: ["Tashkent, Uzbekistan"],
   map: {
     center: [69.279737, 41.311151] as [number, number],
     zoom: 15,

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/atoms/Button";
+import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { SiteNav } from "@/components/molecules/SiteNav";
@@ -31,7 +31,6 @@ export function Header({
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const homePath = localePath(locale, "/");
-  const contactPath = localePath(locale, "/#contact");
   const isHero = variant === "hero";
   const navItems = home.nav.map((item) => ({
     label: item.label,
@@ -103,14 +102,13 @@ export function Header({
           />
 
           <div className="flex items-center gap-3">
-            <Button
-              href={contactPath}
+            <ProjectBriefCta
               variant="outlineAccent"
               size="sm"
               className="site-header__cta"
             >
               {home.footer.startCta}
-            </Button>
+            </ProjectBriefCta>
             <button
               type="button"
               className="site-header__menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-foreground/15 lg:hidden"
@@ -152,15 +150,14 @@ export function Header({
             ariaLabel={ui.navAria}
             onNavigate={() => setOpen(false)}
           />
-          <Button
-            href={contactPath}
+          <ProjectBriefCta
             variant="outlineAccent"
             size="sm"
             className="w-full"
             onClick={() => setOpen(false)}
           >
             {home.footer.startCta}
-          </Button>
+          </ProjectBriefCta>
         </div>
       ) : null}
     </>

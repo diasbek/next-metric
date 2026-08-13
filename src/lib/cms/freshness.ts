@@ -24,7 +24,7 @@ async function fetchSiteSettingsUpdatedAt(): Promise<string | null> {
 const getCachedSettingsUpdatedAt = unstable_cache(
   fetchSiteSettingsUpdatedAt,
   ["cms-site-settings-updated-at"],
-  { tags: ["cms", "settings"], revalidate: false },
+  { tags: ["cms", "site_settings"], revalidate: false },
 );
 
 /** Latest CMS content timestamp for sitemap lastmod / og:updated_time. */

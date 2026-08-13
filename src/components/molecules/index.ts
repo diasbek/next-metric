@@ -1,5 +1,7 @@
 export { ProjectCard, ProjectTag } from "./ProjectCard";
 export { ContactForm } from "./ContactForm";
+export { ProjectBriefCta } from "./ProjectBriefCta";
+export { ProjectBriefProvider } from "./ProjectBriefProvider";
 export { CaseDetailModal } from "./CaseDetailModal";
 export { CaseDetailModalPage } from "./CaseDetailModalPage";
 export { CategoriesMarquee } from "./CategoriesMarquee";

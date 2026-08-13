@@ -13,7 +13,7 @@ export function GoogleTagManager({ containerId }: GoogleTagManagerProps) {
     <>
       <Script
         id="google-tag-manager"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

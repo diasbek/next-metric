@@ -152,7 +152,7 @@ export function ContactForm({
       (captcha.provider === "turnstile" || captcha.provider === "hcaptcha") &&
       !captchaToken
     ) {
-      setError("Captcha is required");
+      setError(ui.captchaRequired);
       setLoading(false);
       return;
     }

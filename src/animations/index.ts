@@ -31,28 +31,14 @@ function initHeroEntrance(): Cleanup {
     defaults: { ease: "power3.out" },
     onComplete: () => targets.forEach((el) => el.classList.add("is-revealed")),
   });
-  const titleLines = copy?.querySelectorAll(".metric-hero__title > span");
   const copyDetails = copy?.querySelectorAll(
     ".metric-hero__subtitle, .metric-cta",
   );
-  const heroCards = visual?.querySelectorAll(
-    ".metric-hero__card, .metric-hero__badge, .metric-hero__redesign",
-  );
   const trustCards = trust?.querySelectorAll(":scope > *");
 
+  // Title + visual stay in the first paint for LCP. GSAP only finishes
+  // subtitle/CTA/trust.
   timeline
-    .fromTo(
-      titleLines ?? [],
-      { autoAlpha: 0, y: 46, skewY: 3 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        skewY: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        clearProps: CLEAR_MOTION_PROPS,
-      },
-    )
     .fromTo(
       copyDetails ?? [],
       { autoAlpha: 0, y: 20 },
@@ -63,20 +49,6 @@ function initHeroEntrance(): Cleanup {
         stagger: 0.08,
         clearProps: CLEAR_MOTION_PROPS,
       },
-      "-=0.42",
-    )
-    .fromTo(
-      heroCards ?? [],
-      { autoAlpha: 0 },
-      {
-        autoAlpha: 1,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: "power3.out",
-        // Don't touch transform — CSS owns the card/badge rotates.
-        clearProps: "opacity,visibility",
-      },
-      "-=0.45",
     )
     .fromTo(
       trustCards ?? [],
@@ -116,47 +88,6 @@ function initCtaHovers(): Cleanup {
     cleanups.push(() => {
       el.removeEventListener("pointerenter", onEnter);
       el.removeEventListener("pointerleave", onLeave);
-    });
-  });
-
-  return () => cleanups.forEach((fn) => fn());
-}
-
-/** Card lifts + scales slightly. Images stay put — no inner zoom. */
-function initHomepageCardHovers(): Cleanup {
-  const cards = Array.from(
-    document.querySelectorAll<HTMLElement>(
-      ".metric-case-card, .metric-workflow-card, .metric-services-card, .metric-categories__card, .metric-work-card, .metric-hero__trust > *",
-    ),
-  );
-  const cleanups: Cleanup[] = [];
-
-  cards.forEach((card) => {
-    const onEnter = () => {
-      gsap.to(card, {
-        y: -8,
-        scale: 1.012,
-        duration: 0.32,
-        ease: "power3.out",
-        overwrite: true,
-      });
-    };
-    const onLeave = () => {
-      gsap.to(card, {
-        y: 0,
-        scale: 1,
-        duration: 0.38,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    };
-    card.addEventListener("pointerenter", onEnter);
-    card.addEventListener("pointerleave", onLeave);
-    cleanups.push(() => {
-      card.removeEventListener("pointerenter", onEnter);
-      card.removeEventListener("pointerleave", onLeave);
-      gsap.killTweensOf(card);
-      gsap.set(card, { clearProps: "transform" });
     });
   });
 
@@ -214,11 +145,7 @@ export function initAnimations(_pathname: string): Cleanup {
     cleanups.push(initBeforeAfterSliders());
     cleanups.push(
       runMatchMedia(FINE_POINTER, () => {
-        const hoverCleanups = [
-          initCtaHovers(),
-          initHomepageCardHovers(),
-          initFaqHovers(),
-        ];
+        const hoverCleanups = [initCtaHovers(), initFaqHovers()];
         return () => hoverCleanups.forEach((cleanup) => cleanup());
       }),
     );

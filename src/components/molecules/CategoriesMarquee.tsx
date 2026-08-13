@@ -36,7 +36,7 @@ function CardStrip({
             fill
             className="object-cover"
             sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, 420px"
-            quality={85}
+            quality={75}
             draggable={false}
           />
         </div>
@@ -69,6 +69,8 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
     let resumeTimer: ReturnType<typeof setTimeout> | null = null;
 
     const seq = track.querySelector<HTMLElement>(".metric-categories__seq");
+    const wrap = track.closest<HTMLElement>(".metric-categories__track-wrap");
+    let inView = true;
 
     const measure = () => {
       loopWidth = seq?.offsetWidth ?? 0;
@@ -83,16 +85,25 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
     };
 
     const tick = (time: number) => {
-      if (lastTime && !paused && loopWidth > 0) {
+      if (lastTime && !paused && inView && loopWidth > 0) {
         const dt = Math.min(time - lastTime, 48);
         offset += (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
         if (offset >= loopWidth) offset -= loopWidth;
         apply();
       }
-      lastTime = time;
+      lastTime = inView ? time : 0;
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
+
+    const intersection = new IntersectionObserver(
+      ([entry]) => {
+        inView = Boolean(entry?.isIntersecting);
+        if (inView) lastTime = 0;
+      },
+      { rootMargin: "80px" },
+    );
+    intersection.observe(wrap ?? track);
 
     const scheduleResume = () => {
       if (resumeTimer) clearTimeout(resumeTimer);
@@ -114,6 +125,7 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
     return () => {
       cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
+      intersection.disconnect();
       if (resumeTimer) clearTimeout(resumeTimer);
       track.style.transform = "";
       track.removeEventListener("pointerdown", pause);
@@ -144,7 +156,7 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
                 fill
                 className="object-cover"
                 sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, 420px"
-                quality={85}
+                quality={75}
                 draggable={false}
               />
             </div>

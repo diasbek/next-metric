@@ -11,9 +11,6 @@ import { getGlobalJsonLdGraph } from "@/utils/seo/json-ld";
 import { getResolvedAnalytics } from "@/lib/cms/settings";
 import { SITE_CONFIG } from "@/utils/consts";
 
-/** Always SSR so CMS edits are reflected on the next request after updateTag. */
-export const dynamic = "force-dynamic";
-
 export const viewport: Viewport = {
   themeColor: SITE_CONFIG.themeColor,
   colorScheme: "light",

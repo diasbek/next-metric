@@ -4,6 +4,7 @@ import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 import { getPublicCaptchaConfig } from "@/lib/cms/settings";
 import { Header } from "@/components/organisms/Header";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
+import { ProjectBriefProvider } from "@/components/molecules/ProjectBriefProvider";
 
 interface SiteLayoutProps {
   locale: Locale;
@@ -23,7 +24,12 @@ export async function SiteLayout({
   ]);
 
   return (
-    <>
+    <ProjectBriefProvider
+      locale={locale}
+      ui={content.ui}
+      captcha={captcha}
+      brief={content.projectBrief}
+    >
       <Header
         locale={locale}
         site={content.site}
@@ -42,6 +48,6 @@ export async function SiteLayout({
         captcha={captcha}
         home={home}
       />
-    </>
+    </ProjectBriefProvider>
   );
 }
