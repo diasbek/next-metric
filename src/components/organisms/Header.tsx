@@ -21,6 +21,35 @@ interface HeaderProps {
 
 const HERO_SCROLL_SOLIDIFY_PX = 24;
 
+function MetricLogo({
+  name,
+  href,
+  onClick,
+  priority,
+}: {
+  name: string;
+  href: string;
+  onClick?: () => void;
+  priority?: boolean;
+}) {
+  return (
+    <TransitionLink
+      href={href}
+      aria-label={name}
+      onClick={onClick}
+      className="site-header__logo-link"
+    >
+      <Image
+        src="/images/metric/logo/metric-logo.svg"
+        alt={name}
+        fill
+        className="object-contain object-left"
+        priority={priority}
+      />
+    </TransitionLink>
+  );
+}
+
 export function Header({
   locale,
   site,
@@ -30,6 +59,7 @@ export function Header({
 }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const homePath = localePath(locale, "/");
   const isHero = variant === "hero";
   const navItems = home.nav.map((item) => ({
@@ -56,9 +86,11 @@ export function Header({
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("resize", onResize);
+    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(frame);
     };
   }, [open]);
 
@@ -90,7 +122,6 @@ export function Header({
         ref={headerRef}
         data-site-header
         data-header-variant={variant}
-        data-menu-open={open ? "true" : undefined}
         className={
           isHero
             ? "site-header site-header--hero sticky top-0 z-50"
@@ -98,20 +129,7 @@ export function Header({
         }
       >
         <PageContainer className="site-header__inner">
-          <TransitionLink
-            href={homePath}
-            aria-label={site.name}
-            className="relative block h-10 w-[140px] shrink-0"
-            onClick={() => setOpen(false)}
-          >
-            <Image
-              src="/images/metric/logo/metric-logo.svg"
-              alt={site.name}
-              fill
-              className="object-contain object-left"
-              priority
-            />
-          </TransitionLink>
+          <MetricLogo name={site.name} href={homePath} priority />
 
           <SiteNav
             locale={locale}
@@ -131,15 +149,13 @@ export function Header({
             </ProjectBriefCta>
             <button
               type="button"
-              className={`site-header__menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-foreground/15 lg:hidden${
-                open ? " is-open" : ""
-              }`}
-              aria-label={open ? ui.closeMenu : ui.openMenu}
+              className="site-header__menu-btn"
+              aria-label={ui.openMenu}
               aria-expanded={open}
               aria-controls="site-mobile-menu"
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => setOpen(true)}
             >
-              <span className="sr-only">{open ? ui.closeMenu : ui.openMenu}</span>
+              <span className="sr-only">{ui.openMenu}</span>
               <span className="site-header__menu-icon" aria-hidden>
                 <span />
                 <span />
@@ -159,7 +175,28 @@ export function Header({
         inert={!open ? true : undefined}
         data-open={open ? "true" : undefined}
       >
-        <PageContainer className="mobile-menu-panel__inner">
+        <PageContainer className="mobile-menu-panel__bar">
+          <MetricLogo
+            name={site.name}
+            href={homePath}
+            onClick={() => setOpen(false)}
+          />
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="mobile-menu-panel__close"
+            aria-label={ui.closeMenu}
+            onClick={() => setOpen(false)}
+          >
+            <span className="sr-only">{ui.closeMenu}</span>
+            <span className="mobile-menu-panel__close-icon" aria-hidden>
+              <span />
+              <span />
+            </span>
+          </button>
+        </PageContainer>
+
+        <PageContainer className="mobile-menu-panel__body">
           <SiteNav
             locale={locale}
             items={navItems}
