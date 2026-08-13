@@ -419,21 +419,23 @@ body {
 }
 
 .metric-hero__card--left {
-  left: 10%;
-  top: 10%;
-  width: 50%;
+  left: 6%;
+  top: 16%;
+  width: 46%;
   /* Source photos are 3:4 (3000×4000). Lock the box to that ratio so
      object-cover neither crops nor letterboxes as the viewport changes. */
   aspect-ratio: 3 / 4;
-  z-index: 2;
+  transform: rotate(-5.25deg);
+  z-index: 1;
 }
 
 .metric-hero__card--right {
-  right: 6%;
+  right: 0;
   top: 0;
-  width: 56%;
+  width: 52%;
   aspect-ratio: 3 / 4;
-  z-index: 1;
+  transform: rotate(7.19deg);
+  z-index: 2;
 }
 
 .metric-hero__badge {
@@ -448,6 +450,7 @@ body {
   background: rgba(245, 245, 245, 0.45);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  transform: rotate(-5.25deg);
 }
 
 .metric-hero__badge-value {
@@ -470,10 +473,11 @@ body {
 
 .metric-hero__redesign {
   position: absolute;
-  right: 0;
-  bottom: 12%;
+  right: -2%;
+  bottom: 14%;
   z-index: 5;
   width: 138px;
+  transform: rotate(7.19deg);
 }
 
 .metric-hero__redesign-tag {
@@ -644,17 +648,17 @@ body {
   }
 
   .metric-hero__card--left {
-    left: 12%;
-    top: 8%;
-    width: min(50%, 280px);
+    left: 4%;
+    top: 12%;
+    width: min(46%, 284px);
     height: auto;
     aspect-ratio: 3 / 4;
   }
 
   .metric-hero__card--right {
-    right: 8%;
+    right: 2%;
     top: 0;
-    width: min(56%, 310px);
+    width: min(52%, 318px);
     height: auto;
     aspect-ratio: 3 / 4;
   }

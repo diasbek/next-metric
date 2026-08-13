@@ -67,15 +67,14 @@ function initHeroEntrance(): Cleanup {
     )
     .fromTo(
       heroCards ?? [],
-      { autoAlpha: 0, y: 28, scale: 0.97 },
+      { autoAlpha: 0 },
       {
         autoAlpha: 1,
-        y: 0,
-        scale: 1,
         duration: 0.6,
         stagger: 0.08,
         ease: "power3.out",
-        clearProps: CLEAR_MOTION_PROPS,
+        // Don't touch transform — CSS owns the card/badge rotates.
+        clearProps: "opacity,visibility",
       },
       "-=0.45",
     )
