@@ -29,18 +29,13 @@ export function useActiveSectionHash(itemPaths: string[]): string | null {
   const idsKey = itemPaths.map(hashFromItemPath).filter(Boolean).join("|");
 
   useEffect(() => {
-    if (!onHome) {
-      setActiveHash(null);
-      return;
-    }
+    if (!onHome) return;
 
     const ids = idsKey.split("|").filter(Boolean);
-    if (!ids.length) {
-      setActiveHash("");
-      return;
-    }
+    if (!ids.length) return;
 
     let ticking = false;
+    let frame = 0;
 
     const read = () => {
       const header = document.querySelector<HTMLElement>("[data-site-header]");
@@ -65,13 +60,14 @@ export function useActiveSectionHash(itemPaths: string[]): string | null {
       });
     };
 
-    read();
+    frame = requestAnimationFrame(read);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     window.addEventListener(LOCATION_CHANGE_EVENT, onScroll);
     window.addEventListener("hashchange", onScroll);
 
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       window.removeEventListener(LOCATION_CHANGE_EVENT, onScroll);

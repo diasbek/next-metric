@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo } from "next/font/google";
+import { degular, degularDisplay } from "@/assets/fonts";
 import "./globals.css";
 import { GsapProviderLazy } from "@/components/animations/GsapProviderLazy";
 import { SiteAnalytics } from "@/components/analytics";
@@ -17,15 +17,6 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };
-
-const archivo = Archivo({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
-  variable: "--font-archivo",
-  display: "swap",
-  preload: true,
-  adjustFontFallback: true,
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const analytics = await getResolvedAnalytics();
@@ -54,8 +45,12 @@ export default function RootLayout({
   modal: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={archivo.variable} suppressHydrationWarning>
-      <body className="antialiased">
+    <html
+      lang="en"
+      className={`${degular.variable} ${degularDisplay.variable}`}
+      suppressHydrationWarning
+    >
+      <body className={`${degular.className} antialiased`}>
         <JsonLd data={getGlobalJsonLdGraph()} />
         <ConsentProvider>
           <GsapProviderLazy>

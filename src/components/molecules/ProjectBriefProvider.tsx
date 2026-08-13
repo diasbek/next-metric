@@ -63,7 +63,9 @@ export function ProjectBriefProvider({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("brief") === "1") setIsOpen(true);
+    if (params.get("brief") !== "1") return;
+    const id = requestAnimationFrame(() => setIsOpen(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const value = useMemo(

@@ -44,7 +44,7 @@ function LogoLetters() {
     <text
       x={0}
       y={230}
-      fontFamily="var(--font-archivo), Archivo, system-ui, sans-serif"
+      fontFamily="var(--font-degular-display), var(--font-degular), system-ui, sans-serif"
       fontSize={240}
       fontWeight={500}
       letterSpacing="-0.04em"
