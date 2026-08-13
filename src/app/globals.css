@@ -631,33 +631,69 @@ body {
 
 @media (min-width: 1024px) {
   .metric-hero {
+    height: 100svh;
+    max-height: 100svh;
     min-height: 100svh;
-    padding-bottom: 28px;
+    padding-bottom: clamp(16px, 2vh, 28px);
+    overflow: hidden;
   }
 
   .metric-hero__shell {
-    padding-top: 8px;
-    gap: clamp(20px, 3vh, 48px);
+    min-height: 0;
+    padding-top: 0;
+    gap: clamp(16px, 2.2vh, 32px);
   }
 
   .metric-hero__main {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: 16px;
+    gap: clamp(12px, 1.5vw, 28px);
     align-items: center;
-    padding-top: clamp(8px, 2vh, 40px);
-    flex: 1;
+    padding-top: 0;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .metric-hero__copy {
-    gap: clamp(24px, 3.5vh, 40px);
+    gap: clamp(18px, 2.6vh, 36px);
+  }
+
+  .metric-hero__title {
+    font-size: clamp(48px, 9svh, 90px);
   }
 
   .metric-hero__visual {
+    height: 100%;
     justify-content: flex-end;
+    align-items: center;
+    min-height: 0;
   }
 
+  /* ~620×500 Figma pair, scaled by viewport so title + trust stay on-screen. */
   .metric-hero__cluster {
-    width: min(100%, 440px);
+    width: min(100%, 560px, 54svh);
+    padding-bottom: 84%;
+  }
+
+  .metric-hero__card--left {
+    left: 4%;
+    top: 16%;
+    width: 48%;
+  }
+
+  .metric-hero__card--right {
+    left: 38%;
+    top: 0;
+    width: 54%;
+  }
+
+  .metric-hero__badge {
+    left: 0;
+    bottom: 14%;
+  }
+
+  .metric-hero__redesign {
+    right: -2%;
+    bottom: 8%;
   }
 
   .metric-hero__trust {
@@ -669,8 +705,8 @@ body {
   }
 
   .metric-hero__trust-card {
-    min-height: 264px;
-    padding: 30px;
+    min-height: clamp(120px, 17svh, 220px);
+    padding: clamp(16px, 2svh, 28px);
   }
 }
 
@@ -690,7 +726,7 @@ body {
   }
 
   .metric-hero__title {
-    font-size: clamp(90px, 5vw, 128px);
+    font-size: clamp(72px, 8svh, 112px);
   }
 
   .metric-hero__subtitle {
@@ -703,17 +739,13 @@ body {
   }
 }
 
-@media (max-height: 860px) and (min-width: 1024px) {
+@media (max-height: 800px) and (min-width: 1024px) {
   .metric-hero__title {
-    font-size: clamp(48px, 6.5vh, 72px);
-  }
-
-  .metric-hero__trust-card {
-    min-height: 160px;
+    font-size: clamp(40px, 7.2svh, 64px);
   }
 
   .metric-hero__cluster {
-    width: min(100%, 380px);
+    width: min(100%, 48svh);
   }
 }
 
@@ -1428,29 +1460,29 @@ body {
   background: transparent;
 }
 
+.metric-services-card__img {
+  object-fit: contain;
+  object-position: left top;
+}
+
 @media (min-width: 1024px) {
   .metric-services-card__media {
     position: absolute;
     order: unset;
-    right: 0;
-    bottom: auto;
-    top: 50%;
+    inset: 24px 0 24px auto;
     width: 58%;
-    height: 92%;
     aspect-ratio: auto;
     border-radius: 0;
     pointer-events: none;
-    overflow: clip;
+    overflow: visible;
     background: transparent;
     z-index: 1;
-    transform: translateY(-50%);
   }
 
   .metric-services-card__img {
-    object-fit: contain;
-    object-position: center right;
-    transform: rotate(-3.3deg) scale(1.06);
-    transform-origin: center center;
+    /* Rotate around the window chrome so the top-left block stays whole. */
+    transform: rotate(-3.3deg);
+    transform-origin: left top;
   }
 }
 
