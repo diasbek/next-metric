@@ -1416,10 +1416,11 @@ body {
   .metric-services-card {
     width: calc(100% + 2 * var(--page-padding));
     margin-inline: calc(-1 * var(--page-padding));
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 16 / 9;
     height: auto;
     padding: 16px var(--page-padding) 0;
-    gap: 12px;
+    overflow: hidden;
+    isolation: isolate;
   }
 }
 
@@ -1519,8 +1520,7 @@ body {
 .metric-services-card__media {
   position: relative;
   width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
+  aspect-ratio: 1 / 1;
   overflow: visible;
   background: transparent;
 }
@@ -1533,17 +1533,21 @@ body {
 }
 
 @media (max-width: 1023px) {
-  .metric-services-card__media {
-    width: calc(100% + 2 * var(--page-padding));
-    margin-inline: calc(-1 * var(--page-padding));
+  .metric-services-card__head {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
   }
 
-  .metric-services-card__img {
-    width: 118%;
-    max-width: none;
-    height: auto;
-    inset: 0 auto auto 0;
-    object-position: top left;
+  /* Same 1:1 mockup size as before — the 16:9 card is only a window. */
+  .metric-services-card__media {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 72px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    pointer-events: none;
   }
 }
 

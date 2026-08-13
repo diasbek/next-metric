@@ -362,7 +362,7 @@ export function MetricServicesSection({
                     src={item.image}
                     alt=""
                     fill
-                    className="metric-services-card__img object-contain"
+                    className="metric-services-card__img"
                     sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 70vw, (max-width: 2559px) min(55vw, 1200px), min(50vw, 1600px)"
                     quality={75}
                   />
