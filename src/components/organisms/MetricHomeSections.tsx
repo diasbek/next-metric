@@ -125,42 +125,44 @@ export function MetricHeroSection({
           </div>
 
           <div className="metric-hero__visual" aria-hidden>
-            <div className="metric-hero__card metric-hero__card--left">
-              <Image
-                src={hero.product1}
-                alt=""
-                fill
-                priority
-                sizes="(max-width: 1024px) 46vw, (max-width: 1799px) 284px, 480px"
-                quality={85}
-                className="object-cover"
-              />
-            </div>
-            <div className="metric-hero__card metric-hero__card--right">
-              <Image
-                src={hero.product2}
-                alt=""
-                fill
-                priority
-                sizes="(max-width: 1024px) 52vw, (max-width: 1799px) 318px, 540px"
-                quality={85}
-                className="object-cover"
-              />
-            </div>
-
-            <div className="metric-hero__badge">
-              <p className="metric-hero__badge-value">{hero.badgeValue}</p>
-              <p className="metric-hero__badge-label">{hero.badgeLabel}</p>
-            </div>
-
-            <div className="metric-hero__redesign">
-              <div className="metric-hero__redesign-tag">
-                <span>{hero.redesignLabel}</span>
+            <div className="metric-hero__cluster">
+              <div className="metric-hero__card metric-hero__card--left">
+                <Image
+                  src={hero.product1}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(max-width: 1023px) 50vw, 280px"
+                  quality={85}
+                  className="object-cover"
+                />
               </div>
-              <div className="metric-hero__redesign-card">
-                <p className="metric-hero__redesign-value">{hero.redesignValue}</p>
-                <p className="metric-hero__redesign-delta">{hero.redesignDelta}</p>
-                <p className="metric-hero__redesign-caption">{hero.redesignCaption}</p>
+              <div className="metric-hero__card metric-hero__card--right">
+                <Image
+                  src={hero.product2}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(max-width: 1023px) 55vw, 300px"
+                  quality={85}
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="metric-hero__badge">
+                <p className="metric-hero__badge-value">{hero.badgeValue}</p>
+                <p className="metric-hero__badge-label">{hero.badgeLabel}</p>
+              </div>
+
+              <div className="metric-hero__redesign">
+                <div className="metric-hero__redesign-tag">
+                  <span>{hero.redesignLabel}</span>
+                </div>
+                <div className="metric-hero__redesign-card">
+                  <p className="metric-hero__redesign-value">{hero.redesignValue}</p>
+                  <p className="metric-hero__redesign-delta">{hero.redesignDelta}</p>
+                  <p className="metric-hero__redesign-caption">{hero.redesignCaption}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -317,14 +319,11 @@ export function MetricServicesSection({
             <p className="metric-services__subtitle" data-reveal>
               {services.subtitle}
             </p>
-            <Button
-              href={localePath(locale, "/#contact")}
-              variant="onAccent"
-              className="metric-services__cta"
-              data-reveal
-            >
-              {services.cta}
-            </Button>
+            <div className="metric-services__cta" data-reveal>
+              <Button href={localePath(locale, "/#contact")} variant="onAccent">
+                {services.cta}
+              </Button>
+            </div>
           </div>
 
           <div
