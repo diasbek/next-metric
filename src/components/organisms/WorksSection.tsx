@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { ProjectCard, ProjectTag } from "@/components/molecules/ProjectCard";
 import type { LocalePageProps } from "@/i18n/props";
@@ -20,7 +20,7 @@ export function WorksSection({ locale, content }: LocalePageProps) {
             data-reveal
           >
             <div className="js-parallax relative aspect-[1432/902] w-full overflow-hidden">
-              <Image
+              <MediaImage
                 src={featured.image}
                 alt={featured.title}
                 fill

@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { Divider } from "@/components/atoms";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import type { LocalePageProps } from "@/i18n/props";
 
 export function AgencyTeamSection({ content }: LocalePageProps) {
@@ -16,7 +16,7 @@ export function AgencyTeamSection({ content }: LocalePageProps) {
 
         <article className="agency-team__director" data-reveal>
           <div className="agency-team__director-photo">
-            <Image
+            <MediaImage
               src={agency.director.image}
               alt={agency.director.name}
               width={900}
@@ -35,7 +35,7 @@ export function AgencyTeamSection({ content }: LocalePageProps) {
         {agency.team.map((member, index) => (
           <article key={member.name} className="agency-team__member" data-reveal>
             <div className="agency-team__member-photo">
-              <Image
+              <MediaImage
                 src={member.image}
                 alt={member.name}
                 width={720}

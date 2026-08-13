@@ -39,10 +39,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({
   children,
-  modal,
 }: Readonly<{
   children: React.ReactNode;
-  modal: React.ReactNode;
 }>) {
   return (
     <html
@@ -55,7 +53,6 @@ export default function RootLayout({
         <ConsentProvider>
           <GsapProviderLazy>
             {children}
-            {modal}
           </GsapProviderLazy>
           <SiteAnalytics />
           <CookieConsentBanner />

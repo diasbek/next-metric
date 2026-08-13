@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
+import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import type { Project } from "@/data/projects";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
@@ -37,18 +38,18 @@ interface WorkCaseSectionProps {
   locale: Locale;
   content: SiteContent;
   project: Project;
-  /** Full page (default) or content inside desktop case modal. */
-  presentation?: "page" | "modal";
 }
 
 export async function WorkCaseSection({
   locale,
   content,
   project,
-  presentation = "page",
 }: WorkCaseSectionProps) {
   const { ui } = content;
   const home = await getMetricHomeResolved(locale);
+  const homeCaseBySlug = new Map(
+    home.caseStudies.items.map((item) => [item.slug, item]),
+  );
   const caseStudy = project.caseStudy;
   const nextProjects = await getNextProjects(locale, project.slug);
   const stripImages = caseStripImages(project);
@@ -70,11 +71,7 @@ export async function WorkCaseSection({
   ];
 
   return (
-    <article
-      className={
-        presentation === "modal" ? "metric-case metric-case--modal" : "metric-case"
-      }
-    >
+    <article className="metric-case">
       <PageContainer>
         <header className="metric-case__intro" data-reveal>
           <div className="metric-case__intro-copy">
@@ -134,7 +131,7 @@ export async function WorkCaseSection({
           <section className="metric-case__stack mt-12 md:mt-16" data-reveal>
             {stripImages.map((src, index) => (
               <div key={`${src}-${index}`} className="metric-case__stack-item">
-                <Image
+                <MediaImage
                   src={src}
                   alt=""
                   fill
@@ -173,7 +170,7 @@ export async function WorkCaseSection({
                   </p>
                   <div className="mt-8 flex items-center gap-3">
                     <div className="relative size-12 overflow-hidden rounded-full bg-[color:var(--surface)]">
-                      <Image
+                      <MediaImage
                         src={review.avatar}
                         alt=""
                         fill
@@ -205,33 +202,27 @@ export async function WorkCaseSection({
               {home.caseStudies.moreLabel}
             </Button>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {nextProjects.slice(0, 2).map((item) => (
-              <article key={item.slug} className="metric-work-card group">
-                <div className="metric-work-card__media">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    quality={75}
-                  />
-                </div>
-                <div className="metric-work-card__body">
-                  <h3 className="metric-work-card__title">
-                    {item.quote ?? item.description}
-                  </h3>
-                  <Button
-                    href={localePath(locale, `/works/${item.slug}/`)}
-                    variant="dark"
-                    className="mt-6"
-                  >
-                    {home.caseStudies.viewLabel}
-                  </Button>
-                </div>
-              </article>
-            ))}
+          <div
+            className="metric-case-studies__list"
+            data-reveal-group="pop"
+            data-reveal-stagger="0.12"
+          >
+            {nextProjects.slice(0, 2).map((item) => {
+              const fromHome = homeCaseBySlug.get(item.slug);
+              return (
+                <MetricCaseCard
+                  key={item.slug}
+                  href={localePath(locale, `/works/${item.slug}/`)}
+                  tags={fromHome?.tags ?? item.tags}
+                  quote={fromHome?.quote ?? item.quote ?? item.title}
+                  author={fromHome?.author ?? item.author ?? item.title}
+                  role={fromHome?.role ?? item.role ?? item.description}
+                  image={fromHome?.image ?? item.image}
+                  imageAlt={item.title}
+                  viewLabel={home.caseStudies.viewLabel}
+                />
+              );
+            })}
           </div>
         </section>
       </PageContainer>

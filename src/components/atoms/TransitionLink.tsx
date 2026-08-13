@@ -36,12 +36,6 @@ function hrefToUrl(href: TransitionLinkProps["href"]): string {
   return "";
 }
 
-/** Soft-open case detail (intercepting modal) — skip full-page FLIP transition. */
-function isWorkCaseDetailHref(url: string): boolean {
-  const path = url.split(/[?#]/)[0] ?? "";
-  return /(?:^|\/)works\/[^/]+\/?$/.test(path);
-}
-
 export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -86,13 +80,6 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
         if (!hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentTop();
-          return;
-        }
-
-        // Case detail: desktop modal via intercepting route — no page FLIP.
-        if (isWorkCaseDetailHref(url)) {
-          event.preventDefault();
-          router.push(url, { scroll: false });
           return;
         }
 

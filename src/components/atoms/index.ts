@@ -1,5 +1,7 @@
 export { Button } from "./Button";
 export type { ButtonProps, ButtonSize, ButtonVariant } from "./Button";
+export { MediaImage } from "./MediaImage";
+export type { MediaImageProps } from "./MediaImage";
 export { SectionTitle } from "./SectionTitle";
 export { Divider } from "./Divider";
 export { PageContainer } from "./PageContainer";

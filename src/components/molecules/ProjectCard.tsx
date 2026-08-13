@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import type { Project } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
@@ -33,7 +33,7 @@ export function ProjectCard({
         className="relative aspect-[701/486] w-full overflow-hidden"
         data-flip-id={`work-image-${project.slug}`}
       >
-        <Image
+        <MediaImage
           src={project.image}
           alt={project.title}
           fill

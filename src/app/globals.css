@@ -74,6 +74,68 @@ body {
   line-height: var(--leading-display);
 }
 
+/* Photo frames: skeleton sits on top until decode, then fades out.
+   Image itself stays opacity:1 so cached / already-painted shots don't blink. */
+.media-image {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.media-image--fill {
+  position: absolute;
+  inset: 0;
+  width: auto;
+}
+
+.media-image__skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--surface);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+}
+
+.media-image__skeleton[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.28s ease, visibility 0s linear 0s;
+}
+
+.media-image__skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 46%,
+    transparent 72%
+  );
+  transform: translateX(-100%);
+  animation: media-image-shimmer 1.15s ease-in-out infinite;
+}
+
+@keyframes media-image-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-image__skeleton {
+    transition: none;
+  }
+
+  .media-image__skeleton::after {
+    animation: none;
+  }
+}
+
 /* —— Metric CTAs ——
    Rounded parallelogram: skew shell + counter-skew label.
    Prefer <Button variant size /> — CSS classes remain for GSAP / legacy. */
@@ -2630,145 +2692,6 @@ html.is-mobile-menu-open {
   padding-block: 40px 80px;
 }
 
-.metric-case--modal {
-  padding-block: 12px 32px;
-}
-
-.metric-case--modal .page-container {
-  max-width: none;
-  width: 100%;
-  padding-inline: max(20px, env(safe-area-inset-left, 0px))
-    max(20px, env(safe-area-inset-right, 0px));
-}
-
-/* Case detail modal — Figma MacBook Pro 14" - 16 (2015:280) */
-.case-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 220;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 0;
-}
-
-.case-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  background: rgba(9, 9, 9, 0.48);
-}
-
-.case-modal__dialog {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  max-height: 100%;
-  padding: 0;
-  pointer-events: none;
-}
-
-.case-modal__close {
-  pointer-events: auto;
-  position: absolute;
-  top: max(12px, env(safe-area-inset-top, 0px));
-  left: 50%;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--dark);
-  box-shadow: 0 8px 28px rgba(9, 9, 9, 0.18);
-  cursor: pointer;
-  transform: translateX(-50%);
-}
-
-.case-modal__close:hover {
-  background: color-mix(in srgb, #fff 92%, var(--dark));
-}
-
-.case-modal__close-icon {
-  display: block;
-  font-size: 28px;
-  line-height: 1;
-  font-weight: 400;
-  transform: translateY(-1px);
-}
-
-.case-modal__panel {
-  pointer-events: auto;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background: #fff;
-  overscroll-behavior: contain;
-  /* Close button sits over the panel — keep copy/media clear of it and notches. */
-  padding-top: calc(68px + env(safe-area-inset-top, 0px));
-  padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
-}
-
-@media (min-width: 1024px) {
-  .case-modal {
-    padding: 48px 60px 40px;
-  }
-
-  .case-modal__dialog {
-    width: min(var(--container-max), calc(100vw - 120px));
-    height: auto;
-    max-height: calc(100dvh - 88px);
-  }
-
-  .case-modal__close {
-    top: 0;
-    width: 64px;
-    height: 64px;
-  }
-
-  .case-modal__panel {
-    margin-top: 80px;
-    width: 100%;
-    height: auto;
-    max-height: calc(100dvh - 128px);
-    border-radius: var(--radius-xl);
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-inline: 48px;
-  }
-
-  .metric-case--modal {
-    padding-block: 40px 64px;
-  }
-
-  .metric-case--modal .page-container {
-    padding-inline: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .case-modal__backdrop,
-  .case-modal__panel {
-    transition: none;
-  }
-}
-
 .metric-legal__inner {
   max-width: 52rem;
 }
@@ -3036,6 +2959,10 @@ html.is-mobile-menu-open {
   border-radius: var(--radius-xl);
   background: var(--surface);
   padding: 28px;
+}
+
+.metric-case .metric-case-studies__list {
+  margin-top: 0;
 }
 
 /* Motion helpers

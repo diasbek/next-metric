@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 
 export type MetricCaseCardProps = {
@@ -43,7 +43,7 @@ export function MetricCaseCard({
         </Button>
       </div>
       <TransitionLink href={href} className="metric-case-card__media" aria-label={viewLabel}>
-        <Image
+        <MediaImage
           src={image}
           alt={imageAlt || author}
           fill

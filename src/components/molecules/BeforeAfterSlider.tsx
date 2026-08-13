@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { MediaImage } from "@/components/atoms/MediaImage";
 
 interface BeforeAfterSliderProps {
   beforeImage: string;
@@ -42,24 +43,22 @@ export function BeforeAfterSlider({
   return (
     <div ref={rootRef} data-before-after data-no-section-snap className="case-slider">
       <div className="case-slider__frame">
-        <Image
+        <MediaImage
           src={afterImage}
           alt={afterLabel}
           fill
           className="case-slider__image object-cover"
           sizes="(max-width: 1512px) 100vw, (max-width: 3840px) 92vw, 3840px"
           quality={85}
-          priority={false}
         />
         <div data-ba-overlay className="case-slider__before">
-          <Image
+          <MediaImage
             src={beforeImage}
             alt={beforeLabel}
             fill
             className="case-slider__image object-cover"
             sizes="(max-width: 1512px) 100vw, (max-width: 3840px) 92vw, 3840px"
             quality={85}
-            priority={false}
           />
         </div>
 

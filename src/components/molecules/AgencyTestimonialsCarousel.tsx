@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useRef } from "react";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import type { Swiper as SwiperInstance } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { SectionTitle } from "@/components/atoms";
@@ -72,7 +72,7 @@ export function AgencyTestimonialsCarousel({
 
               <div className="agency-testimonials__author">
                 <div className="agency-testimonials__avatar agency-testimonials__avatar--person">
-                  <Image
+                  <MediaImage
                     src={item.personImage}
                     alt={item.role}
                     fill
@@ -96,7 +96,7 @@ export function AgencyTestimonialsCarousel({
                     .filter(Boolean)
                     .join(" ")}
                 >
-                  <Image
+                  <MediaImage
                     src={item.logoImage}
                     alt={
                       item.role.includes(",")

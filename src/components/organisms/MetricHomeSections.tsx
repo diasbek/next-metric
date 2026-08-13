@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/atoms/Button";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import { LiquidGlassPlaque } from "@/components/atoms/LiquidGlassPlaque";
 import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
 import { PageContainer } from "@/components/atoms/PageContainer";
@@ -358,10 +359,11 @@ export function MetricServicesSection({
                   </Button>
                 </div>
                 <div className="metric-services-card__media">
-                  <Image
+                  <MediaImage
                     src={item.image}
                     alt=""
                     fill
+                    skeleton={false}
                     className="metric-services-card__img"
                     sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 70vw, (max-width: 2559px) min(55vw, 1200px), min(50vw, 1600px)"
                     quality={75}
@@ -414,11 +416,12 @@ export function MetricWorkflowSection({
             const [imgW, imgH] = workflowImageSize(card.image);
             const media = (
               <div className="metric-workflow-card__media">
-                <Image
+                <MediaImage
                   src={card.image}
                   alt=""
                   width={imgW}
                   height={imgH}
+                  skeleton={false}
                   className="metric-workflow-card__img"
                   sizes="(max-width: 1024px) 90vw, 33vw"
                   quality={75}

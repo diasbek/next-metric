@@ -62,6 +62,7 @@ export function Header({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const homePath = localePath(locale, "/");
   const isHero = variant === "hero";
+  const cta = home.footer.startCta;
   const navItems = home.nav.map((item) => ({
     label: item.label,
     path: item.href,
@@ -145,7 +146,7 @@ export function Header({
               size="sm"
               className="site-header__cta"
             >
-              {home.footer.startCta}
+              {cta}
             </ProjectBriefCta>
             <button
               type="button"
@@ -210,7 +211,7 @@ export function Header({
             className="mobile-menu-panel__cta"
             onClick={() => setOpen(false)}
           >
-            {home.footer.startCta}
+            {cta}
           </ProjectBriefCta>
         </PageContainer>
       </div>

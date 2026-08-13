@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useSyncExternalStore } from "react";
+import { MediaImage } from "@/components/atoms/MediaImage";
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -30,7 +30,7 @@ function CardStrip({
     <div className="metric-categories__seq" aria-hidden={inert || undefined}>
       {images.map((src, index) => (
         <div key={`${keyPrefix}-${src}-${index}`} className="metric-categories__card">
-          <Image
+          <MediaImage
             src={src}
             alt=""
             fill
@@ -150,7 +150,7 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
         <div className="metric-categories__track">
           {images.map((src, index) => (
             <div key={`${src}-${index}`} className="metric-categories__card">
-              <Image
+              <MediaImage
                 src={src}
                 alt=""
                 fill
