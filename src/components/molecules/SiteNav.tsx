@@ -2,6 +2,7 @@
 
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { usePathname } from "next/navigation";
+import { useActiveSectionHash } from "@/hooks/useActiveSectionHash";
 import { useLocationHash } from "@/hooks/useLocationHash";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -35,6 +36,8 @@ export function SiteNav({
 }: SiteNavProps) {
   const pathname = usePathname();
   const hash = useLocationHash();
+  const spyHash = useActiveSectionHash(items.map((item) => item.path));
+  const effectiveHash = spyHash ?? hash;
   const LinkComponent = TransitionLink;
 
   return (
@@ -43,7 +46,7 @@ export function SiteNav({
       aria-label={ariaLabel}
     >
       {items.map((item) => {
-        const active = isNavPathActive(pathname, item.path, hash);
+        const active = isNavPathActive(pathname, item.path, effectiveHash);
 
         return (
           <LinkComponent
