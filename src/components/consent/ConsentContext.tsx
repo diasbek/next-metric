@@ -28,6 +28,10 @@ type ConsentContextValue = {
 
 const ConsentContext = createContext<ConsentContextValue | null>(null);
 
+function subscribeNever() {
+  return () => undefined;
+}
+
 function subscribe(callback: () => void): () => void {
   const onStorage = (event: StorageEvent) => {
     if (event.key === CONSENT_STORAGE_KEY) callback();
@@ -52,13 +56,28 @@ function getServerSnapshot(): string | null {
   return null;
 }
 
+function getClientMounted(): boolean {
+  return true;
+}
+
+function getServerMounted(): boolean {
+  return false;
+}
+
 export function ConsentProvider({ children }: { children: ReactNode }) {
+  const mounted = useSyncExternalStore(
+    subscribeNever,
+    getClientMounted,
+    getServerMounted,
+  );
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
 
   const decision = useMemo(() => readConsent(raw), [raw]);
   const status: ConsentStatus = decision ? "resolved" : "pending";
-  const isPanelOpen = decision === null ? true : preferencesOpen;
+  // Hidden until the client has read localStorage — otherwise the portal
+  // flashes for visitors who already confirmed.
+  const isPanelOpen = mounted && (decision === null || preferencesOpen);
 
   const acceptAll = useCallback(() => {
     writeConsent("accepted");
