@@ -8,7 +8,7 @@ import { stripLocalePrefix } from "@/i18n/paths";
 const COPY = {
   en: {
     title: "We value your privacy",
-    body: "We use strictly necessary cookies to run this site, and — only with your permission — analytics cookies (Yandex Metrika, Google Analytics/Tag Manager) to understand traffic. Analytics stays off until you accept.",
+    body: "We use cookies to run this site and to understand traffic. Your choice is saved in this browser.",
     privacyLinkLabel: "Privacy Policy",
     acceptAll: "Accept all",
     rejectAll: "Necessary only",
@@ -16,7 +16,7 @@ const COPY = {
   },
   de: {
     title: "Ihre Privatsphäre ist uns wichtig",
-    body: "Wir verwenden technisch notwendige Cookies für den Betrieb der Website und — nur mit Ihrer Zustimmung — Analyse-Cookies (Yandex Metrika, Google Analytics/Tag Manager). Analyse bleibt deaktiviert, bis Sie zustimmen.",
+    body: "Wir verwenden Cookies für den Betrieb der Website und für die Traffic-Analyse. Ihre Auswahl speichern wir in diesem Browser.",
     privacyLinkLabel: "Datenschutzerklärung",
     acceptAll: "Alle akzeptieren",
     rejectAll: "Nur notwendige",

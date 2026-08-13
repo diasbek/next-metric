@@ -18,9 +18,7 @@ import {
 import type { ConsentStatus } from "@/lib/consent/types";
 
 type ConsentContextValue = {
-  /** "pending" until a decision is stored — banner/preferences must stay reachable. */
   status: ConsentStatus;
-  analyticsConsent: boolean;
   isPanelOpen: boolean;
   acceptAll: () => void;
   rejectAll: () => void;
@@ -42,8 +40,6 @@ function subscribe(callback: () => void): () => void {
   };
 }
 
-/** Raw string snapshot (not the parsed object) so useSyncExternalStore can
- * cheaply compare it and avoid the "getSnapshot should be cached" pitfall. */
 function getSnapshot(): string | null {
   try {
     return window.localStorage.getItem(CONSENT_STORAGE_KEY);
@@ -57,26 +53,20 @@ function getServerSnapshot(): string | null {
 }
 
 export function ConsentProvider({ children }: { children: ReactNode }) {
-  // Synced with localStorage via the browser's storage event / our custom
-  // event — this is the React-recommended way to read an external mutable
-  // store without setState-in-effect cascades or SSR hydration mismatches.
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
 
   const decision = useMemo(() => readConsent(raw), [raw]);
   const status: ConsentStatus = decision ? "resolved" : "pending";
-  const analyticsConsent = decision?.analytics ?? false;
-  // No decision yet → keep the banner up (no silent dismissal); once
-  // resolved, visibility is purely driven by the "manage cookies" toggle.
   const isPanelOpen = decision === null ? true : preferencesOpen;
 
   const acceptAll = useCallback(() => {
-    writeConsent(true);
+    writeConsent("accepted");
     setPreferencesOpen(false);
   }, []);
 
   const rejectAll = useCallback(() => {
-    writeConsent(false);
+    writeConsent("necessary");
     setPreferencesOpen(false);
   }, []);
 
@@ -86,14 +76,13 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       status,
-      analyticsConsent,
       isPanelOpen,
       acceptAll,
       rejectAll,
       openPreferences,
       closePanel,
     }),
-    [status, analyticsConsent, isPanelOpen, acceptAll, rejectAll, openPreferences, closePanel],
+    [status, isPanelOpen, acceptAll, rejectAll, openPreferences, closePanel],
   );
 
   return <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>;

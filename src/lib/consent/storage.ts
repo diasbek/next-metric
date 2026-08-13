@@ -1,6 +1,5 @@
-import type { ConsentDecision } from "./types";
+import type { ConsentChoice, ConsentDecision } from "./types";
 
-/** Bump when consent categories or their meaning change materially. */
 export const CONSENT_VERSION = 1;
 export const CONSENT_STORAGE_KEY = "metric_cookie_consent";
 export const CONSENT_EVENT = "metric:consent-change";
@@ -9,30 +8,39 @@ function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
 
-/** Pass `raw` to parse an already-read value (e.g. from useSyncExternalStore)
- * instead of reading localStorage again. */
+function parseChoice(value: unknown): ConsentChoice | null {
+  if (value === "accepted" || value === "necessary") return value;
+  if (value === true) return "accepted";
+  if (value === false) return "necessary";
+  return null;
+}
+
+/** Pass `raw` to parse an already-read value (e.g. from useSyncExternalStore). */
 export function readConsent(raw?: string | null): ConsentDecision | null {
-  const source = raw !== undefined ? raw : isBrowser() ? window.localStorage.getItem(CONSENT_STORAGE_KEY) : null;
+  const source =
+    raw !== undefined
+      ? raw
+      : isBrowser()
+        ? window.localStorage.getItem(CONSENT_STORAGE_KEY)
+        : null;
   if (!source) return null;
   try {
-    const parsed = JSON.parse(source) as Partial<ConsentDecision>;
-    if (
-      typeof parsed.analytics !== "boolean" ||
-      typeof parsed.version !== "number" ||
-      typeof parsed.decidedAt !== "number"
-    ) {
-      return null;
-    }
-    if (parsed.version !== CONSENT_VERSION) return null;
-    return parsed as ConsentDecision;
+    const parsed = JSON.parse(source) as Partial<ConsentDecision> & {
+      analytics?: boolean;
+    };
+    const choice = parseChoice(parsed.choice ?? parsed.analytics);
+    const decidedAt =
+      typeof parsed.decidedAt === "number" ? parsed.decidedAt : Number.NaN;
+    if (!choice || !Number.isFinite(decidedAt)) return null;
+    return { choice, version: CONSENT_VERSION, decidedAt };
   } catch {
     return null;
   }
 }
 
-export function writeConsent(analytics: boolean): ConsentDecision {
+export function writeConsent(choice: ConsentChoice): ConsentDecision {
   const decision: ConsentDecision = {
-    analytics,
+    choice,
     version: CONSENT_VERSION,
     decidedAt: Date.now(),
   };
@@ -41,19 +49,8 @@ export function writeConsent(analytics: boolean): ConsentDecision {
       window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(decision));
       window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: decision }));
     } catch {
-      // localStorage unavailable (private mode / disabled) — consent simply
-      // won't persist across reloads, analytics stays blocked by default.
+      /* private mode — banner may reappear on reload */
     }
   }
   return decision;
-}
-
-export function clearConsent(): void {
-  if (!isBrowser()) return;
-  try {
-    window.localStorage.removeItem(CONSENT_STORAGE_KEY);
-    window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: null }));
-  } catch {
-    // ignore
-  }
 }

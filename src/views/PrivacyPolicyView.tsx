@@ -45,28 +45,28 @@ const COOKIE_ROWS_EN: CookieRow[] = [
     provider: "Yandex Metrika",
     purpose: "Distinguishes visitors, records clicks/scroll for traffic analytics",
     duration: "Up to 1 year",
-    category: "Analytics — set only after consent",
+    category: "Analytics",
   },
   {
     name: "_ga, _ga_*",
     provider: "Google Analytics",
     purpose: "Distinguishes visitors across sessions",
     duration: "Up to 2 years",
-    category: "Analytics — set only after consent",
+    category: "Analytics",
   },
   {
     name: "_gid",
     provider: "Google Analytics",
     purpose: "Distinguishes visitors within a day",
     duration: "24 hours",
-    category: "Analytics — set only after consent",
+    category: "Analytics",
   },
   {
     name: "Container-defined (varies)",
     provider: "Google Tag Manager",
     purpose: "Loads and manages other analytics/marketing tags we configure",
     duration: "Varies by tag",
-    category: "Analytics — set only after consent",
+    category: "Analytics",
   },
   {
     name: "metric_cookie_consent",
@@ -104,28 +104,28 @@ const COOKIE_ROWS_DE: CookieRow[] = [
     provider: "Yandex Metrika",
     purpose: "Unterscheidet Besucher, erfasst Klicks/Scroll für die Traffic-Analyse",
     duration: "Bis zu 1 Jahr",
-    category: "Analyse — nur nach Zustimmung",
+    category: "Analyse",
   },
   {
     name: "_ga, _ga_*",
     provider: "Google Analytics",
     purpose: "Unterscheidet Besucher über mehrere Sitzungen hinweg",
     duration: "Bis zu 2 Jahre",
-    category: "Analyse — nur nach Zustimmung",
+    category: "Analyse",
   },
   {
     name: "_gid",
     provider: "Google Analytics",
     purpose: "Unterscheidet Besucher innerhalb eines Tages",
     duration: "24 Stunden",
-    category: "Analyse — nur nach Zustimmung",
+    category: "Analyse",
   },
   {
     name: "Container-abhängig (variiert)",
     provider: "Google Tag Manager",
     purpose: "Lädt und verwaltet weitere von uns konfigurierte Analyse-/Marketing-Tags",
     duration: "Abhängig vom Tag",
-    category: "Analyse — nur nach Zustimmung",
+    category: "Analyse",
   },
   {
     name: "metric_cookie_consent",
@@ -192,7 +192,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
           paragraphs: [
             "Kontaktformular: Wenn Sie unser Kontaktformular ausfüllen, verarbeiten wir Ihren Namen, Ihre Telefonnummer, Ihre Nachricht, optional eine angehängte Datei sowie das Formularfeld für die Zustimmung und den Zeitpunkt der Übermittlung.",
             "Technische Daten: Bei jedem Seitenaufruf verarbeiten unser Hosting-Anbieter und unsere Sicherheitsdienste (z. B. Bot-/Spam-Schutz) automatisch technische Daten wie IP-Adresse, Zeitstempel und grundlegende Anfrageinformationen, um Missbrauch zu verhindern und die Website betriebsbereit zu halten.",
-            "Analyse-Daten: Nur wenn Sie den Analyse-Cookies über unser Consent-Banner zustimmen, verarbeiten wir Nutzungsdaten (z. B. besuchte Seiten, Klicks, ungefähre Herkunft) über Yandex Metrika und/oder Google Analytics bzw. Google Tag Manager.",
+            "Analyse-Daten: Wir verarbeiten Nutzungsdaten (z. B. besuchte Seiten, Klicks, ungefähre Herkunft) über Yandex Metrika und/oder Google Analytics bzw. Google Tag Manager.",
           ],
         },
         {
@@ -200,7 +200,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
           list: [
             "Bearbeitung von Anfragen über das Kontaktformular: Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen) bzw. lit. f (berechtigtes Interesse an der Beantwortung von Anfragen).",
             "Sicherheit, Betrugs- und Spam-Prävention (IP-Verarbeitung, Rate-Limiting, Captcha): Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am sicheren Betrieb der Website).",
-            "Analyse-Cookies (Yandex Metrika, Google Analytics/Tag Manager): Art. 6 Abs. 1 lit. a DSGVO (Ihre Einwilligung). Sie können diese jederzeit widerrufen.",
+            "Analyse-Cookies (Yandex Metrika, Google Analytics/Tag Manager): Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Reichweitenmessung).",
           ],
         },
         {
@@ -212,7 +212,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
             "Supabase, Inc. — Datenbank-, Speicher- und Authentifizierungs-Infrastruktur für Anfragen und Datei-Uploads.",
             "Telegram (Telegram FZ-LLC) — interne Benachrichtigung unseres Teams über neue Anfragen (Name, Telefonnummer, Nachricht, Hinweis auf Anhang).",
             "Cloudflare Turnstile bzw. hCaptcha — Bot-/Spam-Schutz für das Kontaktformular, sofern aktiviert.",
-            "Yandex LLC (Yandex Metrika) und Google LLC / Google Ireland Limited (Google Analytics, Google Tag Manager) — Website-Analyse, nur nach Ihrer Einwilligung.",
+            "Yandex LLC (Yandex Metrika) und Google LLC / Google Ireland Limited (Google Analytics, Google Tag Manager) — Website-Analyse.",
             "[Hosting-Anbieter] — Bereitstellung der Website-Infrastruktur.",
           ],
         },
@@ -226,7 +226,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
           heading: "7. Speicherdauer",
           list: [
             "Kontaktanfragen (metric_leads): gespeichert, solange dies zur Bearbeitung Ihrer Anfrage erforderlich ist, in der Regel [12 Monate] nach der letzten Interaktion, danach werden Datensatz und angehängte Datei gelöscht.",
-            "Analyse-Daten: gemäß den Aufbewahrungsfristen von Yandex Metrika / Google Analytics, sofern Sie zugestimmt haben; Sie können Ihre Zustimmung jederzeit widerrufen, um die weitere Erhebung zu beenden.",
+            "Analyse-Daten: gemäß den Aufbewahrungsfristen von Yandex Metrika / Google Analytics.",
             "Admin-Konten und Audit-Protokolle: für die Dauer des Beschäftigungsverhältnisses bzw. der Geschäftsbeziehung sowie zur Erfüllung gesetzlicher Aufbewahrungspflichten.",
           ],
         },
@@ -267,7 +267,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
       ],
       cookieHeading: "12. Cookies, die wir verwenden",
       cookieIntro:
-        "Notwendige Cookies werden immer gesetzt, damit die Website funktioniert. Analyse-Cookies werden erst gesetzt, nachdem Sie im Cookie-Banner zugestimmt haben.",
+        "Das Banner speichert Ihre Auswahl in localStorage. Analyse-Cookies können von Yandex Metrika und Google Analytics / Tag Manager gesetzt werden.",
       cookieColumns: {
         name: "Cookie",
         provider: "Anbieter",
@@ -315,7 +315,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
         paragraphs: [
           "Contact form: when you submit our contact form, we process your name, phone number, message, an optional file attachment, the consent checkbox state, and the submission timestamp.",
           "Technical data: on every page load, our hosting provider and security safeguards (e.g. bot/spam protection) automatically process technical data such as IP address, timestamps, and basic request metadata to prevent abuse and keep the site running.",
-          "Analytics data: only if you accept analytics cookies via our consent banner, we process usage data (pages visited, clicks, approximate location) through Yandex Metrika and/or Google Analytics or Google Tag Manager.",
+          "Analytics data: we process usage data (pages visited, clicks, approximate location) through Yandex Metrika and/or Google Analytics or Google Tag Manager.",
         ],
       },
       {
@@ -323,7 +323,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
         list: [
           "Responding to contact form inquiries: Art. 6(1)(b) GDPR (pre-contractual steps) or Art. 6(1)(f) (legitimate interest in answering inquiries).",
           "Security, fraud and spam prevention (IP processing, rate-limiting, captcha): Art. 6(1)(f) GDPR (legitimate interest in running a secure website).",
-          "Analytics cookies (Yandex Metrika, Google Analytics/Tag Manager): Art. 6(1)(a) GDPR (your consent). You may withdraw consent at any time.",
+          "Analytics cookies (Yandex Metrika, Google Analytics/Tag Manager): Art. 6(1)(f) GDPR (legitimate interest in measuring traffic).",
         ],
       },
       {
@@ -333,7 +333,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
           "Supabase, Inc. — database, storage and authentication infrastructure for inquiries and file uploads.",
           "Telegram (Telegram FZ-LLC) — internal notification to our team about new inquiries (name, phone number, message, attachment indicator).",
           "Cloudflare Turnstile or hCaptcha — bot/spam protection for the contact form, when enabled.",
-          "Yandex LLC (Yandex Metrika) and Google LLC / Google Ireland Limited (Google Analytics, Google Tag Manager) — website analytics, only after your consent.",
+          "Yandex LLC (Yandex Metrika) and Google LLC / Google Ireland Limited (Google Analytics, Google Tag Manager) — website analytics.",
           "[Hosting provider] — website infrastructure hosting.",
         ],
       },
@@ -347,7 +347,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
         heading: "7. Retention periods",
         list: [
           "Contact inquiries (metric_leads): kept for as long as needed to handle your request, generally [12 months] after the last interaction, after which the record and any attached file are deleted.",
-          "Analytics data: retained per Yandex Metrika / Google Analytics retention settings, only while you've given consent; you can withdraw consent at any time to stop further collection.",
+          "Analytics data: retained per Yandex Metrika / Google Analytics retention settings.",
           "Admin accounts and audit logs: kept for the duration of the working relationship and as required by applicable legal retention obligations.",
         ],
       },
@@ -386,7 +386,7 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
     ],
     cookieHeading: "12. Cookies we use",
     cookieIntro:
-      "Necessary cookies are always set so the site works. Analytics cookies are only set after you accept them in the cookie banner.",
+      "The banner stores your choice in localStorage. Analytics cookies may be set by Yandex Metrika and Google Analytics / Tag Manager.",
     cookieColumns: {
       name: "Cookie",
       provider: "Provider",
