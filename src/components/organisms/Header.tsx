@@ -38,9 +38,27 @@ export function Header({
   }));
 
   useEffect(() => {
+    document.documentElement.classList.toggle("is-mobile-menu-open", open);
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
+      document.documentElement.classList.remove("is-mobile-menu-open");
       document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onResize = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
     };
   }, [open]);
 
@@ -72,6 +90,7 @@ export function Header({
         ref={headerRef}
         data-site-header
         data-header-variant={variant}
+        data-menu-open={open ? "true" : undefined}
         className={
           isHero
             ? "site-header site-header--hero sticky top-0 z-50"
@@ -83,6 +102,7 @@ export function Header({
             href={homePath}
             aria-label={site.name}
             className="relative block h-10 w-[140px] shrink-0"
+            onClick={() => setOpen(false)}
           >
             <Image
               src="/images/metric/logo/metric-logo.svg"
@@ -111,50 +131,35 @@ export function Header({
             </ProjectBriefCta>
             <button
               type="button"
-              className="site-header__menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-foreground/15 lg:hidden"
+              className={`site-header__menu-btn inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-foreground/15 lg:hidden${
+                open ? " is-open" : ""
+              }`}
               aria-label={open ? ui.closeMenu : ui.openMenu}
               aria-expanded={open}
+              aria-controls="site-mobile-menu"
               onClick={() => setOpen((v) => !v)}
             >
               <span className="sr-only">{open ? ui.closeMenu : ui.openMenu}</span>
-              <span className="flex flex-col gap-1.5">
-                <span className="block h-0.5 w-5 bg-foreground" />
-                <span className="block h-0.5 w-5 bg-foreground" />
+              <span className="site-header__menu-icon" aria-hidden>
+                <span />
+                <span />
               </span>
             </button>
           </div>
         </PageContainer>
       </header>
 
-      {open ? (
-        <div className="mobile-menu-panel lg:hidden" role="dialog" aria-modal>
-          <div className="flex items-center justify-between">
-            <TransitionLink
-              href={homePath}
-              aria-label={site.name}
-              className="relative block h-10 w-[140px] shrink-0"
-              onClick={() => setOpen(false)}
-            >
-              <Image
-                src="/images/metric/logo/metric-logo.svg"
-                alt={site.name}
-                fill
-                className="object-contain object-left"
-              />
-            </TransitionLink>
-            <button
-              type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15"
-              aria-label={ui.closeMenu}
-              onClick={() => setOpen(false)}
-            >
-              <span className="sr-only">{ui.closeMenu}</span>
-              <span className="relative block size-5" aria-hidden>
-                <span className="absolute left-1/2 top-1/2 block h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-foreground" />
-                <span className="absolute left-1/2 top-1/2 block h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-foreground" />
-              </span>
-            </button>
-          </div>
+      <div
+        id="site-mobile-menu"
+        className="mobile-menu-panel lg:hidden"
+        role="dialog"
+        aria-modal={open}
+        aria-label={ui.navAria}
+        aria-hidden={!open}
+        inert={!open ? true : undefined}
+        data-open={open ? "true" : undefined}
+      >
+        <PageContainer className="mobile-menu-panel__inner">
           <SiteNav
             locale={locale}
             items={navItems}
@@ -165,14 +170,13 @@ export function Header({
           <ProjectBriefCta
             variant="outlineAccent"
             size="sm"
-            className="w-full"
+            className="mobile-menu-panel__cta"
             onClick={() => setOpen(false)}
           >
             {home.footer.startCta}
           </ProjectBriefCta>
-        </div>
-      ) : null}
+        </PageContainer>
+      </div>
     </>
   );
 }
-

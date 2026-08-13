@@ -143,7 +143,7 @@ export function MetricHeroSection({
                   alt=""
                   fill
                   priority
-                  sizes="(max-width: 1023px) 50vw, 280px"
+                  sizes="(max-width: 1023px) 50vw, min(42vw, 900px)"
                   quality={85}
                   className="object-cover"
                 />
@@ -154,7 +154,7 @@ export function MetricHeroSection({
                   alt=""
                   fill
                   priority
-                  sizes="(max-width: 1023px) 55vw, 300px"
+                  sizes="(max-width: 1023px) 55vw, min(42vw, 900px)"
                   quality={85}
                   className="object-cover"
                 />
@@ -344,16 +344,6 @@ export function MetricServicesSection({
           >
             {services.items.map((item) => (
               <article key={item.n} className="metric-services-card" data-reveal>
-                <div className="metric-services-card__media">
-                  <Image
-                    src={item.image}
-                    alt=""
-                    fill
-                    className="metric-services-card__img object-contain"
-                    sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 560px, 900px"
-                    quality={75}
-                  />
-                </div>
                 <div className="metric-services-card__head">
                   <span className="metric-services-card__num" aria-hidden>
                     {item.n}
@@ -366,6 +356,16 @@ export function MetricServicesSection({
                   >
                     {item.title}
                   </Button>
+                </div>
+                <div className="metric-services-card__media">
+                  <Image
+                    src={item.image}
+                    alt=""
+                    fill
+                    className="metric-services-card__img object-contain"
+                    sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 70vw, (max-width: 2559px) min(55vw, 1200px), min(50vw, 1600px)"
+                    quality={75}
+                  />
                 </div>
               </article>
             ))}

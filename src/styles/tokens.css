@@ -9,14 +9,15 @@
  * stuck between two hard-coded states.
  *
  * Past 1512px the page shell keeps growing (one shared --container-max)
- * up to 2560px so ultrawide / 4K monitors are not a letterboxed 1512
- * strip. Spacing and type pick up again at --breakpoint-2xl.
+ * up to 3840px so 4K / 4K UHD monitors are not a letterboxed 1512
+ * strip. Spacing and type pick up again at --breakpoint-2xl and 2560px.
  */
 :root {
   --page-padding: clamp(20px, 20px + (100vw - 320px) * 0.03356, 60px);
-  /* 1512 at design width; 90vw past ~1680px; hard-cap 2560 on 4K. */
-  --container-max: max(1512px, min(90vw, 2560px));
+  /* 1512 at design width; 92vw past ~1640px; hard-cap 3840 on 4K UHD. */
+  --container-max: max(1512px, min(92vw, 3840px));
   --breakpoint-2xl: 1800px;
+  --breakpoint-4k: 2560px;
 
   /* Generic fluid spacing scale — building blocks for component gaps. */
   --space-2xs: clamp(4px, 4px + (100vw - 320px) * 0.00336, 8px);
@@ -67,16 +68,29 @@
   --glass: rgba(245, 245, 245, 0.3);
 }
 
-/* Second fluid stage: 1512 design → 4K. Padding / gaps / display type
+/* Second fluid stage: 1512 design → 2560. Padding / gaps / display type
    resume scaling so a 2560px shell does not look like a blown-up 13". */
 @media (min-width: 1800px) {
   :root {
-    --page-padding: clamp(60px, 3.4vw, 96px);
-    --section-gap: clamp(120px, 6vw, 180px);
-    --text-display-xl: clamp(120px, 6.4vw, 160px);
-    --text-display-lg: clamp(100px, 5.4vw, 132px);
-    --text-display: clamp(90px, 4.8vw, 120px);
-    --text-h2: clamp(60px, 3.2vw, 80px);
-    --text-h3: clamp(40px, 2.2vw, 52px);
+    --page-padding: clamp(60px, 3.4vw, 104px);
+    --section-gap: clamp(120px, 6vw, 200px);
+    --text-display-xl: clamp(120px, 6.4vw, 176px);
+    --text-display-lg: clamp(100px, 5.4vw, 148px);
+    --text-display: clamp(90px, 4.8vw, 132px);
+    --text-h2: clamp(60px, 3.2vw, 88px);
+    --text-h3: clamp(40px, 2.2vw, 56px);
+  }
+}
+
+/* Third fluid stage: 2560 → 4K UHD (3840). */
+@media (min-width: 2560px) {
+  :root {
+    --page-padding: clamp(96px, 3.2vw, 128px);
+    --section-gap: clamp(180px, 5.4vw, 240px);
+    --text-display-xl: clamp(160px, 5.2vw, 200px);
+    --text-display-lg: clamp(132px, 4.4vw, 168px);
+    --text-display: clamp(120px, 4vw, 152px);
+    --text-h2: clamp(80px, 2.8vw, 100px);
+    --text-h3: clamp(52px, 1.9vw, 64px);
   }
 }

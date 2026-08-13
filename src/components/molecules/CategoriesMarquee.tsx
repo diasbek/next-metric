@@ -35,7 +35,7 @@ function CardStrip({
             alt=""
             fill
             className="object-cover"
-            sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, 420px"
+            sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
             quality={75}
             draggable={false}
           />
@@ -155,7 +155,7 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
                 alt=""
                 fill
                 className="object-cover"
-                sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, 420px"
+                sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
                 quality={75}
                 draggable={false}
               />
