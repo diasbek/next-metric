@@ -42,12 +42,7 @@ export async function SiteLayout({
           {children}
         </main>
       </div>
-      <SiteFooter
-        locale={locale}
-        content={content}
-        captcha={captcha}
-        home={home}
-      />
+      <SiteFooter locale={locale} content={content} home={home} />
     </ProjectBriefProvider>
   );
 }

@@ -129,7 +129,19 @@ export function Header({
       {open ? (
         <div className="mobile-menu-panel lg:hidden" role="dialog" aria-modal>
           <div className="flex items-center justify-between">
-            <span className="text-xl font-semibold tracking-tight">{site.name}</span>
+            <TransitionLink
+              href={homePath}
+              aria-label={site.name}
+              className="relative block h-10 w-[140px] shrink-0"
+              onClick={() => setOpen(false)}
+            >
+              <Image
+                src="/images/metric/logo/metric-logo.svg"
+                alt={site.name}
+                fill
+                className="object-contain object-left"
+              />
+            </TransitionLink>
             <button
               type="button"
               className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15"

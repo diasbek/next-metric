@@ -451,7 +451,7 @@ body {
 .metric-hero__badge {
   position: absolute;
   left: -2%;
-  bottom: 12%;
+  bottom: 24%;
   z-index: 4;
   width: 120px;
   min-height: 118px;
@@ -484,7 +484,7 @@ body {
 .metric-hero__redesign {
   position: absolute;
   right: -6%;
-  bottom: 10%;
+  bottom: 22%;
   z-index: 5;
   width: 138px;
   transform: rotate(7.19deg);
@@ -676,12 +676,12 @@ body {
 
   .metric-hero__badge {
     left: 0;
-    bottom: 14%;
+    bottom: 26%;
   }
 
   .metric-hero__redesign {
     right: -2%;
-    bottom: 8%;
+    bottom: 22%;
   }
 
   .metric-hero__trust {
@@ -740,7 +740,7 @@ body {
 @media (max-width: 1023px) {
   .metric-hero__redesign {
     right: 2%;
-    bottom: 8%;
+    bottom: 22%;
     width: 112px;
   }
 
@@ -776,8 +776,7 @@ body {
 #case-studies,
 #services,
 #workflow,
-#faq,
-#contact {
+#faq {
   scroll-margin-top: var(--header-height);
 }
 
@@ -1940,33 +1939,6 @@ body {
   background: #fff;
   padding-block: clamp(40px, 6vw, 60px) 28px;
   scroll-margin-top: var(--header-height);
-}
-
-.site-footer__form {
-  margin-bottom: clamp(48px, 7vw, 80px);
-  border-radius: 24px;
-  background: var(--surface);
-  padding: clamp(24px, 4vw, 40px);
-}
-
-.site-footer__form-copy {
-  margin-bottom: 24px;
-  max-width: 36rem;
-}
-
-.site-footer__form-title {
-  font-size: clamp(28px, 4vw, 48px);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  color: var(--foreground);
-}
-
-.site-footer__form-subtitle {
-  margin-top: 12px;
-  font-size: 18px;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  color: var(--muted);
 }
 
 .site-footer__main {

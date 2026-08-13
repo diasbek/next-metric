@@ -6,13 +6,10 @@ import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
-import { ContactForm } from "@/components/molecules/ContactForm";
-import type { PublicCaptchaConfig } from "@/lib/cms/settings";
 
 interface SiteFooterProps {
   locale: Locale;
   content: SiteContent;
-  captcha: PublicCaptchaConfig;
   home: MetricHomeContent;
 }
 
@@ -25,7 +22,7 @@ const FOOTER_NAV_HREFS = [
   "/#faq",
 ] as const;
 
-export function SiteFooter({ locale, content, captcha, home }: SiteFooterProps) {
+export function SiteFooter({ locale, content, home }: SiteFooterProps) {
   const { site, ui } = content;
   const footer = home.footer;
   const socialMap: Record<string, string | undefined> = {
@@ -44,16 +41,8 @@ export function SiteFooter({ locale, content, captcha, home }: SiteFooterProps) 
   });
 
   return (
-    <footer id="contact" className="site-footer">
+    <footer className="site-footer">
       <PageContainer>
-        <div className="site-footer__form" data-reveal>
-          <div className="site-footer__form-copy">
-            <h2 className="site-footer__form-title font-display">{footer.startCta}</h2>
-            <p className="site-footer__form-subtitle">{ui.contactSubtitle}</p>
-          </div>
-          <ContactForm locale={locale} ui={ui} captcha={captcha} />
-        </div>
-
         <div className="site-footer__main" data-reveal>
           <TransitionLink
             href={localePath(locale, "/")}
