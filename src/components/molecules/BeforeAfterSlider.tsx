@@ -47,7 +47,8 @@ export function BeforeAfterSlider({
           alt={afterLabel}
           fill
           className="case-slider__image object-cover"
-          sizes="100vw"
+          sizes="(max-width: 1512px) 100vw, 1392px"
+          quality={85}
           priority={false}
         />
         <div data-ba-overlay className="case-slider__before">
@@ -56,7 +57,8 @@ export function BeforeAfterSlider({
             alt={beforeLabel}
             fill
             className="case-slider__image object-cover"
-            sizes="100vw"
+            sizes="(max-width: 1512px) 100vw, 1392px"
+            quality={85}
             priority={false}
           />
         </div>

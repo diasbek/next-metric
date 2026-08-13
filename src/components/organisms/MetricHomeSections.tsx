@@ -131,6 +131,7 @@ export function MetricHeroSection({
                 fill
                 priority
                 sizes="(max-width: 1024px) 46vw, 284px"
+                quality={85}
                 className="object-cover"
               />
             </div>
@@ -141,6 +142,7 @@ export function MetricHeroSection({
                 fill
                 priority
                 sizes="(max-width: 1024px) 52vw, 318px"
+                quality={85}
                 className="object-cover"
               />
             </div>
@@ -279,7 +281,7 @@ export function MetricCaseStudiesSection({
                   {caseStudies.viewLabel}
                 </Button>
               </div>
-              <div className="metric-case-card__media js-parallax">
+              <div className="metric-case-card__media">
                 <Image
                   src={item.image}
                   alt={
@@ -289,7 +291,8 @@ export function MetricCaseStudiesSection({
                   }
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="(max-width: 1023px) 92vw, 42vw"
+                  quality={85}
                 />
               </div>
             </article>
@@ -366,6 +369,7 @@ export function MetricServicesSection({
                     fill
                     className="metric-services-card__img object-contain"
                     sizes="(max-width: 1024px) 90vw, 560px"
+                    quality={85}
                   />
                 </div>
                 <div className="metric-services-card__head">
@@ -436,6 +440,7 @@ export function MetricWorkflowSection({
                      render up to 1680px wide on ultrawide/4K (page-container--wide),
                      so a fixed 450px hint would under-serve resolution there. */
                   sizes="(max-width: 1024px) 90vw, 33vw"
+                  quality={85}
                 />
               </div>
             );

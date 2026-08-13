@@ -422,7 +422,9 @@ body {
   left: 6%;
   top: 16%;
   width: 46%;
-  aspect-ratio: 284 / 395;
+  /* Source photos are 3:4 (3000×4000). Lock the box to that ratio so
+     object-cover neither crops nor letterboxes as the viewport changes. */
+  aspect-ratio: 3 / 4;
   transform: rotate(-5.25deg);
   z-index: 2;
 }
@@ -431,7 +433,7 @@ body {
   right: 0;
   top: 0;
   width: 52%;
-  aspect-ratio: 318 / 441;
+  aspect-ratio: 3 / 4;
   transform: rotate(7.19deg);
   z-index: 1;
 }
@@ -635,7 +637,7 @@ body {
     top: 12%;
     width: min(46%, 284px);
     height: auto;
-    aspect-ratio: 284 / 395;
+    aspect-ratio: 3 / 4;
   }
 
   .metric-hero__card--right {
@@ -643,7 +645,7 @@ body {
     top: 0;
     width: min(52%, 318px);
     height: auto;
-    aspect-ratio: 318 / 441;
+    aspect-ratio: 3 / 4;
   }
 
   .metric-hero__badge {
@@ -780,6 +782,7 @@ body {
 
 .metric-categories__track {
   display: flex;
+  align-items: flex-start;
   gap: 24px;
   overflow-x: auto;
   padding-bottom: 8px;
@@ -804,6 +807,7 @@ body {
 
 .metric-categories__seq {
   display: flex;
+  align-items: flex-start;
   flex-shrink: 0;
   gap: 24px;
   padding-right: 24px;
@@ -815,8 +819,14 @@ body {
 
 .metric-categories__card {
   position: relative;
-  flex: 0 0 min(72vw, 280px);
+  /* Width-only flex basis + explicit 3:4 (matches cat-*.jpg 3000×4000).
+     align-self:flex-start so a stretched flex line can't override the
+     ratio and crop / letterbox the photo. */
+  flex: 0 0 auto;
+  width: min(72vw, 280px);
   aspect-ratio: 3 / 4;
+  height: auto;
+  align-self: flex-start;
   overflow: hidden;
   border-radius: var(--radius-md);
   scroll-snap-align: start;
@@ -826,9 +836,17 @@ body {
   will-change: transform;
 }
 
+.metric-categories__card img,
+.metric-hero__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 @media (min-width: 768px) {
   .metric-categories__card {
-    flex-basis: min(28vw, 320px);
+    width: min(28vw, 320px);
   }
 }
 
@@ -853,7 +871,7 @@ body {
   .metric-case-card {
     grid-template-columns: 1fr 1.05fr;
     grid-template-areas: "body media";
-    min-height: 600px;
+    align-items: center;
     border-radius: var(--radius-2xl);
   }
 }
@@ -892,27 +910,33 @@ body {
   width: calc(100% - 32px);
   min-width: 0;
   margin: 16px 16px 0;
-  min-height: 220px;
-  aspect-ratio: 4 / 3;
+  /* case-*.jpg are 3000×2347. Keep this ratio at every breakpoint so
+     object-cover fills the box without cropping or letterbox bars. */
+  aspect-ratio: 3000 / 2347;
+  height: auto;
   overflow: hidden;
   border-radius: 20px;
+}
+
+.metric-case-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 @media (min-width: 768px) {
   .metric-case-card__media {
     width: calc(100% - 40px);
     margin: 20px 20px 0;
-    min-height: 280px;
     border-radius: 24px;
   }
 }
 
 @media (min-width: 1024px) {
   .metric-case-card__media {
+    width: calc(100% - 50px);
     margin: 50px 50px 50px 0;
-    min-height: auto;
-    aspect-ratio: auto;
-    height: calc(100% - 100px);
     align-self: center;
     border-radius: 30px;
   }
@@ -1439,6 +1463,26 @@ body {
   justify-content: flex-start;
   gap: 30px;
   padding-top: 30px;
+}
+
+/* Desktop keeps the alternating layout (copy on top, illustration at the
+   bottom). On anything narrower, reverse so the middle card matches the
+   other two: illustration first, then the title/body. */
+@media (max-width: 1023px) {
+  .metric-workflow-card--media-bottom {
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    gap: 24px;
+    padding-top: 20px;
+  }
+
+  .metric-workflow-card--media-bottom .metric-workflow-card__media {
+    margin-top: 0;
+  }
+
+  .metric-workflow-card--media-bottom .metric-workflow-card__copy {
+    gap: 16px;
+  }
 }
 
 @media (min-width: 1024px) {

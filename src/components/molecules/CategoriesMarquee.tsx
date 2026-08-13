@@ -35,7 +35,8 @@ function CardStrip({
             alt=""
             fill
             className="object-cover"
-            sizes="320px"
+            sizes="(max-width: 767px) 72vw, 320px"
+            quality={85}
             draggable={false}
           />
         </div>
@@ -154,7 +155,8 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
                 alt=""
                 fill
                 className="object-cover"
-                sizes="320px"
+                sizes="(max-width: 767px) 72vw, 320px"
+                quality={85}
                 draggable={false}
               />
             </div>

@@ -37,6 +37,7 @@ export async function WorksListingSection({ locale, content }: LocalePageProps) 
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  quality={85}
                 />
               </div>
               <div className="metric-work-card__body">

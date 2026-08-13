@@ -125,6 +125,7 @@ export async function WorkCaseSection({
                     fill
                     className="object-cover"
                     sizes="(max-width: 1512px) 100vw, 1392px"
+                    quality={85}
                     priority={index === 0}
                   />
                 </div>
@@ -146,6 +147,7 @@ export async function WorkCaseSection({
                     fill
                     className="object-cover"
                     sizes="(max-width: 1512px) 100vw, 1392px"
+                    quality={85}
                     priority={blockIndex === 0 && index === 0}
                   />
                   {blockIndex === 0 && index === 0 && caseStudy?.metricValue ? (
@@ -262,6 +264,7 @@ export async function WorkCaseSection({
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    quality={85}
                   />
                 </div>
                 <div className="metric-work-card__body">
