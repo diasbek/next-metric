@@ -45,7 +45,7 @@ export function MetricCaseCard({
           <p className="metric-case-card__author">{author}</p>
           <p className="metric-case-card__role">{role}</p>
         </div>
-        <Button href={href} variant="dark" className="metric-case-card__cta w-fit">
+        <Button href={href} variant="dark" className="metric-case-card__cta">
           {viewLabel}
         </Button>
       </div>

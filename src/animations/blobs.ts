@@ -1,18 +1,19 @@
 import { gsap, MOTION_OK, registerGsapPlugins, runMatchMedia } from "./gsap";
 
 /**
- * Soft ambient blob drift — same motion model as next-timsol services
- * (5s linear boomerang, scaled to section size).
+ * Soft ambient blob drift inside the hero.
+ * Shorter travel + longer duration so the pink/coral wash floats
+ * within the section instead of sweeping across it.
  */
 const DESIGN_W = 1512;
 const DESIGN_H = 982;
-const DURATION = 5;
-const TRAVEL_SCALE = 1.15;
+const DURATION = 9;
+const TRAVEL_SCALE = 0.55;
 
 const BLOB_TRAVEL = [
-  { x: -489, y: 811 },
-  { x: -618.024, y: -865.681 },
-  { x: 1121.933, y: -61.568 },
+  { x: -220, y: 280 },
+  { x: -260, y: -240 },
+  { x: 180, y: -160 },
 ] as const;
 
 export function initBlobAnimations(): () => void {
@@ -45,8 +46,8 @@ export function initBlobAnimations(): () => void {
           gsap.to(blob, {
             x: travel.x * sx * TRAVEL_SCALE,
             y: travel.y * sy * TRAVEL_SCALE,
-            duration: DURATION,
-            ease: "none",
+            duration: DURATION + i * 1.2,
+            ease: "sine.inOut",
             repeat: -1,
             yoyo: true,
           }),

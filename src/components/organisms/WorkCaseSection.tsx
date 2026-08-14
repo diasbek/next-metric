@@ -74,31 +74,32 @@ export async function WorkCaseSection({
   return (
     <article className="metric-case">
       <PageContainer>
+        {/* Figma 2046:23 — title, then row: role | tags + lede */}
         <header className="metric-case__intro" data-reveal>
-          <div className="metric-case__intro-copy">
-            <h1 className="font-display text-[clamp(42px,6vw,90px)] leading-[0.9] tracking-[-0.02em] text-foreground">
-              {authorName}
-            </h1>
+          <h1 className="metric-case__title font-display">{authorName}</h1>
+
+          <div className="metric-case__intro-body">
             {project.role ? (
-              <p className="mt-4 text-[clamp(18px,2vw,24px)] tracking-[-0.02em] text-[color:var(--muted)]">
-                {project.role}
-              </p>
-            ) : null}
-          </div>
-          <div className="metric-case__intro-meta">
-            <div className="flex flex-wrap gap-[5px]">
-              {project.tags.map((tag) => (
-                <MetricTagPill
-                  key={tag}
-                  tag={tag}
-                  locale={locale}
-                  className="border-foreground/25 text-foreground"
-                />
-              ))}
+              <p className="metric-case__role">{project.role}</p>
+            ) : (
+              <span className="metric-case__role metric-case__role--empty" aria-hidden />
+            )}
+
+            <div className="metric-case__intro-meta">
+              {project.tags.length ? (
+                <div className="metric-case__tags">
+                  {project.tags.map((tag) => (
+                    <MetricTagPill
+                      key={tag}
+                      tag={tag}
+                      locale={locale}
+                      className="metric-case__tag"
+                    />
+                  ))}
+                </div>
+              ) : null}
+              <p className="metric-case__lede">{project.description}</p>
             </div>
-            <p className="mt-6 max-w-xl text-[clamp(16px,1.5vw,20px)] leading-[1.25] tracking-[-0.02em] text-foreground">
-              {project.description}
-            </p>
           </div>
         </header>
 

@@ -65,6 +65,12 @@ body {
   max-width: var(--container-max);
   padding-inline: var(--page-padding);
   width: 100%;
+  box-sizing: border-box;
+}
+
+/* Skewed header CTA: keep the parallelogram tip inside the shell gutter. */
+.site-header__inner .metric-cta {
+  margin-inline-end: var(--cta-skew-gutter);
 }
 
 .font-display {
@@ -146,11 +152,16 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* Figma CTAs are always hug-to-label (Rectangle 62 sized to copy),
+     never stretched to the parent column. Use .metric-cta--full only
+     when a form/layout explicitly needs a block button. */
+  width: fit-content;
+  max-width: 100%;
   min-height: var(--cta-height);
   padding: 0 48px;
   border: none;
   border-radius: var(--cta-radius);
-  font-size: 20px;
+  font-size: var(--text-body-lg);
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -163,6 +174,10 @@ body {
   background: transparent;
   box-shadow: none;
   transition: opacity 0.2s ease;
+}
+
+.metric-cta--full {
+  width: 100%;
 }
 
 .metric-cta::before {
@@ -195,23 +210,41 @@ body {
 
 /* Sizes — padding/font-size ramp fluidly from a 320px floor up to the
    1512px design width instead of a fixed size, so a long label (e.g. the
-   hero CTA) can't force horizontal overflow on narrow phones. */
+   hero CTA) can't force horizontal overflow on narrow phones. Past 1800
+   heights follow --cta-height-* tokens. */
 .metric-cta--sm {
-  min-height: 44px;
+  min-height: var(--cta-height-sm);
   padding: 0 clamp(16px, 16px + (100vw - 320px) * 0.01007, 28px);
   font-size: clamp(16px, 16px + (100vw - 320px) * 0.00168, 18px);
 }
 
 .metric-cta--md {
-  min-height: 48px;
+  min-height: var(--cta-height);
   padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02013, 48px);
   font-size: clamp(17px, 17px + (100vw - 320px) * 0.00252, 20px);
 }
 
 .metric-cta--lg {
-  min-height: 56px;
+  min-height: var(--cta-height-lg);
   padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02685, 56px);
   font-size: clamp(18px, 18px + (100vw - 320px) * 0.00336, 22px);
+}
+
+@media (min-width: 1800px) {
+  .metric-cta--sm {
+    padding: 0 clamp(28px, 1.6vw, 36px);
+    font-size: var(--text-nav);
+  }
+
+  .metric-cta--md {
+    padding: 0 clamp(48px, 2.6vw, 64px);
+    font-size: var(--text-body);
+  }
+
+  .metric-cta--lg {
+    padding: 0 clamp(56px, 3vw, 72px);
+    font-size: var(--text-body-lg);
+  }
 }
 
 /* Primary fill pink (hero / workflow). */
@@ -235,14 +268,15 @@ body {
   --cta-fill: color-mix(in srgb, #fff 92%, var(--dark));
 }
 
-/* Case-study / secondary — filled black parallelogram. */
+/* Case-study / secondary — filled black parallelogram.
+   Figma View Case-Study: ~260×48 desktop / ~240×48 mobile — hug label. */
 .metric-cta--dark-fill,
 .metric-cta--skew-dark,
 .metric-cta--dark.metric-cta--skew {
   --cta-fill: var(--dark);
   --cta-shadow: none;
-  width: auto;
-  min-width: clamp(140px, 140px + (100vw - 320px) * 0.06711, 220px);
+  width: fit-content;
+  min-width: 0;
   padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   color: #fff;
 }
@@ -252,13 +286,13 @@ body {
   opacity: 0.92;
 }
 
-/* "More Projects" — outline dark parallelogram. */
+/* "More Projects" — outline dark parallelogram. Same hug model as dark-fill. */
 .metric-cta--outline-dark,
 .metric-cta--skew-outline {
   --cta-fill: transparent;
   --cta-shadow: inset 0 0 0 1.5px var(--dark);
-  width: auto;
-  min-width: clamp(140px, 140px + (100vw - 320px) * 0.06711, 220px);
+  width: fit-content;
+  min-width: 0;
   padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   color: var(--dark);
 }
@@ -273,10 +307,10 @@ body {
 .metric-cta--outline {
   --cta-fill: transparent;
   --cta-shadow: inset 0 0 0 1.5px var(--accent);
-  min-height: 44px;
+  min-height: var(--cta-height-sm);
   padding: 0 28px;
   color: var(--accent);
-  font-size: 18px;
+  font-size: var(--text-nav);
 }
 
 .metric-cta--outline:hover {
@@ -286,9 +320,9 @@ body {
 
 /* Size + outlineAccent: keep nav proportions when size=sm is set. */
 .metric-cta--outline.metric-cta--sm {
-  min-height: 44px;
+  min-height: var(--cta-height-sm);
   padding: 0 28px;
-  font-size: 18px;
+  font-size: var(--text-nav);
 }
 
 .metric-cta--dark-fill.metric-cta--sm,
@@ -361,7 +395,8 @@ a.metric-pill--link:active {
   padding-top: var(--header-height);
 }
 
-/* Ambient pink blobs — same GSAP drift as next-timsol services. */
+/* Ambient hero glow — pink + coral wash on the right (Figma / ref).
+   Soft disks with heavy blur; GSAP drifts them gently inside the hero. */
 .metric-hero__blobs {
   pointer-events: none;
   position: absolute;
@@ -372,77 +407,96 @@ a.metric-pill--link:active {
 
 .metric-hero-blob {
   position: absolute;
-  width: min(110vw, 900px);
-  height: min(110vw, 900px);
+  width: min(100vw, 820px);
+  height: min(100vw, 820px);
   border-radius: 50%;
-  background: var(--accent);
   will-change: transform;
   pointer-events: none;
   user-select: none;
   transform: translateZ(0);
   contain: layout paint;
-  opacity: 0.65;
 }
 
 @media (min-width: 1024px) {
   .metric-hero-blob {
-    width: 900px;
-    height: 900px;
+    width: 980px;
+    height: 980px;
   }
 }
 
 @media (min-width: 1800px) {
   .metric-hero-blob {
-    width: min(48vw, 1400px);
-    height: min(48vw, 1400px);
+    width: min(52vw, 1500px);
+    height: min(52vw, 1500px);
   }
 }
 
 @media (min-width: 2560px) {
   .metric-hero-blob {
-    width: min(42vw, 1800px);
-    height: min(42vw, 1800px);
+    width: min(46vw, 1900px);
+    height: min(46vw, 1900px);
   }
 }
 
+/* Coral / peach — upper-right wash */
 .metric-hero-blob--a {
-  left: 55%;
-  top: -35%;
-  filter: blur(90px);
-  opacity: 0.45;
+  left: 52%;
+  top: -28%;
+  background: radial-gradient(
+    circle at 40% 45%,
+    rgba(255, 154, 120, 0.95) 0%,
+    rgba(255, 120, 140, 0.55) 42%,
+    rgba(255, 120, 140, 0) 72%
+  );
+  filter: blur(100px);
+  opacity: 0.7;
 }
 
+/* Hot pink — lower-right core */
 .metric-hero-blob--b {
   left: 48%;
-  top: 45%;
-  filter: blur(70px);
-  opacity: 0.65;
+  top: 28%;
+  background: radial-gradient(
+    circle at 45% 40%,
+    rgba(255, 60, 130, 1) 0%,
+    rgba(255, 60, 130, 0.65) 38%,
+    rgba(255, 60, 130, 0) 70%
+  );
+  filter: blur(90px);
+  opacity: 0.78;
 }
 
+/* Soft pink bridge — mid-right, ties coral + accent */
 .metric-hero-blob--c {
-  left: 70%;
-  top: 15%;
-  filter: blur(110px);
-  opacity: 0.38;
+  left: 62%;
+  top: 8%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 110, 160, 0.85) 0%,
+    rgba(255, 90, 150, 0.4) 45%,
+    rgba(255, 90, 150, 0) 72%
+  );
+  filter: blur(120px);
+  opacity: 0.55;
 }
 
 @media (min-width: 1024px) {
   .metric-hero-blob--a {
-    left: 58%;
-    top: -42%;
-    filter: blur(140px);
+    left: 54%;
+    top: -36%;
+    filter: blur(150px);
   }
 
   .metric-hero-blob--b {
-    left: 52%;
-    top: 38%;
-    filter: blur(100px);
+    left: 50%;
+    top: 22%;
+    filter: blur(130px);
   }
 
   .metric-hero-blob--c {
-    left: 72%;
-    top: 8%;
-    filter: blur(160px);
+    left: 68%;
+    top: -4%;
+    filter: blur(170px);
   }
 }
 
@@ -523,6 +577,18 @@ a.metric-pill--link:active {
 .metric-hero__main,
 .metric-hero__cluster {
   overflow: visible;
+}
+
+/* Large screens: keep plaques/shadows inside the page shell. */
+@media (min-width: 1800px) {
+  .metric-hero__shell,
+  .metric-hero__main {
+    overflow-x: clip;
+  }
+
+  .metric-hero__visual {
+    overflow: hidden;
+  }
 }
 
 .metric-hero__cluster,
@@ -747,14 +813,14 @@ a.metric-pill--link:active {
 .metric-hero__trust-kicker,
 .metric-hero__trust-copy {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--text-body);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
 .metric-hero__trust-copy--bottom {
-  max-width: 180px;
+  max-width: min(100%, 180px);
 }
 
 .metric-hero__trust-value {
@@ -943,6 +1009,71 @@ a.metric-pill--link:active {
   }
 }
 
+@media (min-width: 1800px) {
+  .metric-hero__title {
+    font-size: min(13cqw, max(9svh, 4.8vw));
+  }
+
+  .metric-hero__subtitle {
+    max-width: min(78%, 42rem);
+    font-size: min(3.45cqw, max(2.2svh, 1.25vw));
+  }
+
+  .metric-hero__trust-card {
+    min-height: clamp(180px, 16svh, 280px);
+    border-radius: var(--radius-2xl);
+  }
+
+  .metric-hero__trust-inner {
+    padding: clamp(24px, 2.2svh, 40px);
+  }
+
+  .metric-hero__trust-kicker,
+  .metric-hero__trust-copy {
+    font-size: var(--text-body);
+  }
+
+  .metric-hero__trust-copy--bottom {
+    max-width: min(100%, 70%);
+  }
+
+  .metric-hero__trust-value {
+    font-size: clamp(64px, 4.2cqw, 104px);
+  }
+
+  .metric-hero__trust-star {
+    width: clamp(41px, 2.4cqw, 56px);
+    height: clamp(39px, 2.3cqw, 54px);
+  }
+
+  .metric-hero__trust-spn img {
+    height: clamp(48px, 3.2cqw, 64px);
+    width: auto;
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-hero__title {
+    font-size: min(12cqw, max(10svh, 4.2vw));
+  }
+
+  .metric-hero__subtitle {
+    font-size: min(3.2cqw, max(2.4svh, 1.15vw));
+  }
+
+  .metric-hero__trust-card {
+    min-height: clamp(220px, 15svh, 320px);
+  }
+
+  .metric-hero__trust-inner {
+    padding: clamp(28px, 2svh, 48px);
+  }
+
+  .metric-hero__trust-value {
+    font-size: clamp(80px, 3.8cqw, 128px);
+  }
+}
+
 /* —— Home sections —— */
 
 /* Keep hash targets clear of the sticky header on every home anchor. */
@@ -977,7 +1108,7 @@ a.metric-pill--link:active {
 
 @media (min-width: 1800px) {
   .metric-categories__title {
-    font-size: clamp(104px, 5.6vw, 136px);
+    font-size: var(--text-display-xl);
   }
 }
 
@@ -1026,6 +1157,7 @@ a.metric-pill--link:active {
 
 .metric-categories__track-wrap--marquee {
   overflow: hidden;
+  overflow-x: clip;
   padding-inline: 0;
   /* Pull the extra hover gutter back so section spacing stays the same. */
   margin-top: calc(clamp(40px, 4.5vw, 64px) - 16px);
@@ -1146,6 +1278,15 @@ a.metric-pill--link:active {
   z-index: 2;
 }
 
+/* Hug label — Figma case-card CTA is ~260px, not full body column. */
+.metric-case-card__cta.metric-cta {
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  align-self: flex-start;
+  padding-inline: 28px;
+}
+
 @media (min-width: 1024px) {
   .metric-case-card {
     grid-template-columns: 1fr 1.05fr;
@@ -1255,6 +1396,44 @@ a.metric-pill--link:active {
   }
 }
 
+@media (min-width: 1800px) {
+  .metric-case-card__body {
+    gap: clamp(40px, 2.4vw, 56px);
+    padding: clamp(50px, 3vw, 72px);
+  }
+
+  .metric-case-card__quote {
+    font-size: clamp(60px, 3.2vw, 84px);
+  }
+
+  .metric-case-card__author {
+    font-size: clamp(32px, 1.7vw, 40px);
+  }
+
+  .metric-case-card__role {
+    font-size: clamp(24px, 1.25vw, 28px);
+  }
+
+  .metric-case-card__tags .metric-pill {
+    padding: clamp(16px, 0.9vw, 22px) clamp(20px, 1.2vw, 28px);
+    font-size: clamp(20px, 1.1vw, 24px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-case-card__quote {
+    font-size: clamp(84px, 2.8vw, 104px);
+  }
+
+  .metric-case-card__author {
+    font-size: clamp(40px, 1.4vw, 48px);
+  }
+
+  .metric-case-card__role {
+    font-size: clamp(28px, 1.05vw, 32px);
+  }
+}
+
 .metric-case-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -1311,22 +1490,15 @@ a.metric-pill--link:active {
 }
 
 .metric-case-studies__title {
-  max-width: 734px;
+  max-width: min(100%, 48rem);
   font-size: clamp(32px, 8vw, 100px);
   line-height: 0.9;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
-@media (min-width: 1800px) {
-  .metric-case-studies__title {
-    max-width: 920px;
-    font-size: clamp(100px, 5.2vw, 128px);
-  }
-}
-
 .metric-case-studies__subtitle {
-  max-width: 430px;
+  max-width: min(100%, 32rem);
   font-size: clamp(14px, 3.4vw, 24px);
   line-height: 1.25;
   letter-spacing: -0.02em;
@@ -1339,10 +1511,43 @@ a.metric-pill--link:active {
   }
 }
 
+@media (min-width: 1800px) {
+  .metric-case-studies__title {
+    max-width: min(100%, 56rem);
+    font-size: var(--text-display-lg);
+  }
+
+  .metric-case-studies__subtitle {
+    max-width: min(100%, 40rem);
+    font-size: var(--text-body-lg);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-case-studies__title {
+    max-width: min(100%, 64rem);
+  }
+
+  .metric-case-studies__subtitle {
+    max-width: min(100%, 48rem);
+  }
+}
+
 .metric-case-studies__more {
   margin-top: 28px;
   display: flex;
   justify-content: center;
+}
+
+.metric-case-studies__more .metric-cta {
+  width: fit-content;
+}
+
+.metric-workflow__cta .metric-cta,
+.metric-services__cta .metric-cta,
+.metric-hero__copy .metric-cta {
+  width: fit-content;
+  align-self: flex-start;
 }
 
 @media (min-width: 768px) {
@@ -1418,7 +1623,7 @@ a.metric-pill--link:active {
 
 .metric-services__subtitle {
   order: 2;
-  max-width: 430px;
+  max-width: min(100%, 32rem);
   font-size: clamp(15px, 3.6vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -1497,7 +1702,7 @@ a.metric-pill--link:active {
   }
 
   .metric-services__subtitle {
-    max-width: 430px;
+    max-width: 100%;
   }
 
   .metric-services__cta {
@@ -1515,7 +1720,11 @@ a.metric-pill--link:active {
 
 @media (min-width: 1800px) {
   .metric-services__title {
-    font-size: clamp(120px, 6.4vw, 152px);
+    font-size: var(--text-display-xl);
+  }
+
+  .metric-services__subtitle {
+    font-size: var(--text-body-lg);
   }
 
   .metric-services__layout {
@@ -1525,13 +1734,21 @@ a.metric-pill--link:active {
   .metric-services__list {
     min-height: calc(4 * 480px + 3 * 30px);
   }
+
+  .metric-services-card__num {
+    width: clamp(65px, 3.6vw, 80px);
+    height: clamp(65px, 3.6vw, 80px);
+    font-size: clamp(32px, 1.8vw, 40px);
+  }
+
+  .metric-services-card__label.metric-cta {
+    min-height: clamp(65px, 3.6vw, 80px);
+    padding: 0 clamp(36px, 2vw, 48px);
+    font-size: clamp(32px, 1.8vw, 40px);
+  }
 }
 
 @media (min-width: 2560px) {
-  .metric-services__title {
-    font-size: clamp(152px, 5.2vw, 184px);
-  }
-
   .metric-services__layout {
     grid-template-columns: minmax(380px, 640px) minmax(0, 1fr);
   }
@@ -1764,8 +1981,8 @@ a.metric-pill--link:active {
 
 @media (min-width: 1024px) {
   .metric-workflow__header {
-    grid-template-columns: minmax(0, 1fr) minmax(200px, 220px);
-    column-gap: 40px;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 28rem);
+    column-gap: clamp(40px, 3vw, 72px);
     align-items: start;
   }
 
@@ -1788,13 +2005,7 @@ a.metric-pill--link:active {
 
 @media (min-width: 1800px) {
   .metric-workflow__title {
-    font-size: clamp(120px, 6.4vw, 176px);
-  }
-}
-
-@media (min-width: 2560px) {
-  .metric-workflow__title {
-    font-size: clamp(160px, 5.2vw, 200px);
+    font-size: var(--text-display-xl);
   }
 }
 
@@ -1828,7 +2039,7 @@ a.metric-pill--link:active {
 }
 
 .metric-workflow__subtitle {
-  max-width: 220px;
+  max-width: min(100%, 28rem);
   font-size: clamp(16px, 1.6vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -1919,7 +2130,41 @@ a.metric-pill--link:active {
 
 @media (min-width: 1024px) {
   .metric-workflow-card--offset {
-    margin-top: 80px;
+    margin-top: clamp(48px, 4vw, 80px);
+  }
+}
+
+@media (min-width: 1800px) {
+  .metric-workflow-card--offset {
+    margin-top: clamp(64px, 4vw, 112px);
+  }
+
+  .metric-workflow__subtitle {
+    max-width: min(100%, 36rem);
+    font-size: var(--text-body-lg);
+  }
+
+  .metric-workflow-card__title {
+    font-size: clamp(40px, 2.2vw, 56px);
+  }
+
+  .metric-workflow-card__body {
+    font-size: clamp(20px, 1.15vw, 26px);
+  }
+
+  .metric-workflow__note {
+    max-width: min(100%, 36rem);
+    font-size: var(--text-body-lg);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-workflow-card__title {
+    font-size: clamp(52px, 1.9vw, 64px);
+  }
+
+  .metric-workflow-card__body {
+    font-size: clamp(24px, 1vw, 30px);
   }
 }
 
@@ -1974,7 +2219,7 @@ a.metric-pill--link:active {
 }
 
 .metric-workflow__note {
-  max-width: 324px;
+  max-width: min(100%, 28rem);
   font-size: clamp(18px, 1.6vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -2008,21 +2253,21 @@ a.metric-pill--link:active {
   align-items: center;
   justify-content: space-between;
   height: var(--header-height);
-  gap: 24px;
+  gap: clamp(24px, 2vw, 48px);
 }
 
 .site-header__logo-link {
   position: relative;
   display: block;
-  width: 140px;
-  height: 40px;
+  width: var(--header-logo-width);
+  height: var(--header-logo-height);
   flex-shrink: 0;
 }
 
 .site-header__nav {
   display: none;
   align-items: center;
-  gap: 30px;
+  gap: clamp(30px, 2vw, 48px);
 }
 
 .site-header__menu-btn,
@@ -2148,7 +2393,7 @@ a.metric-pill--link:active {
 }
 
 .site-nav__link--footer {
-  font-size: 16px;
+  font-size: var(--text-small);
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
@@ -2256,7 +2501,7 @@ a.metric-pill--link:active {
 /* Footer — Figma desktop 2015:832 / mobile 2020:4 */
 .site-footer {
   background: #fff;
-  padding-block: clamp(40px, 6vw, 60px) 28px;
+  padding-block: clamp(40px, var(--section-gap), 120px) clamp(28px, 2vw, 48px);
   scroll-margin-top: var(--header-height);
 }
 
@@ -2294,7 +2539,7 @@ a.metric-pill--link:active {
 
   .site-footer__logo {
     grid-column: auto;
-    width: 213px;
+    width: var(--footer-logo-width);
   }
 
   .site-footer__nav {
@@ -2322,7 +2567,7 @@ a.metric-pill--link:active {
 .site-footer__contact-label,
 .site-footer__contact-value {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--text-small);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--foreground);
@@ -2335,11 +2580,11 @@ a.metric-pill--link:active {
 }
 
 .site-footer__bottom {
-  margin-top: 48px;
+  margin-top: clamp(48px, 6vw, 80px);
   display: flex;
   flex-direction: column;
   gap: 48px;
-  font-size: 16px;
+  font-size: var(--text-small);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--foreground);
@@ -2374,7 +2619,7 @@ a.metric-pill--link:active {
 
 @media (min-width: 1024px) {
   .site-footer__bottom {
-    margin-top: 140px;
+    margin-top: clamp(100px, 8vw, 160px);
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
@@ -2473,6 +2718,37 @@ a.metric-pill--link:active {
   }
 }
 
+@media (min-width: 1800px) {
+  .metric-faq__grid {
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: clamp(64px, 4vw, 96px);
+  }
+
+  .faq-item__trigger {
+    padding: clamp(24px, 1.6vw, 36px) clamp(32px, 2vw, 48px);
+    font-size: clamp(28px, 1.5vw, 36px);
+  }
+
+  .faq-item__panel {
+    padding: 0 clamp(32px, 2vw, 48px) clamp(32px, 2vw, 48px);
+    font-size: clamp(24px, 1.25vw, 28px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-faq__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .faq-item__trigger {
+    font-size: clamp(32px, 1.25vw, 40px);
+  }
+
+  .faq-item__panel {
+    font-size: clamp(26px, 1.05vw, 32px);
+  }
+}
+
 .metric-faq__title {
   font-size: clamp(64px, 10vw, 120px);
   line-height: 0.9;
@@ -2481,11 +2757,22 @@ a.metric-pill--link:active {
 
 .metric-faq__subtitle {
   margin-top: 24px;
-  max-width: 453px;
+  max-width: min(100%, 36rem);
   font-size: clamp(16px, 1.5vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: #fff;
+}
+
+@media (min-width: 1800px) {
+  .metric-faq__title {
+    font-size: var(--text-display-xl);
+  }
+
+  .metric-faq__subtitle {
+    max-width: min(100%, 44rem);
+    font-size: var(--text-body-lg);
+  }
 }
 
 .metric-faq__list {
@@ -3033,17 +3320,77 @@ html.is-mobile-menu-open {
   background: var(--surface);
 }
 
+/* Case intro — Figma 2046:23
+   Hierarchy: title → body row (role | tags + lede).
+   Desktop: title full-bleed left; body is 2-col with right meta ~430px. */
 .metric-case__intro {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 28px;
+  min-width: 0;
 }
 
+.metric-case__title {
+  margin: 0;
+  max-width: 12ch;
+  font-size: clamp(42px, 6vw, 90px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-case__intro-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.metric-case__role {
+  margin: 0;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-case__role--empty {
+  display: none;
+}
+
+.metric-case__intro-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  min-width: 0;
+}
+
+.metric-case__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.metric-case__tag.metric-pill,
 .metric-case__intro-meta .metric-pill {
   padding: 8px 12px;
   font-size: 13px;
+  border-color: var(--foreground);
+  color: var(--foreground);
+}
+
+.metric-case__lede {
+  margin: 0;
+  max-width: 430px;
+  font-size: clamp(16px, 1.6vw, 24px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
 }
 
 @media (min-width: 768px) {
+  .metric-case__tag.metric-pill,
   .metric-case__intro-meta .metric-pill {
     padding: 16px 20px;
     font-size: 20px;
@@ -3051,10 +3398,60 @@ html.is-mobile-menu-open {
 }
 
 @media (min-width: 1024px) {
+  /* Title → body gap ≈ 30px (Figma title bottom 241 → row 271). */
   .metric-case__intro {
-    grid-template-columns: 1.1fr 0.9fr;
-    align-items: end;
-    gap: 48px;
+    gap: 30px;
+  }
+
+  .metric-case__intro-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+    column-gap: clamp(40px, 6vw, 120px);
+    align-items: start;
+  }
+
+  /* Tags sit ~17px above role baseline in Figma — keep meta top-aligned,
+     nudge role down so it sits under the title optical line. */
+  .metric-case__role {
+    margin-top: 17px;
+  }
+
+  .metric-case__role--empty {
+    display: block;
+  }
+
+  .metric-case__intro-meta {
+    justify-self: end;
+    width: 100%;
+    max-width: 430px;
+    gap: 40px;
+  }
+
+  .metric-case__lede {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1800px) {
+  .metric-case__title {
+    max-width: 14ch;
+    font-size: clamp(90px, 4.8vw, 120px);
+  }
+
+  .metric-case__intro-body {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 480px);
+  }
+
+  .metric-case__intro-meta {
+    max-width: 480px;
+  }
+
+  .metric-case__role {
+    font-size: var(--text-body);
+  }
+
+  .metric-case__lede {
+    font-size: var(--text-body-lg);
   }
 }
 
