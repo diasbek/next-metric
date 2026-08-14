@@ -68,11 +68,6 @@ body {
   box-sizing: border-box;
 }
 
-/* Skewed header CTA: keep the parallelogram tip inside the shell gutter. */
-.site-header__inner .metric-cta {
-  margin-inline-end: var(--cta-skew-gutter);
-}
-
 .font-display {
   font-family: var(--font-display-stack);
   font-weight: 600;
@@ -144,10 +139,17 @@ body {
 
 /* —— Metric CTAs ——
    Rounded parallelogram: skew shell + counter-skew label.
-   Prefer <Button variant size /> — CSS classes remain for GSAP / legacy. */
+   Prefer <Button variant size /> — CSS classes remain for GSAP / legacy.
+
+   Skew containment: --cta-skew-overhang is reserved on each side inside the
+   layout box (extra padding + matching ::before inset). Tips land on the
+   element edges, so left-flush and right-flush CTAs both stay in safe-area
+   without per-section margin hacks. */
 .metric-cta {
   --cta-fill: transparent;
   --cta-shadow: none;
+  --cta-pad-x: 48px;
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height));
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -158,7 +160,7 @@ body {
   width: fit-content;
   max-width: 100%;
   min-height: var(--cta-height);
-  padding: 0 48px;
+  padding: 0 calc(var(--cta-pad-x) + var(--cta-skew-overhang));
   border: none;
   border-radius: var(--cta-radius);
   font-size: var(--text-body-lg);
@@ -183,7 +185,8 @@ body {
 .metric-cta::before {
   content: "";
   position: absolute;
-  inset: 0;
+  /* Inset by overhang so after skewX the tips sit on the layout edges. */
+  inset: 0 var(--cta-skew-overhang);
   z-index: 0;
   border-radius: inherit;
   background: var(--cta-fill);
@@ -213,36 +216,39 @@ body {
    hero CTA) can't force horizontal overflow on narrow phones. Past 1800
    heights follow --cta-height-* tokens. */
 .metric-cta--sm {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-sm));
+  --cta-pad-x: clamp(16px, 16px + (100vw - 320px) * 0.01007, 28px);
   min-height: var(--cta-height-sm);
-  padding: 0 clamp(16px, 16px + (100vw - 320px) * 0.01007, 28px);
   font-size: clamp(16px, 16px + (100vw - 320px) * 0.00168, 18px);
 }
 
 .metric-cta--md {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height));
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02013, 48px);
   min-height: var(--cta-height);
-  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02013, 48px);
   font-size: clamp(17px, 17px + (100vw - 320px) * 0.00252, 20px);
 }
 
 .metric-cta--lg {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-lg));
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02685, 56px);
   min-height: var(--cta-height-lg);
-  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02685, 56px);
   font-size: clamp(18px, 18px + (100vw - 320px) * 0.00336, 22px);
 }
 
 @media (min-width: 1800px) {
   .metric-cta--sm {
-    padding: 0 clamp(28px, 1.6vw, 36px);
+    --cta-pad-x: clamp(28px, 1.6vw, 36px);
     font-size: var(--text-nav);
   }
 
   .metric-cta--md {
-    padding: 0 clamp(48px, 2.6vw, 64px);
+    --cta-pad-x: clamp(48px, 2.6vw, 64px);
     font-size: var(--text-body);
   }
 
   .metric-cta--lg {
-    padding: 0 clamp(56px, 3vw, 72px);
+    --cta-pad-x: clamp(56px, 3vw, 72px);
     font-size: var(--text-body-lg);
   }
 }
@@ -275,9 +281,9 @@ body {
 .metric-cta--dark.metric-cta--skew {
   --cta-fill: var(--dark);
   --cta-shadow: none;
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   width: fit-content;
   min-width: 0;
-  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   color: #fff;
 }
 
@@ -291,9 +297,9 @@ body {
 .metric-cta--skew-outline {
   --cta-fill: transparent;
   --cta-shadow: inset 0 0 0 1.5px var(--dark);
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   width: fit-content;
   min-width: 0;
-  padding: 0 clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
   color: var(--dark);
 }
 
@@ -307,8 +313,9 @@ body {
 .metric-cta--outline {
   --cta-fill: transparent;
   --cta-shadow: inset 0 0 0 1.5px var(--accent);
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-sm));
+  --cta-pad-x: 28px;
   min-height: var(--cta-height-sm);
-  padding: 0 28px;
   color: var(--accent);
   font-size: var(--text-nav);
 }
@@ -320,8 +327,9 @@ body {
 
 /* Size + outlineAccent: keep nav proportions when size=sm is set. */
 .metric-cta--outline.metric-cta--sm {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-sm));
+  --cta-pad-x: 28px;
   min-height: var(--cta-height-sm);
-  padding: 0 28px;
   font-size: var(--text-nav);
 }
 
@@ -330,7 +338,7 @@ body {
 .metric-cta--outline-dark.metric-cta--sm,
 .metric-cta--skew-outline.metric-cta--sm {
   min-width: 0;
-  padding: 0 28px;
+  --cta-pad-x: 28px;
 }
 
 .metric-pill {
@@ -896,10 +904,9 @@ a.metric-pill--link:active {
 
   .metric-hero .metric-cta--lg {
     min-height: 48px;
+    --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 48px);
     width: fit-content;
-    max-width: calc(100% - var(--cta-skew-gutter));
-    margin-inline-start: var(--cta-skew-gutter);
-    padding: 0 24px;
+    --cta-pad-x: 24px;
     font-size: 18px;
   }
 
@@ -1285,10 +1292,8 @@ a.metric-pill--link:active {
 .metric-case-card__cta.metric-cta {
   width: fit-content;
   min-width: 0;
-  max-width: calc(100% - var(--cta-skew-gutter));
   align-self: flex-start;
-  margin-inline-start: var(--cta-skew-gutter);
-  padding-inline: 28px;
+  --cta-pad-x: 28px;
 }
 
 @media (min-width: 1024px) {
@@ -1558,10 +1563,7 @@ a.metric-pill--link:active {
 
 .metric-hero__copy .metric-cta {
   width: fit-content;
-  max-width: calc(100% - var(--cta-skew-gutter));
   align-self: flex-start;
-  /* Skew tip must stay inside the copy padding (mobile safe-area). */
-  margin-inline-start: var(--cta-skew-gutter);
 }
 
 @media (min-width: 768px) {
@@ -1757,7 +1759,8 @@ a.metric-pill--link:active {
 
   .metric-services-card__label.metric-cta {
     min-height: clamp(65px, 3.6vw, 80px);
-    padding: 0 clamp(36px, 2vw, 48px);
+    --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * clamp(65px, 3.6vw, 80px));
+    --cta-pad-x: clamp(36px, 2vw, 48px);
     font-size: clamp(32px, 1.8vw, 40px);
   }
 }
@@ -1871,7 +1874,8 @@ a.metric-pill--link:active {
 /* Title chip — separate parallelogram, not fused into the number circle. */
 .metric-services-card__label.metric-cta {
   min-height: 44px;
-  padding: 0 22px;
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 44px);
+  --cta-pad-x: 22px;
   font-size: 16px;
   margin-left: 0;
   cursor: default;
@@ -1887,7 +1891,8 @@ a.metric-pill--link:active {
 @media (min-width: 1024px) {
   .metric-services-card__label.metric-cta {
     min-height: 65px;
-    padding: 0 36px;
+    --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 65px);
+    --cta-pad-x: 36px;
     font-size: 32px;
   }
 }
@@ -3333,12 +3338,15 @@ html.is-mobile-menu-open {
   background: var(--surface);
 }
 
-/* Case intro — Figma header:
-   | Title                         | Tags        |
-   | Role                          | Lede        |
-   | Task (optional)               | Solution    |
-   Both columns left-aligned on one shared grid. */
+/* Case intro — full-width title, then 2-col body:
+   | Role                          | Tags        |
+   | Task (optional)               | Lede        |
+   |                               | Solution    | */
 .metric-case__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
   min-width: 0;
 }
 
@@ -3346,6 +3354,7 @@ html.is-mobile-menu-open {
   display: flex;
   flex-direction: column;
   gap: 28px;
+  width: 100%;
   min-width: 0;
 }
 
@@ -3357,16 +3366,9 @@ html.is-mobile-menu-open {
   min-width: 0;
 }
 
-.metric-case__identity {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  min-width: 0;
-}
-
 .metric-case__title {
   margin: 0;
+  width: 100%;
   font-size: clamp(42px, 6vw, 90px);
   line-height: 0.9;
   letter-spacing: -0.02em;
@@ -3445,6 +3447,10 @@ html.is-mobile-menu-open {
 }
 
 @media (min-width: 1024px) {
+  .metric-case__intro {
+    gap: 40px;
+  }
+
   .metric-case__grid {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -3456,13 +3462,7 @@ html.is-mobile-menu-open {
     gap: 48px;
   }
 
-  .metric-case__identity {
-    /* Name → role ≈ Figma gap under 90px title */
-    gap: 20px;
-  }
-
   .metric-case__meta {
-    /* Tags top-align with title; lede below with clear gap */
     gap: 40px;
   }
 }

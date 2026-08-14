@@ -74,16 +74,15 @@ export async function WorkCaseSection({
   return (
     <article className="metric-case">
       <PageContainer>
-        {/* Figma case header: 2-col — title+role | tags+lede (+ task | solution). */}
+        {/* Full-width title, then 2-col: role+task | tags+lede+solution. */}
         <header className="metric-case__intro" data-reveal>
+          <h1 className="metric-case__title font-display">{authorName}</h1>
+
           <div className="metric-case__grid">
             <div className="metric-case__col metric-case__col--main">
-              <div className="metric-case__identity">
-                <h1 className="metric-case__title font-display">{authorName}</h1>
-                {project.role ? (
-                  <p className="metric-case__role">{project.role}</p>
-                ) : null}
-              </div>
+              {project.role ? (
+                <p className="metric-case__role">{project.role}</p>
+              ) : null}
 
               {caseStudy?.task ? (
                 <div className="metric-case__brief">
