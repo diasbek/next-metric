@@ -74,60 +74,53 @@ export async function WorkCaseSection({
   return (
     <article className="metric-case">
       <PageContainer>
-        {/* Figma 2046:23 — title, then row: role | tags + lede */}
+        {/* Figma case header: 2-col — title+role | tags+lede (+ task | solution). */}
         <header className="metric-case__intro" data-reveal>
-          <h1 className="metric-case__title font-display">{authorName}</h1>
+          <div className="metric-case__grid">
+            <div className="metric-case__col metric-case__col--main">
+              <div className="metric-case__identity">
+                <h1 className="metric-case__title font-display">{authorName}</h1>
+                {project.role ? (
+                  <p className="metric-case__role">{project.role}</p>
+                ) : null}
+              </div>
 
-          <div className="metric-case__intro-body">
-            {project.role ? (
-              <p className="metric-case__role">{project.role}</p>
-            ) : (
-              <span className="metric-case__role metric-case__role--empty" aria-hidden />
-            )}
-
-            <div className="metric-case__intro-meta">
-              {project.tags.length ? (
-                <div className="metric-case__tags">
-                  {project.tags.map((tag) => (
-                    <MetricTagPill
-                      key={tag}
-                      tag={tag}
-                      locale={locale}
-                      className="metric-case__tag"
-                    />
-                  ))}
+              {caseStudy?.task ? (
+                <div className="metric-case__brief">
+                  <p className="metric-case__brief-label">{ui.task}</p>
+                  <p className="metric-case__brief-text">{caseStudy.task}</p>
                 </div>
               ) : null}
-              <p className="metric-case__lede">{project.description}</p>
+            </div>
+
+            <div className="metric-case__col metric-case__col--aside">
+              <div className="metric-case__meta">
+                {project.tags.length ? (
+                  <div className="metric-case__tags">
+                    {project.tags.map((tag) => (
+                      <MetricTagPill
+                        key={tag}
+                        tag={tag}
+                        locale={locale}
+                        className="metric-case__tag"
+                      />
+                    ))}
+                  </div>
+                ) : null}
+                {project.description ? (
+                  <p className="metric-case__lede">{project.description}</p>
+                ) : null}
+              </div>
+
+              {caseStudy?.solution ? (
+                <div className="metric-case__brief">
+                  <p className="metric-case__brief-label">{ui.solution}</p>
+                  <p className="metric-case__brief-text">{caseStudy.solution}</p>
+                </div>
+              ) : null}
             </div>
           </div>
         </header>
-
-        {(caseStudy?.task || caseStudy?.solution) && (
-          <div
-            className="mt-10 grid gap-8 md:grid-cols-2"
-            data-reveal-group
-          >
-            {caseStudy.task ? (
-              <div data-reveal>
-                <p className="text-sm uppercase tracking-[0.08em] text-[color:var(--muted)]">
-                  {ui.task}
-                </p>
-                <p className="mt-2 text-[20px] leading-[1.3]">{caseStudy.task}</p>
-              </div>
-            ) : null}
-            {caseStudy.solution ? (
-              <div data-reveal>
-                <p className="text-sm uppercase tracking-[0.08em] text-[color:var(--muted)]">
-                  {ui.solution}
-                </p>
-                <p className="mt-2 text-[20px] leading-[1.3]">
-                  {caseStudy.solution}
-                </p>
-              </div>
-            ) : null}
-          </div>
-        )}
 
         {stripImages.length ? (
           <section className="metric-case__stack mt-12 md:mt-16" data-reveal>

@@ -385,7 +385,7 @@ a.metric-pill--link:active {
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  padding-block: 24px 32px;
+  padding-block: 24px clamp(20px, 3vh, 32px);
   background: #fff;
   /* Extend the hero (and its ambient blobs) up behind the sticky header at
      every breakpoint, not just desktop — otherwise the transparent-at-top
@@ -896,14 +896,15 @@ a.metric-pill--link:active {
 
   .metric-hero .metric-cta--lg {
     min-height: 48px;
-    width: 290px;
-    max-width: 100%;
+    width: fit-content;
+    max-width: calc(100% - var(--cta-skew-gutter));
+    margin-inline-start: var(--cta-skew-gutter);
     padding: 0 24px;
     font-size: 18px;
   }
 
   .metric-hero__trust-card {
-    min-height: 148px;
+    min-height: 168px;
     border-radius: 24px;
   }
 
@@ -928,18 +929,19 @@ a.metric-pill--link:active {
 
 @media (min-width: 1024px) {
   /* Figma 2032:19 — one viewport column: copy|visual, then trust.
-     Columns share leftover width; cluster fits the visual cell. */
+     Trust cards ~264px in Figma; size with svh so main+trust+bottom pad
+     still fit inside 100svh. */
   .metric-hero {
     height: 100svh;
     max-height: 100svh;
     min-height: 100svh;
-    padding-bottom: clamp(16px, 2vh, 28px);
+    padding-bottom: clamp(24px, 3.2vh, 40px);
   }
 
   .metric-hero__shell {
     min-height: 0;
     padding-top: 0;
-    gap: clamp(16px, 2.2vh, 32px);
+    gap: clamp(12px, 1.6vh, 28px);
   }
 
   .metric-hero__main {
@@ -997,11 +999,12 @@ a.metric-pill--link:active {
   }
 
   .metric-hero__trust-card {
-    min-height: clamp(120px, 17svh, 220px);
+    /* Figma trust row ≈ 264px; svh cap keeps the block inside 100svh. */
+    min-height: clamp(168px, 24svh, 264px);
   }
 
   .metric-hero__trust-inner {
-    padding: clamp(16px, 2svh, 28px);
+    padding: clamp(18px, 2.2svh, 28px);
   }
 
   .metric-hero__trust-value {
@@ -1020,7 +1023,7 @@ a.metric-pill--link:active {
   }
 
   .metric-hero__trust-card {
-    min-height: clamp(180px, 16svh, 280px);
+    min-height: clamp(200px, 22svh, 280px);
     border-radius: var(--radius-2xl);
   }
 
@@ -1062,7 +1065,7 @@ a.metric-pill--link:active {
   }
 
   .metric-hero__trust-card {
-    min-height: clamp(220px, 15svh, 320px);
+    min-height: clamp(220px, 20svh, 300px);
   }
 
   .metric-hero__trust-inner {
@@ -1282,8 +1285,9 @@ a.metric-pill--link:active {
 .metric-case-card__cta.metric-cta {
   width: fit-content;
   min-width: 0;
-  max-width: 100%;
+  max-width: calc(100% - var(--cta-skew-gutter));
   align-self: flex-start;
+  margin-inline-start: var(--cta-skew-gutter);
   padding-inline: 28px;
 }
 
@@ -1291,7 +1295,9 @@ a.metric-pill--link:active {
   .metric-case-card {
     grid-template-columns: 1fr 1.05fr;
     grid-template-areas: "body media";
-    align-items: center;
+    /* Stretch so body fills the card height — center was leaving gray
+       bands above tags and below the CTA when media is taller. */
+    align-items: stretch;
     border-radius: var(--radius-2xl);
   }
 }
@@ -1314,8 +1320,10 @@ a.metric-pill--link:active {
 
 @media (min-width: 1024px) {
   .metric-case-card__body {
-    gap: 40px;
+    /* Figma: 50px inset; space-between pins tags top / CTA bottom. */
+    gap: 24px;
     padding: 50px;
+    min-height: 0;
   }
 }
 
@@ -1398,8 +1406,8 @@ a.metric-pill--link:active {
 
 @media (min-width: 1800px) {
   .metric-case-card__body {
-    gap: clamp(40px, 2.4vw, 56px);
-    padding: clamp(50px, 3vw, 72px);
+    gap: clamp(24px, 1.6vw, 40px);
+    padding: 50px;
   }
 
   .metric-case-card__quote {
@@ -1544,10 +1552,16 @@ a.metric-pill--link:active {
 }
 
 .metric-workflow__cta .metric-cta,
-.metric-services__cta .metric-cta,
+.metric-services__cta .metric-cta {
+  width: fit-content;
+}
+
 .metric-hero__copy .metric-cta {
   width: fit-content;
+  max-width: calc(100% - var(--cta-skew-gutter));
   align-self: flex-start;
+  /* Skew tip must stay inside the copy padding (mobile safe-area). */
+  margin-inline-start: var(--cta-skew-gutter);
 }
 
 @media (min-width: 768px) {
@@ -3320,30 +3334,44 @@ html.is-mobile-menu-open {
   background: var(--surface);
 }
 
-/* Case intro — Figma 2046:23
-   Hierarchy: title → body row (role | tags + lede).
-   Desktop: title full-bleed left; body is 2-col with right meta ~430px. */
+/* Case intro — Figma header:
+   | Title                         | Tags        |
+   | Role                          | Lede        |
+   | Task (optional)               | Solution    |
+   Both columns left-aligned on one shared grid. */
 .metric-case__intro {
+  min-width: 0;
+}
+
+.metric-case__grid {
   display: flex;
   flex-direction: column;
   gap: 28px;
   min-width: 0;
 }
 
+.metric-case__col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+  min-width: 0;
+}
+
+.metric-case__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+
 .metric-case__title {
   margin: 0;
-  max-width: 12ch;
   font-size: clamp(42px, 6vw, 90px);
   line-height: 0.9;
   letter-spacing: -0.02em;
   color: var(--foreground);
-}
-
-.metric-case__intro-body {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  min-width: 0;
 }
 
 .metric-case__role {
@@ -3354,15 +3382,12 @@ html.is-mobile-menu-open {
   color: var(--foreground);
 }
 
-.metric-case__role--empty {
-  display: none;
-}
-
-.metric-case__intro-meta {
+.metric-case__meta {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 24px;
+  width: 100%;
   min-width: 0;
 }
 
@@ -3372,8 +3397,7 @@ html.is-mobile-menu-open {
   gap: 5px;
 }
 
-.metric-case__tag.metric-pill,
-.metric-case__intro-meta .metric-pill {
+.metric-case__tag.metric-pill {
   padding: 8px 12px;
   font-size: 13px;
   border-color: var(--foreground);
@@ -3382,68 +3406,75 @@ html.is-mobile-menu-open {
 
 .metric-case__lede {
   margin: 0;
-  max-width: 430px;
+  max-width: 34rem;
   font-size: clamp(16px, 1.6vw, 24px);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
+.metric-case__brief {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.metric-case__brief-label {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metric-case__brief-text {
+  margin: 0;
+  max-width: 34rem;
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
 @media (min-width: 768px) {
-  .metric-case__tag.metric-pill,
-  .metric-case__intro-meta .metric-pill {
+  .metric-case__tag.metric-pill {
     padding: 16px 20px;
     font-size: 20px;
   }
 }
 
 @media (min-width: 1024px) {
-  /* Title → body gap ≈ 30px (Figma title bottom 241 → row 271). */
-  .metric-case__intro {
-    gap: 30px;
-  }
-
-  .metric-case__intro-body {
+  .metric-case__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
-    column-gap: clamp(40px, 6vw, 120px);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    column-gap: clamp(48px, 5vw, 96px);
     align-items: start;
   }
 
-  /* Tags sit ~17px above role baseline in Figma — keep meta top-aligned,
-     nudge role down so it sits under the title optical line. */
-  .metric-case__role {
-    margin-top: 17px;
+  .metric-case__col {
+    gap: 48px;
   }
 
-  .metric-case__role--empty {
-    display: block;
+  .metric-case__identity {
+    /* Name → role ≈ Figma gap under 90px title */
+    gap: 20px;
   }
 
-  .metric-case__intro-meta {
-    justify-self: end;
-    width: 100%;
-    max-width: 430px;
+  .metric-case__meta {
+    /* Tags top-align with title; lede below with clear gap */
     gap: 40px;
-  }
-
-  .metric-case__lede {
-    max-width: none;
   }
 }
 
 @media (min-width: 1800px) {
   .metric-case__title {
-    max-width: 14ch;
     font-size: clamp(90px, 4.8vw, 120px);
   }
 
-  .metric-case__intro-body {
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 480px);
-  }
-
-  .metric-case__intro-meta {
-    max-width: 480px;
+  .metric-case__grid {
+    column-gap: clamp(64px, 5vw, 120px);
   }
 
   .metric-case__role {
@@ -3452,6 +3483,10 @@ html.is-mobile-menu-open {
 
   .metric-case__lede {
     font-size: var(--text-body-lg);
+  }
+
+  .metric-case__brief-text {
+    font-size: var(--text-body);
   }
 }
 

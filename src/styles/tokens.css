@@ -75,8 +75,9 @@
   --cta-radius-8: 8px;
   --cta-radius: var(--cta-radius-4);
   --cta-skew: -34.11deg;
-  /* Extra inline room so skewX fill does not visually exit the shell. */
-  --cta-skew-gutter: 12px;
+  /* Horizontal overhang of skewX(::before) past the box (origin center):
+     ≈ 0.5 * height * tan(|skew|). Keep tips inside page/copy padding. */
+  --cta-skew-gutter: calc(0.5 * tan(34.11deg) * var(--cta-height-lg) + 8px);
   --header-height: 88px;
   --header-logo-width: 140px;
   --header-logo-height: 40px;
@@ -102,7 +103,7 @@
     --cta-height: clamp(48px, 2.8vw, 56px);
     --cta-height-sm: clamp(44px, 2.6vw, 52px);
     --cta-height-lg: clamp(56px, 3.2vw, 64px);
-    --cta-skew-gutter: 18px;
+    --cta-skew-gutter: calc(0.5 * tan(34.11deg) * var(--cta-height-lg) + 10px);
     --header-height: clamp(88px, 5vw, 104px);
     --header-logo-width: clamp(140px, 8.5vw, 176px);
     --header-logo-height: clamp(40px, 2.4vw, 50px);
@@ -129,7 +130,7 @@
     --cta-height: clamp(56px, 2.2vw, 64px);
     --cta-height-sm: clamp(52px, 2vw, 58px);
     --cta-height-lg: clamp(64px, 2.5vw, 72px);
-    --cta-skew-gutter: 24px;
+    --cta-skew-gutter: calc(0.5 * tan(34.11deg) * var(--cta-height-lg) + 12px);
     --header-height: clamp(104px, 4vw, 120px);
     --header-logo-width: clamp(176px, 6.5vw, 220px);
     --header-logo-height: clamp(50px, 1.9vw, 62px);
