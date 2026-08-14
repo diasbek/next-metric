@@ -86,17 +86,20 @@ export function LiquidGlassPlaque({
     };
   }, [fxMounted]);
 
+  // Do not set borderRadius inline — className (e.g. trust-card / plaque) owns it.
+  // `borderRadius: inherit` previously overrode those classes and made the CSS
+  // border a sharp rectangle while gray shell corners stuck out past the FX.
   const shellStyle: CSSProperties = {
     ...FILL,
     ...style,
-    borderRadius: "inherit",
     boxSizing: "border-box",
-    background,
-    border: `1px solid ${GLASS_BORDER}`,
+    background: fxVisible ? "transparent" : background,
+    border: fxVisible ? "1px solid transparent" : `1px solid ${GLASS_BORDER}`,
     // Keep CSS blur until the FX layer is fully visible — avoids a gray hole.
     backdropFilter: fxVisible ? "none" : "blur(12px) saturate(160%)",
     WebkitBackdropFilter: fxVisible ? "none" : "blur(12px) saturate(160%)",
-    transition: "backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease",
+    transition:
+      "background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease",
   };
 
   return (
@@ -118,7 +121,7 @@ export function LiquidGlassPlaque({
             blur={12}
             glassColor={GLASS_TINT}
             background={background}
-            border={0.08}
+            border={0.07}
             borderColor={GLASS_BORDER}
             quality="standard"
             lens="rim"

@@ -564,12 +564,15 @@ a.metric-pill--link:active {
 .liquid-glass-plaque {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
 }
 
 .liquid-glass-plaque__fx {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s ease;
@@ -577,6 +580,15 @@ a.metric-pill--link:active {
 
 .liquid-glass-plaque__fx.is-on {
   opacity: 1;
+}
+
+.liquid-glass-plaque__fx > [data-liquid-glass] {
+  border-radius: inherit !important;
+  overflow: hidden;
+}
+
+.liquid-glass-plaque__fx .liquid-glass-border {
+  border-radius: inherit !important;
 }
 
 .liquid-glass-plaque__content {
@@ -3023,6 +3035,18 @@ html.is-mobile-menu-open {
 .metric-case__intro {
   display: grid;
   gap: 28px;
+}
+
+.metric-case__intro-meta .metric-pill {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+@media (min-width: 768px) {
+  .metric-case__intro-meta .metric-pill {
+    padding: 16px 20px;
+    font-size: 20px;
+  }
 }
 
 @media (min-width: 1024px) {
