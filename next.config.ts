@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
-import { isIndexableDeployment } from "./src/utils/seo/indexing";
 
 const PROD_SITE = "https://metric.graphics";
+const PRODUCTION_HOSTS = new Set(["metric.graphics", "www.metric.graphics"]);
+const NON_INDEXABLE_HOSTS = new Set([
+  "metric.nocode.uz",
+  "www.metric.nocode.uz",
+  "localhost",
+  "127.0.0.1",
+]);
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || PROD_SITE;
@@ -11,6 +17,30 @@ function siteOrigin(url: string): string {
     return new URL(url).origin;
   } catch {
     return PROD_SITE;
+  }
+}
+
+/** Mirror of `isIndexableDeployment` — keep inline; next.config cannot use `@/` imports. */
+function isIndexableDeployment(): boolean {
+  const allowFlag = process.env.NEXT_PUBLIC_ALLOW_INDEXING?.trim();
+  if (allowFlag === "true") return true;
+  if (allowFlag === "false") return false;
+
+  if (process.env.VERCEL) {
+    if (process.env.VERCEL_ENV !== "production") return false;
+  } else if (process.env.NODE_ENV !== "production") {
+    return false;
+  }
+
+  try {
+    let host = new URL(siteUrl).hostname.toLowerCase();
+    if (host.startsWith("www.")) host = host.slice(4);
+    if (NON_INDEXABLE_HOSTS.has(host) || host.endsWith(".vercel.app")) {
+      return false;
+    }
+    return PRODUCTION_HOSTS.has(host) || PRODUCTION_HOSTS.has(`www.${host}`);
+  } catch {
+    return false;
   }
 }
 

@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -22,17 +23,30 @@ const FILL: CSSProperties = {
   boxShadow: "none",
 };
 
+const GLASS_TINT = "rgba(255, 255, 255, 0.38)";
+const GLASS_BORDER = "rgba(255, 255, 255, 0.55)";
+const DEFAULT_BG =
+  "linear-gradient(145deg, rgba(243, 221, 232, 0.55), rgba(255, 255, 255, 0.72))";
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function LiquidGlassPlaque({
   children,
   className,
-  background = "linear-gradient(145deg, #f3dde8, #ffffff)",
+  background = DEFAULT_BG,
   style,
 }: LiquidGlassPlaqueProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
   const [radiusPx, setRadiusPx] = useState(10);
+  /** Mount the WebGL/SVG layer (after paint-safe layout). */
+  const [fxMounted, setFxMounted] = useState(false);
+  /** Fade the FX layer in once it's in the DOM. */
+  const [fxVisible, setFxVisible] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
 
@@ -42,7 +56,10 @@ export function LiquidGlassPlaque({
     };
 
     sync();
-    setMounted(true);
+
+    if (!prefersReducedMotion()) {
+      setFxMounted(true);
+    }
 
     const ro = new ResizeObserver(sync);
     ro.observe(el);
@@ -55,39 +72,63 @@ export function LiquidGlassPlaque({
     };
   }, []);
 
+  useEffect(() => {
+    if (!fxMounted) return;
+    // Double rAF: wait until LiquidGlass has committed paint before fading in.
+    let outer = 0;
+    let inner = 0;
+    outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setFxVisible(true));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [fxMounted]);
+
+  const shellStyle: CSSProperties = {
+    ...FILL,
+    ...style,
+    borderRadius: "inherit",
+    boxSizing: "border-box",
+    background,
+    border: `1px solid ${GLASS_BORDER}`,
+    // Keep CSS blur until the FX layer is fully visible — avoids a gray hole.
+    backdropFilter: fxVisible ? "none" : "blur(12px) saturate(160%)",
+    WebkitBackdropFilter: fxVisible ? "none" : "blur(12px) saturate(160%)",
+    transition: "backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease",
+  };
+
   return (
-    <div ref={wrapRef} className={className} style={{ ...FILL, ...style }}>
-      {mounted ? (
-        <LiquidGlass
-          mode="preset"
-          style={{ ...FILL, borderRadius: radiusPx, boxShadow: "none" }}
-          radius={radiusPx}
-          frost={0.16}
-          blur={12}
-          glassColor="rgba(255, 255, 255, 0.38)"
-          background={background}
-          border={0.08}
-          borderColor="rgba(255, 255, 255, 0.55)"
-          quality="standard"
-          lens="rim"
-          effectMode="auto"
-          mobileFallback="svg"
-        >
-          {children}
-        </LiquidGlass>
-      ) : (
+    <div
+      ref={wrapRef}
+      className={`liquid-glass-plaque${fxVisible ? " is-ready" : ""} ${className ?? ""}`.trim()}
+      style={shellStyle}
+    >
+      {fxMounted ? (
         <div
-          style={{
-            ...FILL,
-            borderRadius: "inherit",
-            background,
-            backdropFilter: "blur(12px) saturate(160%)",
-            WebkitBackdropFilter: "blur(12px) saturate(160%)",
-          }}
+          className={`liquid-glass-plaque__fx${fxVisible ? " is-on" : ""}`}
+          aria-hidden
         >
-          {children}
+          <LiquidGlass
+            mode="preset"
+            style={{ ...FILL, borderRadius: radiusPx, boxShadow: "none" }}
+            radius={radiusPx}
+            frost={0.16}
+            blur={12}
+            glassColor={GLASS_TINT}
+            background={background}
+            border={0.08}
+            borderColor={GLASS_BORDER}
+            quality="standard"
+            lens="rim"
+            effectMode="auto"
+            mobileFallback="svg"
+          />
         </div>
-      )}
+      ) : null}
+
+      <div className="liquid-glass-plaque__content">{children}</div>
     </div>
   );
 }
