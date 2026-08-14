@@ -567,6 +567,7 @@ a.metric-pill--link:active {
   overflow: hidden;
 }
 
+.liquid-glass-plaque__fallback,
 .liquid-glass-plaque__fx {
   position: absolute;
   inset: 0;
@@ -574,21 +575,21 @@ a.metric-pill--link:active {
   overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
+}
+
+.liquid-glass-plaque__fx {
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.35s ease;
 }
 
 .liquid-glass-plaque__fx.is-on {
   opacity: 1;
 }
 
-.liquid-glass-plaque__fx > [data-liquid-glass] {
-  border-radius: inherit !important;
-  overflow: hidden;
-}
-
+.liquid-glass-plaque__fx > [data-liquid-glass],
 .liquid-glass-plaque__fx .liquid-glass-border {
   border-radius: inherit !important;
+  overflow: hidden;
 }
 
 .liquid-glass-plaque__content {

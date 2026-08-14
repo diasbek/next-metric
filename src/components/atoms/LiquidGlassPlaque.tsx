@@ -33,6 +33,21 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function readBorderRadiusPx(el: HTMLElement): number {
+  const style = getComputedStyle(el);
+  for (const key of [
+    "borderTopLeftRadius",
+    "borderTopRightRadius",
+    "borderBottomRightRadius",
+    "borderBottomLeftRadius",
+    "borderRadius",
+  ] as const) {
+    const px = parseFloat(style[key]);
+    if (Number.isFinite(px) && px > 0) return px;
+  }
+  return 0;
+}
+
 export function LiquidGlassPlaque({
   children,
   className,
@@ -41,9 +56,7 @@ export function LiquidGlassPlaque({
 }: LiquidGlassPlaqueProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [radiusPx, setRadiusPx] = useState(10);
-  /** Mount the WebGL/SVG layer (after paint-safe layout). */
   const [fxMounted, setFxMounted] = useState(false);
-  /** Fade the FX layer in once it's in the DOM. */
   const [fxVisible, setFxVisible] = useState(false);
 
   useLayoutEffect(() => {
@@ -51,8 +64,8 @@ export function LiquidGlassPlaque({
     if (!el) return;
 
     const sync = () => {
-      const px = parseFloat(getComputedStyle(el).borderRadius);
-      if (Number.isFinite(px) && px > 0) setRadiusPx(px);
+      const px = readBorderRadiusPx(el);
+      if (px > 0) setRadiusPx(px);
     };
 
     sync();
@@ -74,7 +87,6 @@ export function LiquidGlassPlaque({
 
   useEffect(() => {
     if (!fxMounted) return;
-    // Double rAF: wait until LiquidGlass has committed paint before fading in.
     let outer = 0;
     let inner = 0;
     outer = requestAnimationFrame(() => {
@@ -86,28 +98,32 @@ export function LiquidGlassPlaque({
     };
   }, [fxMounted]);
 
-  // Do not set borderRadius inline — className (e.g. trust-card / plaque) owns it.
-  // `borderRadius: inherit` previously overrode those classes and made the CSS
-  // border a sharp rectangle while gray shell corners stuck out past the FX.
-  const shellStyle: CSSProperties = {
-    ...FILL,
-    ...style,
-    boxSizing: "border-box",
-    background: fxVisible ? "transparent" : background,
-    border: fxVisible ? "1px solid transparent" : `1px solid ${GLASS_BORDER}`,
-    // Keep CSS blur until the FX layer is fully visible — avoids a gray hole.
-    backdropFilter: fxVisible ? "none" : "blur(12px) saturate(160%)",
-    WebkitBackdropFilter: fxVisible ? "none" : "blur(12px) saturate(160%)",
-    transition:
-      "background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease",
-  };
+  // Radius comes from CSS classes on this node — never set borderRadius: inherit
+  // (that inherits the parent and zeros out plaque/trust-card rounding).
+  // No CSS border/fill on the shell: LiquidGlass draws the glass edge itself.
+  // A pre-FX frosted fill avoids a hole while the library mounts.
+  const showCssFallback = !fxVisible;
 
   return (
     <div
       ref={wrapRef}
       className={`liquid-glass-plaque${fxVisible ? " is-ready" : ""} ${className ?? ""}`.trim()}
-      style={shellStyle}
+      style={{ ...FILL, ...style }}
     >
+      {showCssFallback ? (
+        <div
+          className="liquid-glass-plaque__fallback"
+          style={{
+            ...FILL,
+            borderRadius: radiusPx,
+            background,
+            backdropFilter: "blur(12px) saturate(160%)",
+            WebkitBackdropFilter: "blur(12px) saturate(160%)",
+          }}
+          aria-hidden
+        />
+      ) : null}
+
       {fxMounted ? (
         <div
           className={`liquid-glass-plaque__fx${fxVisible ? " is-on" : ""}`}
@@ -121,7 +137,7 @@ export function LiquidGlassPlaque({
             blur={12}
             glassColor={GLASS_TINT}
             background={background}
-            border={0.07}
+            border={0.08}
             borderColor={GLASS_BORDER}
             quality="standard"
             lens="rim"
