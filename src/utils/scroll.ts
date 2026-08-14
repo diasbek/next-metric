@@ -46,7 +46,24 @@ export function getPathnameFromHref(href: string): string {
   }
   const index = href.indexOf("#");
   const path = (index >= 0 ? href.slice(0, index) : href).trim();
-  return path || "/";
+  const withoutQuery = path.split("?")[0]?.trim() ?? "";
+  return withoutQuery || "/";
+}
+
+/** Query string from an href (`?a=1`), including leading `?`, or empty. */
+export function getSearchFromHref(href: string): string {
+  try {
+    if (href.startsWith("http://") || href.startsWith("https://")) {
+      return new URL(href).search || "";
+    }
+  } catch {
+    /* fall through */
+  }
+  const hashIndex = href.indexOf("#");
+  const beforeHash = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
+  const queryIndex = beforeHash.indexOf("?");
+  if (queryIndex < 0) return "";
+  return beforeHash.slice(queryIndex);
 }
 
 /** Normalize pathnames for same-page comparisons (`/de` → `/de/`). */

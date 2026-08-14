@@ -1,13 +1,26 @@
 import type { Metadata } from "next";
 import { getPublicEnv } from "@/utils/env";
 
-const PRODUCTION_HOSTS = new Set(["metric.agency", "www.metric.agency"]);
+/** Canonical production apex + www. Staging / previews are never indexable. */
+export const PRODUCTION_HOSTS = new Set([
+  "metric.graphics",
+  "www.metric.graphics",
+]);
+
+const NON_INDEXABLE_HOSTS = new Set([
+  "metric.nocode.uz",
+  "www.metric.nocode.uz",
+  "localhost",
+  "127.0.0.1",
+]);
+
+const PROD_SITE_FALLBACK = "https://metric.graphics";
 
 /** Apex host (no www) used for canonical URLs and redirects. */
 export function getCanonicalSiteUrl(): string {
   const raw = getPublicEnv(
     "NEXT_PUBLIC_SITE_URL",
-    "https://metric.agency",
+    PROD_SITE_FALLBACK,
   ).replace(/\/$/, "");
   try {
     const parsed = new URL(raw);
@@ -20,7 +33,15 @@ export function getCanonicalSiteUrl(): string {
   }
 }
 
-/** True for production deploys targeting metric.agency (Hostinger, etc.). */
+function hostnameFromSiteUrl(): string | null {
+  try {
+    return new URL(getCanonicalSiteUrl()).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+/** True for production deploys targeting metric.graphics (Hostinger, etc.). */
 export function isIndexableDeployment(): boolean {
   const allowFlag = getPublicEnv("NEXT_PUBLIC_ALLOW_INDEXING");
   if (allowFlag === "true") return true;
@@ -33,12 +54,12 @@ export function isIndexableDeployment(): boolean {
     return false;
   }
 
-  try {
-    const host = new URL(getCanonicalSiteUrl()).hostname.toLowerCase();
-    return PRODUCTION_HOSTS.has(host);
-  } catch {
-    return false;
-  }
+  const host = hostnameFromSiteUrl();
+  if (!host) return false;
+  if (NON_INDEXABLE_HOSTS.has(host)) return false;
+  if (host.endsWith(".vercel.app")) return false;
+
+  return PRODUCTION_HOSTS.has(host);
 }
 
 export function getRobotsMetadata(): Metadata["robots"] {

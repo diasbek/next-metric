@@ -11,8 +11,6 @@ const staticPaths = [
   "/",
   "/works/",
   "/privacy/",
-  "/newsletter/",
-  "/careers/",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

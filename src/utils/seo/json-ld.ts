@@ -35,7 +35,7 @@ export function getOrganizationSchema() {
     description: SITE_CONFIG.description,
     telephone: SITE_CONFIG.phone,
     logo: absoluteUrl("/images/metric/logo/metric-logo.svg"),
-    image: absoluteUrl("/og/ru/home/"),
+    image: absoluteUrl("/og/en/home/"),
     address: {
       "@type": "PostalAddress",
       streetAddress: STREET_ADDRESS,
@@ -57,7 +57,7 @@ export function getWebSiteSchema() {
     name: SITE_CONFIG.name,
     url: SITE_CONFIG.url,
     description: SITE_CONFIG.description,
-    inLanguage: "en",
+    inLanguage: ["en", "de"],
     publisher: { "@id": ORGANIZATION_ID },
   };
 }
@@ -182,7 +182,7 @@ export function getLocalBusinessSchema(locale: Locale = "en") {
     description: SITE_CONFIG.description,
     url: absoluteUrl(path),
     telephone: SITE_CONFIG.phone,
-    image: absoluteUrl("/og-image/"),
+    image: absoluteUrl("/og/en/home/"),
     address: {
       "@type": "PostalAddress",
       streetAddress: STREET_ADDRESS,

@@ -1,55 +1,82 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 import type { SiteContent } from "@/i18n/types";
 
 interface WorksListingFiltersProps {
   ui: SiteContent["ui"];
-  sphereFilters: readonly string[];
-  directionFilters: readonly string[];
+  categoryOptions: readonly string[];
+  typeOptions: readonly string[];
 }
 
 export function WorksListingFilters({
   ui,
-  sphereFilters,
-  directionFilters,
+  categoryOptions,
+  typeOptions,
 }: WorksListingFiltersProps) {
-  const [sphere, setSphere] = useState(ui.filterAll);
-  const [direction, setDirection] = useState(ui.filterAll);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const items = document.querySelectorAll<HTMLElement>("[data-work-item]");
+  const category = searchParams.get("category")?.trim() || ui.filterAll;
+  const type = searchParams.get("type")?.trim() || ui.filterAll;
 
-    items.forEach((item) => {
-      const itemSphere = item.dataset.sphere ?? "";
-      const itemTags = (item.dataset.tags ?? "").split("|");
-      const sphereMatch = sphere === ui.filterAll || itemSphere === sphere;
-      const directionMatch =
-        direction === ui.filterAll || itemTags.includes(direction);
+  const updateFilter = useCallback(
+    (key: "category" | "type", next: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (!next || next === ui.filterAll) params.delete(key);
+      else params.set(key, next);
 
-      item.style.display = sphereMatch && directionMatch ? "" : "none";
-    });
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams, ui.filterAll],
+  );
 
-    window.dispatchEvent(new CustomEvent("metric:works-filter"));
-  }, [sphere, direction, ui.filterAll]);
+  const clearFilters = useCallback(() => {
+    router.replace(pathname, { scroll: false });
+  }, [pathname, router]);
+
+  const hasActive =
+    (category && category !== ui.filterAll) || (type && type !== ui.filterAll);
 
   return (
-    <div className="works-filters flex flex-wrap gap-3" data-reveal-group="pop">
-      <FilterDropdown
-        label={ui.filterSphere}
-        options={sphereFilters}
-        value={sphere}
-        onChange={setSphere}
-        allLabel={ui.filterAll}
-      />
-      <FilterDropdown
-        label={ui.filterDirection}
-        options={directionFilters}
-        value={direction}
-        onChange={setDirection}
-        allLabel={ui.filterAll}
-      />
+    <div className="works-filters" data-reveal>
+      <div className="works-filters__row">
+        <FilterDropdown
+          label={ui.filterSphere}
+          options={[ui.filterAll, ...categoryOptions]}
+          value={
+            categoryOptions.includes(category) || category === ui.filterAll
+              ? category
+              : ui.filterAll
+          }
+          onChange={(value) => updateFilter("category", value)}
+          allLabel={ui.filterAll}
+        />
+        <FilterDropdown
+          label={ui.filterDirection}
+          options={[ui.filterAll, ...typeOptions]}
+          value={
+            typeOptions.includes(type) || type === ui.filterAll
+              ? type
+              : ui.filterAll
+          }
+          onChange={(value) => updateFilter("type", value)}
+          allLabel={ui.filterAll}
+        />
+        {hasActive ? (
+          <button
+            type="button"
+            className="works-filters__clear"
+            onClick={clearFilters}
+          >
+            {ui.filterClear}
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

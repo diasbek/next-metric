@@ -442,7 +442,7 @@ export function ProjectEditor({ project, library }: Props) {
                 {tr.meta_title || `${tr.title || "METRIC"} — METRIC`}
               </p>
               <p style={{ margin: "0 0 4px", color: "#006621", fontSize: 12 }}>
-                metric.agency/works/{draft.slug}/
+                metric.graphics/works/{draft.slug}/
               </p>
               <p style={{ margin: 0, color: "#545454", fontSize: 13 }}>
                 {tr.meta_description || tr.description || "…"}

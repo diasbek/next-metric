@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
+import { isIndexableDeployment } from "./src/utils/seo/indexing";
 
-const PROD_SITE = "https://metric.agency";
+const PROD_SITE = "https://metric.graphics";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || PROD_SITE;
@@ -42,6 +43,13 @@ const securityHeaders = [
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
 ];
 
+const noindexRobotsHeader = {
+  key: "X-Robots-Tag",
+  value: "noindex, nofollow, noarchive",
+};
+
+const indexable = isIndexableDeployment();
+
 const nextConfig: NextConfig = {
   // Hostinger Node.js / VPS — SSR (`next build` + `next start`), not static export
   trailingSlash: true,
@@ -55,6 +63,8 @@ const nextConfig: NextConfig = {
       allowedOrigins: [
         siteOrigin(siteUrl),
         siteOrigin(PROD_SITE),
+        "metric.graphics",
+        "www.metric.graphics",
         "metric.agency",
         "localhost:3000",
         "127.0.0.1:3000",
@@ -82,20 +92,32 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
+        has: [{ type: "host", value: "www.metric.graphics" }],
+        destination: "https://metric.graphics/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "metric.agency" }],
+        destination: "https://metric.graphics/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
         has: [{ type: "host", value: "www.metric.agency" }],
-        destination: "https://metric.agency/:path*",
+        destination: "https://metric.graphics/:path*",
         permanent: true,
       },
       {
         source: "/:path*",
         has: [{ type: "host", value: "www.metric.uz" }],
-        destination: "https://metric.agency/:path*",
+        destination: "https://metric.graphics/:path*",
         permanent: true,
       },
       {
         source: "/:path*",
         has: [{ type: "host", value: "metric.uz" }],
-        destination: "https://metric.agency/:path*",
+        destination: "https://metric.graphics/:path*",
         permanent: true,
       },
       // Legacy TIMSOL locale prefixes → EN (default, unprefixed)
@@ -160,6 +182,10 @@ const nextConfig: NextConfig = {
             key: "Cache-Control",
             value: "private, no-store, max-age=0, must-revalidate",
           },
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
+          },
         ],
       },
       {
@@ -183,6 +209,7 @@ const nextConfig: NextConfig = {
             key: "Cache-Control",
             value: "public, max-age=0, s-maxage=0, must-revalidate",
           },
+          ...(indexable ? [] : [noindexRobotsHeader]),
         ],
       },
     ];

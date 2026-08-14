@@ -19,7 +19,7 @@ export async function GET() {
       try {
         return new URL(content.site.url).hostname;
       } catch {
-        return "metric.agency";
+        return "metric.graphics";
       }
     })(),
   });

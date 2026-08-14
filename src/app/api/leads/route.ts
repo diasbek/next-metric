@@ -34,6 +34,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function allowedOrigins(): string[] {
   const extras = [
+    "https://metric.graphics",
+    "https://www.metric.graphics",
     "https://metric.agency",
     "https://www.metric.agency",
     "http://localhost:3000",

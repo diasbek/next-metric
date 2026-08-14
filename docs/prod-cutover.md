@@ -1,15 +1,22 @@
-# Production — `metric.agency`
+# Production — `metric.graphics`
 
 Single production environment template (fill Supabase + Hostinger when ready).
 
+## Indexing matrix
+
 | Env | URL | Indexing |
 |-----|-----|----------|
-| Production | `https://metric.agency` (+ www → apex) | indexed when host allowlist + `SITE_URL` are agency |
+| Local | `http://localhost:3000` | **noindex** (`NODE_ENV` / gate) |
+| Staging | `https://metric.nocode.uz` | **noindex** (host not in allowlist + headers) |
+| Production | `https://metric.graphics` (+ www → apex) | **indexed** when `SITE_URL` is graphics |
+| Legacy | `metric.agency`, `metric.uz` | **301 → metric.graphics** (never index) |
+
+Never set `NEXT_PUBLIC_ALLOW_INDEXING=true` on staging or local.
 
 ## Hosts
 
-- `PRODUCTION_HOSTS` = `metric.agency`, `www.metric.agency`
-- www / legacy `metric.uz` redirects → apex agency
+- `PRODUCTION_HOSTS` = `metric.graphics`, `www.metric.graphics`
+- www / legacy `metric.agency` / `metric.uz` → apex `https://metric.graphics`
 
 ## Supabase
 
@@ -22,7 +29,7 @@ Single production environment template (fill Supabase + Hostinger when ready).
 ## Env (Hostinger / `.env.production.local`)
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://metric.agency
+NEXT_PUBLIC_SITE_URL=https://metric.graphics
 NEXT_PUBLIC_CONTACT_EMAIL=hello@metric.agency
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 SUPABASE_URL=https://YOUR_PROJECT.supabase.co
@@ -34,10 +41,16 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 - [ ] Create Supabase project + apply migrations (`npm run db:migrate`)
 - [ ] Seed CMS (`npm run seed:cms`) + create admin (`npm run create:cms-admin`)
-- [ ] Hostinger env → prod Supabase + `SITE_URL=https://metric.agency`
-- [ ] Auth redirect URLs: `https://metric.agency/**`, `https://www.metric.agency/**`
-- [ ] Telegram webhook: `https://metric.agency/api/telegram/webhook/?secret=…`
-- [ ] Google Search Console + Yandex Webmaster → `https://metric.agency`
-- [ ] Purge CDN / cache for `metric.agency`
+- [ ] Hostinger env → prod Supabase + `SITE_URL=https://metric.graphics`
+- [ ] Auth redirect URLs: `https://metric.graphics/**`, `https://www.metric.graphics/**`
+- [ ] Telegram webhook: `https://metric.graphics/api/telegram/webhook/?secret=…`
+- [ ] Confirm staging `metric.nocode.uz`: `/robots.txt` Disallow `/`, empty sitemap, `X-Robots-Tag: noindex`
+- [ ] Confirm production: `/robots.txt` Allow, non-empty `/sitemap.xml`, meta robots index
+- [ ] Google Search Console → property `https://metric.graphics` → submit sitemap → request index for `/` and top cases
+- [ ] Yandex Webmaster → `https://metric.graphics` → submit sitemap
+- [ ] Optionally keep `metric.agency` GSC property temporarily to monitor 301s
+- [ ] Set Google / Yandex verification tokens in CMS settings
+- [ ] Spot-check: canonicals, hreflang en↔de, OG debugger, Rich Results (Organization / FAQ / Breadcrumb)
+- [ ] Purge CDN / cache for `metric.graphics`
 - [ ] Confirm CDN does **not** long-cache HTML/RSC — `next.config.ts` already sets `Cache-Control: max-age=0, s-maxage=0, must-revalidate` on `/:path*` so post-deploy chunk hashes cannot 404 as `text/plain`
 - [ ] Admin media uploads use browser → Supabase path (`browser-upload`); avoid Server Action uploads on VPS (`fetch failed`)

@@ -188,7 +188,26 @@ export function createWorksPage(locale: Locale) {
   const path = localePath(locale, pagePaths.works);
 
   return {
-    generateMetadata: () => getLocalizedPageMetadata(locale, "works"),
+    generateMetadata: async ({
+      searchParams,
+    }: {
+      searchParams?: Promise<Record<string, string | string[] | undefined>>;
+    }) => {
+      const params = (await searchParams) ?? {};
+      const category = typeof params.category === "string" ? params.category.trim() : "";
+      const type = typeof params.type === "string" ? params.type.trim() : "";
+      const filtered = Boolean(category || type);
+      const base = await getLocalizedPageMetadata(locale, "works");
+      if (!filtered) return base;
+      // Filtered list URLs canonicalize to clean /works/ and stay out of the index.
+      return {
+        ...base,
+        robots: {
+          index: false,
+          follow: true,
+        },
+      };
+    },
     Page: async function WorksPage() {
       return (
         <>

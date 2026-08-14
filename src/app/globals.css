@@ -311,6 +311,23 @@ body {
   white-space: nowrap;
 }
 
+a.metric-pill--link {
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+a.metric-pill--link:hover {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+a.metric-pill--link:active {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
 .metric-glass {
   background: var(--glass);
   backdrop-filter: blur(12px);
@@ -1058,6 +1075,7 @@ body {
      in tokens.css for the same forward-looking approach at the page level. */
   container-type: inline-size;
   container-name: case-card;
+  position: relative;
   display: grid;
   grid-template-areas:
     "media"
@@ -1065,6 +1083,22 @@ body {
   overflow: hidden;
   border-radius: var(--radius-xl);
   background: var(--surface);
+}
+
+.metric-case-card__cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.metric-case-card__tags,
+.metric-case-card__cta {
+  position: relative;
+  z-index: 2;
 }
 
 @media (min-width: 1024px) {
@@ -1103,9 +1137,6 @@ body {
   grid-area: media;
   position: relative;
   display: block;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
   /* Explicit width (not just min-width: 0) — a grid item with aspect-ratio
      + min-height and width:auto uses the ratio-transferred size as its
      preferred width and skips stretch, blowing out past the 1-column
@@ -1120,6 +1151,7 @@ body {
   height: auto;
   overflow: hidden;
   border-radius: 20px;
+  pointer-events: none;
 }
 
 .metric-case-card__media img {
@@ -2626,6 +2658,138 @@ html.is-mobile-menu-open {
   color: var(--muted);
 }
 
+.works-filters {
+  margin: 0 0 32px;
+}
+
+@media (min-width: 768px) {
+  .works-filters {
+    margin-bottom: 40px;
+  }
+}
+
+.works-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.works-filters__clear {
+  appearance: none;
+  margin: 0;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.works-filters__clear:hover {
+  color: var(--foreground);
+}
+
+.works-filters__empty {
+  margin: 24px 0 0;
+  max-width: 36em;
+  font-size: 18px;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
+.ui-select {
+  position: relative;
+  display: inline-flex;
+}
+
+.ui-select__trigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(9, 9, 9, 0.2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.ui-select.is-open .ui-select__trigger,
+.ui-select__trigger:hover {
+  border-color: rgba(9, 9, 9, 0.45);
+}
+
+.ui-select__value {
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-select__chevron {
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.ui-select.is-open .ui-select__chevron {
+  transform: rotate(180deg);
+}
+
+.ui-select__menu {
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border: 1px solid rgba(9, 9, 9, 0.12);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(9, 9, 9, 0.12);
+}
+
+.ui-select__menu-option {
+  margin: 0;
+}
+
+.ui-select__menu-item {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ui-select__menu-item:hover,
+.ui-select__menu-item:focus-visible {
+  background: rgba(245, 245, 245, 0.9);
+  outline: none;
+}
+
+.ui-select__menu-item.is-active {
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  color: var(--foreground);
+}
+
 .metric-works-grid {
   display: grid;
   gap: 20px;
@@ -2837,7 +3001,7 @@ html.is-mobile-menu-open {
   }
 }
 
-/* One long case: 16:9 patches glued edge-to-edge, shared outer radius. */
+/* Full-bleed case gallery: width = container, height from intrinsic image ratio. */
 .metric-case__stack {
   display: flex;
   flex-direction: column;
@@ -2850,9 +3014,23 @@ html.is-mobile-menu-open {
 .metric-case__stack-item {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--surface);
+  line-height: 0;
+}
+
+.metric-case__stack-item .media-image {
+  display: block;
+  width: 100%;
+}
+
+.metric-case__stack-item .media-image img,
+.metric-case__stack-img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  position: relative !important;
 }
 
 .case-slider {

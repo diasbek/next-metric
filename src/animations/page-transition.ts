@@ -187,7 +187,11 @@ export async function navigateWithTransition(
   href: string,
   navigate: () => void,
 ): Promise<void> {
-  if (transitioning) return;
+  // A second click must never no-op for seconds while an earlier transition
+  // is stuck waiting on a slow RSC response.
+  if (transitioning) {
+    resetPageTransition();
+  }
 
   const hash = getHashFromHref(href);
   if (
@@ -209,8 +213,18 @@ export async function navigateWithTransition(
 
   const state = captureTransitionState();
   stashTransitionState(state);
-  await playExitTransition();
-  // Keep scroll for hash targets — settleScrollAfterNavigation handles both cases.
+
+  // Keep the current page visible until the next route paints.
+  // Awaiting an exit fade first blanked the screen for the entire RSC wait —
+  // in production that felt like dead clicks on case studies.
+  // Skip the enter fade too: only FLIP shared elements when present.
+  transitioning = true;
+  pendingEnterTransition = false;
+  if (watchdogTimer) clearTimeout(watchdogTimer);
+  watchdogTimer = setTimeout(() => {
+    if (transitioning) resetPageTransition();
+  }, 4000);
+
   if (!hash) resetScrollPosition();
   navigate();
   settleScrollAfterNavigation(href);

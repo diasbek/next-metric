@@ -150,6 +150,9 @@ export function GsapProvider({ children }: GsapProviderProps) {
         cleanup = initAnimations(pathname);
         settleScrollAfterNavigation();
         markReady();
+        // Warm the transition module so the first case-study click doesn't
+        // wait on a cold dynamic import in production.
+        void import("@/animations/page-transition");
       } catch {
         clearFallback();
         if (cancelled) return;

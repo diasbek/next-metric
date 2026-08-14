@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ComponentProps } from "react";
 import {
   getHashFromHref,
+  getSearchFromHref,
   isSameDocumentPath,
   navigateSameDocumentHash,
   navigateSameDocumentTop,
@@ -29,9 +30,18 @@ function hrefToUrl(href: TransitionLinkProps["href"]): string {
   if (typeof href === "string") return href;
   if (typeof href === "object" && href !== null && "pathname" in href) {
     const path = href.pathname ?? "";
+    const search =
+      typeof href.search === "string"
+        ? href.search.startsWith("?")
+          ? href.search
+          : href.search
+            ? `?${href.search}`
+            : ""
+        : "";
     const hash =
       typeof href.hash === "string" ? href.hash.replace(/^#/, "").split("#")[0] : "";
-    return hash ? `${path || "/"}#${hash}` : path;
+    const base = `${path || "/"}${search}`;
+    return hash ? `${base}#${hash}` : base;
   }
   return "";
 }
@@ -56,11 +66,10 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
           return;
         }
 
-        // Block native navigation while a page transition runs — otherwise
-        // Next Link falls through and can stack hashes / flash white.
+        // Don't swallow clicks while a previous transition is in flight —
+        // reset and continue so production slow navigations stay interruptible.
         if (transitionMod?.isTransitioning()) {
-          event.preventDefault();
-          return;
+          transitionMod.resetPageTransition();
         }
 
         const url = hrefToUrl(href);
@@ -68,11 +77,22 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
 
         const hash = getHashFromHref(url);
         const sameDoc = url.startsWith("#") || isSameDocumentPath(url, pathname);
+        const nextSearch = getSearchFromHref(url);
+        const currentSearch =
+          typeof window !== "undefined" ? window.location.search || "" : "";
 
         // Same-document section links: never use Next router / page transitions.
         if (hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentHash(hash);
+          return;
+        }
+
+        // Same path, different query (e.g. /works/?category=Listing) — update
+        // filters without a full-page FLIP or a forced scroll-to-top.
+        if (!hash && sameDoc && nextSearch !== currentSearch) {
+          event.preventDefault();
+          router.replace(url, { scroll: false });
           return;
         }
 
@@ -85,7 +105,7 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
 
         event.preventDefault();
         void loadPageTransition().then((mod) => {
-          if (mod.isTransitioning()) return;
+          if (mod.isTransitioning()) mod.resetPageTransition();
           return mod.navigateWithTransition(url, () =>
             router.push(url, { scroll: false }),
           );

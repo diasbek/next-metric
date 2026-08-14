@@ -16,7 +16,7 @@ export function OgTemplate({
   eyebrow,
   logoDataUrl,
   imageDataUrl,
-  siteUrl = "metric.agency",
+  siteUrl = "metric.graphics",
 }: OgTemplateProps): ReactElement {
   const titleSize = title.length > 42 ? 46 : title.length > 28 ? 54 : 60;
 

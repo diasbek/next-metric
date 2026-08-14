@@ -73,6 +73,8 @@ export interface SiteContent {
     filterSphere: string;
     filterDirection: string;
     filterAll: string;
+    filterClear: string;
+    filterEmpty: string;
     downloadPresentation: string;
     downloadBrief: string;
     downloadHint: string;

@@ -130,7 +130,7 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
     try {
       return new URL(SITE_CONFIG.url).hostname;
     } catch {
-      return "metric.agency";
+      return "metric.graphics";
     }
   }, []);
 

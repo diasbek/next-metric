@@ -74,6 +74,8 @@ export const deContent: SiteContent = {
     filterSphere: "Nach Kategorie",
     filterDirection: "Nach Typ",
     filterAll: "Alle",
+    filterClear: "Filter zurücksetzen",
+    filterEmpty: "Keine Projekte passen zu diesen Filtern.",
     downloadPresentation: "Präsentation herunterladen",
     downloadBrief: "Briefing herunterladen",
     downloadHint: "Füllen Sie das Briefing aus, um die Anforderungen zu klären.",

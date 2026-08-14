@@ -2,6 +2,7 @@ import { Button } from "@/components/atoms/Button";
 import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
+import { MetricTagPill } from "@/components/molecules/MetricTagPill";
 import type { Project } from "@/data/projects";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
@@ -47,7 +48,7 @@ export async function WorkCaseSection({
 }: WorkCaseSectionProps) {
   const { ui } = content;
   const home = await getMetricHomeResolved(locale);
-  const homeCaseBySlug = new Map(
+  const homeCaseBySlug = new Map<string, (typeof home.caseStudies.items)[number]>(
     home.caseStudies.items.map((item) => [item.slug, item]),
   );
   const caseStudy = project.caseStudy;
@@ -87,12 +88,12 @@ export async function WorkCaseSection({
           <div className="metric-case__intro-meta">
             <div className="flex flex-wrap gap-[5px]">
               {project.tags.map((tag) => (
-                <span
+                <MetricTagPill
                   key={tag}
-                  className="metric-pill border-foreground/25 text-foreground"
-                >
-                  {tag}
-                </span>
+                  tag={tag}
+                  locale={locale}
+                  className="border-foreground/25 text-foreground"
+                />
               ))}
             </div>
             <p className="mt-6 max-w-xl text-[clamp(16px,1.5vw,20px)] leading-[1.25] tracking-[-0.02em] text-foreground">
@@ -133,10 +134,15 @@ export async function WorkCaseSection({
               <div key={`${src}-${index}`} className="metric-case__stack-item">
                 <MediaImage
                   src={src}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
+                  alt={
+                    index === 0
+                      ? `${project.title} — Amazon listing visuals`
+                      : `${project.title} — project image ${index + 1}`
+                  }
+                  width={2400}
+                  height={1600}
+                  className="metric-case__stack-img"
+                  sizes="(max-width: 1512px) 100vw, 1512px"
                   quality={index === 0 ? 85 : 75}
                   priority={index === 0}
                 />
@@ -212,6 +218,7 @@ export async function WorkCaseSection({
               return (
                 <MetricCaseCard
                   key={item.slug}
+                  locale={locale}
                   href={localePath(locale, `/works/${item.slug}/`)}
                   tags={fromHome?.tags ?? item.tags}
                   quote={fromHome?.quote ?? item.quote ?? item.title}

@@ -274,12 +274,14 @@ export function MetricCaseStudiesSection({
           {caseStudies.items.map((item) => (
             <MetricCaseCard
               key={item.slug}
+              locale={locale}
               href={localePath(locale, `/works/${item.slug}/`)}
               tags={item.tags}
               quote={item.quote}
               author={item.author}
               role={item.role}
               image={item.image}
+              imageAlt={`${item.author} — ${item.tags.slice(0, 2).join(", ") || "Amazon case study"}`}
               viewLabel={caseStudies.viewLabel}
             />
           ))}
@@ -361,7 +363,7 @@ export function MetricServicesSection({
                 <div className="metric-services-card__media">
                   <MediaImage
                     src={item.image}
-                    alt=""
+                    alt={`${item.title} — Amazon deliverable example`}
                     fill
                     skeleton={false}
                     className="metric-services-card__img"
@@ -418,7 +420,7 @@ export function MetricWorkflowSection({
               <div className="metric-workflow-card__media">
                 <MediaImage
                   src={card.image}
-                  alt=""
+                  alt={card.title}
                   width={imgW}
                   height={imgH}
                   skeleton={false}

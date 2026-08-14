@@ -93,6 +93,8 @@ export const metricSiteContent: SiteContent = {
     filterSphere: "By category",
     filterDirection: "By type",
     filterAll: "All",
+    filterClear: "Clear filters",
+    filterEmpty: "No projects match these filters.",
     downloadPresentation: "Download presentation",
     downloadBrief: "Download brief",
     downloadHint: "Fill in the brief to clarify project requirements.",

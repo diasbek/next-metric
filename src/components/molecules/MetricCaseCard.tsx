@@ -1,8 +1,11 @@
 import { Button } from "@/components/atoms/Button";
 import { MediaImage } from "@/components/atoms/MediaImage";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
+import { MetricTagPill } from "@/components/molecules/MetricTagPill";
+import type { Locale } from "@/i18n/config";
 
 export type MetricCaseCardProps = {
+  locale: Locale;
   href: string;
   tags: readonly string[];
   quote: string;
@@ -14,6 +17,7 @@ export type MetricCaseCardProps = {
 };
 
 export function MetricCaseCard({
+  locale,
   href,
   tags,
   quote,
@@ -28,21 +32,24 @@ export function MetricCaseCard({
       <div className="metric-case-card__body">
         <div className="metric-case-card__tags">
           {tags.map((tag) => (
-            <span key={tag} className="metric-pill border-foreground text-foreground">
-              {tag}
-            </span>
+            <MetricTagPill
+              key={tag}
+              tag={tag}
+              locale={locale}
+              className="border-foreground text-foreground"
+            />
           ))}
         </div>
-        <div>
+        <div className="metric-case-card__copy">
           <h3 className="metric-case-card__quote font-display">{quote}</h3>
           <p className="metric-case-card__author">{author}</p>
           <p className="metric-case-card__role">{role}</p>
         </div>
-        <Button href={href} variant="dark" className="w-fit">
+        <Button href={href} variant="dark" className="metric-case-card__cta w-fit">
           {viewLabel}
         </Button>
       </div>
-      <TransitionLink href={href} className="metric-case-card__media" aria-label={viewLabel}>
+      <div className="metric-case-card__media">
         <MediaImage
           src={image}
           alt={imageAlt || author}
@@ -51,7 +58,13 @@ export function MetricCaseCard({
           sizes="(max-width: 1023px) 92vw, 42vw"
           quality={75}
         />
-      </TransitionLink>
+      </div>
+      <TransitionLink
+        href={href}
+        className="metric-case-card__cover"
+        aria-label={viewLabel}
+        prefetch
+      />
     </article>
   );
 }

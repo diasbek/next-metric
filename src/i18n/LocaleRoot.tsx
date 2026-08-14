@@ -11,6 +11,12 @@ export function LocaleRoot({ locale, children }: LocaleRootProps) {
   const lang = htmlLang[locale];
   return (
     <div lang={lang} className="contents">
+      {/* Set <html lang> before paint so crawlers that run minimal JS see DE. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.lang=${JSON.stringify(lang)};`,
+        }}
+      />
       <DocumentLang lang={lang} />
       {children}
     </div>
