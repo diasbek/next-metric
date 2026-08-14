@@ -1997,11 +1997,10 @@ a.metric-pill--link:active {
   .metric-workflow__header {
     grid-template-columns: minmax(0, 1fr) minmax(220px, 28rem);
     column-gap: clamp(40px, 3vw, 72px);
-    align-items: start;
+    align-items: end;
   }
 
   .metric-workflow__subtitle {
-    margin-top: clamp(72px, 8vw, 120px);
     justify-self: end;
     text-align: left;
   }
