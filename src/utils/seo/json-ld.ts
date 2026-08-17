@@ -13,10 +13,15 @@ const ADDRESS_LOCALITY = "Tashkent";
 const ADDRESS_COUNTRY = "UZ";
 const STREET_ADDRESS = SITE_CONFIG.address.join(", ");
 
+function origin() {
+  return SITE_CONFIG.url.replace(/\/$/, "");
+}
+
 function absoluteUrl(path: string) {
-  if (!path) return SITE_CONFIG.url;
+  if (!path || path === "/") return `${origin()}/`;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  return `${SITE_CONFIG.url}${path.startsWith("/") ? path : `/${path}`}`;
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${origin()}${normalized}`;
 }
 
 function toGraph(...nodes: Record<string, unknown>[]) {
@@ -31,7 +36,7 @@ export function getOrganizationSchema() {
     "@type": "Organization",
     "@id": ORGANIZATION_ID,
     name: SITE_CONFIG.name,
-    url: SITE_CONFIG.url,
+    url: absoluteUrl("/"),
     description: SITE_CONFIG.description,
     telephone: SITE_CONFIG.phone,
     logo: absoluteUrl("/images/metric/logo/metric-logo.svg"),
@@ -55,7 +60,7 @@ export function getWebSiteSchema() {
     "@type": "WebSite",
     "@id": WEBSITE_ID,
     name: SITE_CONFIG.name,
-    url: SITE_CONFIG.url,
+    url: absoluteUrl("/"),
     description: SITE_CONFIG.description,
     inLanguage: ["en", "de"],
     publisher: { "@id": ORGANIZATION_ID },
@@ -173,7 +178,7 @@ export function getServicesCatalogSchema(services: Service[], locale: Locale = "
 }
 
 export function getLocalBusinessSchema(locale: Locale = "en") {
-  const path = localePath(locale, "/contacts/");
+  const path = localePath(locale, "/");
 
   return {
     "@type": "ProfessionalService",

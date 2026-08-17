@@ -1,11 +1,28 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getCanonicalRedirectFromHeaders } from "@/utils/seo/canonical-request";
 
 /**
- * Admin edge gate: refresh session cookies and require a signed-in user.
- * Membership is enforced in the dashboard layout via requireAdmin (cached).
+ * 1. One-hop 308 to the canonical URL (https apex, trailing slash, retired pages).
+ * 2. Admin edge gate: refresh session cookies and require a signed-in user.
+ *    Membership is enforced in the dashboard layout via requireAdmin (cached).
  */
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  if (!pathname.startsWith("/_next")) {
+    const canonical = getCanonicalRedirectFromHeaders(
+      request.headers,
+      request.nextUrl,
+    );
+    if (canonical) {
+      return NextResponse.redirect(canonical, 308);
+    }
+  }
+
+  if (!pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+
   const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey =
     process.env.SUPABASE_ANON_KEY ??
@@ -44,7 +61,6 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
   const isLogin = pathname.startsWith("/admin/login");
   const isSetup = pathname.startsWith("/admin/setup");
   const isLogout = pathname.startsWith("/admin/logout");
@@ -64,5 +80,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: [
+    "/",
+    "/((?!_next/|favicon.ico).*)",
+  ],
 };

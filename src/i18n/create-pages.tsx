@@ -18,7 +18,7 @@ import { SiteLayout } from "@/components/templates";
 import { WorkCaseSection } from "@/components/organisms";
 import { getContentFreshnessDate } from "@/lib/cms/freshness";
 import { getAllPublishedSlugsFromCms } from "@/lib/cms/projects";
-import { createPageMetadata } from "@/utils/metadata";
+import { canonicalPageUrl, createPageMetadata } from "@/utils/metadata";
 import { getWorkOgImagePath } from "@/utils/og/paths";
 import { HomePageView } from "@/views/HomePageView";
 import { AgencyPageView } from "@/views/AgencyPageView";
@@ -68,7 +68,7 @@ export function createWorkCasePage(locale: Locale) {
         alternates: Object.fromEntries(
           Object.entries(alternates).map(([lang, href]) => [
             lang,
-            `${getContent(locale).site.url}${href}`,
+            canonicalPageUrl(href),
           ]),
         ),
       });

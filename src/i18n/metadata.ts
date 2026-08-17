@@ -4,9 +4,8 @@ import { pagePaths, ogLocale } from "./config";
 import { getContent, getResolvedContent } from "./get-content";
 import { getLocalizedAlternates, localePath } from "./paths";
 import { getContentFreshnessDate } from "@/lib/cms/freshness";
-import { createPageMetadata } from "@/utils/metadata";
+import { canonicalPageUrl, createPageMetadata } from "@/utils/metadata";
 import { getPageOgImagePath, isOgPageKey } from "@/utils/og/paths";
-import { SITE_CONFIG } from "@/utils/consts";
 
 export async function getLocalizedPageMetadata(
   locale: Locale,
@@ -28,7 +27,7 @@ export async function getLocalizedPageMetadata(
     alternates: Object.fromEntries(
       Object.entries(alternates).map(([lang, href]) => [
         lang,
-        `${content.site.url}${href}`,
+        canonicalPageUrl(href),
       ]),
     ),
     modifiedTime,
@@ -62,7 +61,7 @@ export function getLegalPageMetadata({
     alternates: Object.fromEntries(
       Object.entries(alternates).map(([lang, href]) => [
         lang,
-        `${SITE_CONFIG.url}${href}`,
+        canonicalPageUrl(href),
       ]),
     ),
     ...(robots ? { robots } : {}),

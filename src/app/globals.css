@@ -961,7 +961,6 @@ a.metric-pill--link:active {
   .metric-hero__copy {
     container-type: inline-size;
     max-width: none;
-    gap: 5.75cqw;
   }
 
   .metric-hero__title {

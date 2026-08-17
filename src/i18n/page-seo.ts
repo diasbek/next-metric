@@ -27,10 +27,10 @@ export function getLocalizedBreadcrumbs(
   };
   const paths = {
     home: localePath(locale, "/"),
-    agency: localePath(locale, "/agency/"),
+    agency: localePath(locale, "/#workflow"),
     works: localePath(locale, "/works/"),
-    services: localePath(locale, "/services/"),
-    contacts: localePath(locale, "/contacts/"),
+    services: localePath(locale, "/#services"),
+    contacts: localePath(locale, "/"),
   };
 
   return items.map((item) => {

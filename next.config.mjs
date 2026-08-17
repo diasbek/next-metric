@@ -100,38 +100,33 @@ const nextConfig = {
     })),
   },
   async redirects() {
-    // Prefer apex host so www / non-www resolve to one canonical origin
+    // Backup for www / alias hosts. `src/proxy.ts` issues the one-hop 308
+    // (apex + trailing slash). A dedicated `/` rule is required because
+    // `/:path*` yields `https://metric.graphics` with no trailing slash.
+    const aliasHosts = [
+      "www.metric.graphics",
+      "metric.agency",
+      "www.metric.agency",
+      "www.metric.uz",
+      "metric.uz",
+    ];
+    const aliasRedirects = aliasHosts.flatMap((host) => [
+      {
+        source: "/",
+        has: [{ type: "host", value: host }],
+        destination: `${PROD_SITE}/`,
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: host }],
+        destination: `${PROD_SITE}/:path*`,
+        permanent: true,
+      },
+    ]);
+
     return [
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.metric.graphics" }],
-        destination: "https://metric.graphics/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "metric.agency" }],
-        destination: "https://metric.graphics/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.metric.agency" }],
-        destination: "https://metric.graphics/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.metric.uz" }],
-        destination: "https://metric.graphics/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "metric.uz" }],
-        destination: "https://metric.graphics/:path*",
-        permanent: true,
-      },
+      ...aliasRedirects,
       // Legacy TIMSOL locale prefixes → EN (default, unprefixed)
       {
         source: "/en",

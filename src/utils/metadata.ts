@@ -1,10 +1,26 @@
 import type { Metadata } from "next";
 import { SITE_CONFIG } from "./consts";
 import type { Locale } from "@/i18n/config";
+import { withTrailingSlash } from "./seo/canonical-request";
 import { getRobotsMetadata } from "./seo/indexing";
 import { OG_IMAGE_DIMENSIONS } from "./og/paths";
 
 const DEFAULT_OG_IMAGE = "/og/en/home/";
+
+function origin(): string {
+  return SITE_CONFIG.url.replace(/\/$/, "");
+}
+
+/** Absolute page URL on the canonical origin, always with a trailing slash. */
+export function canonicalPageUrl(path = ""): string {
+  const hashIndex = path.indexOf("#");
+  const hash = hashIndex >= 0 ? path.slice(hashIndex) : "";
+  const withoutHash = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
+  const queryIndex = withoutHash.indexOf("?");
+  const search = queryIndex >= 0 ? withoutHash.slice(queryIndex) : "";
+  const pathname = queryIndex >= 0 ? withoutHash.slice(0, queryIndex) : withoutHash;
+  return `${origin()}${withTrailingSlash(pathname || "/")}${search}${hash}`;
+}
 
 export function createPageMetadata(
   title: string,
@@ -21,11 +37,11 @@ export function createPageMetadata(
     robots?: Metadata["robots"];
   },
 ): Metadata {
-  const url = `${SITE_CONFIG.url}${path}`;
+  const url = canonicalPageUrl(path);
   const imagePath = options?.image ?? DEFAULT_OG_IMAGE;
   const imageUrl = imagePath.startsWith("http")
     ? imagePath
-    : `${SITE_CONFIG.url}${imagePath}`;
+    : `${origin()}${imagePath.startsWith("/") ? imagePath : `/${imagePath}`}`;
   const modifiedTime = options?.modifiedTime;
   const keywords = options?.keywords
     ?.split(",")
@@ -120,12 +136,12 @@ export const rootMetadata: Metadata = {
   manifest: "/manifest.json",
   robots: getRobotsMetadata(),
   alternates: {
-    canonical: `${SITE_CONFIG.url}/`,
+    canonical: canonicalPageUrl("/"),
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: `${SITE_CONFIG.url}/`,
+    url: canonicalPageUrl("/"),
     siteName: SITE_CONFIG.name,
     title: SITE_CONFIG.title,
     description: SITE_CONFIG.description,

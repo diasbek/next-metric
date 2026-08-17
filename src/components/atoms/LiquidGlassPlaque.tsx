@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
@@ -28,8 +29,13 @@ const GLASS_BORDER = "rgba(255, 255, 255, 0.55)";
 const DEFAULT_BG =
   "linear-gradient(145deg, rgba(243, 221, 232, 0.55), rgba(255, 255, 255, 0.72))";
 
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function getReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
@@ -56,7 +62,12 @@ export function LiquidGlassPlaque({
 }: LiquidGlassPlaqueProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [radiusPx, setRadiusPx] = useState(10);
-  const [fxMounted, setFxMounted] = useState(false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => true,
+  );
+  const fxMounted = !reducedMotion;
   const [fxVisible, setFxVisible] = useState(false);
 
   useLayoutEffect(() => {
@@ -69,10 +80,6 @@ export function LiquidGlassPlaque({
     };
 
     sync();
-
-    if (!prefersReducedMotion()) {
-      setFxMounted(true);
-    }
 
     const ro = new ResizeObserver(sync);
     ro.observe(el);
