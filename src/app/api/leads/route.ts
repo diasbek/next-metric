@@ -4,6 +4,7 @@ import { hasSupabaseAdminConfig } from "@/lib/supabase/env";
 import { getSiteSettings } from "@/lib/cms/settings";
 import { verifyCaptcha } from "@/lib/cms/captcha";
 import { notifyLeadViaTelegram } from "@/lib/cms/telegram";
+import { notifyLeadViaResend } from "@/lib/cms/resend";
 import type { DbSiteSettings } from "@/lib/cms/types";
 import { clientIp, rateLimit } from "@/lib/security/rate-limit";
 import {
@@ -307,14 +308,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    void notifyLeadViaTelegram({
+    const notifyPayload = {
       name,
       phone,
       email: email || null,
       message,
       locale: locale || null,
       hasAttachment: Boolean(attachmentPath),
-    });
+    };
+    void notifyLeadViaTelegram(notifyPayload);
+    void notifyLeadViaResend(notifyPayload);
 
     return NextResponse.json({ ok: true });
   } catch (error) {
