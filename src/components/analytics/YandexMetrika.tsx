@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Script from "next/script";
 import { usePathname } from "next/navigation";
+import { getYandexMetrikaInitScript } from "@/lib/analytics/yandex-metrika-snippet";
 
 interface YandexMetrikaProps {
   counterId: string;
@@ -11,9 +11,29 @@ interface YandexMetrikaProps {
 declare global {
   interface Window {
     ym?: (counterId: number, method: string, ...args: unknown[]) => void;
+    Ya?: {
+      _metrika?: {
+        getCounters?: () => unknown[];
+      };
+    };
   }
 }
 
+function isStubYm(ym: Window["ym"]): boolean {
+  if (typeof ym !== "function") return true;
+  try {
+    return Function.prototype.toString.call(ym).includes("m[i].a");
+  } catch {
+    return false;
+  }
+}
+
+function countersReady(): boolean {
+  const list = window.Ya?._metrika?.getCounters?.();
+  return Array.isArray(list) && list.length > 0;
+}
+
+/** SPA pageviews. The counter itself is injected from the root layout. */
 export function YandexMetrika({ counterId }: YandexMetrikaProps) {
   const id = Number(counterId);
   const pathname = usePathname();
@@ -21,50 +41,25 @@ export function YandexMetrika({ counterId }: YandexMetrikaProps) {
 
   useEffect(() => {
     if (!Number.isFinite(id) || id <= 0) return;
+    if (countersReady() || document.getElementById("yandex-metrika")) return;
+
+    const snippet = getYandexMetrikaInitScript(String(id));
+    if (!snippet) return;
+    const script = document.createElement("script");
+    script.id = "yandex-metrika";
+    script.text = snippet;
+    document.head.appendChild(script);
+  }, [id]);
+
+  useEffect(() => {
+    if (!Number.isFinite(id) || id <= 0) return;
     if (skipNextHit.current) {
       skipNextHit.current = false;
       return;
     }
+    if (isStubYm(window.ym)) return;
     window.ym?.(id, "hit", window.location.href);
   }, [id, pathname]);
 
-  if (!Number.isFinite(id) || id <= 0) return null;
-
-  return (
-    <>
-      <Script
-        id="yandex-metrika"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-(function(m,e,t,r,i,k,a){
-  m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-  m[i].l=1*new Date();
-  for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
-  k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
-})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
-ym(${id}, 'init', {
-  ssr: true,
-  webvisor: false,
-  clickmap: true,
-  ecommerce: 'dataLayer',
-  referrer: document.referrer,
-  url: location.href,
-  accurateTrackBounce: true,
-  trackLinks: true
-});
-          `.trim(),
-        }}
-      />
-      <noscript>
-        <div>
-          <img
-            src={`https://mc.yandex.ru/watch/${id}`}
-            style={{ position: "absolute", left: -9999 }}
-            alt="Yandex Metrika"
-          />
-        </div>
-      </noscript>
-    </>
-  );
+  return null;
 }
