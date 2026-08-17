@@ -1,4 +1,6 @@
-import type { NextConfig } from "next";
+// @ts-check
+// Plain JS so Hostinger (glibc < 2.29) can load config without native SWC.
+// `next.config.ts` is compiled synchronously via next-swc and fails there.
 
 const PROD_SITE = "https://metric.graphics";
 const PRODUCTION_HOSTS = new Set(["metric.graphics", "www.metric.graphics"]);
@@ -12,7 +14,10 @@ const NON_INDEXABLE_HOSTS = new Set([
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || PROD_SITE;
 
-function siteOrigin(url: string): string {
+/**
+ * @param {string} url
+ */
+function siteOrigin(url) {
   try {
     return new URL(url).origin;
   } catch {
@@ -21,7 +26,7 @@ function siteOrigin(url: string): string {
 }
 
 /** Mirror of `isIndexableDeployment` — keep inline; next.config cannot use `@/` imports. */
-function isIndexableDeployment(): boolean {
+function isIndexableDeployment() {
   const allowFlag = process.env.NEXT_PUBLIC_ALLOW_INDEXING?.trim();
   if (allowFlag === "true") return true;
   if (allowFlag === "false") return false;
@@ -44,8 +49,8 @@ function isIndexableDeployment(): boolean {
   }
 }
 
-function supabaseStorageHosts(): string[] {
-  const hosts = new Set<string>();
+function supabaseStorageHosts() {
+  const hosts = new Set();
   const raw =
     process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "";
   try {
@@ -80,7 +85,8 @@ const noindexRobotsHeader = {
 
 const indexable = isIndexableDeployment();
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Hostinger Node.js / VPS — SSR (`next build` + `next start`), not static export
   trailingSlash: true,
   poweredByHeader: false,
@@ -112,7 +118,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2560, 3840],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: supabaseStorageHosts().map((hostname) => ({
-      protocol: "https" as const,
+      protocol: "https",
       hostname,
       pathname: "/storage/v1/object/public/**",
     })),

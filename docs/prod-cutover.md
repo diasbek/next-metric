@@ -52,5 +52,5 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 - [ ] Set Google / Yandex verification tokens in CMS settings
 - [ ] Spot-check: canonicals, hreflang en↔de, OG debugger, Rich Results (Organization / FAQ / Breadcrumb)
 - [ ] Purge CDN / cache for `metric.graphics`
-- [ ] Confirm CDN does **not** long-cache HTML/RSC — `next.config.ts` already sets `Cache-Control: max-age=0, s-maxage=0, must-revalidate` on `/:path*` so post-deploy chunk hashes cannot 404 as `text/plain`
+- [ ] Confirm CDN does **not** long-cache HTML/RSC — `next.config.mjs` already sets `Cache-Control: max-age=0, s-maxage=0, must-revalidate` on `/:path*` so post-deploy chunk hashes cannot 404 as `text/plain`
 - [ ] Admin media uploads use browser → Supabase path (`browser-upload`); avoid Server Action uploads on VPS (`fetch failed`)
