@@ -57,5 +57,8 @@ export const degularDisplay = localFont({
   variable: "--font-degular-display",
   display: "swap",
   fallback: ["system-ui", "sans-serif"],
+  // Metric-matched fallback + faux-bold of Regular were colliding
+  // with Display’s tight sidebearings on large headlines.
+  adjustFontFallback: false,
   preload: true,
 });

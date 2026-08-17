@@ -33,7 +33,7 @@ export async function saveSettingsAction(formData: FormData) {
     formData.get("captcha_provider") ?? "none",
   ) as CaptchaProvider;
 
-  await supabase.from("metric_site_settings").upsert({
+  const { error: settingsError } = await supabase.from("metric_site_settings").upsert({
     id: 1,
     // Contacts live on /admin/contacts/ — preserve when saving settings
     phone: current?.phone ?? "",
@@ -71,6 +71,10 @@ export async function saveSettingsAction(formData: FormData) {
       String(formData.get("google_site_verification") ?? ""),
     ),
   });
+
+  if (settingsError) {
+    return adminFail(settingsError.message);
+  }
 
   for (const locale of ["en", "de"] as const) {
     for (const pageKey of ["home", "agency", "works", "services", "contacts"] as const) {

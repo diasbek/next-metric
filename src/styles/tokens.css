@@ -55,7 +55,9 @@
   --leading-display: 0.9;
   --leading-body: 1.2;
 
-  --tracking-display: -0.02em;
+  /* Display cut is already tight — extra negative tracking stacked with
+     Tailwind/next/font overwrites and made “cu / th / fir” collide. */
+  --tracking-display: 0em;
   --tracking-body: -0.02em;
 
   --radius-sm: 10px;

@@ -53,7 +53,7 @@ export type ResolvedAnalytics = {
 };
 
 async function loadResolvedAnalytics(): Promise<ResolvedAnalytics> {
-  const settings = await getSiteSettings();
+  const settings = await loadSiteSettings();
   return {
     yandexMetrikaId:
       parseYandexMetrikaId(settings?.yandex_metrika_id) ||
@@ -77,8 +77,14 @@ async function loadResolvedAnalytics(): Promise<ResolvedAnalytics> {
   };
 }
 
+/** Always hits the DB — used by /api/analytics so a saved Metrika ID
+ * shows up without waiting for a full site rebuild. */
+export async function getLiveResolvedAnalytics(): Promise<ResolvedAnalytics> {
+  return loadResolvedAnalytics();
+}
+
 export const getResolvedAnalytics = unstable_cache(
   loadResolvedAnalytics,
   ["resolved-analytics"],
-  { tags: ["cms", "site_settings"], revalidate: false },
+  { tags: ["cms", "site_settings"], revalidate: 60 },
 );

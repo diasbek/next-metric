@@ -120,12 +120,12 @@ export const rootMetadata: Metadata = {
   manifest: "/manifest.json",
   robots: getRobotsMetadata(),
   alternates: {
-    canonical: SITE_CONFIG.url,
+    canonical: `${SITE_CONFIG.url}/`,
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: SITE_CONFIG.url,
+    url: `${SITE_CONFIG.url}/`,
     siteName: SITE_CONFIG.name,
     title: SITE_CONFIG.title,
     description: SITE_CONFIG.description,

@@ -54,7 +54,7 @@ function readConfig() {
       name: extractStringValue(body, "name"),
       title: extractStringValue(body, "title"),
       description: extractStringValue(body, "description"),
-      url: extractStringValue(body, "url"),
+      url: extractStringValue(body, "url") || "https://metric.graphics",
       phone: extractStringValue(body, "phone"),
       email: extractStringValue(body, "email"),
       themeColor: extractStringValue(body, "themeColor"),

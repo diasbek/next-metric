@@ -17,6 +17,10 @@ type CategoriesMarqueeProps = {
   images: readonly string[];
 };
 
+function categoryAlt(index: number) {
+  return `Amazon product listing photography example ${index + 1}`;
+}
+
 function CardStrip({
   images,
   keyPrefix,
@@ -32,7 +36,7 @@ function CardStrip({
         <div key={`${keyPrefix}-${src}-${index}`} className="metric-categories__card">
           <MediaImage
             src={src}
-            alt=""
+            alt={categoryAlt(index)}
             fill
             className="object-cover"
             sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
@@ -152,7 +156,7 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
             <div key={`${src}-${index}`} className="metric-categories__card">
               <MediaImage
                 src={src}
-                alt=""
+                alt={categoryAlt(index)}
                 fill
                 className="object-cover"
                 sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"

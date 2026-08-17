@@ -1,13 +1,32 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 
 interface YandexMetrikaProps {
   counterId: string;
 }
 
+declare global {
+  interface Window {
+    ym?: (counterId: number, method: string, ...args: unknown[]) => void;
+  }
+}
+
 export function YandexMetrika({ counterId }: YandexMetrikaProps) {
   const id = Number(counterId);
+  const pathname = usePathname();
+  const skipNextHit = useRef(true);
+
+  useEffect(() => {
+    if (!Number.isFinite(id) || id <= 0) return;
+    if (skipNextHit.current) {
+      skipNextHit.current = false;
+      return;
+    }
+    window.ym?.(id, "hit", window.location.href);
+  }, [id, pathname]);
 
   if (!Number.isFinite(id) || id <= 0) return null;
 
@@ -15,7 +34,7 @@ export function YandexMetrika({ counterId }: YandexMetrikaProps) {
     <>
       <Script
         id="yandex-metrika"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
 (function(m,e,t,r,i,k,a){
@@ -23,7 +42,7 @@ export function YandexMetrika({ counterId }: YandexMetrikaProps) {
   m[i].l=1*new Date();
   for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
-})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=${id}', 'ym');
+})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
 ym(${id}, 'init', {
   ssr: true,
   webvisor: false,
@@ -42,7 +61,7 @@ ym(${id}, 'init', {
           <img
             src={`https://mc.yandex.ru/watch/${id}`}
             style={{ position: "absolute", left: -9999 }}
-            alt=""
+            alt="Yandex Metrika"
           />
         </div>
       </noscript>

@@ -51,7 +51,7 @@ function MetricTrustCards({ trust }: { trust: MetricHomeContent["trust"] }) {
                 <div className="metric-hero__trust-icon">
                   <Image
                     src={item.icon}
-                    alt=""
+                    alt="Trustpilot"
                     width={56}
                     height={48}
                     className="object-contain"
@@ -69,7 +69,7 @@ function MetricTrustCards({ trust }: { trust: MetricHomeContent["trust"] }) {
                   {item.value}
                   <Image
                     src="/images/metric/icons/star.svg"
-                    alt=""
+                    alt="5 star rating"
                     width={41}
                     height={39}
                     className="metric-hero__trust-star"
@@ -130,7 +130,7 @@ export function MetricHeroSection({
       <PageContainer className="metric-hero__shell">
         <div className="metric-hero__main">
           <div className="metric-hero__copy">
-            <h1 className="metric-hero__title">
+            <h1 className="metric-hero__title font-display">
               <span className="block">{hero.titleLine1}</span>
               <span className="block">{hero.titleLine2}</span>
             </h1>
@@ -140,12 +140,12 @@ export function MetricHeroSection({
             </ProjectBriefCta>
           </div>
 
-          <div className="metric-hero__visual" aria-hidden>
+          <div className="metric-hero__visual">
             <div className="metric-hero__cluster">
               <div className="metric-hero__cluster-shot">
                 <Image
                   src="/images/metric/hero/cluster.png"
-                  alt=""
+                  alt="Amazon listing images and A+ Content product photography examples"
                   fill
                   priority
                   unoptimized
@@ -224,11 +224,10 @@ export function MetricCategoriesSection({
                   {line.icon ? (
                     <Image
                       src="/images/metric/icons/arrow.svg"
-                      alt=""
+                      alt="Amazon bestsellers"
                       width={94}
                       height={80}
                       className="metric-categories__laurel"
-                      aria-hidden
                     />
                   ) : null}
                 </span>
@@ -397,11 +396,10 @@ export function MetricWorkflowSection({
             <span className="metric-workflow__title-line metric-workflow__title-line--brand">
               <Image
                 src="/images/metric/icons/metric-m.svg"
-                alt=""
+                alt="METRIC"
                 width={123}
                 height={95}
                 className="metric-workflow__mark"
-                aria-hidden
               />
               <span>{workflow.titleLine2}</span>
             </span>

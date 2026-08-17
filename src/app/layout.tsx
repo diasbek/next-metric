@@ -48,7 +48,7 @@ export default function RootLayout({
       className={`${degular.variable} ${degularDisplay.variable}`}
       suppressHydrationWarning
     >
-      <body className={`${degular.className} antialiased`}>
+      <body className="antialiased">
         <JsonLd data={getGlobalJsonLdGraph()} />
         <ConsentProvider>
           <GsapProviderLazy>

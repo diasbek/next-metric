@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { revalidatePath, updateTag } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 
 export const CMS_TAGS = [
   "cms",
@@ -77,6 +77,11 @@ export function revalidateCms(tags: CmsTag[] = ["cms", "projects"]) {
 
   for (const tag of unique) {
     updateTag(tag);
+    revalidateTag(tag, "max");
+  }
+
+  if (unique.has("site_settings")) {
+    revalidatePath("/", "layout");
   }
 
   const paths = new Map<string, "layout" | "page">();

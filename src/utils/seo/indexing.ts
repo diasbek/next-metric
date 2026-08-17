@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { getPublicEnv } from "@/utils/env";
+
+/** Public origin used for canonical, Open Graph, sitemap, robots, JSON-LD. */
+export const CANONICAL_SITE_URL = "https://metric.graphics";
 
 /** Canonical production apex + www. Staging / previews are never indexable. */
 export const PRODUCTION_HOSTS = new Set([
@@ -7,59 +9,42 @@ export const PRODUCTION_HOSTS = new Set([
   "www.metric.graphics",
 ]);
 
-const NON_INDEXABLE_HOSTS = new Set([
+const STAGING_HOSTS = new Set([
   "metric.nocode.uz",
   "www.metric.nocode.uz",
   "localhost",
   "127.0.0.1",
 ]);
 
-const PROD_SITE_FALLBACK = "https://metric.graphics";
-
-/** Apex host (no www) used for canonical URLs and redirects. */
+/**
+ * Always the live SEO host. Hostinger env (`NEXT_PUBLIC_SITE_URL`) is
+ * ignored — that value cannot be changed on production and previously
+ * leaked metric.nocode.uz into canonical / robots.
+ */
 export function getCanonicalSiteUrl(): string {
-  const raw = getPublicEnv(
-    "NEXT_PUBLIC_SITE_URL",
-    PROD_SITE_FALLBACK,
-  ).replace(/\/$/, "");
-  try {
-    const parsed = new URL(raw);
-    if (parsed.hostname.startsWith("www.")) {
-      parsed.hostname = parsed.hostname.slice(4);
-    }
-    return parsed.origin;
-  } catch {
-    return raw.replace(/^https?:\/\/www\./i, (m) => m.replace("www.", ""));
-  }
+  return CANONICAL_SITE_URL;
 }
 
-function hostnameFromSiteUrl(): string | null {
-  try {
-    return new URL(getCanonicalSiteUrl()).hostname.toLowerCase();
-  } catch {
-    return null;
-  }
+export function isStagingHost(host: string | null | undefined): boolean {
+  const hostname = (host ?? "").split(":")[0].toLowerCase();
+  if (!hostname) return false;
+  if (STAGING_HOSTS.has(hostname)) return true;
+  if (hostname.endsWith(".vercel.app")) return true;
+  return false;
 }
 
-/** True for production deploys targeting metric.graphics (Hostinger, etc.). */
+/**
+ * True for Hostinger / production Node (`next start`).
+ * Ignores NEXT_PUBLIC_SITE_URL and NEXT_PUBLIC_ALLOW_INDEXING — those
+ * were set to staging values on the live box and cannot be edited there.
+ * Vercel previews and `next dev` stay out of the index.
+ */
 export function isIndexableDeployment(): boolean {
-  const allowFlag = getPublicEnv("NEXT_PUBLIC_ALLOW_INDEXING");
-  if (allowFlag === "true") return true;
-  if (allowFlag === "false") return false;
-
-  // Vercel preview / development — do not index
-  if (process.env.VERCEL) {
-    if (process.env.VERCEL_ENV !== "production") return false;
-  } else if (process.env.NODE_ENV !== "production") {
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
     return false;
   }
-
-  const host = hostnameFromSiteUrl();
-  if (!host) return false;
-  if (NON_INDEXABLE_HOSTS.has(host)) return false;
-  if (host.endsWith(".vercel.app")) return false;
-
-  return PRODUCTION_HOSTS.has(host);
+  if (process.env.NODE_ENV === "development") return false;
+  return true;
 }
 
 export function getRobotsMetadata(): Metadata["robots"] {

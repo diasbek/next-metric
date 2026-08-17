@@ -73,7 +73,7 @@ export function MetricFaqList({ items }: { items: FAQItem[] }) {
                 <span className="relative mt-1 size-6 shrink-0">
                   <Image
                     src="/images/metric/icons/plus.svg"
-                    alt=""
+                    alt="Expand"
                     fill
                     className="object-contain"
                   />

@@ -19,6 +19,7 @@
   --color-muted: var(--muted);
   --color-dark: var(--dark);
   --font-sans: var(--font-degular);
+  --font-display: var(--font-degular-display);
   --breakpoint-sm: 390px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
@@ -71,6 +72,7 @@ body {
 .font-display {
   font-family: var(--font-display-stack);
   font-weight: 600;
+  font-synthesis: none;
   letter-spacing: var(--tracking-display);
   line-height: var(--leading-display);
 }
@@ -539,11 +541,7 @@ a.metric-pill--link:active {
 
 .metric-hero__title {
   margin: 0;
-  font-family: var(--font-display-stack);
-  font-weight: 600;
   font-size: clamp(40px, 6.2vw, 90px);
-  line-height: 0.9;
-  letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
