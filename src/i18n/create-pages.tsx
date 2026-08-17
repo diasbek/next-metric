@@ -208,7 +208,16 @@ export function createWorksPage(locale: Locale) {
         },
       };
     },
-    Page: async function WorksPage() {
+    Page: async function WorksPage({
+      searchParams,
+    }: {
+      searchParams?: Promise<Record<string, string | string[] | undefined>>;
+    }) {
+      const params = (await searchParams) ?? {};
+      const category =
+        typeof params.category === "string" ? params.category.trim() : "";
+      const type = typeof params.type === "string" ? params.type.trim() : "";
+
       return (
         <>
           <JsonLd
@@ -216,7 +225,7 @@ export function createWorksPage(locale: Locale) {
               getLocalizedProjectListSchema(locale),
             ])}
           />
-          <WorksPageView locale={locale} />
+          <WorksPageView locale={locale} category={category} type={type} />
         </>
       );
     },

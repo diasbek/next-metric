@@ -8,7 +8,7 @@ import { CategoriesMarquee } from "@/components/molecules/CategoriesMarquee";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
-import { localePath } from "@/i18n/paths";
+import { localePath, localeBriefHref } from "@/i18n/paths";
 
 const WORKFLOW_IMAGE_SIZE: Record<string, readonly [number, number]> = {
   "/images/metric/workflow/wf-1.png": [820, 518],
@@ -114,6 +114,7 @@ export function MetricHeroSection({
   home: MetricHomeContent;
 }) {
   const { hero } = home;
+  const briefHref = localeBriefHref(locale);
 
   return (
     <section
@@ -135,7 +136,7 @@ export function MetricHeroSection({
               <span className="block">{hero.titleLine2}</span>
             </h1>
             <p className="metric-hero__subtitle">{hero.subtitle}</p>
-            <ProjectBriefCta variant="primary" size="lg">
+            <ProjectBriefCta href={briefHref} variant="primary" size="lg">
               {hero.cta}
             </ProjectBriefCta>
           </div>
@@ -304,6 +305,7 @@ export function MetricServicesSection({
   home: MetricHomeContent;
 }) {
   const { services } = home;
+  const briefHref = localeBriefHref(locale);
   return (
     <section id={services.id} className="metric-services">
       <PageContainer className="metric-services__inner">
@@ -333,7 +335,7 @@ export function MetricServicesSection({
               {services.subtitle}
             </p>
             <div className="metric-services__cta" data-reveal>
-              <ProjectBriefCta variant="onAccent">
+              <ProjectBriefCta href={briefHref} variant="onAccent">
                 {services.cta}
               </ProjectBriefCta>
             </div>
@@ -387,6 +389,7 @@ export function MetricWorkflowSection({
   home: MetricHomeContent;
 }) {
   const { workflow } = home;
+  const briefHref = localeBriefHref(locale);
   return (
     <section id={workflow.id} className="metric-section metric-workflow">
       <PageContainer>
@@ -461,7 +464,7 @@ export function MetricWorkflowSection({
 
         <div className="metric-workflow__cta" data-reveal>
           <p className="metric-workflow__note">{workflow.note}</p>
-          <ProjectBriefCta variant="primary">
+          <ProjectBriefCta href={briefHref} variant="primary">
             {workflow.cta}
           </ProjectBriefCta>
         </div>

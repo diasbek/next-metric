@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 import type { SiteContent } from "@/i18n/types";
 
@@ -9,30 +9,38 @@ interface WorksListingFiltersProps {
   ui: SiteContent["ui"];
   categoryOptions: readonly string[];
   typeOptions: readonly string[];
+  category: string;
+  type: string;
+  pathname: string;
 }
 
 export function WorksListingFilters({
   ui,
   categoryOptions,
   typeOptions,
+  category,
+  type,
+  pathname,
 }: WorksListingFiltersProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const category = searchParams.get("category")?.trim() || ui.filterAll;
-  const type = searchParams.get("type")?.trim() || ui.filterAll;
+  const categoryValue = category || ui.filterAll;
+  const typeValue = type || ui.filterAll;
 
   const updateFilter = useCallback(
     (key: "category" | "type", next: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (!next || next === ui.filterAll) params.delete(key);
-      else params.set(key, next);
-
+      const nextCategory = key === "category" ? next : categoryValue;
+      const nextType = key === "type" ? next : typeValue;
+      const params = new URLSearchParams();
+      if (nextCategory && nextCategory !== ui.filterAll) {
+        params.set("category", nextCategory);
+      }
+      if (nextType && nextType !== ui.filterAll) {
+        params.set("type", nextType);
+      }
       const query = params.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
-    [pathname, router, searchParams, ui.filterAll],
+    [categoryValue, pathname, router, typeValue, ui.filterAll],
   );
 
   const clearFilters = useCallback(() => {
@@ -49,8 +57,8 @@ export function WorksListingFilters({
           label={ui.filterSphere}
           options={[ui.filterAll, ...categoryOptions]}
           value={
-            categoryOptions.includes(category) || category === ui.filterAll
-              ? category
+            categoryOptions.includes(categoryValue) || categoryValue === ui.filterAll
+              ? categoryValue
               : ui.filterAll
           }
           onChange={(value) => updateFilter("category", value)}
@@ -60,8 +68,8 @@ export function WorksListingFilters({
           label={ui.filterDirection}
           options={[ui.filterAll, ...typeOptions]}
           value={
-            typeOptions.includes(type) || type === ui.filterAll
-              ? type
+            typeOptions.includes(typeValue) || typeValue === ui.filterAll
+              ? typeValue
               : ui.filterAll
           }
           onChange={(value) => updateFilter("type", value)}

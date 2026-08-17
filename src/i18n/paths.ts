@@ -29,6 +29,11 @@ export function localePath(locale: Locale, path: string): string {
   return localePathWithoutHash(locale, path);
 }
 
+/** Homepage URL that opens the project brief (`/?brief=1` or `/de/?brief=1`). */
+export function localeBriefHref(locale: Locale): string {
+  return `${localePath(locale, "/")}?brief=1`;
+}
+
 export function stripLocalePrefix(pathname: string): {
   locale: Locale;
   path: string;

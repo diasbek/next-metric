@@ -2,6 +2,7 @@ import { PageContainer } from "@/components/atoms/PageContainer";
 import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
 import { SiteLayout } from "@/components/templates";
 import type { Locale } from "@/i18n/config";
+import { localeBriefHref } from "@/i18n/paths";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
 const copy = {
@@ -49,7 +50,7 @@ export async function LegalPageView({
               {content.title}
             </h1>
             <p className="metric-legal__body">{content.body}</p>
-            <ProjectBriefCta variant="primary" className="mt-10">
+            <ProjectBriefCta href={localeBriefHref(locale)} variant="primary" className="mt-10">
               {home.footer.startCta}
             </ProjectBriefCta>
           </div>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";
-import { SiteNav } from "@/components/molecules/SiteNav";
+import { SiteNavLinks } from "@/components/molecules/SiteNavLinks";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -58,7 +58,7 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
             />
           </TransitionLink>
 
-          <SiteNav
+          <SiteNavLinks
             locale={locale}
             items={navItems}
             variant="footer"

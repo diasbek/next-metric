@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import Script from "next/script";
 import { degular, degularDisplay } from "@/assets/fonts";
 import "./globals.css";
@@ -50,10 +51,12 @@ export default async function RootLayout({
   const analytics = await getResolvedAnalytics();
   const metrikaSnippet = getYandexMetrikaInitScript(analytics.yandexMetrikaId);
   const metrikaPixel = getYandexMetrikaNoscriptUrl(analytics.yandexMetrikaId);
+  const htmlLangHeader = (await headers()).get("x-html-lang");
+  const lang = htmlLangHeader === "de" ? "de" : "en";
 
   return (
     <html
-      lang="en"
+      lang={lang}
       className={`${degular.variable} ${degularDisplay.variable}`}
       suppressHydrationWarning
     >

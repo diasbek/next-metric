@@ -20,7 +20,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!pathname.startsWith("/admin")) {
-    return NextResponse.next();
+    const requestHeaders = new Headers(request.headers);
+    const german =
+      pathname === "/de" || pathname === "/de/" || pathname.startsWith("/de/");
+    requestHeaders.set("x-html-lang", german ? "de" : "en");
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;

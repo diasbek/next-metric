@@ -2689,6 +2689,7 @@ a.metric-pill--link:active {
   font-size: clamp(18px, 2vw, 28px);
   letter-spacing: -0.02em;
   line-height: 1.2;
+  cursor: pointer;
 }
 
 .faq-item__collapse {
@@ -2697,8 +2698,22 @@ a.metric-pill--link:active {
   transition: grid-template-rows 0.35s ease;
 }
 
-.faq-item.is-open .faq-item__collapse {
+.faq-item.is-open .faq-item__collapse,
+.faq-item[open] .faq-item__collapse {
   grid-template-rows: 1fr;
+}
+
+.faq-item summary {
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item[open] .faq-item__icon--plus,
+.faq-item:not([open]) .faq-item__icon--minus {
+  display: none;
 }
 
 .faq-item__collapse-inner {

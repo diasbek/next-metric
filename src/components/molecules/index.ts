@@ -12,7 +12,7 @@ export { SiteNav } from "./SiteNav";
 export { SiteLogoMark } from "./SiteLogoMark";
 export { TestimonialNavButtons } from "./TestimonialsCarousel";
 export { WorksListingFilters } from "./WorksListingFilters";
-export { WorksListingClient } from "./WorksListingClient";
+export { SiteNavLinks } from "./SiteNavLinks";
 export { AgencyTestimonialsCarousel } from "./AgencyTestimonialsCarousel";
 export { AgencyTestimonialsNav } from "./AgencyTestimonialsNav";
 export { OfficeMap } from "./OfficeMapLazy";

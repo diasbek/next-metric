@@ -5,13 +5,15 @@ import { Button, type ButtonSize, type ButtonVariant } from "@/components/atoms/
 import { useProjectBrief } from "@/components/molecules/ProjectBriefProvider";
 
 type ProjectBriefCtaProps = {
+  href: string;
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
-} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children">;
+} & Omit<ButtonHTMLAttributes<HTMLAnchorElement>, "type" | "children" | "href">;
 
 export function ProjectBriefCta({
+  href,
   children,
   onClick,
   variant,
@@ -23,15 +25,17 @@ export function ProjectBriefCta({
 
   return (
     <Button
-      type="button"
+      href={href}
       variant={variant}
       size={size}
       className={className}
+      {...rest}
       onClick={(event) => {
         onClick?.(event);
-        if (!event.defaultPrevented) open();
+        if (event.defaultPrevented) return;
+        event.preventDefault();
+        open();
       }}
-      {...rest}
     >
       {children}
     </Button>

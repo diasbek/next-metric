@@ -9,7 +9,7 @@ import { SiteNav } from "@/components/molecules/SiteNav";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
-import { localePath } from "@/i18n/paths";
+import { localePath, localeBriefHref } from "@/i18n/paths";
 
 interface HeaderProps {
   locale: Locale;
@@ -61,6 +61,7 @@ export function Header({
   const headerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const homePath = localePath(locale, "/");
+  const briefHref = localeBriefHref(locale);
   const isHero = variant === "hero";
   const cta = home.footer.startCta;
   const navItems = home.nav.map((item) => ({
@@ -142,6 +143,7 @@ export function Header({
 
           <div className="flex items-center gap-3">
             <ProjectBriefCta
+              href={briefHref}
               variant="outlineAccent"
               size="sm"
               className="site-header__cta"
@@ -206,6 +208,7 @@ export function Header({
             onNavigate={() => setOpen(false)}
           />
           <ProjectBriefCta
+            href={briefHref}
             variant="outlineAccent"
             size="sm"
             className="mobile-menu-panel__cta"
