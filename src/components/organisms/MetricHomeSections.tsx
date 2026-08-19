@@ -268,8 +268,7 @@ export function MetricCaseStudiesSection({
 
         <div
           className="metric-case-studies__list"
-          data-reveal-group="pop"
-          data-reveal-stagger="0.12"
+          data-case-steps
         >
           {caseStudies.items.map((item) => (
             <MetricCaseCard

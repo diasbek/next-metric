@@ -18,12 +18,37 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function showAllRevealTargets(): void {
+function firstVisibleCaseStepCard(): HTMLElement | null {
+  const cards = document.querySelectorAll<HTMLElement>(
+    "#case-studies [data-case-steps] > .metric-case-card",
+  );
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect();
+    if (rect.bottom > 0 && rect.top < (window.innerHeight * 88) / 100) {
+      return card;
+    }
+  }
+  return null;
+}
+
+export function showAllRevealTargets(
+  options: { preserveCaseSteps?: boolean } = {},
+): void {
+  const visibleCase =
+    options.preserveCaseSteps === true ? firstVisibleCaseStepCard() : null;
+
   document
     .querySelectorAll<HTMLElement>(
       "[data-reveal], [data-reveal-group], [data-reveal-group] > *, [data-split-title], [data-border-draw], [data-counter]",
     )
     .forEach((el) => {
+      if (
+        options.preserveCaseSteps &&
+        el.closest("[data-case-steps]") &&
+        el !== visibleCase
+      ) {
+        return;
+      }
       el.classList.add("is-revealed");
       el.style.visibility = "visible";
       el.style.opacity = "1";

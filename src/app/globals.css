@@ -3647,12 +3647,14 @@ html.is-mobile-menu-open {
    Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
    content after scroll reveals complete — do not use that pattern. */
 html.gsap-pending [data-reveal]:not(.is-revealed),
-html.gsap-pending [data-reveal-group] > *:not(.is-revealed) {
+html.gsap-pending [data-reveal-group] > *:not(.is-revealed),
+html.gsap-pending [data-case-steps] > *:not(.is-revealed) {
   visibility: hidden;
 }
 
 [data-reveal].is-revealed,
 [data-reveal-group] > *.is-revealed,
+[data-case-steps] > *.is-revealed,
 .metric-hero__copy.is-revealed,
 .metric-hero__visual.is-revealed,
 .metric-hero__trust.is-revealed {

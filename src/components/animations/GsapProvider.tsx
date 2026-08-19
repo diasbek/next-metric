@@ -82,7 +82,8 @@ export function GsapProvider({ children }: GsapProviderProps) {
         try {
           const { showAllRevealTargets } = await import("@/animations/gsap");
           if (cancelled) return;
-          showAllRevealTargets();
+          // Keep homepage case cards queued — do not flash cards 2+ visible.
+          showAllRevealTargets({ preserveCaseSteps: true });
         } catch {
           /* continue — fallback timer / catch path still force-shows */
         }

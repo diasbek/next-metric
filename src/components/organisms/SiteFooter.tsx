@@ -26,11 +26,27 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
   const { site, ui } = content;
   const footer = home.footer;
   const socialMap: Record<string, string | undefined> = {
+    telegram: site.social.telegram,
     instagram: site.social.instagram,
     linkedin: site.social.linkedin,
     x: site.social.x,
     facebook: site.social.facebook,
   };
+  const socialLabels: Record<string, string> = {
+    telegram: "Telegram",
+    instagram: "Instagram",
+    linkedin: "LinkedIn",
+    x: "X",
+    facebook: "Facebook",
+  };
+  const socialLinks = (
+    ["telegram", "instagram", "linkedin", "x", "facebook"] as const
+  ).flatMap((key) => {
+    const href = socialMap[key];
+    if (!href) return [];
+    const fromCms = footer.social.find((item) => item.key === key);
+    return [{ key, href, label: fromCms?.label ?? socialLabels[key] }];
+  });
 
   const privacyLink = footer.links.find((link) => link.href.includes("privacy"));
   const utilityLinks = footer.links.filter((link) => !link.href.includes("privacy"));
@@ -87,22 +103,18 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
           </div>
         </div>
 
-        <div className="site-footer__bottom" data-reveal>
+        <div className="site-footer__bottom">
           <div className="site-footer__meta">
-            {footer.social.map((item) => {
-              const href = socialMap[item.key];
-              if (!href) return null;
-              return (
-                <a
-                  key={item.label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {item.label}
-                </a>
-              );
-            })}
+            {socialLinks.map((item) => (
+              <a
+                key={item.key}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {item.label}
+              </a>
+            ))}
             {utilityLinks.map((link) => (
               <TransitionLink
                 key={link.label}

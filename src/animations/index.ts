@@ -12,6 +12,7 @@ import {
 import { initBlobAnimations } from "./blobs";
 import { initGlobalReveals } from "./reveals";
 import { initBeforeAfterSliders } from "./before-after";
+import { initCaseStudySteps } from "./case-studies";
 
 export { showAllRevealTargets } from "./gsap";
 
@@ -142,6 +143,7 @@ export function initAnimations(_pathname: string): Cleanup {
     cleanups.push(initHeroEntrance());
     cleanups.push(initBlobAnimations());
     cleanups.push(initGlobalReveals());
+    cleanups.push(initCaseStudySteps());
     cleanups.push(initBeforeAfterSliders());
     cleanups.push(
       runMatchMedia(FINE_POINTER, () => {

@@ -54,9 +54,12 @@ export function createReveals(): void {
     // Skip already-revealed items (e.g. force-shown for a hash jump) —
     // re-animating them would flash them invisible again.
     .querySelectorAll<HTMLElement>(
-      "[data-reveal]:not(.is-revealed):not([data-split-title]):not([data-reveal-group] > [data-reveal])",
+      "[data-reveal]:not(.is-revealed):not([data-split-title])",
     )
     .forEach((el) => {
+      const parent = el.parentElement;
+      if (parent?.hasAttribute("data-reveal-group")) return;
+      if (parent?.hasAttribute("data-case-steps")) return;
       if (isPastRevealStart(el, 88)) {
         showImmediately(el);
         return;
