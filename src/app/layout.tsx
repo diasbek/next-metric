@@ -56,11 +56,11 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Before paint: drop pending for reduced-motion so content never stays hidden. */}
+        {/* Before paint: drop pending for reduced-motion; fail-open if GSAP never boots. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.remove('gsap-pending');}}catch(e){}})();",
+              "(function(){try{var h=document.documentElement;if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){h.classList.remove('gsap-pending');return;}setTimeout(function(){if(h.classList.contains('gsap-ready')||h.classList.contains('gsap-force-show'))return;h.classList.add('gsap-force-show');h.classList.remove('gsap-pending');},1500);}catch(e){}})();",
           }}
         />
       </head>

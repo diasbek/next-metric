@@ -67,6 +67,15 @@ export function showAllRevealTargets(
     el.style.opacity = "1";
     el.style.transform = "none";
   });
+
+  const transitionRoot = document.querySelector<HTMLElement>(
+    "[data-page-transition-root]",
+  );
+  if (transitionRoot) {
+    transitionRoot.style.visibility = "visible";
+    transitionRoot.style.opacity = "1";
+    transitionRoot.style.transform = "none";
+  }
 }
 
 export function registerGsapPlugins(): typeof gsap {

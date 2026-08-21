@@ -8,7 +8,11 @@ interface GsapProviderProps {
   children: React.ReactNode;
 }
 
-const HARD_READY_MS = 3000;
+/** Fail-open: never leave the page blank waiting on the animation chunk. */
+const HARD_READY_MS = 1500;
+
+/** Survives Soft nav / Strict Mode remounts within the same document session. */
+let bootCompleted = false;
 
 async function waitForPaint(): Promise<void> {
   await new Promise<void>((resolve) => {
@@ -51,6 +55,15 @@ async function tryShowAllRevealTargets(
   }
 }
 
+async function tryResetPageTransition(): Promise<void> {
+  try {
+    const { resetPageTransition } = await import("@/animations/page-transition");
+    resetPageTransition();
+  } catch {
+    /* ignore */
+  }
+}
+
 function settleIfHash(): void {
   if (typeof window === "undefined") return;
   if (!window.location.hash) return;
@@ -71,12 +84,16 @@ export function GsapProvider({ children }: GsapProviderProps) {
 
     const reduced = prefersReducedMotion();
     const html = document.documentElement;
-    // Layout already paints with gsap-pending; keep it through Strict Mode
-    // remounts so content never flashes visible → hidden → visible.
-    // No delayed boot spinner: hero LCP is intentional during pending, and a
-    // late overlay on top of it feels like a second loading pass.
+    const softNav = bootCompleted;
+
+    // Cold boot: keep SSR gsap-pending so reveals don't flash before init.
+    // Soft nav / Strict remount: never re-hide — that was the white-screen bug.
     if (reduced) {
       html.classList.remove("gsap-pending", "gsap-force-show");
+    } else if (softNav) {
+      html.classList.remove("gsap-pending", "gsap-force-show");
+      void tryShowAllRevealTargets({ preserveCaseSteps: true });
+      void tryResetPageTransition();
     } else {
       html.classList.add("gsap-pending");
       html.classList.remove("gsap-ready", "gsap-force-show");
@@ -97,6 +114,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
     const markReady = (opts: { forceShow?: boolean } = {}) => {
       if (ready || cancelled) return;
       ready = true;
+      bootCompleted = true;
       clearTimers();
       html.classList.remove("gsap-pending");
       if (opts.forceShow) {
@@ -110,12 +128,18 @@ export function GsapProvider({ children }: GsapProviderProps) {
     const forceReadyCssOnly = () => {
       if (ready || cancelled) return;
       html.classList.add("gsap-force-show");
+      html.classList.remove("gsap-pending");
       markReady({ forceShow: true });
       void tryShowAllRevealTargets();
+      void tryResetPageTransition();
     };
 
     if (!reduced) {
-      hardReadyTimer = setTimeout(forceReadyCssOnly, HARD_READY_MS);
+      // Soft nav already shows content; still fail-open if init hangs.
+      hardReadyTimer = setTimeout(
+        forceReadyCssOnly,
+        softNav ? HARD_READY_MS * 2 : HARD_READY_MS,
+      );
     }
 
     const run = async () => {
@@ -138,20 +162,26 @@ export function GsapProvider({ children }: GsapProviderProps) {
       }
 
       try {
-        const { playEnterTransition, resetPageTransition } = await import(
-          "@/animations/page-transition"
-        );
-        await waitForPaint();
-        if (cancelled) return;
+        if (!softNav) {
+          const { playEnterTransition, resetPageTransition } = await import(
+            "@/animations/page-transition"
+          );
+          await waitForPaint();
+          if (cancelled) return;
 
-        await playEnterTransition();
-        if (cancelled) {
-          resetPageTransition();
-          return;
+          await playEnterTransition();
+          if (cancelled) {
+            resetPageTransition();
+            return;
+          }
+
+          await waitForIdle(400);
+          if (cancelled || ready) return;
+        } else {
+          await waitForPaint();
+          if (cancelled || ready) return;
+          await tryResetPageTransition();
         }
-
-        await waitForIdle(400);
-        if (cancelled || ready) return;
 
         const { initAnimations } = await import("@/animations");
         await waitForPaint();
@@ -162,14 +192,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
         void import("@/animations/page-transition");
       } catch {
         if (cancelled || ready) return;
-        try {
-          const { resetPageTransition } = await import(
-            "@/animations/page-transition"
-          );
-          resetPageTransition();
-        } catch {
-          /* ignore */
-        }
+        await tryResetPageTransition();
         markReady({ forceShow: true });
         void tryShowAllRevealTargets();
       }
@@ -181,12 +204,11 @@ export function GsapProvider({ children }: GsapProviderProps) {
       cancelled = true;
       clearTimers();
       cleanup?.();
-      // Keep pending across Strict Mode remount / soft nav so SSR-visible
-      // content never pops back before the next effect re-hides it.
-      html.classList.remove("gsap-ready", "gsap-force-show");
-      if (!prefersReducedMotion()) {
-        html.classList.add("gsap-pending");
-      }
+      // Keep content readable across remount/nav. Re-adding gsap-pending here
+      // blanked the page (white screen) until the next effect finished.
+      html.classList.remove("gsap-ready");
+      void tryShowAllRevealTargets();
+      void tryResetPageTransition();
     };
   }, [pathname]);
 
