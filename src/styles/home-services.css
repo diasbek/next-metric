@@ -363,58 +363,24 @@
   .metric-services-card__media {
     position: absolute;
     inset: unset;
-    top: 56px;
+    top: 40px;
     right: 0;
-    width: 62%;
-    height: calc(100% + 48px);
+    /* Same width for every deliverable mockup; right-aligned in the card. */
+    width: min(52%, 520px);
+    height: calc(100% - 24px);
     aspect-ratio: auto;
     border-radius: 0;
     pointer-events: none;
     overflow: visible;
     background: transparent;
     z-index: 1;
-    margin-bottom: 0;
+    margin: 0;
   }
 
   .metric-services-card__img {
-    /* Mockups sit large on the right and bleed out — card overflow clips. */
     object-fit: contain;
-    object-position: left top;
-  }
-
-  /* Product images — wide listing, overflow right/bottom. */
-  .metric-services-card:nth-child(1) .metric-services-card__media {
-    top: 44px;
-    right: -7%;
-    width: 76%;
-    height: 112%;
-    margin-bottom: 0;
-  }
-
-  /* A+ Content — tall stacked modules. */
-  .metric-services-card:nth-child(2) .metric-services-card__media {
-    top: 28px;
-    right: 2%;
-    width: 40%;
-    height: 132%;
-    margin-bottom: 0;
-  }
-
-  /* Ad-Banner — search-result mockup. */
-  .metric-services-card:nth-child(3) .metric-services-card__media {
-    top: 36px;
-    right: -4%;
-    width: 54%;
-    height: 124%;
-    margin-bottom: 0;
-  }
-
-  /* BrandStore — mobile storefront. */
-  .metric-services-card:nth-child(4) .metric-services-card__media {
-    top: 24px;
-    right: 4%;
-    width: 38%;
-    height: 138%;
-    margin-bottom: 0;
+    object-position: right top;
+    transform: rotate(-3.6deg);
+    transform-origin: right top;
   }
 }
