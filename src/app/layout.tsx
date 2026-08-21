@@ -56,11 +56,11 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Before paint: drop pending for reduced-motion; fail-open if GSAP never boots. */}
+        {/* Before paint: show content in Telegram/IG WebViews; fail-open otherwise. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var h=document.documentElement;if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){h.classList.remove('gsap-pending');return;}setTimeout(function(){if(h.classList.contains('gsap-ready')||h.classList.contains('gsap-force-show'))return;h.classList.add('gsap-force-show');h.classList.remove('gsap-pending');},1500);}catch(e){}})();",
+              "(function(){try{var h=document.documentElement;var ua=navigator.userAgent||'';var restricted=/Telegram|Instagram|FBAN|FBAV|FBIOS|Line\\//i.test(ua)||!!(window.TelegramWebviewProxy||(window.Telegram&&window.Telegram.WebView));if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||restricted){h.classList.remove('gsap-pending');if(restricted)h.classList.add('gsap-force-show');return;}setTimeout(function(){if(h.classList.contains('gsap-ready')||h.classList.contains('gsap-force-show'))return;h.classList.add('gsap-force-show');h.classList.remove('gsap-pending');},1200);}catch(e){}})();",
           }}
         />
       </head>

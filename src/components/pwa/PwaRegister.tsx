@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { isRestrictedWebView } from "@/utils/webview";
 
 /** Registers the installability service worker (Chrome / Edge / Android). */
 export function PwaRegister() {
@@ -8,6 +9,16 @@ export function PwaRegister() {
     if (typeof window === "undefined") return;
     if (!("serviceWorker" in navigator)) return;
     if (process.env.NODE_ENV !== "production") return;
+
+    // Telegram / IG in-app browsers + SW = blank pages more often than not.
+    if (isRestrictedWebView()) {
+      void navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((reg) => {
+          void reg.unregister();
+        });
+      });
+      return;
+    }
 
     const register = () => {
       navigator.serviceWorker

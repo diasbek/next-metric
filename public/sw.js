@@ -1,5 +1,5 @@
-/* METRIC installability SW — network-first; never serve HTML for /_next assets. */
-const CACHE = "metric-shell-v4";
+/* METRIC installability SW — network-only for pages + /_next; no HTML fallback. */
+const CACHE = "metric-shell-v5";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -30,18 +30,16 @@ function isNextAsset(url) {
 }
 
 function isDocumentRequest(request) {
-  return (
-    request.mode === "navigate" ||
-    request.destination === "document"
-  );
+  return request.mode === "navigate" || request.destination === "document";
 }
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
 
-  // Scripts/styles/fonts from the app build must never fall back to HTML.
-  if (isNextAsset(request.url)) {
+  // Never cache or synthesize documents / app chunks — Telegram WebView + stale
+  // HTML shells were a common white-screen path.
+  if (isNextAsset(request.url) || isDocumentRequest(request)) {
     event.respondWith(fetch(request));
     return;
   }
@@ -52,8 +50,7 @@ self.addEventListener("fetch", (event) => {
         if (
           response.ok &&
           request.url.startsWith(self.location.origin) &&
-          (isDocumentRequest(request) ||
-            request.destination === "manifest" ||
+          (request.destination === "manifest" ||
             request.url.includes("/icons/"))
         ) {
           const copy = response.clone();
@@ -61,11 +58,6 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => {
-        if (isDocumentRequest(request)) {
-          return caches.match(request).then((cached) => cached || caches.match("/"));
-        }
-        return caches.match(request);
-      }),
+      .catch(() => caches.match(request)),
   );
 });

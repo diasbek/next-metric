@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { settleScrollAfterNavigation } from "@/utils/scroll";
+import { isRestrictedWebView } from "@/utils/webview";
 
 interface GsapProviderProps {
   children: React.ReactNode;
 }
 
 /** Fail-open: never leave the page blank waiting on the animation chunk. */
-const HARD_READY_MS = 1500;
+const HARD_READY_MS = 1200;
 
 /** Survives Soft nav / Strict Mode remounts within the same document session. */
 let bootCompleted = false;
@@ -83,17 +84,25 @@ export function GsapProvider({ children }: GsapProviderProps) {
     settleIfHash();
 
     const reduced = prefersReducedMotion();
+    const restricted = isRestrictedWebView();
     const html = document.documentElement;
     const softNav = bootCompleted;
+    const alreadyForced = html.classList.contains("gsap-force-show");
 
     // Cold boot: keep SSR gsap-pending so reveals don't flash before init.
-    // Soft nav / Strict remount: never re-hide — that was the white-screen bug.
-    if (reduced) {
-      html.classList.remove("gsap-pending", "gsap-force-show");
-    } else if (softNav) {
-      html.classList.remove("gsap-pending", "gsap-force-show");
-      void tryShowAllRevealTargets({ preserveCaseSteps: true });
-      void tryResetPageTransition();
+    // Soft nav / Strict remount / in-app browsers: never re-hide — that blanked
+    // Telegram WebView after the head script had already force-shown content.
+    if (reduced || restricted || alreadyForced || softNav) {
+      html.classList.remove("gsap-pending");
+      if (restricted || alreadyForced) {
+        html.classList.add("gsap-force-show");
+      } else {
+        html.classList.remove("gsap-force-show");
+      }
+      if (softNav || restricted || alreadyForced) {
+        void tryShowAllRevealTargets({ preserveCaseSteps: true });
+        void tryResetPageTransition();
+      }
     } else {
       html.classList.add("gsap-pending");
       html.classList.remove("gsap-ready", "gsap-force-show");
@@ -135,10 +144,10 @@ export function GsapProvider({ children }: GsapProviderProps) {
     };
 
     if (!reduced) {
-      // Soft nav already shows content; still fail-open if init hangs.
+      // Soft nav / WebView already show content; still fail-open if init hangs.
       hardReadyTimer = setTimeout(
         forceReadyCssOnly,
-        softNav ? HARD_READY_MS * 2 : HARD_READY_MS,
+        softNav || restricted ? HARD_READY_MS * 2 : HARD_READY_MS,
       );
     }
 
@@ -162,7 +171,8 @@ export function GsapProvider({ children }: GsapProviderProps) {
       }
 
       try {
-        if (!softNav) {
+        const skipEnter = softNav || restricted || alreadyForced;
+        if (!skipEnter) {
           const { playEnterTransition, resetPageTransition } = await import(
             "@/animations/page-transition"
           );
@@ -188,7 +198,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
         if (cancelled || ready) return;
 
         cleanup = initAnimations(pathname);
-        markReady();
+        markReady({ forceShow: restricted || alreadyForced });
         void import("@/animations/page-transition");
       } catch {
         if (cancelled || ready) return;
