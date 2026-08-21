@@ -1,0 +1,229 @@
+/* Works listing, filters, and work cards */
+
+/* Works / case */
+.metric-works__header {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .metric-works__header {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: end;
+    gap: 40px;
+  }
+}
+
+.metric-works__title {
+  font-size: clamp(42px, 6vw, 90px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 1800px) {
+  .metric-works__title {
+    font-size: clamp(90px, 5vw, 120px);
+  }
+}
+
+.metric-works__subtitle {
+  max-width: 28rem;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
+.works-filters {
+  margin: 0 0 32px;
+}
+
+@media (min-width: 768px) {
+  .works-filters {
+    margin-bottom: 40px;
+  }
+}
+
+.works-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.works-filters__clear {
+  appearance: none;
+  margin: 0;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.works-filters__clear:hover {
+  color: var(--foreground);
+}
+
+.works-filters__empty {
+  margin: 24px 0 0;
+  max-width: 36em;
+  font-size: 18px;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
+.ui-select {
+  position: relative;
+  display: inline-flex;
+}
+
+.ui-select__trigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(9, 9, 9, 0.2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.ui-select.is-open .ui-select__trigger,
+.ui-select__trigger:hover {
+  border-color: rgba(9, 9, 9, 0.45);
+}
+
+.ui-select__value {
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-select__chevron {
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.ui-select.is-open .ui-select__chevron {
+  transform: rotate(180deg);
+}
+
+.ui-select__menu {
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border: 1px solid rgba(9, 9, 9, 0.12);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(9, 9, 9, 0.12);
+}
+
+.ui-select__menu-option {
+  margin: 0;
+}
+
+.ui-select__menu-item {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ui-select__menu-item:hover,
+.ui-select__menu-item:focus-visible {
+  background: rgba(245, 245, 245, 0.9);
+  outline: none;
+}
+
+.ui-select__menu-item.is-active {
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  color: var(--foreground);
+}
+
+.metric-works-grid {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .metric-works-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .metric-works-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.metric-work-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--surface);
+}
+
+.metric-work-card__media {
+  position: relative;
+  min-width: 0;
+  width: calc(100% - 40px);
+  margin: 20px 20px 0;
+  /* Same source ratio as homepage case cards (case-*.jpg 3000×2347 /
+     2400×1878). 4/5 was taller than the photo and object-cover cropped it. */
+  aspect-ratio: 3000 / 2347;
+  height: auto;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #ddd;
+}
+
+.metric-work-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.metric-work-card__title {
+  font-size: clamp(24px, 2vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-work-card__desc {
+  margin-top: 8px;
+  flex: 1;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--muted);
+}

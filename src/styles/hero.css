@@ -1,0 +1,640 @@
+/* Fullscreen Metric home hero */
+
+/* —— Fullscreen Metric hero —— */
+.metric-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  padding-block: 24px clamp(20px, 3vh, 32px);
+  background: #fff;
+  /* Extend the hero (and its ambient blobs) up behind the sticky header at
+     every breakpoint, not just desktop — otherwise the transparent-at-top
+     navbar has nothing colorful behind it on mobile and just reads as a
+     flat white bar instead of matching the "see-through" desktop look. */
+  margin-top: calc(-1 * var(--header-height));
+  padding-top: var(--header-height);
+}
+
+/* Ambient hero glow — pink + coral wash on the right (Figma / ref).
+   Soft disks with heavy blur; GSAP drifts them gently inside the hero. */
+.metric-hero__blobs {
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+
+.metric-hero-blob {
+  position: absolute;
+  width: min(100vw, 820px);
+  height: min(100vw, 820px);
+  border-radius: 50%;
+  will-change: transform;
+  pointer-events: none;
+  user-select: none;
+  transform: translateZ(0);
+  contain: layout paint;
+}
+
+@media (min-width: 1024px) {
+  .metric-hero-blob {
+    width: 980px;
+    height: 980px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .metric-hero-blob {
+    width: min(52vw, 1500px);
+    height: min(52vw, 1500px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-hero-blob {
+    width: min(46vw, 1900px);
+    height: min(46vw, 1900px);
+  }
+}
+
+/* Coral / peach — upper-right wash */
+.metric-hero-blob--a {
+  left: 52%;
+  top: -28%;
+  background: radial-gradient(
+    circle at 40% 45%,
+    rgba(255, 154, 120, 0.95) 0%,
+    rgba(255, 120, 140, 0.55) 42%,
+    rgba(255, 120, 140, 0) 72%
+  );
+  filter: blur(100px);
+  opacity: 0.7;
+}
+
+/* Hot pink — lower-right core */
+.metric-hero-blob--b {
+  left: 48%;
+  top: 28%;
+  background: radial-gradient(
+    circle at 45% 40%,
+    rgba(255, 60, 130, 1) 0%,
+    rgba(255, 60, 130, 0.65) 38%,
+    rgba(255, 60, 130, 0) 70%
+  );
+  filter: blur(90px);
+  opacity: 0.78;
+}
+
+/* Soft pink bridge — mid-right, ties coral + accent */
+.metric-hero-blob--c {
+  left: 62%;
+  top: 8%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 110, 160, 0.85) 0%,
+    rgba(255, 90, 150, 0.4) 45%,
+    rgba(255, 90, 150, 0) 72%
+  );
+  filter: blur(120px);
+  opacity: 0.55;
+}
+
+@media (min-width: 1024px) {
+  .metric-hero-blob--a {
+    left: 54%;
+    top: -36%;
+    filter: blur(150px);
+  }
+
+  .metric-hero-blob--b {
+    left: 50%;
+    top: 22%;
+    filter: blur(130px);
+  }
+
+  .metric-hero-blob--c {
+    left: 68%;
+    top: -4%;
+    filter: blur(170px);
+  }
+}
+
+.metric-hero .metric-cta {
+  --cta-shadow: none;
+}
+
+.metric-hero__shell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+}
+
+.metric-hero__main {
+  display: grid;
+  gap: 36px;
+  align-items: center;
+}
+
+.metric-hero__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  min-width: 0;
+}
+
+.metric-hero__title {
+  margin: 0;
+  font-size: clamp(40px, 6.2vw, 90px);
+  color: var(--foreground);
+}
+
+.metric-hero__subtitle {
+  margin: 0;
+  max-width: 70%;
+  font-size: clamp(18px, 1.7vw, 24px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-hero__visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: visible;
+}
+
+/* Figma 2029:7 / 2030:10 — cards are a flattened export; plaques stay HTML. */
+.metric-hero__cluster {
+  position: relative;
+  flex: 0 0 auto;
+  align-self: center;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 660 / 478;
+  container-type: inline-size;
+  --hero-tilt-tag: -8.04deg;
+  /* Figma 2029:7 — 10px / 4px at 660-wide cluster */
+  --hero-r-plaque: 1.515cqw;
+  --hero-r-tag: 0.606cqw;
+}
+
+.metric-hero,
+.metric-hero__shell,
+.metric-hero__main,
+.metric-hero__cluster {
+  overflow: visible;
+}
+
+/* Large screens: keep plaques/shadows inside the page shell. */
+@media (min-width: 1800px) {
+  .metric-hero__shell,
+  .metric-hero__main {
+    overflow-x: clip;
+  }
+
+  .metric-hero__visual {
+    overflow: hidden;
+  }
+}
+
+.metric-hero__cluster,
+.metric-hero__cluster :not(.metric-hero__cluster-shot) {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.metric-hero__cluster-shot {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 14px rgba(131, 4, 108, 0.14));
+}
+
+.metric-hero__cluster-shot img {
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.metric-hero__badge {
+  position: absolute;
+  left: 0;
+  top: 62.955%;
+  z-index: 4;
+  width: 18.182%;
+  height: 24.686%;
+}
+
+.metric-hero__plaque {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--hero-r-plaque);
+  box-shadow: none !important;
+}
+
+.metric-hero__redesign-tag-glass .metric-hero__plaque {
+  border-radius: var(--hero-r-tag);
+}
+
+.metric-hero__badge-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 2.12cqw;
+}
+
+.metric-hero__badge-value {
+  margin: 0;
+  font-size: 6.06cqw;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.06em;
+  color: var(--foreground);
+}
+
+.metric-hero__badge-label {
+  margin: 0;
+  max-width: 13.5cqw;
+  font-size: 2.42cqw;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-hero__redesign-tag {
+  position: absolute;
+  left: 79.098%;
+  top: 54.669%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20.901%;
+  height: 9.5%;
+  font-size: 1.99cqw;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  white-space: nowrap;
+  transform: rotate(var(--hero-tilt-tag));
+}
+
+.metric-hero__redesign-tag-glass {
+  position: absolute;
+  inset: 12% 0;
+  z-index: 0;
+  transform: skewX(var(--cta-skew));
+  pointer-events: none;
+}
+
+.metric-hero__redesign-tag > span {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+.metric-hero__redesign-card {
+  position: absolute;
+  left: 79.665%;
+  top: 62.623%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6cqw;
+  width: 19.545%;
+  height: 30.98%;
+  padding: 2.12cqw 2.12cqw 1.67cqw;
+  border-radius: var(--hero-r-plaque);
+  background: var(--accent);
+  color: #fff;
+}
+
+.metric-hero__redesign-value {
+  margin: 0;
+  font-size: 6.06cqw;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.06em;
+}
+
+.metric-hero__redesign-delta {
+  margin: 0;
+  font-size: 2.38cqw;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.06em;
+}
+
+.metric-hero__redesign-caption {
+  margin: 1.21cqw 0 0;
+  max-width: 13.5cqw;
+  font-size: 2.42cqw;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.metric-hero__trust {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric-hero__trust-card {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 32px;
+  box-shadow: none !important;
+}
+
+.metric-hero__trust-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 28px;
+}
+
+.metric-hero__trust-kicker,
+.metric-hero__trust-copy {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-hero__trust-copy--bottom {
+  max-width: min(100%, 180px);
+}
+
+.metric-hero__trust-value {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: var(--font-display-stack);
+  font-weight: 600;
+  font-size: clamp(48px, 5vw, 80px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+
+.metric-hero__trust-star {
+  margin-top: 8px;
+  width: 41px;
+  height: 39px;
+}
+
+.metric-hero__trust-spn {
+  margin-block: 18px auto;
+}
+
+.metric-hero__trust-icon {
+  margin-bottom: auto;
+}
+
+@media (max-width: 1023px) {
+  /* Figma iPhone 16 (2015:564): visual at y=106.62, copy at 448, trust at 748. */
+  .metric-hero__shell {
+    gap: 59px;
+    padding-top: 19px;
+  }
+
+  .metric-hero__main {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+  }
+
+  .metric-hero__visual,
+  .metric-hero__copy {
+    width: calc(100% + 2 * var(--page-padding));
+    margin-inline: calc(-1 * var(--page-padding));
+    padding-inline: 16px;
+  }
+
+  .metric-hero__visual {
+    order: -1;
+    justify-content: stretch;
+    align-items: stretch;
+  }
+
+  .metric-hero__cluster {
+    width: 100%;
+    max-width: none;
+  }
+
+  .metric-hero__copy {
+    max-width: none;
+    gap: 24px;
+  }
+
+  .metric-hero__title {
+    font-size: 40px;
+  }
+
+  .metric-hero__subtitle {
+    max-width: none;
+    font-size: 16px;
+  }
+
+  .metric-hero .metric-cta--lg {
+    min-height: 48px;
+    --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 48px);
+    width: fit-content;
+    --cta-pad-x: 24px;
+    font-size: 18px;
+  }
+
+  .metric-hero__trust-card {
+    min-height: 168px;
+    border-radius: 24px;
+  }
+
+  .metric-hero__trust-inner {
+    padding: 16px;
+  }
+
+  .metric-hero__trust-card:first-child,
+  .metric-hero__trust-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .metric-hero__trust-kicker,
+  .metric-hero__trust-copy {
+    font-size: 14px;
+  }
+
+  .metric-hero__trust-value {
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Figma 2032:19 — one viewport column: copy|visual, then trust.
+     Trust cards ~264px in Figma; size with svh so main+trust+bottom pad
+     still fit inside 100svh. */
+  .metric-hero {
+    height: 100svh;
+    max-height: 100svh;
+    min-height: 100svh;
+    padding-bottom: clamp(24px, 3.2vh, 40px);
+  }
+
+  .metric-hero__shell {
+    min-height: 0;
+    padding-top: 0;
+    gap: clamp(12px, 1.6vh, 28px);
+  }
+
+  .metric-hero__main {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(16px, 2.4vw, 40px);
+    align-items: center;
+    padding-top: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .metric-hero__copy {
+    container-type: inline-size;
+    max-width: none;
+  }
+
+  .metric-hero__title {
+    font-size: min(13cqw, 9svh);
+  }
+
+  .metric-hero__subtitle {
+    max-width: 70%;
+    font-size: min(3.45cqw, 2.2svh);
+  }
+
+  .metric-hero__visual {
+    container-type: size;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    min-height: 0;
+  }
+
+  .metric-hero__cluster {
+    flex: 0 0 auto;
+    align-self: center;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    padding-bottom: 0;
+  }
+
+  @supports (width: 1cqh) {
+    .metric-hero__cluster {
+      width: min(100%, calc(100cqh * 660 / 478));
+    }
+  }
+
+  .metric-hero__trust {
+    grid-template-columns: 1.55fr 1fr 1fr 1fr;
+    gap: clamp(12px, 1.3vw, 20px);
+    flex-shrink: 0;
+  }
+
+  .metric-hero__trust-card {
+    /* Figma trust row ≈ 264px; svh cap keeps the block inside 100svh. */
+    min-height: clamp(168px, 24svh, 264px);
+  }
+
+  .metric-hero__trust-inner {
+    padding: clamp(18px, 2.2svh, 28px);
+  }
+
+  .metric-hero__trust-value {
+    font-size: clamp(48px, 5cqw, 80px);
+  }
+}
+
+@media (min-width: 1800px) {
+  .metric-hero__title {
+    font-size: min(13cqw, max(9svh, 4.8vw));
+  }
+
+  .metric-hero__subtitle {
+    max-width: min(78%, 42rem);
+    font-size: min(3.45cqw, max(2.2svh, 1.25vw));
+  }
+
+  .metric-hero__trust-card {
+    min-height: clamp(200px, 22svh, 280px);
+    border-radius: var(--radius-2xl);
+  }
+
+  .metric-hero__trust-inner {
+    padding: clamp(24px, 2.2svh, 40px);
+  }
+
+  .metric-hero__trust-kicker,
+  .metric-hero__trust-copy {
+    font-size: var(--text-body);
+  }
+
+  .metric-hero__trust-copy--bottom {
+    max-width: min(100%, 70%);
+  }
+
+  .metric-hero__trust-value {
+    font-size: clamp(64px, 4.2cqw, 104px);
+  }
+
+  .metric-hero__trust-star {
+    width: clamp(41px, 2.4cqw, 56px);
+    height: clamp(39px, 2.3cqw, 54px);
+  }
+
+  .metric-hero__trust-spn img {
+    height: clamp(48px, 3.2cqw, 64px);
+    width: auto;
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-hero__title {
+    font-size: min(12cqw, max(10svh, 4.2vw));
+  }
+
+  .metric-hero__subtitle {
+    font-size: min(3.2cqw, max(2.4svh, 1.15vw));
+  }
+
+  .metric-hero__trust-card {
+    min-height: clamp(220px, 20svh, 300px);
+  }
+
+  .metric-hero__trust-inner {
+    padding: clamp(28px, 2svh, 48px);
+  }
+
+  .metric-hero__trust-value {
+    font-size: clamp(80px, 3.8cqw, 128px);
+  }
+}

@@ -1,0 +1,77 @@
+/* Base document styles, theme bridge, and shared utilities */
+
+:root {
+  --background: #ffffff;
+  --foreground: #090909;
+  --accent: #ff3c82;
+  --surface: #f5f5f5;
+  --muted: rgba(9, 9, 9, 0.6);
+  --dark: #090909;
+  --font-display-stack: var(--font-degular-display), var(--font-degular), system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-dark: var(--dark);
+  --font-sans: var(--font-degular);
+  --font-display: var(--font-degular-display);
+  --breakpoint-sm: 390px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1512px;
+  --breakpoint-2xl: 1800px;
+  --breakpoint-4k: 2560px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-degular), system-ui, sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+}
+
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:where(a, button, input, textarea, select):focus:not(:focus-visible) {
+  outline: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-container {
+  margin-inline: auto;
+  max-width: var(--container-max);
+  padding-inline: var(--page-padding);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.font-display {
+  font-family: var(--font-display-stack);
+  font-weight: 600;
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+}

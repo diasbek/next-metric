@@ -44,7 +44,6 @@
     "react-leaflet": "^5.0.0",
     "react-toastify": "^11.1.0",
     "resend": "^6.20.0",
-    "simple-liquid-glass": "^4.1.0",
     "swiper": "^14.1.0",
     "yup": "^1.7.1"
   },

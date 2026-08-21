@@ -1,0 +1,212 @@
+/* Shared Metric case card (home + works) */
+
+.metric-case-card {
+  /* Container-query ready: this card's internal breakpoints are viewport-
+     based today (safe, since it's always full-width in a 1-column stack),
+     but containment lets it adapt correctly if it's ever reused inside a
+     narrower parent without a global rewrite — see --breakpoint-2xl notes
+     in tokens.css for the same forward-looking approach at the page level. */
+  container-type: inline-size;
+  container-name: case-card;
+  position: relative;
+  display: grid;
+  grid-template-areas:
+    "media"
+    "body";
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+}
+
+.metric-case-card__cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.metric-case-card__tags,
+.metric-case-card__cta {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hug label — Figma case-card CTA is ~260px, not full body column. */
+.metric-case-card__cta.metric-cta {
+  width: fit-content;
+  min-width: 0;
+  align-self: flex-start;
+  --cta-pad-x: 28px;
+}
+
+@media (min-width: 1024px) {
+  .metric-case-card {
+    grid-template-columns: 1fr 1.05fr;
+    grid-template-areas: "body media";
+    /* Stretch so body fills the card height — center was leaving gray
+       bands above tags and below the CTA when media is taller. */
+    align-items: stretch;
+    border-radius: var(--radius-2xl);
+  }
+}
+
+.metric-case-card__body {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+}
+
+@media (min-width: 768px) {
+  .metric-case-card__body {
+    gap: 28px;
+    padding: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .metric-case-card__body {
+    /* Figma: 50px inset; space-between pins tags top / CTA bottom. */
+    gap: 24px;
+    padding: 50px;
+    min-height: 0;
+  }
+}
+
+.metric-case-card__media {
+  grid-area: media;
+  position: relative;
+  display: block;
+  /* Explicit width (not just min-width: 0) — a grid item with aspect-ratio
+     + min-height and width:auto uses the ratio-transferred size as its
+     preferred width and skips stretch, blowing out past the 1-column
+     track on narrow phones. calc() subtracts the inline margins below so
+     the border-box still lines up with them instead of double-counting. */
+  width: calc(100% - 32px);
+  min-width: 0;
+  margin: 16px 16px 0;
+  /* case-*.jpg are 3000×2347. Keep this ratio at every breakpoint so
+     object-cover fills the box without cropping or letterbox bars. */
+  aspect-ratio: 3000 / 2347;
+  height: auto;
+  overflow: hidden;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.metric-case-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (min-width: 768px) {
+  .metric-case-card__media {
+    width: calc(100% - 40px);
+    margin: 20px 20px 0;
+    border-radius: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .metric-case-card__media {
+    width: calc(100% - 50px);
+    margin: 50px 50px 50px 0;
+    align-self: center;
+    border-radius: 30px;
+  }
+}
+
+.metric-case-card__quote {
+  font-size: clamp(24px, 6vw, 60px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-case-card__author {
+  margin-top: 16px;
+  font-size: clamp(18px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-case-card__role {
+  margin-top: 8px;
+  font-size: clamp(14px, 1.8vw, 24px);
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+@media (min-width: 1024px) {
+  .metric-case-card__author {
+    margin-top: 32px;
+  }
+
+  .metric-case-card__role {
+    margin-top: 20px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .metric-case-card__body {
+    gap: clamp(24px, 1.6vw, 40px);
+    padding: 50px;
+  }
+
+  .metric-case-card__quote {
+    font-size: clamp(60px, 3.2vw, 84px);
+  }
+
+  .metric-case-card__author {
+    font-size: clamp(32px, 1.7vw, 40px);
+  }
+
+  .metric-case-card__role {
+    font-size: clamp(24px, 1.25vw, 28px);
+  }
+
+  .metric-case-card__tags .metric-pill {
+    padding: clamp(16px, 0.9vw, 22px) clamp(20px, 1.2vw, 28px);
+    font-size: clamp(20px, 1.1vw, 24px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-case-card__quote {
+    font-size: clamp(84px, 2.8vw, 104px);
+  }
+
+  .metric-case-card__author {
+    font-size: clamp(40px, 1.4vw, 48px);
+  }
+
+  .metric-case-card__role {
+    font-size: clamp(28px, 1.05vw, 32px);
+  }
+}
+
+.metric-case-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.metric-case-card__tags .metric-pill {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .metric-case-card__tags .metric-pill {
+    padding: 16px 20px;
+    font-size: 20px;
+  }
+}

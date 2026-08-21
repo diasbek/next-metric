@@ -1,0 +1,93 @@
+/* GSAP reveal gates, boot, and reduced-motion helpers */
+
+/* Motion helpers
+   Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
+   content after scroll reveals complete — do not use that pattern.
+   html.gsap-pending is set on the SSR <html> so the first paint never
+   shows reveals/hero details only to yank them on hydrate. */
+html.gsap-pending:not(.gsap-force-show) [data-reveal]:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show) [data-reveal-group] > *:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show) [data-case-steps] > *:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show) .metric-hero__subtitle,
+html.gsap-pending:not(.gsap-force-show) .metric-hero__copy .metric-cta,
+html.gsap-pending:not(.gsap-force-show) .metric-hero__trust > * {
+  visibility: hidden;
+}
+
+/* Chunk/network failure path — show content without waiting on GSAP import. */
+html.gsap-force-show [data-reveal],
+html.gsap-force-show [data-reveal-group] > *,
+html.gsap-force-show [data-case-steps] > *,
+html.gsap-force-show [data-split-title],
+html.gsap-force-show [data-border-draw],
+html.gsap-force-show [data-counter],
+html.gsap-force-show .metric-hero__copy,
+html.gsap-force-show .metric-hero__visual,
+html.gsap-force-show .metric-hero__trust,
+html.gsap-force-show .metric-hero__subtitle,
+html.gsap-force-show .metric-hero__copy .metric-cta,
+html.gsap-force-show .metric-hero__trust > * {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: none !important;
+}
+
+[data-reveal].is-revealed,
+[data-reveal-group] > *.is-revealed,
+[data-case-steps] > *.is-revealed,
+.metric-hero__copy.is-revealed,
+.metric-hero__visual.is-revealed,
+.metric-hero__trust.is-revealed {
+  visibility: visible !important;
+  clip-path: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .metric-case-card,
+  .metric-workflow-card,
+  .metric-services-card,
+  .metric-categories__card,
+  .metric-work-card,
+  .metric-hero__trust > * {
+    transition: transform 0.32s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .metric-case-card:hover,
+  .metric-workflow-card:hover,
+  .metric-services-card:hover,
+  .metric-categories__card:hover,
+  .metric-work-card:hover,
+  .metric-hero__trust > *:hover {
+    transform: translateY(-8px) scale(1.012);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal-group] > *,
+  [data-split-title],
+  [data-border-draw],
+  [data-counter],
+  .metric-hero__copy,
+  .metric-hero__visual,
+  .metric-hero__trust,
+  .metric-hero__subtitle,
+  .metric-hero__copy .metric-cta,
+  .metric-hero__trust > * {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+
+  .metric-cta:hover,
+  .metric-case-card:hover,
+  .metric-workflow-card:hover,
+  .metric-services-card:hover,
+  .metric-categories__card:hover,
+  .metric-work-card:hover,
+  .metric-hero__trust > *:hover {
+    transform: none;
+  }
+}

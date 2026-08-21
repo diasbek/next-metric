@@ -1,0 +1,84 @@
+/* CSS-only liquid glass — no JS library, no mount fallbacks.
+   Uses backdrop-filter where supported; warm frosted fill otherwise. */
+
+.liquid-glass-plaque {
+  --liquid-glass-bg: linear-gradient(
+    145deg,
+    rgba(243, 221, 232, 0.62),
+    rgba(255, 255, 255, 0.78)
+  );
+  --liquid-glass-rim: rgba(255, 255, 255, 0.72);
+  --liquid-glass-edge: rgba(255, 255, 255, 0.42);
+  --liquid-glass-blur: 14px;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  box-shadow: none;
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-edge);
+  -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(165%);
+  backdrop-filter: blur(var(--liquid-glass-blur)) saturate(165%);
+}
+
+/* Soft specular highlight + rim light (replaces SVG/WebGL glass border). */
+.liquid-glass-plaque::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.18) 28%,
+      transparent 52%
+    ),
+    linear-gradient(
+      335deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      transparent 45%
+    );
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-rim),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.liquid-glass-plaque__content {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* No backdrop-filter: keep the same warm fill — never a gray hole. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass-plaque {
+    background: linear-gradient(
+      145deg,
+      rgba(248, 230, 239, 0.92),
+      rgba(255, 255, 255, 0.95)
+    );
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass-plaque {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: linear-gradient(
+      145deg,
+      rgba(248, 230, 239, 0.94),
+      rgba(255, 255, 255, 0.97)
+    );
+  }
+
+  .liquid-glass-plaque::before {
+    opacity: 0.55;
+  }
+}

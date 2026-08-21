@@ -1,0 +1,254 @@
+/* Home workflow section */
+
+/* Workflow — Figma node 2015:833 */
+.metric-workflow__header {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .metric-workflow__header {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 28rem);
+    column-gap: clamp(40px, 3vw, 72px);
+    align-items: end;
+  }
+
+  .metric-workflow__subtitle {
+    justify-self: end;
+    text-align: left;
+  }
+}
+
+.metric-workflow__title {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: clamp(42px, 8vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+@media (min-width: 1800px) {
+  .metric-workflow__title {
+    font-size: var(--text-display-xl);
+  }
+}
+
+.metric-workflow__title-line {
+  display: block;
+}
+
+.metric-workflow__title-line--brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.2vw, 18px);
+}
+
+.metric-workflow__mark {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(36px, 6.5vw, 96px);
+  height: auto;
+}
+
+@media (min-width: 1800px) {
+  .metric-workflow__mark {
+    width: clamp(96px, 5vw, 140px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-workflow__mark {
+    width: clamp(128px, 4.2vw, 168px);
+  }
+}
+
+.metric-workflow__subtitle {
+  max-width: min(100%, 28rem);
+  font-size: clamp(16px, 1.6vw, 24px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-workflow__grid {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+/* Intermediate 2-column tablet step (iPad portrait/landscape sits right at
+   this range) instead of jumping straight from a 1-column mobile stack to
+   the 3-column desktop grid at 1024px. The 3rd card spans both columns so
+   it doesn't sit alone in a half-empty row. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .metric-workflow__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .metric-workflow-card:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .metric-workflow__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+.metric-workflow-card {
+  /* Container-query ready — see .metric-case-card comment. */
+  container-type: inline-size;
+  container-name: workflow-card;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: clamp(420px, 52vw, 548px);
+  padding: 20px 20px 30px;
+  border-radius: 20px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+@media (min-width: 1800px) {
+  .metric-workflow-card {
+    min-height: clamp(548px, 32vw, 720px);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-workflow-card {
+    min-height: clamp(680px, 28vw, 880px);
+  }
+}
+
+.metric-workflow-card--media-bottom {
+  justify-content: flex-start;
+  gap: 30px;
+  padding-top: 30px;
+}
+
+/* Desktop keeps the alternating layout (copy on top, illustration at the
+   bottom). On anything narrower, reverse so the middle card matches the
+   other two: illustration first, then the title/body. */
+@media (max-width: 1023px) {
+  .metric-workflow-card--media-bottom {
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    gap: 24px;
+    padding-top: 20px;
+  }
+
+  .metric-workflow-card--media-bottom .metric-workflow-card__media {
+    margin-top: 0;
+  }
+
+  .metric-workflow-card--media-bottom .metric-workflow-card__copy {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .metric-workflow-card--offset {
+    margin-top: clamp(48px, 4vw, 80px);
+  }
+}
+
+@media (min-width: 1800px) {
+  .metric-workflow-card--offset {
+    margin-top: clamp(64px, 4vw, 112px);
+  }
+
+  .metric-workflow__subtitle {
+    max-width: min(100%, 36rem);
+    font-size: var(--text-body-lg);
+  }
+
+  .metric-workflow-card__title {
+    font-size: clamp(40px, 2.2vw, 56px);
+  }
+
+  .metric-workflow-card__body {
+    font-size: clamp(20px, 1.15vw, 26px);
+  }
+
+  .metric-workflow__note {
+    max-width: min(100%, 36rem);
+    font-size: var(--text-body-lg);
+  }
+}
+
+@media (min-width: 2560px) {
+  .metric-workflow-card__title {
+    font-size: clamp(52px, 1.9vw, 64px);
+  }
+
+  .metric-workflow-card__body {
+    font-size: clamp(24px, 1vw, 30px);
+  }
+}
+
+.metric-workflow-card__media {
+  width: 100%;
+}
+
+.metric-workflow-card--media-bottom .metric-workflow-card__media {
+  margin-top: auto;
+}
+
+.metric-workflow-card__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+}
+
+.metric-workflow-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 10px;
+}
+
+.metric-workflow-card--media-bottom .metric-workflow-card__copy {
+  gap: 30px;
+  padding: 0 10px;
+}
+
+.metric-workflow-card__title {
+  font-size: clamp(28px, 2.8vw, 40px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-workflow-card__body {
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.metric-workflow__cta {
+  margin-top: clamp(48px, 6vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  text-align: center;
+}
+
+.metric-workflow__note {
+  max-width: min(100%, 28rem);
+  font-size: clamp(18px, 1.6vw, 24px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}

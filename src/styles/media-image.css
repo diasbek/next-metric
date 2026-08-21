@@ -1,0 +1,63 @@
+/* Media image frames and decode skeletons */
+
+/* Photo frames: skeleton sits on top until decode, then fades out.
+   Image itself stays opacity:1 so cached / already-painted shots don't blink. */
+.media-image {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.media-image--fill {
+  position: absolute;
+  inset: 0;
+  width: auto;
+}
+
+.media-image__skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--surface);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+}
+
+.media-image__skeleton[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.28s ease, visibility 0s linear 0s;
+}
+
+.media-image__skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 46%,
+    transparent 72%
+  );
+  transform: translateX(-100%);
+  animation: media-image-shimmer 1.15s ease-in-out infinite;
+}
+
+@keyframes media-image-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-image__skeleton {
+    transition: none;
+  }
+
+  .media-image__skeleton::after {
+    animation: none;
+  }
+}

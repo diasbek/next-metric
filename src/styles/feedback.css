@@ -1,0 +1,76 @@
+/* Route loading and public error pages */
+
+.site-route-loading {
+  min-height: 50dvh;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+}
+
+.site-route-loading__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-route-loading__logo {
+  display: block;
+  width: min(160px, 42vw);
+  height: auto;
+}
+
+.site-route-loading__spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(9, 9, 9, 0.12);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: site-boot-spin 0.7s linear infinite;
+}
+
+@keyframes site-boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.metric-error-page {
+  min-height: 60dvh;
+  display: grid;
+  place-items: center;
+  padding: 64px 0;
+}
+
+.metric-error-page__inner {
+  text-align: center;
+  max-width: 420px;
+}
+
+.metric-error-page__brand {
+  margin: 0 0 8px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.metric-error-page__title {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 4vw, 40px);
+  color: var(--foreground);
+}
+
+.metric-error-page__body {
+  margin: 0 0 28px;
+  font-size: var(--text-small);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.metric-error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}

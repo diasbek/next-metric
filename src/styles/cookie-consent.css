@@ -1,0 +1,139 @@
+/* Cookie consent banner */
+
+/* Cookie consent banner (GDPR) — fixed bottom bar, appears until a choice
+   is made; reopenable via "Manage cookies" on the privacy page. */
+.cookie-consent {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 200;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cookie-consent__inner {
+  pointer-events: auto;
+  width: min(100%, 920px);
+  background: var(--dark);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(9, 9, 9, 0.35);
+  padding: clamp(18px, 2.5vw, 28px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cookie-consent__copy {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.cookie-consent__title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+.cookie-consent__body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+}
+
+.cookie-consent__link {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cookie-consent__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cookie-consent__btn {
+  height: 44px;
+  padding-inline: 20px;
+  border-radius: var(--cta-radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cookie-consent__btn:hover {
+  transform: translateY(-1px);
+}
+
+.cookie-consent__btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+
+.cookie-consent__btn--ghost {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+.cookie-consent__close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.cookie-consent__close:hover {
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .cookie-consent {
+    padding: 10px;
+  }
+
+  .cookie-consent__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .cookie-consent__copy {
+    /* Reset the row-layout flex-basis (320px) — in a column flex container
+       that basis applies to height, not width, which was blowing up the
+       banner with a large empty gap below the text on mobile. */
+    flex: 1 1 auto;
+  }
+
+  .cookie-consent__title {
+    margin: 0 0 4px;
+  }
+
+  .cookie-consent__actions {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .cookie-consent__btn {
+    flex: 1 1 auto;
+    height: 40px;
+    padding-inline: 14px;
+  }
+}

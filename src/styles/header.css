@@ -1,0 +1,336 @@
+/* Site header, nav, language switcher, mobile menu */
+
+.site-header {
+  height: var(--header-height);
+}
+
+.site-header--hero {
+  background: transparent;
+  transition:
+    background-color 0.28s ease,
+    box-shadow 0.28s ease,
+    backdrop-filter 0.28s ease,
+    -webkit-backdrop-filter 0.28s ease;
+}
+
+/* Sticky hero nav must leave the transparent state once content scrolls under it —
+   otherwise dark links/CTA blend into pink / accent sections. */
+.site-header--hero.is-scrolled {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 1px 0 rgba(9, 9, 9, 0.06);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  gap: clamp(24px, 2vw, 48px);
+}
+
+.site-header__logo-link {
+  position: relative;
+  display: block;
+  width: var(--header-logo-width);
+  height: var(--header-logo-height);
+  flex-shrink: 0;
+}
+
+.site-header__nav {
+  display: none;
+  align-items: center;
+  gap: clamp(30px, 2vw, 48px);
+}
+
+.site-header__menu-btn,
+.mobile-menu-panel__close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(9, 9, 9, 0.15);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.site-header__menu-icon,
+.mobile-menu-panel__close-icon {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 14px;
+}
+
+.site-header__menu-icon span,
+.mobile-menu-panel__close-icon span {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--foreground);
+  border-radius: 1px;
+}
+
+.site-header__menu-icon span:first-child {
+  top: 3px;
+}
+
+.site-header__menu-icon span:last-child {
+  bottom: 3px;
+}
+
+.mobile-menu-panel__close-icon span:first-child {
+  top: 6px;
+  transform: rotate(45deg);
+}
+
+.mobile-menu-panel__close-icon span:last-child {
+  bottom: 6px;
+  transform: rotate(-45deg);
+}
+
+/* Keep header CTA off the closed mobile bar — `.metric-cta` otherwise
+   overrides Tailwind `hidden` via display:inline-flex. */
+.site-header__cta {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .site-header__nav {
+    display: flex;
+  }
+
+  .site-header__menu-btn {
+    display: none !important;
+  }
+
+  .site-header__cta {
+    display: inline-flex;
+  }
+}
+
+.site-header__nav a {
+  font-size: var(--text-nav);
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.site-header__nav a:hover {
+  color: var(--accent);
+}
+
+.site-nav--footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.site-nav--mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.site-nav__link {
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  transition: color 0.2s ease;
+}
+
+.site-nav__link:hover {
+  color: var(--accent);
+}
+
+.site-nav__link--header {
+  position: relative;
+  font-size: var(--text-nav);
+}
+
+.site-nav__link--header.site-nav__link--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(var(--nav-line, 1));
+  transform-origin: left center;
+}
+
+.site-nav__link--footer {
+  font-size: var(--text-small);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.site-nav__link--mobile {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.site-nav__link--mobile.site-nav__link--active {
+  color: var(--accent);
+}
+
+.language-switcher--inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.language-switcher__sep {
+  color: var(--muted);
+}
+
+.language-switcher__active {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.language-switcher__link {
+  color: var(--muted);
+}
+
+.language-switcher__link:hover {
+  color: var(--accent);
+}
+
+.language-switcher--dropdown {
+  position: relative;
+}
+
+.language-switcher__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(9, 9, 9, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--foreground);
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.language-switcher__trigger:hover {
+  border-color: rgba(9, 9, 9, 0.22);
+}
+
+.language-switcher__chevron {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.language-switcher__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  min-width: 120px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border: 1px solid rgba(9, 9, 9, 0.08);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(9, 9, 9, 0.1);
+}
+
+.language-switcher__menu[hidden] {
+  display: none;
+}
+
+.language-switcher__option-link,
+.language-switcher__option-active {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+
+.language-switcher__option-active {
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.language-switcher__option-link:hover {
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.mobile-menu-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    visibility 0.22s ease;
+}
+
+.mobile-menu-panel[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobile-menu-panel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  gap: 24px;
+}
+
+.mobile-menu-panel__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  padding-top: 8px;
+  padding-bottom: var(--page-padding);
+}
+
+.mobile-menu-panel .site-nav--mobile {
+  gap: 4px;
+}
+
+.mobile-menu-panel .site-nav__link--mobile {
+  display: block;
+  padding-block: 8px;
+}
+
+.mobile-menu-panel__cta {
+  width: auto;
+  margin-top: auto;
+}
+
+html.is-mobile-menu-open {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-panel {
+    transition: none;
+  }
+}

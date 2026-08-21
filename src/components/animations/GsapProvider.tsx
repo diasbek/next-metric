@@ -9,8 +9,6 @@ interface GsapProviderProps {
 }
 
 const HARD_READY_MS = 3000;
-/** Only show spinner on truly slow boots — avoid overlay flash on normal loads. */
-const SLOW_SPINNER_MS = 1200;
 
 async function waitForPaint(): Promise<void> {
   await new Promise<void>((resolve) => {
@@ -75,8 +73,10 @@ export function GsapProvider({ children }: GsapProviderProps) {
     const html = document.documentElement;
     // Layout already paints with gsap-pending; keep it through Strict Mode
     // remounts so content never flashes visible → hidden → visible.
+    // No delayed boot spinner: hero LCP is intentional during pending, and a
+    // late overlay on top of it feels like a second loading pass.
     if (reduced) {
-      html.classList.remove("gsap-pending", "gsap-slow", "gsap-force-show");
+      html.classList.remove("gsap-pending", "gsap-force-show");
     } else {
       html.classList.add("gsap-pending");
       html.classList.remove("gsap-ready", "gsap-force-show");
@@ -85,7 +85,6 @@ export function GsapProvider({ children }: GsapProviderProps) {
     let cleanup: (() => void) | undefined;
     let cancelled = false;
     let hardReadyTimer: ReturnType<typeof setTimeout> | undefined;
-    let slowSpinnerTimer: ReturnType<typeof setTimeout> | undefined;
     let ready = false;
 
     const clearTimers = () => {
@@ -93,17 +92,13 @@ export function GsapProvider({ children }: GsapProviderProps) {
         clearTimeout(hardReadyTimer);
         hardReadyTimer = undefined;
       }
-      if (slowSpinnerTimer) {
-        clearTimeout(slowSpinnerTimer);
-        slowSpinnerTimer = undefined;
-      }
     };
 
     const markReady = (opts: { forceShow?: boolean } = {}) => {
       if (ready || cancelled) return;
       ready = true;
       clearTimers();
-      html.classList.remove("gsap-pending", "gsap-slow");
+      html.classList.remove("gsap-pending");
       if (opts.forceShow) {
         html.classList.add("gsap-force-show");
       }
@@ -120,13 +115,6 @@ export function GsapProvider({ children }: GsapProviderProps) {
     };
 
     if (!reduced) {
-      slowSpinnerTimer = setTimeout(() => {
-        if (cancelled || ready) return;
-        if (html.classList.contains("gsap-pending")) {
-          html.classList.add("gsap-slow");
-        }
-      }, SLOW_SPINNER_MS);
-
       hardReadyTimer = setTimeout(forceReadyCssOnly, HARD_READY_MS);
     }
 
@@ -195,34 +183,12 @@ export function GsapProvider({ children }: GsapProviderProps) {
       cleanup?.();
       // Keep pending across Strict Mode remount / soft nav so SSR-visible
       // content never pops back before the next effect re-hides it.
-      html.classList.remove("gsap-ready", "gsap-slow", "gsap-force-show");
+      html.classList.remove("gsap-ready", "gsap-force-show");
       if (!prefersReducedMotion()) {
         html.classList.add("gsap-pending");
       }
     };
   }, [pathname]);
 
-  return (
-    <>
-      <div
-        className="site-boot-overlay"
-        aria-busy="true"
-        aria-live="polite"
-        aria-label="Loading"
-      >
-        <div className="site-boot-overlay__inner">
-          {/* eslint-disable-next-line @next/next/no-img-element -- boot shell before next/image */}
-          <img
-            className="site-boot-overlay__logo"
-            src="/images/metric/logo/metric-logo.svg"
-            alt=""
-            width={160}
-            height={36}
-          />
-          <span className="site-boot-overlay__spinner" aria-hidden="true" />
-        </div>
-      </div>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

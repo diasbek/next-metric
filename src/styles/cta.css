@@ -1,0 +1,251 @@
+/* Metric CTA buttons, pills, glass, and section gradients */
+
+/* —— Metric CTAs ——
+   Rounded parallelogram: skew shell + counter-skew label.
+   Prefer <Button variant size /> — CSS classes remain for GSAP / legacy.
+
+   Skew containment: --cta-skew-overhang is reserved on each side inside the
+   layout box (extra padding + matching ::before inset). Tips land on the
+   element edges, so left-flush and right-flush CTAs both stay in safe-area
+   without per-section margin hacks. */
+.metric-cta {
+  --cta-fill: transparent;
+  --cta-shadow: none;
+  --cta-pad-x: 48px;
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height));
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Figma CTAs are always hug-to-label (Rectangle 62 sized to copy),
+     never stretched to the parent column. Use .metric-cta--full only
+     when a form/layout explicitly needs a block button. */
+  width: fit-content;
+  max-width: 100%;
+  min-height: var(--cta-height);
+  padding: 0 calc(var(--cta-pad-x) + var(--cta-skew-overhang));
+  border: none;
+  border-radius: var(--cta-radius);
+  font-size: var(--text-body-lg);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  /* Fill/skew live on ::before so GSAP reveal/hover transforms
+     cannot flatten the parallelogram into a rectangle. */
+  background: transparent;
+  box-shadow: none;
+  transition: opacity 0.2s ease;
+}
+
+.metric-cta--full {
+  width: 100%;
+}
+
+.metric-cta::before {
+  content: "";
+  position: absolute;
+  /* Inset by overhang so after skewX the tips sit on the layout edges. */
+  inset: 0 var(--cta-skew-overhang);
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--cta-fill);
+  box-shadow: var(--cta-shadow);
+  transform: skewX(var(--cta-skew));
+  pointer-events: none;
+}
+
+.metric-cta:hover {
+  opacity: 0.92;
+}
+
+.metric-cta:disabled,
+.metric-cta.is-loading {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.metric-cta__label {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+/* Sizes — padding/font-size ramp fluidly from a 320px floor up to the
+   1512px design width instead of a fixed size, so a long label (e.g. the
+   hero CTA) can't force horizontal overflow on narrow phones. Past 1800
+   heights follow --cta-height-* tokens. */
+.metric-cta--sm {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-sm));
+  --cta-pad-x: clamp(16px, 16px + (100vw - 320px) * 0.01007, 28px);
+  min-height: var(--cta-height-sm);
+  font-size: clamp(16px, 16px + (100vw - 320px) * 0.00168, 18px);
+}
+
+.metric-cta--md {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height));
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02013, 48px);
+  min-height: var(--cta-height);
+  font-size: clamp(17px, 17px + (100vw - 320px) * 0.00252, 20px);
+}
+
+.metric-cta--lg {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-lg));
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02685, 56px);
+  min-height: var(--cta-height-lg);
+  font-size: clamp(18px, 18px + (100vw - 320px) * 0.00336, 22px);
+}
+
+@media (min-width: 1800px) {
+  .metric-cta--sm {
+    --cta-pad-x: clamp(28px, 1.6vw, 36px);
+    font-size: var(--text-nav);
+  }
+
+  .metric-cta--md {
+    --cta-pad-x: clamp(48px, 2.6vw, 64px);
+    font-size: var(--text-body);
+  }
+
+  .metric-cta--lg {
+    --cta-pad-x: clamp(56px, 3vw, 72px);
+    font-size: var(--text-body-lg);
+  }
+}
+
+/* Primary fill pink (hero / workflow). */
+.metric-cta--primary,
+.metric-cta--skew,
+.metric-cta--solid {
+  --cta-fill: var(--accent);
+  --cta-shadow: 0 10px 30px rgba(255, 60, 130, 0.22);
+  color: #fff;
+}
+
+/* White fill on accent surfaces (services). */
+.metric-cta--on-accent {
+  --cta-fill: #fff;
+  --cta-shadow: none;
+  color: var(--dark);
+}
+
+.metric-cta--on-accent:hover {
+  opacity: 1;
+  --cta-fill: color-mix(in srgb, #fff 92%, var(--dark));
+}
+
+/* Case-study / secondary — filled black parallelogram.
+   Figma View Case-Study: ~260×48 desktop / ~240×48 mobile — hug label. */
+.metric-cta--dark-fill,
+.metric-cta--skew-dark,
+.metric-cta--dark.metric-cta--skew {
+  --cta-fill: var(--dark);
+  --cta-shadow: none;
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
+  width: fit-content;
+  min-width: 0;
+  color: #fff;
+}
+
+.metric-cta--dark-fill:hover,
+.metric-cta--skew-dark:hover {
+  opacity: 0.92;
+}
+
+/* "More Projects" — outline dark parallelogram. Same hug model as dark-fill. */
+.metric-cta--outline-dark,
+.metric-cta--skew-outline {
+  --cta-fill: transparent;
+  --cta-shadow: inset 0 0 0 1.5px var(--dark);
+  --cta-pad-x: clamp(24px, 24px + (100vw - 320px) * 0.02349, 52px);
+  width: fit-content;
+  min-width: 0;
+  color: var(--dark);
+}
+
+.metric-cta--outline-dark:hover,
+.metric-cta--skew-outline:hover {
+  opacity: 1;
+  --cta-fill: color-mix(in srgb, var(--dark) 4%, transparent);
+}
+
+/* Navbar — outline pink parallelogram. */
+.metric-cta--outline {
+  --cta-fill: transparent;
+  --cta-shadow: inset 0 0 0 1.5px var(--accent);
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-sm));
+  --cta-pad-x: 28px;
+  min-height: var(--cta-height-sm);
+  color: var(--accent);
+  font-size: var(--text-nav);
+}
+
+.metric-cta--outline:hover {
+  opacity: 1;
+  --cta-fill: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+/* Size + outlineAccent: keep nav proportions when size=sm is set. */
+.metric-cta--outline.metric-cta--sm {
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * var(--cta-height-sm));
+  --cta-pad-x: 28px;
+  min-height: var(--cta-height-sm);
+  font-size: var(--text-nav);
+}
+
+.metric-cta--dark-fill.metric-cta--sm,
+.metric-cta--skew-dark.metric-cta--sm,
+.metric-cta--outline-dark.metric-cta--sm,
+.metric-cta--skew-outline.metric-cta--sm {
+  min-width: 0;
+  --cta-pad-x: 28px;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+a.metric-pill--link {
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+a.metric-pill--link:hover {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+a.metric-pill--link:active {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.metric-glass {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+}
+
+.metric-gradient-pink {
+  background:
+    radial-gradient(
+      80% 120% at 20% 120%,
+      rgba(255, 60, 130, 1) 0%,
+      rgba(132, 35, 70, 0.85) 40%,
+      rgba(9, 9, 9, 1) 100%
+    ),
+    #090909;
+}

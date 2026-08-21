@@ -1,0 +1,202 @@
+/* Project brief modal */
+
+/* Project brief modal — CTA “Start your project” */
+.project-brief {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+
+.project-brief__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(9, 9, 9, 0.52);
+}
+
+.project-brief__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 720px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-brief__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--dark);
+  box-shadow: 0 8px 24px rgba(9, 9, 9, 0.16);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.project-brief__close:hover {
+  background: color-mix(in srgb, #fff 92%, var(--dark));
+}
+
+.project-brief__panel {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: #fff;
+  border-radius: 28px;
+  padding: 28px 22px 32px;
+  box-shadow: 0 24px 80px rgba(9, 9, 9, 0.22);
+}
+
+@media (min-width: 768px) {
+  .project-brief {
+    align-items: center;
+    padding: 40px 24px;
+  }
+
+  .project-brief__panel {
+    padding: 40px 44px 44px;
+  }
+
+  .project-brief__close {
+    top: 18px;
+    right: 18px;
+  }
+}
+
+.project-brief__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 36px;
+  margin-bottom: 28px;
+}
+
+.project-brief__title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+
+.project-brief__subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.project-brief__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-brief__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.project-brief__label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.project-brief__num {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.project-brief__hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.project-brief__input--area {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.project-brief__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.project-brief__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.project-brief__option input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.project-brief__captcha {
+  min-height: 68px;
+}
+
+.project-brief__submit {
+  margin-top: 4px;
+}
+
+.project-brief__success {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0 8px;
+}
+
+.project-brief__success-title {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 44px);
+  letter-spacing: -0.03em;
+}
+
+.project-brief__success-body {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--muted);
+}
