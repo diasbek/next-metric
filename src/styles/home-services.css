@@ -366,13 +366,25 @@
 
   .metric-services-card__media {
     position: absolute;
-    left: 0;
+    left: auto;
     right: 0;
     top: 72px;
-    width: 100%;
+    width: 50%;
     aspect-ratio: auto;
     height: auto;
     pointer-events: none;
+  }
+
+  .metric-services-card__media .media-image {
+    left: auto;
+    right: 0;
+    width: 100%;
+  }
+
+  .metric-services-card__media .media-image img,
+  .metric-services-card__img {
+    object-position: right top;
+    transform-origin: right top;
   }
 }
 
