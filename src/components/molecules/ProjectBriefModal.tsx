@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useSyncExternalStore } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
 import type { PublicCaptchaConfig } from "@/lib/cms/settings";
@@ -27,6 +28,7 @@ export function ProjectBriefModal({
   brief: SiteContent["projectBrief"];
 }) {
   const titleId = useId();
+  const [submitted, setSubmitted] = useState(false);
   const mounted = useSyncExternalStore(
     subscribeNever,
     () => true,
@@ -34,7 +36,10 @@ export function ProjectBriefModal({
   );
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setSubmitted(false);
+      return;
+    }
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.classList.add("project-brief-open");
@@ -75,21 +80,54 @@ export function ProjectBriefModal({
           aria-label={brief.closeLabel}
           onClick={onClose}
         >
-          <span aria-hidden>×</span>
-        </button>
-        <div className="project-brief__panel">
-          <header className="project-brief__intro">
-            <h2 id={titleId} className="project-brief__title font-display">
-              {brief.title}
-            </h2>
-            <p className="project-brief__subtitle">{brief.subtitle}</p>
-          </header>
-          <ProjectBriefForm
-            locale={locale}
-            ui={ui}
-            captcha={captcha}
-            brief={brief}
+          <Image
+            src="/images/metric/case-detail/imgGroup1328.svg"
+            alt=""
+            width={64}
+            height={64}
+            unoptimized
           />
+        </button>
+        <div
+          className={
+            submitted
+              ? "project-brief__panel project-brief__panel--success"
+              : "project-brief__panel"
+          }
+        >
+          {submitted ? (
+            <div className="project-brief__success" role="status">
+              <h2 id={titleId} className="project-brief__success-title font-display">
+                {brief.successTitle}
+              </h2>
+              <div className="project-brief__success-mark" aria-hidden>
+                <Image
+                  src="/images/metric/icons/metric-m.svg"
+                  alt=""
+                  width={520}
+                  height={400}
+                  unoptimized
+                />
+              </div>
+              <p className="project-brief__success-body">{brief.successBody}</p>
+            </div>
+          ) : (
+            <>
+              <header className="project-brief__intro">
+                <h2 id={titleId} className="project-brief__title font-display">
+                  {brief.title}
+                </h2>
+                <p className="project-brief__subtitle">{brief.subtitle}</p>
+              </header>
+              <ProjectBriefForm
+                locale={locale}
+                ui={ui}
+                captcha={captcha}
+                brief={brief}
+                onSuccess={() => setSubmitted(true)}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>,

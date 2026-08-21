@@ -58,11 +58,13 @@ export function ProjectBriefForm({
   ui,
   captcha,
   brief,
+  onSuccess,
 }: {
   locale: Locale;
   ui: SiteContent["ui"];
   captcha: PublicCaptchaConfig;
   brief: SiteContent["projectBrief"];
+  onSuccess?: () => void;
 }) {
   const [values, setValues] = useState<Values>({
     name: "",
@@ -71,12 +73,11 @@ export function ProjectBriefForm({
     productUrl: "",
     about: "",
   });
-  const [services, setServices] = useState<ProjectBriefServiceId[]>([]);
+  const [service, setService] = useState<ProjectBriefServiceId | "">("");
   const [consent, setConsent] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const widgetHostRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -114,17 +115,9 @@ export function ProjectBriefForm({
     return () => window.clearInterval(timer);
   }, [captcha.provider, captcha.siteKey]);
 
-  const toggleService = (id: ProjectBriefServiceId) => {
-    setServices((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-    setSubmitted(false);
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    setSubmitted(false);
 
     const name = values.name.trim();
     const email = values.email.trim();
@@ -134,7 +127,7 @@ export function ProjectBriefForm({
       setError(brief.emailInvalid);
       return;
     }
-    if (!services.length) {
+    if (!service) {
       setError(brief.helpRequired);
       return;
     }
@@ -162,7 +155,7 @@ export function ProjectBriefForm({
           email,
           company: values.company.trim(),
           productUrl: values.productUrl.trim(),
-          services,
+          services: [service],
           message: about,
           locale,
           consent: true,
@@ -178,32 +171,21 @@ export function ProjectBriefForm({
         throw new Error(payload?.error || "Request failed");
       }
 
-      setSubmitted(true);
       setValues({ name: "", email: "", company: "", productUrl: "", about: "" });
-      setServices([]);
+      setService("");
       setConsent(false);
       setCaptchaToken("");
       if (widgetIdRef.current) {
         window.turnstile?.reset(widgetIdRef.current);
         window.hcaptcha?.reset(widgetIdRef.current);
       }
+      onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
     } finally {
       setLoading(false);
     }
   };
-
-  if (submitted) {
-    return (
-      <div className="project-brief__success" role="status">
-        <h3 className="project-brief__success-title font-display">
-          {brief.successTitle}
-        </h3>
-        <p className="project-brief__success-body">{brief.successBody}</p>
-      </div>
-    );
-  }
 
   return (
     <form className="project-brief__form" onSubmit={handleSubmit} data-no-section-snap>
@@ -227,7 +209,6 @@ export function ProjectBriefForm({
 
       <label className="project-brief__field">
         <span className="project-brief__label">
-          <span className="project-brief__num">1.</span>
           {brief.nameLabel} <span aria-hidden>*</span>
         </span>
         <input
@@ -245,7 +226,6 @@ export function ProjectBriefForm({
 
       <label className="project-brief__field">
         <span className="project-brief__label">
-          <span className="project-brief__num">2.</span>
           {brief.emailLabel} <span aria-hidden>*</span>
         </span>
         <input
@@ -262,10 +242,7 @@ export function ProjectBriefForm({
       </label>
 
       <label className="project-brief__field">
-        <span className="project-brief__label">
-          <span className="project-brief__num">3.</span>
-          {brief.companyLabel}
-        </span>
+        <span className="project-brief__label">{brief.companyLabel}</span>
         <input
           type="text"
           name="company"
@@ -278,10 +255,7 @@ export function ProjectBriefForm({
       </label>
 
       <label className="project-brief__field">
-        <span className="project-brief__label">
-          <span className="project-brief__num">4.</span>
-          {brief.linkLabel}
-        </span>
+        <span className="project-brief__label">{brief.linkLabel}</span>
         <input
           type="text"
           name="productUrl"
@@ -296,40 +270,45 @@ export function ProjectBriefForm({
         />
       </label>
 
-      <fieldset className="project-brief__field project-brief__field--help">
-        <legend className="project-brief__label">
-          <span className="project-brief__num">5.</span>
+      <label className="project-brief__field">
+        <span className="project-brief__label">
           {brief.helpLabel} <span aria-hidden>*</span>
-        </legend>
-        <p className="project-brief__hint">{brief.helpHint}</p>
-        <div className="project-brief__options">
-          {PROJECT_BRIEF_SERVICE_IDS.map((id) => {
-            const checked = services.includes(id);
-            return (
-              <label key={id} className="project-brief__option">
-                <input
-                  type="checkbox"
-                  name="services"
-                  value={id}
-                  checked={checked}
-                  onChange={() => toggleService(id)}
-                />
-                <span>{brief.services[id]}</span>
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
+        </span>
+        <span className="project-brief__select-wrap">
+          <select
+            name="services"
+            required
+            value={service}
+            onChange={(e) =>
+              setService(e.target.value as ProjectBriefServiceId | "")
+            }
+            className={
+              service
+                ? "project-brief__select ui-input"
+                : "project-brief__select ui-input project-brief__select--empty"
+            }
+            aria-label={brief.helpLabel}
+          >
+            <option value="" disabled>
+              {brief.helpHint}
+            </option>
+            {PROJECT_BRIEF_SERVICE_IDS.map((id) => (
+              <option key={id} value={id}>
+                {brief.services[id]}
+              </option>
+            ))}
+          </select>
+        </span>
+      </label>
 
       <label className="project-brief__field">
         <span className="project-brief__label">
-          <span className="project-brief__num">6.</span>
           {brief.aboutLabel} <span aria-hidden>*</span>
         </span>
         <textarea
           name="message"
           required
-          rows={5}
+          rows={2}
           placeholder={brief.aboutPlaceholder}
           value={values.about}
           onChange={(e) => setValues((v) => ({ ...v, about: e.target.value }))}
@@ -342,7 +321,7 @@ export function ProjectBriefForm({
         <div ref={widgetHostRef} className="project-brief__captcha" />
       ) : null}
 
-      <label className="contact-form__consent">
+      <label className="contact-form__consent project-brief__consent">
         <input
           type="checkbox"
           name="consent"
@@ -370,7 +349,13 @@ export function ProjectBriefForm({
         </p>
       ) : null}
 
-      <Button type="submit" variant="primary" disabled={loading} className="project-brief__submit">
+      <Button
+        type="submit"
+        variant="primary"
+        size="lg"
+        disabled={loading}
+        className="project-brief__submit metric-cta--full"
+      >
         {loading ? brief.submitting : brief.submit}
       </Button>
     </form>
