@@ -188,7 +188,7 @@
   .metric-services-card__label.metric-cta {
     min-height: clamp(65px, 3.6vw, 80px);
     --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * clamp(65px, 3.6vw, 80px));
-    --cta-pad-x: clamp(36px, 2vw, 48px);
+    --cta-pad-x: clamp(22px, 1.4vw, 32px);
     font-size: clamp(32px, 1.8vw, 40px);
   }
 }
@@ -215,7 +215,7 @@
   border-radius: 20px;
   /* Figma 2015:179 — 30% #f5f5f5 over the pink section = pale pink cards. */
   background: rgb(245 245 245 / 0.3);
-  padding: 14px 14px 0;
+  padding: 10px 10px 0;
 }
 
 @media (max-width: 1023px) {
@@ -224,7 +224,7 @@
     margin-inline: calc(-1 * var(--page-padding));
     aspect-ratio: 16 / 9;
     height: auto;
-    padding: 16px var(--page-padding) 0;
+    padding: 12px var(--page-padding) 0;
     overflow: hidden;
     isolation: isolate;
   }
@@ -237,7 +237,7 @@
     align-content: start;
     align-items: start;
     height: 400px;
-    padding: 30px;
+    padding: 18px;
     border-radius: 24px;
     gap: 0;
     overflow: clip;
@@ -263,7 +263,7 @@
   flex-wrap: nowrap;
   align-items: flex-start;
   /* Extra gap: skewX pulls the label’s left edge back toward the number. */
-  gap: 16px;
+  gap: 8px;
   z-index: 2;
   width: fit-content;
 }
@@ -271,7 +271,7 @@
 @media (min-width: 1024px) {
   .metric-services-card__head {
     grid-area: head;
-    gap: 28px;
+    gap: 12px;
   }
 }
 
@@ -303,7 +303,7 @@
 .metric-services-card__label.metric-cta {
   min-height: 44px;
   --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 44px);
-  --cta-pad-x: 22px;
+  --cta-pad-x: 14px;
   font-size: 16px;
   margin-left: 0;
   cursor: default;
@@ -320,7 +320,7 @@
   .metric-services-card__label.metric-cta {
     min-height: 65px;
     --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 65px);
-    --cta-pad-x: 36px;
+    --cta-pad-x: 22px;
     font-size: 32px;
   }
 }
@@ -333,8 +333,25 @@
   background: transparent;
 }
 
+/* Same display width for every mockup — sources have different aspect ratios,
+   so contain would shrink portrait frames (A+/BrandStore) vs landscape. */
+.metric-services-card__media .media-image {
+  position: absolute;
+  inset: unset;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.metric-services-card__media .media-image img,
 .metric-services-card__img {
-  object-fit: contain;
+  position: relative !important;
+  inset: unset !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: none;
+  object-fit: unset;
   object-position: left top;
   transform: rotate(-3.6deg);
   transform-origin: left top;
@@ -347,14 +364,14 @@
     flex-shrink: 0;
   }
 
-  /* Same 1:1 mockup size as before — the 16:9 card is only a window. */
   .metric-services-card__media {
     position: absolute;
     left: 0;
     right: 0;
     top: 72px;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: auto;
+    height: auto;
     pointer-events: none;
   }
 }
@@ -367,7 +384,7 @@
     right: 0;
     /* Same width for every deliverable mockup; right-aligned in the card. */
     width: min(52%, 520px);
-    height: calc(100% - 24px);
+    height: auto;
     aspect-ratio: auto;
     border-radius: 0;
     pointer-events: none;
@@ -377,8 +394,14 @@
     margin: 0;
   }
 
+  .metric-services-card__media .media-image {
+    left: auto;
+    right: 0;
+    width: 100%;
+  }
+
+  .metric-services-card__media .media-image img,
   .metric-services-card__img {
-    object-fit: contain;
     object-position: right top;
     transform: rotate(-3.6deg);
     transform-origin: right top;
