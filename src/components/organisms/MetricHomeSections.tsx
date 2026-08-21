@@ -27,7 +27,6 @@ function MetricTrustCards({ trust }: { trust: MetricHomeContent["trust"] }) {
         <LiquidGlassPlaque
           key={`${item.kind}-${"value" in item ? item.value : "label" in item ? item.label : index}`}
           className={`metric-hero__trust-card metric-hero__trust-card--${item.kind}`}
-          background="rgba(255, 255, 255, 0.38)"
         >
           <div className="metric-hero__trust-inner">
             {item.kind === "spn" ? (

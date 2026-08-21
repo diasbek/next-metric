@@ -643,13 +643,24 @@ a.metric-pill--link:active {
 .liquid-glass-plaque__fx {
   position: absolute;
   inset: 0;
-  z-index: 0;
   overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
 }
 
+/* Fallback sits above FX until glass has finished fading in, then soft-exits. */
+.liquid-glass-plaque__fallback {
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+
+.liquid-glass-plaque__fallback.is-fading {
+  opacity: 0;
+}
+
 .liquid-glass-plaque__fx {
+  z-index: 0;
   opacity: 0;
   transition: opacity 0.35s ease;
 }
@@ -666,14 +677,15 @@ a.metric-pill--link:active {
 
 .liquid-glass-plaque__content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: block;
   width: 100%;
   height: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-glass-plaque__fx {
+  .liquid-glass-plaque__fx,
+  .liquid-glass-plaque__fallback {
     transition: none;
   }
 }
@@ -3645,10 +3657,15 @@ html.is-mobile-menu-open {
 
 /* Motion helpers
    Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
-   content after scroll reveals complete — do not use that pattern. */
+   content after scroll reveals complete — do not use that pattern.
+   html.gsap-pending is set on the SSR <html> so the first paint never
+   shows reveals/hero details only to yank them on hydrate. */
 html.gsap-pending:not(.gsap-force-show) [data-reveal]:not(.is-revealed),
 html.gsap-pending:not(.gsap-force-show) [data-reveal-group] > *:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show) [data-case-steps] > *:not(.is-revealed) {
+html.gsap-pending:not(.gsap-force-show) [data-case-steps] > *:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show) .metric-hero__subtitle,
+html.gsap-pending:not(.gsap-force-show) .metric-hero__copy .metric-cta,
+html.gsap-pending:not(.gsap-force-show) .metric-hero__trust > * {
   visibility: hidden;
 }
 
@@ -3661,7 +3678,10 @@ html.gsap-force-show [data-border-draw],
 html.gsap-force-show [data-counter],
 html.gsap-force-show .metric-hero__copy,
 html.gsap-force-show .metric-hero__visual,
-html.gsap-force-show .metric-hero__trust {
+html.gsap-force-show .metric-hero__trust,
+html.gsap-force-show .metric-hero__subtitle,
+html.gsap-force-show .metric-hero__copy .metric-cta,
+html.gsap-force-show .metric-hero__trust > * {
   visibility: visible !important;
   opacity: 1 !important;
   transform: none !important;
@@ -3760,7 +3780,10 @@ html.gsap-pending.gsap-slow .site-boot-overlay {
   [data-counter],
   .metric-hero__copy,
   .metric-hero__visual,
-  .metric-hero__trust {
+  .metric-hero__trust,
+  .metric-hero__subtitle,
+  .metric-hero__copy .metric-cta,
+  .metric-hero__trust > * {
     visibility: visible;
     opacity: 1;
     transform: none;

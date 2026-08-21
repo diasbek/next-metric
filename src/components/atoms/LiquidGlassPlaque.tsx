@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
+  type TransitionEvent,
 } from "react";
 import { LiquidGlass } from "simple-liquid-glass";
 
@@ -28,6 +29,8 @@ const GLASS_TINT = "rgba(255, 255, 255, 0.38)";
 const GLASS_BORDER = "rgba(255, 255, 255, 0.55)";
 const DEFAULT_BG =
   "linear-gradient(145deg, rgba(243, 221, 232, 0.55), rgba(255, 255, 255, 0.72))";
+
+type FallbackPhase = "solid" | "fading" | "gone";
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -68,7 +71,8 @@ export function LiquidGlassPlaque({
     () => true,
   );
   const fxMounted = !reducedMotion;
-  const [fxVisible, setFxVisible] = useState(false);
+  const [fxOn, setFxOn] = useState(false);
+  const [fallbackPhase, setFallbackPhase] = useState<FallbackPhase>("solid");
 
   useLayoutEffect(() => {
     const el = wrapRef.current;
@@ -93,11 +97,16 @@ export function LiquidGlassPlaque({
   }, []);
 
   useEffect(() => {
-    if (!fxMounted) return;
+    if (!fxMounted) {
+      setFxOn(false);
+      setFallbackPhase("solid");
+      return;
+    }
     let outer = 0;
     let inner = 0;
     outer = requestAnimationFrame(() => {
-      inner = requestAnimationFrame(() => setFxVisible(true));
+      // Paint FX at opacity 0 under the solid fallback, then fade FX in.
+      inner = requestAnimationFrame(() => setFxOn(true));
     });
     return () => {
       cancelAnimationFrame(outer);
@@ -105,21 +114,46 @@ export function LiquidGlassPlaque({
     };
   }, [fxMounted]);
 
-  // Radius comes from CSS classes on this node — never set borderRadius: inherit
-  // (that inherits the parent and zeros out plaque/trust-card rounding).
-  // No CSS border/fill on the shell: LiquidGlass draws the glass edge itself.
-  // A pre-FX frosted fill avoids a hole while the library mounts.
-  const showCssFallback = !fxVisible;
+  // If transitionend never fires (tab background, reduced transitions), still peel fallback.
+  useEffect(() => {
+    if (!fxOn || fallbackPhase !== "solid") return;
+    const timer = window.setTimeout(() => setFallbackPhase("fading"), 420);
+    return () => window.clearTimeout(timer);
+  }, [fxOn, fallbackPhase]);
+
+  useEffect(() => {
+    if (fallbackPhase !== "fading") return;
+    const timer = window.setTimeout(() => setFallbackPhase("gone"), 280);
+    return () => window.clearTimeout(timer);
+  }, [fallbackPhase]);
+
+  const onFxTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.propertyName !== "opacity") return;
+    if (event.target !== event.currentTarget) return;
+    if (!fxOn) return;
+    // Glass is fully on — only then peel the CSS fallback away.
+    setFallbackPhase((phase) => (phase === "solid" ? "fading" : phase));
+  };
+
+  const onFallbackTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.propertyName !== "opacity") return;
+    if (event.target !== event.currentTarget) return;
+    if (fallbackPhase !== "fading") return;
+    setFallbackPhase("gone");
+  };
+
+  const showCssFallback = !fxMounted || fallbackPhase !== "gone";
+  const ready = fxOn && fallbackPhase === "gone";
 
   return (
     <div
       ref={wrapRef}
-      className={`liquid-glass-plaque${fxVisible ? " is-ready" : ""} ${className ?? ""}`.trim()}
+      className={`liquid-glass-plaque${ready ? " is-ready" : ""} ${className ?? ""}`.trim()}
       style={{ ...FILL, ...style }}
     >
       {showCssFallback ? (
         <div
-          className="liquid-glass-plaque__fallback"
+          className={`liquid-glass-plaque__fallback${fallbackPhase === "fading" ? " is-fading" : ""}`}
           style={{
             ...FILL,
             borderRadius: radiusPx,
@@ -128,13 +162,15 @@ export function LiquidGlassPlaque({
             WebkitBackdropFilter: "blur(12px) saturate(160%)",
           }}
           aria-hidden
+          onTransitionEnd={onFallbackTransitionEnd}
         />
       ) : null}
 
       {fxMounted ? (
         <div
-          className={`liquid-glass-plaque__fx${fxVisible ? " is-on" : ""}`}
+          className={`liquid-glass-plaque__fx${fxOn ? " is-on" : ""}`}
           aria-hidden
+          onTransitionEnd={onFxTransitionEnd}
         >
           <LiquidGlass
             mode="preset"

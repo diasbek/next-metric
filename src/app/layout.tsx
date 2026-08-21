@@ -52,10 +52,27 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      className={`${degular.variable} ${degularDisplay.variable}`}
+      className={`${degular.variable} ${degularDisplay.variable} gsap-pending`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Before paint: drop pending for reduced-motion so content never stays hidden. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.remove('gsap-pending');}}catch(e){}})();",
+          }}
+        />
+      </head>
       <body className="antialiased">
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{
+              __html:
+                "html.gsap-pending [data-reveal],html.gsap-pending [data-reveal-group]>*,html.gsap-pending [data-case-steps]>*,html.gsap-pending .metric-hero__subtitle,html.gsap-pending .metric-hero__copy .metric-cta,html.gsap-pending .metric-hero__trust>*{visibility:visible!important;opacity:1!important;transform:none!important}",
+            }}
+          />
+        </noscript>
         {metrikaPixel ? (
           <noscript>
             <div>

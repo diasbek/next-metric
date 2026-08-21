@@ -9,7 +9,8 @@ interface GsapProviderProps {
 }
 
 const HARD_READY_MS = 3000;
-const SLOW_SPINNER_MS = 500;
+/** Only show spinner on truly slow boots — avoid overlay flash on normal loads. */
+const SLOW_SPINNER_MS = 1200;
 
 async function waitForPaint(): Promise<void> {
   await new Promise<void>((resolve) => {
@@ -52,6 +53,12 @@ async function tryShowAllRevealTargets(
   }
 }
 
+function settleIfHash(): void {
+  if (typeof window === "undefined") return;
+  if (!window.location.hash) return;
+  settleScrollAfterNavigation();
+}
+
 export function GsapProvider({ children }: GsapProviderProps) {
   const pathname = usePathname();
 
@@ -62,12 +69,17 @@ export function GsapProvider({ children }: GsapProviderProps) {
   }, []);
 
   useEffect(() => {
-    settleScrollAfterNavigation();
+    settleIfHash();
 
     const reduced = prefersReducedMotion();
     const html = document.documentElement;
-    if (!reduced) {
+    // Layout already paints with gsap-pending; keep it through Strict Mode
+    // remounts so content never flashes visible → hidden → visible.
+    if (reduced) {
+      html.classList.remove("gsap-pending", "gsap-slow", "gsap-force-show");
+    } else {
       html.classList.add("gsap-pending");
+      html.classList.remove("gsap-ready", "gsap-force-show");
     }
 
     let cleanup: (() => void) | undefined;
@@ -96,7 +108,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
         html.classList.add("gsap-force-show");
       }
       html.classList.add("gsap-ready");
-      settleScrollAfterNavigation();
+      settleIfHash();
     };
 
     /** Absolute safety net — never leave the page blank, even mid-import. */
@@ -180,13 +192,13 @@ export function GsapProvider({ children }: GsapProviderProps) {
     return () => {
       cancelled = true;
       clearTimers();
-      html.classList.remove(
-        "gsap-pending",
-        "gsap-ready",
-        "gsap-slow",
-        "gsap-force-show",
-      );
       cleanup?.();
+      // Keep pending across Strict Mode remount / soft nav so SSR-visible
+      // content never pops back before the next effect re-hides it.
+      html.classList.remove("gsap-ready", "gsap-slow", "gsap-force-show");
+      if (!prefersReducedMotion()) {
+        html.classList.add("gsap-pending");
+      }
     };
   }, [pathname]);
 
