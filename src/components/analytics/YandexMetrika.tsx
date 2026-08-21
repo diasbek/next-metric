@@ -33,7 +33,7 @@ function countersReady(): boolean {
   return Array.isArray(list) && list.length > 0;
 }
 
-/** SPA pageviews. The counter itself is injected from the root layout. */
+/** SPA pageviews + counter inject (afterInteractive via client effect). */
 export function YandexMetrika({ counterId }: YandexMetrikaProps) {
   const id = Number(counterId);
   const pathname = usePathname();

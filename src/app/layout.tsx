@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import Script from "next/script";
 import { degular, degularDisplay } from "@/assets/fonts";
 import "./globals.css";
 import { GsapProviderLazy } from "@/components/animations/GsapProviderLazy";
@@ -8,10 +7,7 @@ import { SiteAnalytics } from "@/components/analytics";
 import { ConsentProvider, CookieConsentBanner } from "@/components/consent";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
 import { JsonLd } from "@/components/seo/JsonLd";
-import {
-  getYandexMetrikaInitScript,
-  getYandexMetrikaNoscriptUrl,
-} from "@/lib/analytics/yandex-metrika-snippet";
+import { getYandexMetrikaNoscriptUrl } from "@/lib/analytics/yandex-metrika-snippet";
 import { getResolvedAnalytics } from "@/lib/cms/settings";
 import { rootMetadata } from "@/utils/metadata";
 import { getGlobalJsonLdGraph } from "@/utils/seo/json-ld";
@@ -49,7 +45,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const analytics = await getResolvedAnalytics();
-  const metrikaSnippet = getYandexMetrikaInitScript(analytics.yandexMetrikaId);
   const metrikaPixel = getYandexMetrikaNoscriptUrl(analytics.yandexMetrikaId);
   const htmlLangHeader = (await headers()).get("x-html-lang");
   const lang = htmlLangHeader === "de" ? "de" : "en";
@@ -61,13 +56,6 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="antialiased">
-        {metrikaSnippet ? (
-          <Script
-            id="yandex-metrika"
-            strategy="beforeInteractive"
-            dangerouslySetInnerHTML={{ __html: metrikaSnippet }}
-          />
-        ) : null}
         {metrikaPixel ? (
           <noscript>
             <div>

@@ -10,9 +10,14 @@ export function PwaRegister() {
     if (process.env.NODE_ENV !== "production") return;
 
     const register = () => {
-      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {
-        /* ignore — install still works on desktop without SW in modern Chrome */
-      });
+      navigator.serviceWorker
+        .register("/sw.js", { scope: "/" })
+        .then((registration) => {
+          void registration.update();
+        })
+        .catch(() => {
+          /* ignore — install still works on desktop without SW in modern Chrome */
+        });
     };
 
     if (document.readyState === "complete") register();

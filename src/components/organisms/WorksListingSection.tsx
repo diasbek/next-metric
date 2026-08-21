@@ -64,7 +64,7 @@ export async function WorksListingSection({
   return (
     <div className="metric-works metric-case-studies bg-white pb-20 pt-10 md:pt-14">
       <PageContainer>
-        <div className="metric-works__header mb-12 md:mb-16" data-reveal>
+        <div className="metric-works__header mb-12 md:mb-16">
           <h1 className="metric-works__title font-display text-foreground">
             {ui.allProjects}
           </h1>

@@ -8,6 +8,9 @@ interface GsapProviderProps {
   children: React.ReactNode;
 }
 
+const HARD_READY_MS = 3000;
+const SLOW_SPINNER_MS = 500;
+
 async function waitForPaint(): Promise<void> {
   await new Promise<void>((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
@@ -37,6 +40,18 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** Best-effort GSAP reveal — never blocks markReady if the chunk fails. */
+async function tryShowAllRevealTargets(
+  options?: { preserveCaseSteps?: boolean },
+): Promise<void> {
+  try {
+    const { showAllRevealTargets } = await import("@/animations/gsap");
+    showAllRevealTargets(options);
+  } catch {
+    /* CSS force-show / pending removal still makes content readable */
+  }
+}
+
 export function GsapProvider({ children }: GsapProviderProps) {
   const pathname = usePathname();
 
@@ -47,46 +62,66 @@ export function GsapProvider({ children }: GsapProviderProps) {
   }, []);
 
   useEffect(() => {
-    // Preserve / repair in-page hash targets across route changes.
     settleScrollAfterNavigation();
 
-    // Jumping straight to a mid-page anchor must never leave that section
-    // sitting invisible for however long GSAP takes to boot. The awaited
-    // force-show inside `run()` handles this before initAnimations.
     const reduced = prefersReducedMotion();
+    const html = document.documentElement;
     if (!reduced) {
-      document.documentElement.classList.add("gsap-pending");
+      html.classList.add("gsap-pending");
     }
 
     let cleanup: (() => void) | undefined;
     let cancelled = false;
-    let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
-    let initStarted = false;
+    let hardReadyTimer: ReturnType<typeof setTimeout> | undefined;
+    let slowSpinnerTimer: ReturnType<typeof setTimeout> | undefined;
+    let ready = false;
 
-    const clearFallback = () => {
-      if (fallbackTimer) {
-        clearTimeout(fallbackTimer);
-        fallbackTimer = undefined;
+    const clearTimers = () => {
+      if (hardReadyTimer) {
+        clearTimeout(hardReadyTimer);
+        hardReadyTimer = undefined;
+      }
+      if (slowSpinnerTimer) {
+        clearTimeout(slowSpinnerTimer);
+        slowSpinnerTimer = undefined;
       }
     };
 
-    const markReady = () => {
-      document.documentElement.classList.remove("gsap-pending");
-      document.documentElement.classList.add("gsap-ready");
+    const markReady = (opts: { forceShow?: boolean } = {}) => {
+      if (ready || cancelled) return;
+      ready = true;
+      clearTimers();
+      html.classList.remove("gsap-pending", "gsap-slow");
+      if (opts.forceShow) {
+        html.classList.add("gsap-force-show");
+      }
+      html.classList.add("gsap-ready");
+      settleScrollAfterNavigation();
     };
 
-    const run = async () => {
-      // Await the hash force-show so initAnimations never races ahead and
-      // re-hides mid-page targets that the user already jumped to.
-      if (typeof window !== "undefined" && window.location.hash) {
-        try {
-          const { showAllRevealTargets } = await import("@/animations/gsap");
-          if (cancelled) return;
-          // Keep homepage case cards queued — do not flash cards 2+ visible.
-          showAllRevealTargets({ preserveCaseSteps: true });
-        } catch {
-          /* continue — fallback timer / catch path still force-shows */
+    /** Absolute safety net — never leave the page blank, even mid-import. */
+    const forceReadyCssOnly = () => {
+      if (ready || cancelled) return;
+      html.classList.add("gsap-force-show");
+      markReady({ forceShow: true });
+      void tryShowAllRevealTargets();
+    };
+
+    if (!reduced) {
+      slowSpinnerTimer = setTimeout(() => {
+        if (cancelled || ready) return;
+        if (html.classList.contains("gsap-pending")) {
+          html.classList.add("gsap-slow");
         }
+      }, SLOW_SPINNER_MS);
+
+      hardReadyTimer = setTimeout(forceReadyCssOnly, HARD_READY_MS);
+    }
+
+    const run = async () => {
+      if (typeof window !== "undefined" && window.location.hash) {
+        await tryShowAllRevealTargets({ preserveCaseSteps: true });
+        if (cancelled) return;
       }
 
       if (reduced) {
@@ -95,78 +130,48 @@ export function GsapProvider({ children }: GsapProviderProps) {
           if (cancelled) return;
           cleanup = initAnimations(pathname);
           markReady();
-          settleScrollAfterNavigation();
         } catch {
-          const { showAllRevealTargets } = await import("@/animations/gsap");
-          if (cancelled) return;
-          showAllRevealTargets();
-          markReady();
-          settleScrollAfterNavigation();
+          markReady({ forceShow: true });
+          void tryShowAllRevealTargets();
         }
         return;
       }
-
-      // Force-show content if init stalls — do not leave the page blank.
-      fallbackTimer = setTimeout(async () => {
-        if (cancelled || initStarted) return;
-        const { showAllRevealTargets } = await import("@/animations/gsap");
-        if (cancelled || initStarted) return;
-        showAllRevealTargets();
-        markReady();
-        settleScrollAfterNavigation();
-      }, 2000);
 
       try {
         const { playEnterTransition, resetPageTransition } = await import(
           "@/animations/page-transition"
         );
         await waitForPaint();
-        if (cancelled) {
-          clearFallback();
-          return;
-        }
+        if (cancelled) return;
 
         await playEnterTransition();
         if (cancelled) {
           resetPageTransition();
-          clearFallback();
           return;
         }
 
         await waitForIdle(400);
-        if (cancelled) {
-          clearFallback();
-          return;
-        }
-
-        initStarted = true;
-        clearFallback();
+        if (cancelled || ready) return;
 
         const { initAnimations } = await import("@/animations");
         await waitForPaint();
-        if (cancelled) {
-          return;
-        }
+        if (cancelled || ready) return;
 
         cleanup = initAnimations(pathname);
-        settleScrollAfterNavigation();
         markReady();
-        // Warm the transition module so the first case-study click doesn't
-        // wait on a cold dynamic import in production.
         void import("@/animations/page-transition");
       } catch {
-        clearFallback();
-        if (cancelled) return;
-        const [{ showAllRevealTargets }, { resetPageTransition }] =
-          await Promise.all([
-            import("@/animations/gsap"),
-            import("@/animations/page-transition"),
-          ]);
-        if (cancelled) return;
-        resetPageTransition();
-        showAllRevealTargets();
-        settleScrollAfterNavigation();
-        markReady();
+        if (cancelled || ready) return;
+        try {
+          const { resetPageTransition } = await import(
+            "@/animations/page-transition"
+          );
+          resetPageTransition();
+        } catch {
+          /* ignore */
+        }
+        markReady({ forceShow: true });
+        void tryShowAllRevealTargets();
       }
     };
 
@@ -174,18 +179,38 @@ export function GsapProvider({ children }: GsapProviderProps) {
 
     return () => {
       cancelled = true;
-      clearFallback();
-      document.documentElement.classList.remove("gsap-pending", "gsap-ready");
-      // Do NOT reset page-transition state here: this cleanup runs on every
-      // route change (that's the whole point of re-running this effect), but
-      // the entering page's own playEnterTransition() call still needs the
-      // pending Flip/fade/scroll-hash state stashed by navigateWithTransition.
-      // Resetting it here always won (it resolves before the new effect's
-      // first await), permanently skipping the enter animation. Real error
-      // paths already call resetPageTransition() themselves.
+      clearTimers();
+      html.classList.remove(
+        "gsap-pending",
+        "gsap-ready",
+        "gsap-slow",
+        "gsap-force-show",
+      );
       cleanup?.();
     };
   }, [pathname]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <div
+        className="site-boot-overlay"
+        aria-busy="true"
+        aria-live="polite"
+        aria-label="Loading"
+      >
+        <div className="site-boot-overlay__inner">
+          {/* eslint-disable-next-line @next/next/no-img-element -- boot shell before next/image */}
+          <img
+            className="site-boot-overlay__logo"
+            src="/images/metric/logo/metric-logo.svg"
+            alt=""
+            width={160}
+            height={36}
+          />
+          <span className="site-boot-overlay__spinner" aria-hidden="true" />
+        </div>
+      </div>
+      {children}
+    </>
+  );
 }

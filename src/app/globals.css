@@ -3646,10 +3646,26 @@ html.is-mobile-menu-open {
 /* Motion helpers
    Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
    content after scroll reveals complete — do not use that pattern. */
-html.gsap-pending [data-reveal]:not(.is-revealed),
-html.gsap-pending [data-reveal-group] > *:not(.is-revealed),
-html.gsap-pending [data-case-steps] > *:not(.is-revealed) {
+html.gsap-pending:not(.gsap-force-show) [data-reveal]:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show) [data-reveal-group] > *:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show) [data-case-steps] > *:not(.is-revealed) {
   visibility: hidden;
+}
+
+/* Chunk/network failure path — show content without waiting on GSAP import. */
+html.gsap-force-show [data-reveal],
+html.gsap-force-show [data-reveal-group] > *,
+html.gsap-force-show [data-case-steps] > *,
+html.gsap-force-show [data-split-title],
+html.gsap-force-show [data-border-draw],
+html.gsap-force-show [data-counter],
+html.gsap-force-show .metric-hero__copy,
+html.gsap-force-show .metric-hero__visual,
+html.gsap-force-show .metric-hero__trust {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: none !important;
 }
 
 [data-reveal].is-revealed,
@@ -3660,6 +3676,60 @@ html.gsap-pending [data-case-steps] > *:not(.is-revealed) {
 .metric-hero__trust.is-revealed {
   visibility: visible !important;
   clip-path: none;
+}
+
+/* Delayed boot spinner — only after ~500ms of gsap-pending (class gsap-slow). */
+.site-boot-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+html.gsap-pending.gsap-slow .site-boot-overlay {
+  display: flex;
+}
+
+.site-boot-overlay__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-boot-overlay__logo {
+  display: block;
+  width: min(160px, 42vw);
+  height: auto;
+}
+
+.site-boot-overlay__spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(9, 9, 9, 0.12);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: site-boot-spin 0.7s linear infinite;
+}
+
+@keyframes site-boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-boot-overlay {
+    display: none !important;
+  }
+
+  .site-boot-overlay__spinner {
+    animation: none;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -3706,6 +3776,75 @@ html.gsap-pending [data-case-steps] > *:not(.is-revealed) {
   .metric-hero__trust > *:hover {
     transform: none;
   }
+}
+
+.site-route-loading {
+  min-height: 50dvh;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+}
+
+.site-route-loading__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-route-loading__logo {
+  display: block;
+  width: min(160px, 42vw);
+  height: auto;
+}
+
+.site-route-loading__spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(9, 9, 9, 0.12);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: site-boot-spin 0.7s linear infinite;
+}
+
+.metric-error-page {
+  min-height: 60dvh;
+  display: grid;
+  place-items: center;
+  padding: 64px 0;
+}
+
+.metric-error-page__inner {
+  text-align: center;
+  max-width: 420px;
+}
+
+.metric-error-page__brand {
+  margin: 0 0 8px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.metric-error-page__title {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 4vw, 40px);
+  color: var(--foreground);
+}
+
+.metric-error-page__body {
+  margin: 0 0 28px;
+  font-size: var(--text-small);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.metric-error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
 
 /* Project brief modal — CTA “Start your project” */

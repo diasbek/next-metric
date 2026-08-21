@@ -75,7 +75,7 @@ export async function WorkCaseSection({
     <article className="metric-case">
       <PageContainer>
         {/* Full-width title, then 2-col: role+task | tags+lede+solution. */}
-        <header className="metric-case__intro" data-reveal>
+        <header className="metric-case__intro">
           <h1 className="metric-case__title font-display">{authorName}</h1>
 
           <div className="metric-case__grid">
