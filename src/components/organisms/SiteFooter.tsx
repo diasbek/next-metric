@@ -13,7 +13,13 @@ interface SiteFooterProps {
   home: MetricHomeContent;
 }
 
-/** Figma footer nav order (differs from header). */
+/** Footer utility links that should not render on the public site. */
+const HIDDEN_FOOTER_LINK_HREFS = new Set(["/newsletter/", "/careers/"]);
+
+function isVisibleFooterLink(link: { label: string; href: string }) {
+  const href = link.href.trim().toLowerCase();
+  return !HIDDEN_FOOTER_LINK_HREFS.has(href);
+}
 const FOOTER_NAV_HREFS = [
   "/#services",
   "/#case-studies",
@@ -48,8 +54,12 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
     return [{ key, href, label: fromCms?.label ?? socialLabels[key] }];
   });
 
-  const privacyLink = footer.links.find((link) => link.href.includes("privacy"));
-  const utilityLinks = footer.links.filter((link) => !link.href.includes("privacy"));
+  const privacyLink = footer.links.find(
+    (link) => link.href.includes("privacy") && isVisibleFooterLink(link),
+  );
+  const utilityLinks = footer.links.filter(
+    (link) => !link.href.includes("privacy") && isVisibleFooterLink(link),
+  );
 
   const navItems = FOOTER_NAV_HREFS.flatMap((href) => {
     const item = home.nav.find((entry) => entry.href === href);
