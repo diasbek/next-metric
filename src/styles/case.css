@@ -211,6 +211,14 @@
 .progressive-case-image__preview,
 .progressive-case-image__full {
   grid-area: 1 / 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.progressive-case-image__preview .media-image,
+.progressive-case-image__full .media-image {
+  display: block;
+  width: 100%;
 }
 
 .progressive-case-image__full {
@@ -220,10 +228,6 @@
 
 .progressive-case-image.is-full .progressive-case-image__full {
   opacity: 1;
-}
-
-.progressive-case-image.is-full .progressive-case-image__preview {
-  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
