@@ -33,6 +33,36 @@ export function MediaImage({
     if (img && isDecoded(img)) setLoadedSrc(src);
   }, [src]);
 
+  useEffect(() => {
+    if (loaded) return;
+
+    const root = rootRef.current;
+    const img = root?.querySelector("img");
+    if (!img) return;
+
+    const markLoaded = () => setLoadedSrc(src);
+    if (isDecoded(img)) {
+      markLoaded();
+      return;
+    }
+
+    img.addEventListener("load", markLoaded);
+    img.addEventListener("error", markLoaded);
+
+    const poll = window.setInterval(() => {
+      if (isDecoded(img)) markLoaded();
+    }, 400);
+
+    const timeout = window.setTimeout(markLoaded, 8000);
+
+    return () => {
+      img.removeEventListener("load", markLoaded);
+      img.removeEventListener("error", markLoaded);
+      window.clearInterval(poll);
+      window.clearTimeout(timeout);
+    };
+  }, [loaded, src]);
+
   const showSkeleton = skeleton && !loaded;
 
   return (

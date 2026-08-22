@@ -3,13 +3,14 @@
 .site-route-loading {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  z-index: 40;
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .site-route-loading__inner {

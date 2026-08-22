@@ -30,6 +30,26 @@
   opacity: 1;
   visibility: visible;
   transition: opacity 0.28s ease, visibility 0s linear 0s;
+  animation: media-image-skeleton-timeout 8s forwards;
+}
+
+@keyframes media-image-skeleton-timeout {
+  0%,
+  85% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.media-image.is-loaded .media-image__skeleton {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
 }
 
 .media-image__skeleton::after {
@@ -55,6 +75,7 @@
 @media (prefers-reduced-motion: reduce) {
   .media-image__skeleton {
     transition: none;
+    animation: none !important;
   }
 
   .media-image__skeleton::after {

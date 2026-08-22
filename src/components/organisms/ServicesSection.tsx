@@ -33,7 +33,7 @@ export function ServicesSection({ locale, content }: LocalePageProps) {
             <h2 className="text-h2 text-white">{ui.whatWeDo}</h2>
           </SectionStickyHeading>
 
-          <SectionScrollColumn className="flex flex-col" data-reveal-group>
+          <SectionScrollColumn className="flex flex-col">
             {services.map((service, index) => (
               <div
                 key={service.id}
@@ -50,7 +50,6 @@ export function ServicesSection({ locale, content }: LocalePageProps) {
 
             <Link
               href={localePath(locale, "/services/")}
-              data-reveal
               className="cta-bar mt-10 w-full bg-white text-lg font-medium text-black transition-opacity hover:opacity-90"
             >
               {ui.allServices}

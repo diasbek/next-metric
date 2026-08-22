@@ -1,5 +1,5 @@
 /* METRIC PWA shell — manifest/icons only; never cache HTML or /_next bundles. */
-const CACHE = "metric-shell-v8";
+const CACHE = "metric-shell-v9";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
