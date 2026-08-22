@@ -84,10 +84,14 @@ export function GsapProvider({ children }: GsapProviderProps) {
     settleIfHash();
 
     const reduced = prefersReducedMotion();
-    const restricted = isRestrictedWebView();
     const html = document.documentElement;
+    const restricted =
+      isRestrictedWebView() ||
+      html.classList.contains("restricted-webview");
     const softNav = bootCompleted;
-    const alreadyForced = html.classList.contains("gsap-force-show");
+    const alreadyForced =
+      html.classList.contains("gsap-force-show") ||
+      html.classList.contains("restricted-webview");
 
     // Cold boot: keep SSR gsap-pending so reveals don't flash before init.
     // Soft nav / Strict remount / in-app browsers: never re-hide — that blanked
@@ -95,7 +99,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
     if (reduced || restricted || alreadyForced || softNav) {
       html.classList.remove("gsap-pending");
       if (restricted || alreadyForced) {
-        html.classList.add("gsap-force-show");
+        html.classList.add("gsap-force-show", "restricted-webview");
       } else {
         html.classList.remove("gsap-force-show");
       }
@@ -157,12 +161,14 @@ export function GsapProvider({ children }: GsapProviderProps) {
         if (cancelled) return;
       }
 
-      if (reduced) {
+      if (reduced || restricted) {
         try {
-          const { initAnimations } = await import("@/animations");
-          if (cancelled) return;
-          cleanup = initAnimations(pathname);
-          markReady();
+          if (!restricted) {
+            const { initAnimations } = await import("@/animations");
+            if (cancelled) return;
+            cleanup = initAnimations(pathname);
+          }
+          markReady({ forceShow: restricted || alreadyForced });
         } catch {
           markReady({ forceShow: true });
           void tryShowAllRevealTargets();

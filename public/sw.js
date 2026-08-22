@@ -1,5 +1,5 @@
-/* METRIC installability SW — network-only for pages + /_next; no HTML fallback. */
-const CACHE = "metric-shell-v5";
+/* METRIC PWA shell — icons only; never intercept HTML or /_next (Telegram-safe). */
+const CACHE = "metric-shell-v6";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -14,8 +14,10 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
+      .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => caches.open(CACHE))
+      .then((cache) =>
+        cache.addAll(["/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png"]),
       )
       .then(() => self.clients.claim()),
   );
@@ -37,27 +39,28 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
 
-  // Never cache or synthesize documents / app chunks — Telegram WebView + stale
-  // HTML shells were a common white-screen path.
   if (isNextAsset(request.url) || isDocumentRequest(request)) {
     event.respondWith(fetch(request));
     return;
   }
 
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (
-          response.ok &&
-          request.url.startsWith(self.location.origin) &&
-          (request.destination === "manifest" ||
-            request.url.includes("/icons/"))
-        ) {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
-        }
-        return response;
-      })
-      .catch(() => caches.match(request)),
-  );
+  if (
+    request.destination === "manifest" ||
+    request.url.includes("/icons/")
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok && request.url.startsWith(self.location.origin)) {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
+
+  event.respondWith(fetch(request));
 });
