@@ -60,6 +60,11 @@ html .media-image.is-loaded .media-image__skeleton {
 html .mobile-menu-panel:not([data-open="true"]) {
   display: none !important;
 }
+
+/* React streaming shells can leave a stale #site-content clone — hide/remove target */
+html div[id^="S:"]:has(#site-content) {
+  display: none !important;
+}
 `.trim();
 
 /** Legacy export — keep name used by layout.tsx. */
@@ -77,8 +82,19 @@ export const WEBVIEW_BOOT_SCRIPT = `
     h.classList.add("content-visible", "gsap-ready", "gsap-force-show");
   }
 
+  function removeStreamingShellDuplicates() {
+    var shells = document.querySelectorAll('div[id^="S:"]');
+    for (var i = 0; i < shells.length; i++) {
+      var shell = shells[i];
+      if (shell.querySelector("#site-content")) {
+        shell.remove();
+      }
+    }
+  }
+
   try {
     unlock();
+    removeStreamingShellDuplicates();
 
     var ua = navigator.userAgent || "";
     var ref = document.referrer || "";
@@ -106,8 +122,14 @@ export const WEBVIEW_BOOT_SCRIPT = `
       }
     }
 
-    document.addEventListener("DOMContentLoaded", unlock, { once: true });
-    window.addEventListener("pageshow", unlock);
+    document.addEventListener("DOMContentLoaded", function() {
+      unlock();
+      removeStreamingShellDuplicates();
+    }, { once: true });
+    window.addEventListener("pageshow", function() {
+      unlock();
+      removeStreamingShellDuplicates();
+    });
   } catch (e) {}
 })();
 `.trim();

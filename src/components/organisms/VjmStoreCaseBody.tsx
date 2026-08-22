@@ -17,7 +17,7 @@ export function VjmStoreCaseBody() {
               className="vjm-case__img"
               priority={index === 0}
               unoptimized
-              skeleton={index === 0}
+              skeleton={false}
             />
           </figure>
         );
