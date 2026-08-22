@@ -296,3 +296,36 @@
 .metric-case .metric-case-studies__list {
   margin-top: 0;
 }
+
+/* VJM-STORE — full-bleed case frames (10 ordered sections) */
+.metric-case--vjm-store {
+  padding-block: 0 80px;
+}
+
+.vjm-case {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.vjm-case__frame {
+  margin: 0;
+  width: 100%;
+  line-height: 0;
+  background: var(--surface);
+}
+
+.vjm-case__frame .media-image {
+  display: block;
+  width: 100%;
+}
+
+.vjm-case__frame .media-image img,
+.vjm-case__img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  position: relative !important;
+}

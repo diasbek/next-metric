@@ -48,9 +48,10 @@ export function getOrganizationSchema() {
       addressCountry: ADDRESS_COUNTRY,
     },
     sameAs: [
+      SITE_CONFIG.social.upwork,
+      SITE_CONFIG.social.facebook,
       SITE_CONFIG.social.instagram,
       SITE_CONFIG.social.linkedin,
-      SITE_CONFIG.social.telegram,
     ].filter(Boolean),
   };
 }
@@ -194,7 +195,11 @@ export function getLocalBusinessSchema(locale: Locale = "en") {
       addressLocality: ADDRESS_LOCALITY,
       addressCountry: ADDRESS_COUNTRY,
     },
-    sameAs: [SITE_CONFIG.social.telegram, SITE_CONFIG.social.instagram],
+    sameAs: [
+      SITE_CONFIG.social.upwork,
+      SITE_CONFIG.social.facebook,
+      SITE_CONFIG.social.instagram,
+    ],
     parentOrganization: { "@id": ORGANIZATION_ID },
   };
 }

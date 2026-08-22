@@ -19,11 +19,11 @@ export interface SiteContent {
     address: string[];
     nav: SiteNavItem[];
     social: {
-      telegram: string;
+      upwork: string;
+      facebook: string;
       instagram: string;
       linkedin?: string;
       x?: string;
-      facebook?: string;
     };
     files: {
       presentation: string;

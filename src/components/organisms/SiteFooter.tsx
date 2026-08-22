@@ -26,21 +26,21 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
   const { site, ui } = content;
   const footer = home.footer;
   const socialMap: Record<string, string | undefined> = {
-    telegram: site.social.telegram,
+    upwork: site.social.upwork,
+    facebook: site.social.facebook,
     instagram: site.social.instagram,
     linkedin: site.social.linkedin,
     x: site.social.x,
-    facebook: site.social.facebook,
   };
   const socialLabels: Record<string, string> = {
-    telegram: "Telegram",
+    upwork: "Upwork",
+    facebook: "Facebook",
     instagram: "Instagram",
     linkedin: "LinkedIn",
     x: "X",
-    facebook: "Facebook",
   };
   const socialLinks = (
-    ["telegram", "instagram", "linkedin", "x", "facebook"] as const
+    ["upwork", "facebook", "instagram", "linkedin", "x"] as const
   ).flatMap((key) => {
     const href = socialMap[key];
     if (!href) return [];
@@ -116,15 +116,7 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
               </a>
             ))}
             {utilityLinks.map((link) => (
-              <TransitionLink
-                key={link.label}
-                href={localePath(locale, link.href)}
-                className={
-                  link.href.includes("newsletter")
-                    ? "site-footer__link--newsletter"
-                    : undefined
-                }
-              >
+              <TransitionLink key={link.label} href={localePath(locale, link.href)}>
                 {link.label}
               </TransitionLink>
             ))}

@@ -16,7 +16,8 @@ export const SITE_CONFIG = {
     zoom: 15,
   },
   social: {
-    telegram: "https://t.me/metricagency",
+    upwork: "https://www.upwork.com/agencies/2077941831495033949/",
+    facebook: "https://www.facebook.com/metric.ecommerce/",
     instagram: "https://www.instagram.com/metric.ecommerce/",
     linkedin: "https://www.linkedin.com/company/metric-ecommerce-design/",
   },

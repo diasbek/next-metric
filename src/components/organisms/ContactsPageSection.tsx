@@ -26,14 +26,26 @@ export function ContactsPageSection({ content }: LocalePageProps) {
 
             <div className="contacts-page__links">
               <div className="contacts-page__link-item">
-                <p className="contacts-page__link-label">Telegram</p>
+                <p className="contacts-page__link-label">Upwork</p>
                 <a
-                  href={site.social.telegram}
+                  href={site.social.upwork}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="contacts-page__link-value"
                 >
-                  {ui.telegramAction}
+                  {ui.instagramAction}
+                </a>
+              </div>
+
+              <div className="contacts-page__link-item">
+                <p className="contacts-page__link-label">Facebook</p>
+                <a
+                  href={site.social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contacts-page__link-value"
+                >
+                  {ui.instagramAction}
                 </a>
               </div>
 

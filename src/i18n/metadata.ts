@@ -48,7 +48,7 @@ export function getLegalPageMetadata({
   path: string;
   title: string;
   description: string;
-  /** Force noindex for thin placeholder pages (careers / newsletter). */
+  /** Optional robots override for static utility pages. */
   robots?: Metadata["robots"];
 }): Metadata {
   const localizedPath = localePath(locale, path);

@@ -70,6 +70,14 @@ const metricHomeEn = {
     viewLabel: "View Case-Study",
     items: [
       {
+        slug: "vjm-store",
+        tags: ["Listing", "A+ Content", "EBC"],
+        quote: "Conversion grew from 9.5% to 22% in three days",
+        author: "VJM-STORE",
+        role: "Drill brush attachment set — Amazon DE",
+        image: "/images/metric/case-detail/vjm-store/1.jpg",
+      },
+      {
         slug: "matolux",
         tags: ["Listing", "Agriculture", "Premium A+"],
         quote: "Your ideas really do make all the difference",
@@ -162,12 +170,10 @@ const metricHomeEn = {
   },
   footer: {
     cities: ["London", "New York", "Austin", "Berlin"],
-    links: [
-      { label: "Privacy Policy", href: "/privacy/" },
-      { label: "Newsletter", href: "/newsletter/" },
-      { label: "Careers", href: "/careers/" },
-    ],
+    links: [{ label: "Privacy Policy", href: "/privacy/" }],
     social: [
+      { label: "Upwork", key: "upwork" as const },
+      { label: "Facebook", key: "facebook" as const },
       { label: "Instagram", key: "instagram" as const },
       { label: "LinkedIn", key: "linkedin" as const },
     ],
@@ -242,6 +248,14 @@ const metricHomeDe = {
     moreLabel: "Mehr Projekte",
     viewLabel: "Case Study ansehen",
     items: [
+      {
+        slug: "vjm-store",
+        tags: ["Listing", "A+ Content", "EBC"],
+        quote: "Conversion stieg in drei Tagen von 9,5 % auf 22 %",
+        author: "VJM-STORE",
+        role: "Bohrbürsten-Set — Amazon DE",
+        image: "/images/metric/case-detail/vjm-store/1.jpg",
+      },
       {
         slug: "matolux",
         tags: ["Listing", "Agriculture", "Premium A+"],
@@ -319,11 +333,7 @@ const metricHomeDe = {
   },
   footer: {
     ...metricHomeEn.footer,
-    links: [
-      { label: "Datenschutz", href: "/privacy/" },
-      { label: "Newsletter", href: "/newsletter/" },
-      { label: "Karriere", href: "/careers/" },
-    ],
+    links: [{ label: "Datenschutz", href: "/privacy/" }],
     startCta: "Projekt starten",
   },
   nav: [

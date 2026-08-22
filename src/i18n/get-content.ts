@@ -18,6 +18,7 @@ const contentByLocale: Record<Locale, SiteContent> = {
 /** Old handles that should never ship; prefer current brand social URLs. */
 const LEGACY_SOCIAL = new Set([
   "https://t.me/timsol",
+  "https://t.me/metricagency",
   "https://instagram.com/timsol",
   "https://www.instagram.com/timsol",
   "https://t.me/timsolagency",
@@ -141,17 +142,14 @@ export async function getResolvedContent(locale: Locale): Promise<SiteContent> {
         ? {
             phone: extras.siteSettings.phone || base.site.phone,
             social: {
-              telegram: resolveSocialUrl(
-                extras.siteSettings.telegram_url,
-                base.site.social.telegram,
-              ),
+              upwork: base.site.social.upwork,
+              facebook: base.site.social.facebook,
               instagram: resolveSocialUrl(
                 extras.siteSettings.instagram_url,
                 base.site.social.instagram,
               ),
               linkedin: base.site.social.linkedin,
               x: base.site.social.x,
-              facebook: base.site.social.facebook,
             },
             files: {
               presentation:

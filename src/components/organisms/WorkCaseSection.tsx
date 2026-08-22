@@ -3,6 +3,7 @@ import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
+import { VjmStoreCaseBody } from "@/components/organisms/VjmStoreCaseBody";
 import type { Project } from "@/data/projects";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
@@ -54,6 +55,7 @@ export async function WorkCaseSection({
   const caseStudy = project.caseStudy;
   const nextProjects = await getNextProjects(locale, project.slug);
   const stripImages = caseStripImages(project);
+  const isVjmStore = project.slug === "vjm-store";
 
   const authorName = project.author ?? project.title;
   const reviews = [
@@ -72,8 +74,11 @@ export async function WorkCaseSection({
   ];
 
   return (
-    <article className="metric-case">
-      <PageContainer>
+    <article className={`metric-case${isVjmStore ? " metric-case--vjm-store" : ""}`}>
+      {isVjmStore ? (
+        <VjmStoreCaseBody />
+      ) : (
+        <PageContainer>
         {/* Full-width title, then 2-col: role+task | tags+lede+solution. */}
         <header className="metric-case__intro">
           <h1 className="metric-case__title font-display">{authorName}</h1>
@@ -192,6 +197,10 @@ export async function WorkCaseSection({
           </section>
         ) : null}
 
+        </PageContainer>
+      )}
+
+      <PageContainer>
         <section className="mt-16 md:mt-20">
           <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
@@ -201,11 +210,7 @@ export async function WorkCaseSection({
               {home.caseStudies.moreLabel}
             </Button>
           </div>
-          <div
-            className="metric-case-studies__list"
-
-
-          >
+          <div className="metric-case-studies__list">
             {nextProjects.slice(0, 2).map((item) => {
               const fromHome = homeCaseBySlug.get(item.slug);
               return (

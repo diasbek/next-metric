@@ -101,10 +101,6 @@
   order: 1;
 }
 
-.site-footer__link--newsletter {
-  order: -1;
-}
-
 .site-footer__legal {
   display: flex;
   flex-wrap: wrap;
@@ -134,10 +130,6 @@
     justify-content: flex-end;
     gap: 16px 24px;
     max-width: none;
-  }
-
-  .site-footer__link--newsletter {
-    order: 0;
   }
 
   .site-footer__legal {
