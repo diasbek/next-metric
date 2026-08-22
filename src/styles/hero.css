@@ -221,6 +221,13 @@
   filter: drop-shadow(0 4px 14px rgba(131, 4, 108, 0.14));
 }
 
+.metric-hero__cluster-shot .media-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .metric-hero__cluster-shot img {
   object-fit: contain;
   pointer-events: none;
