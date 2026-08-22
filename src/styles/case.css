@@ -181,13 +181,14 @@
 
 /* Overlap + trim JPEG block edges that cause hairlines between frames. */
 .metric-case__stack-item + .metric-case__stack-item {
-  margin-top: -3px;
+  margin-top: -2px;
 }
 
 .metric-case__stack-item:not(:last-child) .progressive-case-image__preview img,
 .metric-case__stack-item:not(:last-child) .progressive-case-image__full img,
 .metric-case__stack-item:not(:last-child) .metric-case__stack-img {
   clip-path: inset(0 0 2px 0);
+  margin-bottom: -2px;
 }
 
 .metric-case__stack-item .media-image,
@@ -373,13 +374,15 @@
 }
 
 .vjm-case__frame + .vjm-case__frame {
-  margin-top: 0;
+  margin-top: -2px;
 }
 
 .vjm-case__frame:not(:last-child) .progressive-case-image__preview img,
 .vjm-case__frame:not(:last-child) .progressive-case-image__full img,
-.vjm-case__frame:not(:last-child) .vjm-case__img {
-  clip-path: none;
+.vjm-case__frame:not(:last-child) .vjm-case__img,
+.vjm-case__frame:not(:last-child) .media-image img {
+  clip-path: inset(0 0 2px 0);
+  margin-bottom: -2px;
 }
 
 .vjm-case__frame .media-image,
