@@ -1,4 +1,4 @@
-import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
+import { MediaImage } from "@/components/atoms/MediaImage";
 import { getCaseImageMeta } from "@/data/case-image-meta";
 import { VJM_STORE_FRAMES } from "@/data/vjm-store-frames";
 
@@ -9,13 +9,15 @@ export function VjmStoreCaseBody() {
         const { width, height } = getCaseImageMeta(frame.src);
         return (
           <figure key={frame.src} className="vjm-case__frame">
-            <ProgressiveCaseImage
+            <MediaImage
               src={frame.src}
               alt={frame.alt}
               width={width}
               height={height}
               className="vjm-case__img"
               priority={index === 0}
+              unoptimized
+              skeleton={index === 0}
             />
           </figure>
         );

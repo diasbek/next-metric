@@ -343,9 +343,14 @@
   margin-top: 0;
 }
 
-/* VJM-STORE — ordered gallery frames inside the shared page shell */
+/* VJM-STORE — ordered source sheets 1–10, native width, no recompression */
 .metric-case--vjm-store {
   padding-block: 40px 80px;
+}
+
+.metric-case--vjm-store .metric-case__shell {
+  max-width: 1024px;
+  padding-inline: 0;
 }
 
 .vjm-case {
@@ -368,13 +373,13 @@
 }
 
 .vjm-case__frame + .vjm-case__frame {
-  margin-top: -3px;
+  margin-top: 0;
 }
 
 .vjm-case__frame:not(:last-child) .progressive-case-image__preview img,
 .vjm-case__frame:not(:last-child) .progressive-case-image__full img,
 .vjm-case__frame:not(:last-child) .vjm-case__img {
-  clip-path: inset(0 0 2px 0);
+  clip-path: none;
 }
 
 .vjm-case__frame .media-image,
@@ -389,6 +394,6 @@
   display: block;
   width: 100% !important;
   height: auto !important;
-  max-width: 100%;
+  max-width: 1024px;
   position: relative !important;
 }
