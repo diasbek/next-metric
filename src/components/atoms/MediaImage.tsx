@@ -20,7 +20,7 @@ export function MediaImage({
   onError,
   onLoad,
   priority,
-  skeleton = true,
+  skeleton = false,
   src,
   ...rest
 }: MediaImageProps) {

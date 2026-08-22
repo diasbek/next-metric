@@ -28,20 +28,39 @@ function useImageReady(
   useEffect(() => {
     if (!enabled) return;
 
-    const img = rootRef.current?.querySelector("img");
-    if (!img) return;
+    let cancelled = false;
+    let detach: (() => void) | undefined;
+    let rafId = 0;
 
-    if (isDecoded(img)) {
-      onReady();
-      return;
-    }
+    const attach = () => {
+      if (cancelled) return;
 
-    const markReady = () => onReady();
-    img.addEventListener("load", markReady);
-    img.addEventListener("error", markReady);
+      const img = rootRef.current?.querySelector("img");
+      if (!img) {
+        rafId = requestAnimationFrame(attach);
+        return;
+      }
+
+      if (isDecoded(img)) {
+        onReady();
+        return;
+      }
+
+      const markReady = () => onReady();
+      img.addEventListener("load", markReady);
+      img.addEventListener("error", markReady);
+      detach = () => {
+        img.removeEventListener("load", markReady);
+        img.removeEventListener("error", markReady);
+      };
+    };
+
+    attach();
+
     return () => {
-      img.removeEventListener("load", markReady);
-      img.removeEventListener("error", markReady);
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      detach?.();
     };
   }, [enabled, onReady, rootRef]);
 }
@@ -71,19 +90,17 @@ export function ProgressiveCaseImage({
     <span
       className={`progressive-case-image${fullReady ? " is-full" : ""}`.trim()}
     >
-      {!fullReady ? (
-        <span ref={previewRef} className="progressive-case-image__preview">
-          <MediaImage
-            {...rest}
-            priority={priority}
-            quality={previewQuality}
-            sizes={previewSizes}
-            className={className}
-            skeleton={skeleton}
-            onLoad={() => markPreviewReady()}
-          />
-        </span>
-      ) : null}
+      <span ref={previewRef} className="progressive-case-image__preview">
+        <MediaImage
+          {...rest}
+          priority={priority}
+          quality={previewQuality}
+          sizes={previewSizes}
+          className={className}
+          skeleton={skeleton}
+          onLoad={() => markPreviewReady()}
+        />
+      </span>
       {previewReady ? (
         <span ref={fullRef} className="progressive-case-image__full">
           <MediaImage

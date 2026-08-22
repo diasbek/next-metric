@@ -166,7 +166,7 @@
   gap: 0;
   overflow: hidden;
   border-radius: var(--radius-xl);
-  background: var(--surface);
+  background: transparent;
   isolation: isolate;
 }
 
@@ -221,19 +221,9 @@
   width: 100%;
 }
 
-.progressive-case-image__full {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.progressive-case-image.is-full .progressive-case-image__full {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progressive-case-image__full {
-    transition: none;
-  }
+.progressive-case-image.is-full .progressive-case-image__preview {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .metric-case__stack-item .media-image img,

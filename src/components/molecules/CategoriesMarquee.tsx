@@ -31,56 +31,6 @@ function categoryAlt(index: number) {
   return `Amazon product listing photography example ${index + 1}`;
 }
 
-function StaticTrack({ images }: { images: readonly string[] }) {
-  return (
-    <div className="metric-categories__track-wrap">
-      <div className="metric-categories__track">
-        {images.map((src, index) => (
-          <div key={`${src}-${index}`} className="metric-categories__card">
-            <MediaImage
-              src={src}
-              alt={categoryAlt(index)}
-              fill
-              className="object-cover"
-              sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
-              quality={75}
-              draggable={false}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CardStrip({
-  images,
-  keyPrefix,
-  inert,
-}: {
-  images: readonly string[];
-  keyPrefix: string;
-  inert?: boolean;
-}) {
-  return (
-    <div className="metric-categories__seq" aria-hidden={inert || undefined}>
-      {images.map((src, index) => (
-        <div key={`${keyPrefix}-${src}-${index}`} className="metric-categories__card">
-          <MediaImage
-            src={src}
-            alt={categoryAlt(index)}
-            fill
-            className="object-cover"
-            sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
-            quality={75}
-            draggable={false}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const AUTO_SCROLL_PX_PER_SEC = 34;
 const RESUME_AFTER_MS = 1200;
 
@@ -169,6 +119,7 @@ function useAutoScrollLoop(
   }, [trackRef, enabled]);
 }
 
+/** Same SSR/hydrate markup; desktop marquee clones the strip after mount. */
 export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
@@ -180,20 +131,65 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
     getMobileLayout,
     () => true,
   );
+  const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const useStaticTrack = reducedMotion || mobileLayout;
+  const marqueeEnabled = !reducedMotion && !mobileLayout;
 
-  useAutoScrollLoop(trackRef, !useStaticTrack);
+  useEffect(() => {
+    const track = trackRef.current;
+    const wrap = wrapRef.current;
+    if (!track || !wrap) return;
 
-  if (useStaticTrack) {
-    return <StaticTrack images={images} />;
-  }
+    if (!marqueeEnabled) {
+      track.querySelector(".metric-categories__seq--clone")?.remove();
+      track.classList.remove("metric-categories__track--marquee");
+      wrap.classList.remove("metric-categories__track-wrap--marquee");
+      track.style.transform = "";
+      return;
+    }
+
+    const primary = track.querySelector<HTMLElement>(".metric-categories__seq");
+    if (!primary) return;
+
+    let clone = track.querySelector<HTMLElement>(".metric-categories__seq--clone");
+    if (!clone) {
+      clone = primary.cloneNode(true) as HTMLElement;
+      clone.classList.add("metric-categories__seq--clone");
+      clone.setAttribute("aria-hidden", "true");
+      track.appendChild(clone);
+    }
+
+    track.classList.add("metric-categories__track--marquee");
+    wrap.classList.add("metric-categories__track-wrap--marquee");
+
+    return () => {
+      clone?.remove();
+      track.classList.remove("metric-categories__track--marquee");
+      wrap.classList.remove("metric-categories__track-wrap--marquee");
+      track.style.transform = "";
+    };
+  }, [marqueeEnabled, images]);
+
+  useAutoScrollLoop(trackRef, marqueeEnabled);
 
   return (
-    <div className="metric-categories__track-wrap metric-categories__track-wrap--marquee">
-      <div ref={trackRef} className="metric-categories__track metric-categories__track--marquee">
-        <CardStrip images={images} keyPrefix="a" />
-        <CardStrip images={images} keyPrefix="b" inert />
+    <div ref={wrapRef} className="metric-categories__track-wrap">
+      <div ref={trackRef} className="metric-categories__track">
+        <div className="metric-categories__seq">
+          {images.map((src, index) => (
+            <div key={`${src}-${index}`} className="metric-categories__card">
+              <MediaImage
+                src={src}
+                alt={categoryAlt(index)}
+                fill
+                className="object-cover"
+                sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
+                quality={75}
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

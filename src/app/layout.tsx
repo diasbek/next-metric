@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { degular, degularDisplay } from "@/assets/fonts";
 import "./globals.css";
-import { ContentVisibilityGuard } from "@/components/ContentVisibilityGuard";
 import { NavigationScrollReset } from "@/components/NavigationScrollReset";
 import { SiteAnalytics } from "@/components/analytics";
 import { ConsentProvider, CookieConsentBanner } from "@/components/consent";
@@ -82,7 +81,6 @@ export default async function RootLayout({
         <ConsentProvider>
           {children}
           <NavigationScrollReset />
-          <ContentVisibilityGuard />
           <SiteAnalytics />
           <CookieConsentBanner />
         </ConsentProvider>
