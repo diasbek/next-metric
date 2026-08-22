@@ -1,9 +1,16 @@
-/** In-app browsers (Telegram etc.) often break SW + delayed GSAP gates. */
+/** Device / in-app browser helpers — keep boot script in sync with these checks. */
 
 export function isIOS(): boolean {
   if (typeof window === "undefined") return false;
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+}
+
+export function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false;
   const ua = navigator.userAgent || "";
-  return /iPhone|iPad|iPod/i.test(ua);
+  return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+    ua,
+  );
 }
 
 export function isRestrictedWebView(): boolean {
@@ -31,8 +38,29 @@ export function isRestrictedWebView(): boolean {
   return false;
 }
 
-/** Critical CSS — must run before the main stylesheet for first paint in WebViews. */
+/** Skip GSAP chunk + page transitions — phones and in-app browsers. */
+export function shouldSkipHeavyMotion(): boolean {
+  if (typeof window === "undefined") return true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
+  return isMobileDevice() || isRestrictedWebView();
+}
+
+/** Desktop with fine pointer — only environment where we register the PWA SW. */
+export function isDesktopInstallContext(): boolean {
+  if (typeof window === "undefined") return false;
+  if (isMobileDevice() || isRestrictedWebView()) return false;
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+
+/** Critical CSS — content must be visible before the main stylesheet loads. */
 export const WEBVIEW_BOOT_CRITICAL_CSS = `
+html.gsap-ready [data-page-transition-root],
+html.gsap-ready .metric-hero__copy,
+html.gsap-ready .metric-hero__visual,
+html.gsap-ready .metric-hero__trust {
+  visibility: visible;
+  opacity: 1;
+}
 html.gsap-force-show [data-reveal],
 html.gsap-force-show [data-reveal-group] > *,
 html.gsap-force-show [data-case-steps] > *,
@@ -45,12 +73,7 @@ html.gsap-force-show .metric-hero__trust,
 html.gsap-force-show .metric-hero__subtitle,
 html.gsap-force-show .metric-hero__copy .metric-cta,
 html.gsap-force-show .metric-hero__trust > *,
-html.gsap-ready [data-reveal],
-html.gsap-ready [data-reveal-group] > *,
-html.gsap-ready [data-case-steps] > *,
-html.gsap-ready .metric-hero__subtitle,
-html.gsap-ready .metric-hero__copy .metric-cta,
-html.gsap-ready .metric-hero__trust > *,
+html.gsap-force-show [data-page-transition-root],
 html.restricted-webview [data-reveal],
 html.restricted-webview [data-reveal-group] > *,
 html.restricted-webview [data-case-steps] > *,
@@ -63,9 +86,7 @@ html.restricted-webview .metric-hero__trust,
 html.restricted-webview .metric-hero__subtitle,
 html.restricted-webview .metric-hero__copy .metric-cta,
 html.restricted-webview .metric-hero__trust > *,
-html.restricted-webview [data-page-transition-root],
-html.gsap-force-show [data-page-transition-root],
-html.gsap-ready [data-page-transition-root] {
+html.restricted-webview [data-page-transition-root] {
   visibility: visible !important;
   opacity: 1 !important;
   transform: none !important;
@@ -74,8 +95,8 @@ html.gsap-ready [data-page-transition-root] {
 `.trim();
 
 /**
- * Runs synchronously in <head> before paint — must stay self-contained (no imports).
- * Keep in sync with isRestrictedWebView() / isIOS().
+ * Runs synchronously in <head> before paint — self-contained, no imports.
+ * Content is always readable; GSAP is progressive enhancement on desktop only.
  */
 export const WEBVIEW_BOOT_SCRIPT = `
 (function(){
@@ -83,60 +104,32 @@ export const WEBVIEW_BOOT_SCRIPT = `
     var h = document.documentElement;
     var ua = navigator.userAgent || "";
     var ref = document.referrer || "";
-    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    var isMobile = /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     var restricted =
       /Telegram|TelegramBot|Instagram|FBAN|FBAV|FBIOS|Line\\//i.test(ua) ||
       /; wv\\)|\\bWebView\\b/i.test(ua) ||
       /t\\.me|telegram\\.(me|org|dog)/i.test(ref) ||
       !!(window.TelegramWebviewProxy || (window.Telegram && (window.Telegram.WebView || window.Telegram.WebApp)));
-    var reduced = false;
-    try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 
-    function forceShow(markRestricted) {
-      h.classList.remove("gsap-pending");
-      h.classList.add("gsap-force-show", "gsap-ready");
-      if (markRestricted) h.classList.add("restricted-webview");
+    h.classList.remove("gsap-pending");
+    h.classList.add("gsap-ready");
+    if (isMobile || restricted) {
+      h.classList.add("gsap-force-show");
+      if (restricted) h.classList.add("restricted-webview");
     }
 
-    function purgeSw() {
-      if (!("serviceWorker" in navigator)) return;
-      navigator.serviceWorker.getRegistrations().then(function(regs) {
-        regs.forEach(function(r) { r.unregister(); });
-      }).catch(function() {});
+    if (isMobile || restricted || (navigator.serviceWorker && navigator.serviceWorker.controller)) {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r) { r.unregister(); });
+        }).catch(function(){});
+      }
+      if ("caches" in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(k) { caches.delete(k); });
+        }).catch(function(){});
+      }
     }
-
-    function purgeCaches() {
-      if (!("caches" in window)) return;
-      caches.keys().then(function(keys) {
-        keys.forEach(function(k) { caches.delete(k); });
-      }).catch(function() {});
-    }
-
-    // iOS Telegram uses a Safari-identical UA — always show content on first paint.
-    if (isIOS || restricted) {
-      forceShow(restricted);
-      purgeSw();
-      purgeCaches();
-      return;
-    }
-
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      forceShow(false);
-      purgeSw();
-      purgeCaches();
-      return;
-    }
-
-    if (reduced) {
-      h.classList.remove("gsap-pending");
-      return;
-    }
-
-    setTimeout(function() {
-      if (h.classList.contains("gsap-ready") || h.classList.contains("gsap-force-show")) return;
-      h.classList.add("gsap-force-show", "gsap-ready");
-      h.classList.remove("gsap-pending");
-    }, 400);
   } catch (e) {}
 })();
 `.trim();

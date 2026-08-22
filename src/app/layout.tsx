@@ -56,7 +56,7 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      className={`${degular.variable} ${degularDisplay.variable} gsap-pending`}
+      className={`${degular.variable} ${degularDisplay.variable}`}
       suppressHydrationWarning
     >
       <head>

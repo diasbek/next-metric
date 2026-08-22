@@ -1,20 +1,26 @@
 /* GSAP reveal gates, boot, and reduced-motion helpers */
 
-/* Motion helpers
-   Hide only while GSAP boots. Permanent opacity:0 + clearProps re-hides
-   content after scroll reveals complete — do not use that pattern.
-   html.gsap-pending is set on the SSR <html> so the first paint never
-   shows reveals/hero details only to yank them on hydrate. */
-html.gsap-pending:not(.gsap-force-show) [data-reveal]:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show) [data-reveal-group] > *:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show) [data-case-steps] > *:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show) .metric-hero__subtitle,
-html.gsap-pending:not(.gsap-force-show) .metric-hero__copy .metric-cta,
-html.gsap-pending:not(.gsap-force-show) .metric-hero__trust > * {
+/* Legacy gsap-pending — kept for safety if ever re-applied client-side.
+   Head boot always sets gsap-ready so first paint is never blank. */
+html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) [data-reveal]:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) [data-reveal-group] > *:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) [data-case-steps] > *:not(.is-revealed),
+html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) .metric-hero__subtitle,
+html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) .metric-hero__copy .metric-cta,
+html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) .metric-hero__trust > * {
   visibility: hidden;
 }
 
-/* Chunk/network failure path — show content without waiting on GSAP import. */
+/* Fail-open shell — hero + page root always readable once head boot runs. */
+html.gsap-ready [data-page-transition-root],
+html.gsap-ready .metric-hero__copy,
+html.gsap-ready .metric-hero__visual,
+html.gsap-ready .metric-hero__trust {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Phones / in-app browsers — never hide content waiting on GSAP. */
 html.gsap-force-show [data-reveal],
 html.gsap-force-show [data-reveal-group] > *,
 html.gsap-force-show [data-case-steps] > *,

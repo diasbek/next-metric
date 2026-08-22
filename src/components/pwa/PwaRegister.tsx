@@ -1,19 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
-import { isRestrictedWebView } from "@/utils/webview";
+import { isDesktopInstallContext } from "@/utils/webview";
 
-/** Registers the installability service worker (desktop Chrome / Edge / Android). */
+/** Registers the installability service worker (desktop Chrome / Edge only). */
 export function PwaRegister() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!("serviceWorker" in navigator)) return;
     if (process.env.NODE_ENV !== "production") return;
 
-    const ua = navigator.userAgent || "";
-
-    // In-app browsers and phones never get a controlling SW — it blanked Telegram.
-    if (isRestrictedWebView() || /Mobile|Android|iPhone|iPad|iPod/i.test(ua)) {
+    if (!isDesktopInstallContext()) {
       void navigator.serviceWorker.getRegistrations().then((regs) => {
         regs.forEach((reg) => {
           void reg.unregister();
@@ -36,7 +33,7 @@ export function PwaRegister() {
           void registration.update();
         })
         .catch(() => {
-          /* ignore — install still works on desktop without SW in modern Chrome */
+          /* ignore */
         });
     };
 
