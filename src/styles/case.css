@@ -174,21 +174,57 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  background: var(--surface);
+  background: transparent;
   line-height: 0;
+  transform: translateZ(0);
 }
 
-/* Kill 1px hairlines between full-bleed JPEG frames on flat backgrounds. */
+/* Overlap + trim JPEG block edges that cause hairlines between frames. */
 .metric-case__stack-item + .metric-case__stack-item {
-  margin-top: -1px;
+  margin-top: -3px;
 }
 
-.metric-case__stack-item .media-image {
+.metric-case__stack-item:not(:last-child) .progressive-case-image__preview img,
+.metric-case__stack-item:not(:last-child) .progressive-case-image__full img,
+.metric-case__stack-item:not(:last-child) .metric-case__stack-img {
+  clip-path: inset(0 0 2px 0);
+}
+
+.metric-case__stack-item .media-image,
+.metric-case__stack-item .progressive-case-image {
   display: block;
   width: 100%;
 }
 
+.progressive-case-image {
+  position: relative;
+  display: grid;
+  width: 100%;
+  line-height: 0;
+}
+
+.progressive-case-image__preview,
+.progressive-case-image__full {
+  grid-area: 1 / 1;
+}
+
+.progressive-case-image__full {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.progressive-case-image.is-full .progressive-case-image__full {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressive-case-image__full {
+    transition: none;
+  }
+}
+
 .metric-case__stack-item .media-image img,
+.metric-case__stack-item .progressive-case-image img,
 .metric-case__stack-img {
   display: block;
   width: 100% !important;
@@ -326,19 +362,29 @@
   margin: 0;
   width: 100%;
   line-height: 0;
-  background: var(--surface);
+  background: transparent;
+  overflow: hidden;
+  transform: translateZ(0);
 }
 
 .vjm-case__frame + .vjm-case__frame {
-  margin-top: -1px;
+  margin-top: -3px;
 }
 
-.vjm-case__frame .media-image {
+.vjm-case__frame:not(:last-child) .progressive-case-image__preview img,
+.vjm-case__frame:not(:last-child) .progressive-case-image__full img,
+.vjm-case__frame:not(:last-child) .vjm-case__img {
+  clip-path: inset(0 0 2px 0);
+}
+
+.vjm-case__frame .media-image,
+.vjm-case__frame .progressive-case-image {
   display: block;
   width: 100%;
 }
 
 .vjm-case__frame .media-image img,
+.vjm-case__frame .progressive-case-image img,
 .vjm-case__img {
   display: block;
   width: 100% !important;

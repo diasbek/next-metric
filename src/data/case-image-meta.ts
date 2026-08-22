@@ -71,3 +71,7 @@ export function getCaseImageMeta(src: string) {
 /** Rendered width for full-bleed galleries inside `.page-container`. */
 export const CASE_GALLERY_SIZES =
   "(max-width: 1512px) 100vw, (max-width: 3840px) 90vw, 3840px";
+
+/** Smaller srcset for the progressive preview pass. */
+export const CASE_GALLERY_PREVIEW_SIZES =
+  "(max-width: 768px) 100vw, (max-width: 1512px) 50vw, 960px";

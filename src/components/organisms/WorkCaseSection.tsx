@@ -5,7 +5,8 @@ import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
 import { VjmStoreCaseBody } from "@/components/organisms/VjmStoreCaseBody";
 import type { Project } from "@/data/projects";
-import { getCaseImageMeta, CASE_GALLERY_SIZES } from "@/data/case-image-meta";
+import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
+import { getCaseImageMeta } from "@/data/case-image-meta";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -134,7 +135,7 @@ export async function WorkCaseSection({
               const { width, height } = getCaseImageMeta(src);
               return (
               <div key={`${src}-${index}`} className="metric-case__stack-item">
-                <MediaImage
+                <ProgressiveCaseImage
                   src={src}
                   alt={
                     index === 0
@@ -144,8 +145,6 @@ export async function WorkCaseSection({
                   width={width}
                   height={height}
                   className="metric-case__stack-img"
-                  sizes={CASE_GALLERY_SIZES}
-                  quality={90}
                   priority={index === 0}
                 />
                 {index === 0 && caseStudy?.metricValue ? (
