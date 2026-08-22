@@ -191,8 +191,7 @@
   margin-bottom: -2px;
 }
 
-.metric-case__stack-item .media-image,
-.metric-case__stack-item .progressive-case-image {
+.metric-case__stack-item .media-image {
   display: block;
   width: 100%;
 }
@@ -202,6 +201,11 @@
   display: grid;
   width: 100%;
   line-height: 0;
+}
+
+.metric-case__stack-item .progressive-case-image {
+  display: grid;
+  width: 100%;
 }
 
 .progressive-case-image__preview,
@@ -216,6 +220,10 @@
 
 .progressive-case-image.is-full .progressive-case-image__full {
   opacity: 1;
+}
+
+.progressive-case-image.is-full .progressive-case-image__preview {
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
