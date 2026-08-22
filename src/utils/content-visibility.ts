@@ -93,6 +93,7 @@ export const WEBVIEW_BOOT_SCRIPT = `
   }
 
   try {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     unlock();
     removeStreamingShellDuplicates();
 

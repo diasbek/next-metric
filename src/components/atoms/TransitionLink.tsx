@@ -9,6 +9,7 @@ import {
   isSameDocumentPath,
   navigateSameDocumentHash,
   navigateSameDocumentTop,
+  resetScrollPosition,
 } from "@/utils/scroll";
 
 type TransitionLinkProps = ComponentProps<typeof Link>;
@@ -77,6 +78,11 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
         if (!hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentTop();
+          return;
+        }
+
+        if (!sameDoc && !hash) {
+          resetScrollPosition();
         }
       }}
     />

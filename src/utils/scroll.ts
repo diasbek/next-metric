@@ -25,6 +25,9 @@ export function resetScrollPositionAfterPaint(): void {
     resetScrollPosition();
     requestAnimationFrame(resetScrollPosition);
   });
+  // Images / fonts can shift layout after the first paint — re-pin once more.
+  window.setTimeout(resetScrollPosition, 0);
+  window.setTimeout(resetScrollPosition, 120);
 }
 
 /** First hash segment only — never allow `#a#b#c` concatenations. */
