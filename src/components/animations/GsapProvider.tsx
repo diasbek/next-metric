@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { settleScrollAfterNavigation } from "@/utils/scroll";
-import { isRestrictedWebView } from "@/utils/webview";
+import { isIOS, isRestrictedWebView } from "@/utils/webview";
 
 interface GsapProviderProps {
   children: React.ReactNode;
@@ -88,28 +88,24 @@ export function GsapProvider({ children }: GsapProviderProps) {
     const restricted =
       isRestrictedWebView() ||
       html.classList.contains("restricted-webview");
+    const ios = isIOS();
     const softNav = bootCompleted;
     const alreadyForced =
       html.classList.contains("gsap-force-show") ||
+      html.classList.contains("gsap-ready") ||
       html.classList.contains("restricted-webview");
 
-    // Cold boot: keep SSR gsap-pending so reveals don't flash before init.
-    // Soft nav / Strict remount / in-app browsers: never re-hide — that blanked
-    // Telegram WebView after the head script had already force-shown content.
-    if (reduced || restricted || alreadyForced || softNav) {
+    // Never re-apply gsap-pending — head boot or SSR already decided visibility.
+    if (reduced || restricted || alreadyForced || softNav || ios) {
       html.classList.remove("gsap-pending");
       if (restricted || alreadyForced) {
-        html.classList.add("gsap-force-show", "restricted-webview");
-      } else {
-        html.classList.remove("gsap-force-show");
+        html.classList.add("gsap-force-show", "gsap-ready");
+        if (restricted) html.classList.add("restricted-webview");
       }
-      if (softNav || restricted || alreadyForced) {
+      if (softNav || restricted || alreadyForced || ios) {
         void tryShowAllRevealTargets({ preserveCaseSteps: true });
         void tryResetPageTransition();
       }
-    } else {
-      html.classList.add("gsap-pending");
-      html.classList.remove("gsap-ready", "gsap-force-show");
     }
 
     let cleanup: (() => void) | undefined;
@@ -147,11 +143,10 @@ export function GsapProvider({ children }: GsapProviderProps) {
       void tryResetPageTransition();
     };
 
-    if (!reduced) {
-      // Soft nav / WebView already show content; still fail-open if init hangs.
+    if (!reduced && !ios && !restricted) {
       hardReadyTimer = setTimeout(
         forceReadyCssOnly,
-        softNav || restricted ? HARD_READY_MS * 2 : HARD_READY_MS,
+        softNav ? HARD_READY_MS * 2 : HARD_READY_MS,
       );
     }
 
@@ -177,7 +172,7 @@ export function GsapProvider({ children }: GsapProviderProps) {
       }
 
       try {
-        const skipEnter = softNav || restricted || alreadyForced;
+        const skipEnter = softNav || restricted || alreadyForced || ios;
         if (!skipEnter) {
           const { playEnterTransition, resetPageTransition } = await import(
             "@/animations/page-transition"

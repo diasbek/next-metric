@@ -1,5 +1,11 @@
 /** In-app browsers (Telegram etc.) often break SW + delayed GSAP gates. */
 
+export function isIOS(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  return /iPhone|iPad|iPod/i.test(ua);
+}
+
 export function isRestrictedWebView(): boolean {
   if (typeof window === "undefined") return false;
 
@@ -39,6 +45,12 @@ html.gsap-force-show .metric-hero__trust,
 html.gsap-force-show .metric-hero__subtitle,
 html.gsap-force-show .metric-hero__copy .metric-cta,
 html.gsap-force-show .metric-hero__trust > *,
+html.gsap-ready [data-reveal],
+html.gsap-ready [data-reveal-group] > *,
+html.gsap-ready [data-case-steps] > *,
+html.gsap-ready .metric-hero__subtitle,
+html.gsap-ready .metric-hero__copy .metric-cta,
+html.gsap-ready .metric-hero__trust > *,
 html.restricted-webview [data-reveal],
 html.restricted-webview [data-reveal-group] > *,
 html.restricted-webview [data-case-steps] > *,
@@ -51,7 +63,9 @@ html.restricted-webview .metric-hero__trust,
 html.restricted-webview .metric-hero__subtitle,
 html.restricted-webview .metric-hero__copy .metric-cta,
 html.restricted-webview .metric-hero__trust > *,
-html.restricted-webview [data-page-transition-root] {
+html.restricted-webview [data-page-transition-root],
+html.gsap-force-show [data-page-transition-root],
+html.gsap-ready [data-page-transition-root] {
   visibility: visible !important;
   opacity: 1 !important;
   transform: none !important;
@@ -61,7 +75,7 @@ html.restricted-webview [data-page-transition-root] {
 
 /**
  * Runs synchronously in <head> before paint — must stay self-contained (no imports).
- * Keep in sync with isRestrictedWebView().
+ * Keep in sync with isRestrictedWebView() / isIOS().
  */
 export const WEBVIEW_BOOT_SCRIPT = `
 (function(){
@@ -69,44 +83,47 @@ export const WEBVIEW_BOOT_SCRIPT = `
     var h = document.documentElement;
     var ua = navigator.userAgent || "";
     var ref = document.referrer || "";
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
     var restricted =
       /Telegram|TelegramBot|Instagram|FBAN|FBAV|FBIOS|Line\\//i.test(ua) ||
       /; wv\\)|\\bWebView\\b/i.test(ua) ||
       /t\\.me|telegram\\.(me|org|dog)/i.test(ref) ||
       !!(window.TelegramWebviewProxy || (window.Telegram && (window.Telegram.WebView || window.Telegram.WebApp)));
-    var controlled = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
     var reduced = false;
     try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 
-    function forceShow() {
+    function forceShow(markRestricted) {
       h.classList.remove("gsap-pending");
-      h.classList.add("gsap-force-show", "gsap-ready", "restricted-webview");
+      h.classList.add("gsap-force-show", "gsap-ready");
+      if (markRestricted) h.classList.add("restricted-webview");
     }
 
     function purgeSw() {
-      if (!("serviceWorker" in navigator)) return Promise.resolve();
-      return navigator.serviceWorker.getRegistrations().then(function(regs) {
-        return Promise.all(regs.map(function(r) { return r.unregister(); }));
+      if (!("serviceWorker" in navigator)) return;
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        regs.forEach(function(r) { r.unregister(); });
       }).catch(function() {});
     }
 
     function purgeCaches() {
-      if (!("caches" in window)) return Promise.resolve();
-      return caches.keys().then(function(keys) {
-        return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+      if (!("caches" in window)) return;
+      caches.keys().then(function(keys) {
+        keys.forEach(function(k) { caches.delete(k); });
       }).catch(function() {});
     }
 
-    if (restricted || controlled) {
-      forceShow();
-      var reloadKey = "metric-sw-purged-v1";
-      var needsReload = controlled && !sessionStorage.getItem(reloadKey);
-      Promise.all([purgeSw(), purgeCaches()]).then(function() {
-        if (needsReload) {
-          try { sessionStorage.setItem(reloadKey, "1"); } catch (e) {}
-          location.reload();
-        }
-      });
+    // iOS Telegram uses a Safari-identical UA — always show content on first paint.
+    if (isIOS || restricted) {
+      forceShow(restricted);
+      purgeSw();
+      purgeCaches();
+      return;
+    }
+
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      forceShow(false);
+      purgeSw();
+      purgeCaches();
       return;
     }
 
@@ -117,7 +134,7 @@ export const WEBVIEW_BOOT_SCRIPT = `
 
     setTimeout(function() {
       if (h.classList.contains("gsap-ready") || h.classList.contains("gsap-force-show")) return;
-      h.classList.add("gsap-force-show");
+      h.classList.add("gsap-force-show", "gsap-ready");
       h.classList.remove("gsap-pending");
     }, 400);
   } catch (e) {}
