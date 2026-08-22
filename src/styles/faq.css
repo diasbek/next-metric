@@ -1,5 +1,26 @@
 /* FAQ accordion and Metric FAQ layout */
 
+.faq-accordion__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.faq-accordion__panel--open {
+  grid-template-rows: 1fr;
+}
+
+.faq-accordion__panel-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-accordion__panel {
+    transition: none;
+  }
+}
+
 .faq-item {
   background: rgba(245, 245, 245, 0.3);
   border-radius: 24px;

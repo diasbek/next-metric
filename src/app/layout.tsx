@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { degular, degularDisplay } from "@/assets/fonts";
 import "./globals.css";
-import { GsapProviderLazy } from "@/components/animations/GsapProviderLazy";
 import { SiteAnalytics } from "@/components/analytics";
 import { ConsentProvider, CookieConsentBanner } from "@/components/consent";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
@@ -12,10 +11,7 @@ import { getResolvedAnalytics } from "@/lib/cms/settings";
 import { rootMetadata } from "@/utils/metadata";
 import { getGlobalJsonLdGraph } from "@/utils/seo/json-ld";
 import { SITE_CONFIG } from "@/utils/consts";
-import {
-  WEBVIEW_BOOT_CRITICAL_CSS,
-  WEBVIEW_BOOT_SCRIPT,
-} from "@/utils/webview";
+import { WEBVIEW_BOOT_SCRIPT } from "@/utils/webview";
 
 export const viewport: Viewport = {
   themeColor: SITE_CONFIG.themeColor,
@@ -60,20 +56,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <style
-          dangerouslySetInnerHTML={{ __html: WEBVIEW_BOOT_CRITICAL_CSS }}
-        />
         <script dangerouslySetInnerHTML={{ __html: WEBVIEW_BOOT_SCRIPT }} />
       </head>
       <body className="antialiased">
-        <noscript>
-          <style
-            dangerouslySetInnerHTML={{
-              __html:
-                "html.gsap-pending [data-reveal],html.gsap-pending [data-reveal-group]>*,html.gsap-pending [data-case-steps]>*,html.gsap-pending .metric-hero__subtitle,html.gsap-pending .metric-hero__copy .metric-cta,html.gsap-pending .metric-hero__trust>*{visibility:visible!important;opacity:1!important;transform:none!important}",
-            }}
-          />
-        </noscript>
         {metrikaPixel ? (
           <noscript>
             <div>
@@ -87,9 +72,7 @@ export default async function RootLayout({
         ) : null}
         <JsonLd data={getGlobalJsonLdGraph()} />
         <ConsentProvider>
-          <GsapProviderLazy>
-            {children}
-          </GsapProviderLazy>
+          {children}
           <SiteAnalytics />
           <CookieConsentBanner />
         </ConsentProvider>

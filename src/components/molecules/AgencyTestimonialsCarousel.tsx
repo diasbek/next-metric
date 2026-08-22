@@ -7,8 +7,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { SectionTitle } from "@/components/atoms";
 import { TestimonialNavButtons } from "@/components/molecules/TestimonialsCarousel";
 import type { Testimonial } from "@/data/agency";
-import { scheduleScrollTriggerRefresh } from "@/animations/gsap";
-
 import "swiper/css";
 
 interface AgencyTestimonialsCarouselProps {
@@ -46,7 +44,6 @@ export function AgencyTestimonialsCarousel({
         onSwiper={(swiper) => {
           swiperRef.current = swiper;
         }}
-        onResize={() => scheduleScrollTriggerRefresh()}
         slidesPerView={1}
         spaceBetween={16}
         grabCursor

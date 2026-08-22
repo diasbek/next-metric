@@ -1,53 +1,4 @@
-/* GSAP reveal gates, boot, and reduced-motion helpers */
-
-/* Legacy gsap-pending — kept for safety if ever re-applied client-side.
-   Head boot always sets gsap-ready so first paint is never blank. */
-html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) [data-reveal]:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) [data-reveal-group] > *:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) [data-case-steps] > *:not(.is-revealed),
-html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) .metric-hero__subtitle,
-html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) .metric-hero__copy .metric-cta,
-html.gsap-pending:not(.gsap-force-show):not(.gsap-ready) .metric-hero__trust > * {
-  visibility: hidden;
-}
-
-/* Fail-open shell — hero + page root always readable once head boot runs. */
-html.gsap-ready [data-page-transition-root],
-html.gsap-ready .metric-hero__copy,
-html.gsap-ready .metric-hero__visual,
-html.gsap-ready .metric-hero__trust {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* Phones / in-app browsers — never hide content waiting on GSAP. */
-html.gsap-force-show [data-reveal],
-html.gsap-force-show [data-reveal-group] > *,
-html.gsap-force-show [data-case-steps] > *,
-html.gsap-force-show [data-split-title],
-html.gsap-force-show [data-border-draw],
-html.gsap-force-show [data-counter],
-html.gsap-force-show .metric-hero__copy,
-html.gsap-force-show .metric-hero__visual,
-html.gsap-force-show .metric-hero__trust,
-html.gsap-force-show .metric-hero__subtitle,
-html.gsap-force-show .metric-hero__copy .metric-cta,
-html.gsap-force-show .metric-hero__trust > * {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: none !important;
-  clip-path: none !important;
-}
-
-[data-reveal].is-revealed,
-[data-reveal-group] > *.is-revealed,
-[data-case-steps] > *.is-revealed,
-.metric-hero__copy.is-revealed,
-.metric-hero__visual.is-revealed,
-.metric-hero__trust.is-revealed {
-  visibility: visible !important;
-  clip-path: none;
-}
+/* Lightweight hover feedback — desktop pointer devices only. */
 
 @media (hover: hover) and (pointer: fine) {
   .metric-case-card,
@@ -70,23 +21,6 @@ html.gsap-force-show .metric-hero__trust > * {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal],
-  [data-reveal-group] > *,
-  [data-split-title],
-  [data-border-draw],
-  [data-counter],
-  .metric-hero__copy,
-  .metric-hero__visual,
-  .metric-hero__trust,
-  .metric-hero__subtitle,
-  .metric-hero__copy .metric-cta,
-  .metric-hero__trust > * {
-    visibility: visible;
-    opacity: 1;
-    transform: none;
-    clip-path: none;
-  }
-
   .metric-cta:hover,
   .metric-case-card:hover,
   .metric-workflow-card:hover,

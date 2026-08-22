@@ -329,8 +329,30 @@ html.is-mobile-menu-open {
   overflow: hidden;
 }
 
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    visibility 0.22s ease;
+}
+
+.mobile-menu[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+html[data-mobile-menu-open] {
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .mobile-menu-panel {
+  .mobile-menu-panel,
+  .mobile-menu {
     transition: none;
   }
 }

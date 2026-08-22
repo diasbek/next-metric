@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { useState } from "react";
 import { Divider } from "@/components/atoms";
-import { MOTION_OK, scheduleScrollTriggerRefresh } from "@/animations/gsap";
 
 interface FAQAccordionProps {
   items: { question: string; answer: string }[];
@@ -15,33 +13,11 @@ export function FAQAccordion({
   variant = "default",
 }: FAQAccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const answerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isAgency = variant === "agency";
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!window.matchMedia(MOTION_OK).matches) return;
-
-    answerRefs.current.forEach((el, index) => {
-      if (!el) return;
-      const isOpen = openIndex === index;
-      gsap.to(el, {
-        height: isOpen ? "auto" : 0,
-        opacity: isOpen ? 1 : 0,
-        duration: 0.4,
-        ease: "power2.inOut",
-        onComplete: () => scheduleScrollTriggerRefresh(),
-      });
-    });
-  }, [openIndex]);
 
   if (isAgency) {
     return (
-      <div
-        className="faq-agency"
-        data-reveal-group
-        data-no-section-snap
-      >
+      <div className="faq-agency" data-no-section-snap>
         {items.map((item, index) => {
           const isOpen = openIndex === index;
           return (
@@ -58,13 +34,11 @@ export function FAQAccordion({
                 </span>
               </button>
               <div
-                ref={(el) => {
-                  answerRefs.current[index] = el;
-                }}
-                className="faq-agency__answer overflow-hidden"
-                style={{ height: isOpen ? "auto" : 0 }}
+                className={`faq-accordion__panel faq-agency__answer${isOpen ? " faq-accordion__panel--open" : ""}`}
               >
-                <p className="faq-agency__answer-text">{item.answer}</p>
+                <div className="faq-accordion__panel-inner">
+                  <p className="faq-agency__answer-text">{item.answer}</p>
+                </div>
               </div>
             </div>
           );
@@ -74,11 +48,7 @@ export function FAQAccordion({
   }
 
   return (
-    <div
-      className="mx-auto flex max-w-[716px] flex-col gap-0"
-      data-reveal-group
-      data-no-section-snap
-    >
+    <div className="mx-auto flex max-w-[716px] flex-col gap-0" data-no-section-snap>
       {items.map((item, index) => {
         const isOpen = openIndex === index;
         return (
@@ -95,13 +65,11 @@ export function FAQAccordion({
               </span>
             </button>
             <div
-              ref={(el) => {
-                answerRefs.current[index] = el;
-              }}
-              className="overflow-hidden"
-              style={{ height: isOpen ? "auto" : 0 }}
+              className={`faq-accordion__panel overflow-hidden${isOpen ? " faq-accordion__panel--open" : ""}`}
             >
-              <p className="pb-10 text-body-lg text-white/70">{item.answer}</p>
+              <div className="faq-accordion__panel-inner">
+                <p className="pb-10 text-body-lg text-white/70">{item.answer}</p>
+              </div>
             </div>
           </div>
         );

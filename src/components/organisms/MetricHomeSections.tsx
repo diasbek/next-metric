@@ -143,7 +143,7 @@ export function MetricHeroSection({
           <div className="metric-hero__visual">
             <div className="metric-hero__cluster">
               <div className="metric-hero__cluster-shot">
-                <Image
+                <MediaImage
                   src="/images/metric/hero/cluster.png"
                   alt="Amazon listing images and A+ Content product photography examples"
                   fill
@@ -364,7 +364,6 @@ export function MetricServicesSection({
                     src={item.image}
                     alt={`${item.title} — Amazon deliverable example`}
                     fill
-                    skeleton={false}
                     className="metric-services-card__img"
                     sizes="(max-width: 1024px) 90vw, (max-width: 1799px) 70vw, (max-width: 2559px) min(55vw, 1200px), min(50vw, 1600px)"
                     quality={75}
@@ -422,7 +421,6 @@ export function MetricWorkflowSection({
                   alt={card.title}
                   width={imgW}
                   height={imgH}
-                  skeleton={false}
                   className="metric-workflow-card__img"
                   sizes="(max-width: 1024px) 90vw, 33vw"
                   quality={75}

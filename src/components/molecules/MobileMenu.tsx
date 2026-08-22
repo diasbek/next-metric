@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
-import { dispatchMenuClose, dispatchMenuOpen } from "@/animations/menu";
 import { SiteLogoMark } from "@/components/molecules/SiteLogoMark";
 import { SiteNav } from "@/components/molecules/SiteNav";
 import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
@@ -12,6 +11,8 @@ import type { SiteContent } from "@/i18n/types";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const MENU_TRANSITION_MS = 220;
 
 interface MobileMenuProps {
   locale: Locale;
@@ -44,31 +45,13 @@ export function MobileMenu({
   }, [isOpen]);
 
   useEffect(() => {
-    if (!mounted) return;
-
-    const panel = panelRef.current;
-    if (!panel) return;
-
     if (isOpen) {
-      dispatchMenuOpen(panel);
+      setMounted(true);
       return;
     }
 
-    const handleClosed = () => setMounted(false);
-    window.addEventListener("metric:menu-closed", handleClosed, { once: true });
-    dispatchMenuClose(panel);
-
-    return () => {
-      window.removeEventListener("metric:menu-closed", handleClosed);
-    };
-  }, [isOpen, mounted]);
-
-  useEffect(() => {
-    if (isOpen) {
-      // Keep the panel mounted through the close animation.
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- exit animation requires mounted state after isOpen becomes false
-      setMounted(true);
-    }
+    const timer = window.setTimeout(() => setMounted(false), MENU_TRANSITION_MS);
+    return () => window.clearTimeout(timer);
   }, [isOpen]);
 
   useEffect(() => {
@@ -139,6 +122,7 @@ export function MobileMenu({
       ref={panelRef}
       id={id}
       data-mobile-menu
+      data-open={isOpen ? "true" : "false"}
       role="dialog"
       aria-modal="true"
       aria-label={ui.navAria}

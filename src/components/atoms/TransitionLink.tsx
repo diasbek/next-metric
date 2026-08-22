@@ -11,19 +11,6 @@ import {
   navigateSameDocumentTop,
 } from "@/utils/scroll";
 
-type PageTransitionMod = typeof import("@/animations/page-transition");
-
-let transitionMod: PageTransitionMod | null = null;
-let transitionLoad: Promise<PageTransitionMod> | null = null;
-
-function loadPageTransition(): Promise<PageTransitionMod> {
-  transitionLoad ??= import("@/animations/page-transition").then((mod) => {
-    transitionMod = mod;
-    return mod;
-  });
-  return transitionLoad;
-}
-
 type TransitionLinkProps = ComponentProps<typeof Link>;
 
 function hrefToUrl(href: TransitionLinkProps["href"]): string {
@@ -66,12 +53,6 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
           return;
         }
 
-        // Don't swallow clicks while a previous transition is in flight —
-        // reset and continue so production slow navigations stay interruptible.
-        if (transitionMod?.isTransitioning()) {
-          transitionMod.resetPageTransition();
-        }
-
         const url = hrefToUrl(href);
         if (!url || url.startsWith("http")) return;
 
@@ -81,35 +62,22 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
         const currentSearch =
           typeof window !== "undefined" ? window.location.search || "" : "";
 
-        // Same-document section links: never use Next router / page transitions.
         if (hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentHash(hash);
           return;
         }
 
-        // Same path, different query (e.g. /works/?category=Listing) — update
-        // filters without a full-page FLIP or a forced scroll-to-top.
         if (!hash && sameDoc && nextSearch !== currentSearch) {
           event.preventDefault();
           router.replace(url, { scroll: false });
           return;
         }
 
-        // Logo / home on the current page: clear hash + scroll top, no transition.
         if (!hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentTop();
-          return;
         }
-
-        event.preventDefault();
-        void loadPageTransition().then((mod) => {
-          if (mod.isTransitioning()) mod.resetPageTransition();
-          return mod.navigateWithTransition(url, () =>
-            router.push(url, { scroll: false }),
-          );
-        });
       }}
     />
   );
