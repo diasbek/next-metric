@@ -216,6 +216,10 @@
   /* Figma 2015:179 — 30% #f5f5f5 over the pink section = pale pink cards. */
   background: rgb(245 245 245 / 0.3);
   padding: 10px 10px 0;
+  /* Mockup tilt + zoom — match Figma yellow frame on card 1. */
+  --services-mock-rotate: -5.5deg;
+  --services-mock-scale: 1.18;
+  --services-mock-origin: right top;
 }
 
 @media (max-width: 1023px) {
@@ -342,6 +346,8 @@
   top: 0;
   width: 100%;
   height: auto;
+  transform: rotate(var(--services-mock-rotate)) scale(var(--services-mock-scale));
+  transform-origin: var(--services-mock-origin);
 }
 
 .metric-services-card__media .media-image img,
@@ -352,9 +358,7 @@
   height: auto !important;
   max-width: none;
   object-fit: unset;
-  object-position: left top;
-  transform: rotate(-3.6deg);
-  transform-origin: left top;
+  object-position: right top;
 }
 
 @media (max-width: 1023px) {
@@ -368,8 +372,8 @@
     position: absolute;
     left: auto;
     right: 0;
-    top: 72px;
-    width: 50%;
+    top: 64px;
+    width: 58%;
     aspect-ratio: auto;
     height: auto;
     pointer-events: none;
@@ -379,12 +383,12 @@
     left: auto;
     right: 0;
     width: 100%;
+    --services-mock-origin: right top;
   }
 
   .metric-services-card__media .media-image img,
   .metric-services-card__img {
     object-position: right top;
-    transform-origin: right top;
   }
 }
 
@@ -392,10 +396,10 @@
   .metric-services-card__media {
     position: absolute;
     inset: unset;
-    top: 40px;
-    right: 0;
+    top: 34px;
+    right: -8px;
     /* Same width for every deliverable mockup; right-aligned in the card. */
-    width: min(52%, 520px);
+    width: min(58%, 560px);
     height: auto;
     aspect-ratio: auto;
     border-radius: 0;
@@ -404,6 +408,7 @@
     background: transparent;
     z-index: 1;
     margin: 0;
+    --services-mock-origin: right top;
   }
 
   .metric-services-card__media .media-image {
@@ -415,7 +420,5 @@
   .metric-services-card__media .media-image img,
   .metric-services-card__img {
     object-position: right top;
-    transform: rotate(-3.6deg);
-    transform-origin: right top;
   }
 }

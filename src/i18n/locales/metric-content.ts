@@ -147,8 +147,8 @@ export const metricSiteContent: SiteContent = {
     linkLabel: "Product or store link",
     linkPlaceholder: "Amazon listing, brand website, or any relevant link",
     helpLabel: "What can we help you with?",
-    helpHint: "Select an option",
-    helpRequired: "Please select what we can help you with",
+    helpHint: "Select one or more",
+    helpRequired: "Please select at least one option",
     emailInvalid: "Please enter a valid work email",
     aboutLabel: "Tell us about your project",
     aboutPlaceholder:

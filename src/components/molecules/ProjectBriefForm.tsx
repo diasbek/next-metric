@@ -8,6 +8,7 @@ import {
 } from "react";
 import Script from "next/script";
 import { Button } from "@/components/atoms/Button";
+import { ProjectBriefMultiSelect } from "@/components/molecules/ProjectBriefMultiSelect";
 import {
   PROJECT_BRIEF_SERVICE_IDS,
   type ProjectBriefServiceId,
@@ -73,7 +74,7 @@ export function ProjectBriefForm({
     productUrl: "",
     about: "",
   });
-  const [service, setService] = useState<ProjectBriefServiceId | "">("");
+  const [services, setServices] = useState<ProjectBriefServiceId[]>([]);
   const [consent, setConsent] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const [loading, setLoading] = useState(false);
@@ -127,7 +128,7 @@ export function ProjectBriefForm({
       setError(brief.emailInvalid);
       return;
     }
-    if (!service) {
+    if (!services.length) {
       setError(brief.helpRequired);
       return;
     }
@@ -155,7 +156,7 @@ export function ProjectBriefForm({
           email,
           company: values.company.trim(),
           productUrl: values.productUrl.trim(),
-          services: [service],
+          services,
           message: about,
           locale,
           consent: true,
@@ -172,7 +173,7 @@ export function ProjectBriefForm({
       }
 
       setValues({ name: "", email: "", company: "", productUrl: "", about: "" });
-      setService("");
+      setServices([]);
       setConsent(false);
       setCaptchaToken("");
       if (widgetIdRef.current) {
@@ -270,36 +271,21 @@ export function ProjectBriefForm({
         />
       </label>
 
-      <label className="project-brief__field">
+      <div className="project-brief__field">
         <span className="project-brief__label">
           {brief.helpLabel} <span aria-hidden>*</span>
         </span>
-        <span className="project-brief__select-wrap">
-          <select
-            name="services"
-            required
-            value={service}
-            onChange={(e) =>
-              setService(e.target.value as ProjectBriefServiceId | "")
-            }
-            className={
-              service
-                ? "project-brief__select ui-input"
-                : "project-brief__select ui-input project-brief__select--empty"
-            }
-            aria-label={brief.helpLabel}
-          >
-            <option value="" disabled>
-              {brief.helpHint}
-            </option>
-            {PROJECT_BRIEF_SERVICE_IDS.map((id) => (
-              <option key={id} value={id}>
-                {brief.services[id]}
-              </option>
-            ))}
-          </select>
-        </span>
-      </label>
+        <ProjectBriefMultiSelect
+          label={brief.helpLabel}
+          hint={brief.helpHint}
+          options={PROJECT_BRIEF_SERVICE_IDS.map((id) => ({
+            id,
+            label: brief.services[id],
+          }))}
+          value={services}
+          onChange={setServices}
+        />
+      </div>
 
       <label className="project-brief__field">
         <span className="project-brief__label">

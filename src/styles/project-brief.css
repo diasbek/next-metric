@@ -145,6 +145,7 @@
 
 .project-brief__input.ui-input,
 .project-brief__select.ui-input,
+.project-brief__multiselect-trigger.ui-input,
 .project-brief__input--area.ui-input {
   width: 100%;
   margin: 0;
@@ -168,6 +169,7 @@
 
 .project-brief__input.ui-input:focus,
 .project-brief__select.ui-input:focus,
+.project-brief__multiselect-trigger.ui-input:focus,
 .project-brief__input--area.ui-input:focus {
   border-bottom-color: var(--accent);
 }
@@ -198,6 +200,125 @@
   pointer-events: none;
   background: #000;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.project-brief__multiselect {
+  position: relative;
+  width: 100%;
+}
+
+.project-brief__multiselect-trigger.ui-input {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding-right: 28px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-brief__multiselect-value {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-brief__multiselect.is-empty .project-brief__multiselect-value {
+  color: transparent;
+}
+
+.project-brief__multiselect::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  width: 12px;
+  height: 8px;
+  pointer-events: none;
+  background: #000;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transition: transform 0.2s ease;
+}
+
+.project-brief__multiselect.is-open::after {
+  transform: rotate(180deg);
+}
+
+.project-brief__multiselect-menu {
+  margin: 0;
+  padding: 8px;
+  max-height: min(320px, calc(100dvh - 120px));
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid rgba(9, 9, 9, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(9, 9, 9, 0.14);
+}
+
+.project-brief__multiselect-option {
+  margin: 0;
+}
+
+.project-brief__multiselect-item {
+  appearance: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-brief__multiselect-item:hover,
+.project-brief__multiselect-item:focus-visible {
+  background: rgba(245, 245, 245, 0.95);
+  outline: none;
+}
+
+.project-brief__multiselect-item.is-active {
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+}
+
+.project-brief__multiselect-check {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.project-brief__multiselect-check.is-checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.project-brief__multiselect-check.is-checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .project-brief__input--area {

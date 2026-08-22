@@ -128,8 +128,8 @@ export const deContent: SiteContent = {
     linkLabel: "Produkt- oder Store-Link",
     linkPlaceholder: "Amazon-Listing, Markenwebsite oder ein anderer relevanter Link",
     helpLabel: "Wobei können wir helfen?",
-    helpHint: "Option wählen",
-    helpRequired: "Bitte wählen Sie, wobei wir helfen können",
+    helpHint: "Eine oder mehrere Optionen wählen",
+    helpRequired: "Bitte wählen Sie mindestens eine Option",
     emailInvalid: "Bitte geben Sie eine gültige geschäftliche E-Mail ein",
     aboutLabel: "Erzählen Sie uns von Ihrem Projekt",
     aboutPlaceholder:
