@@ -187,7 +187,6 @@ export function FilterDropdown({
     <div
       ref={rootRef}
       className={`ui-select ${open ? "is-open" : ""}`.trim()}
-      data-no-section-snap
     >
       <button
         ref={triggerRef}

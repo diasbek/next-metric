@@ -15,11 +15,11 @@ export function ServicesPageSection({ locale, content }: LocalePageProps) {
   return (
     <div className="bg-black pb-16 pt-28 md:pb-24">
       <PageContainer>
-        <section className="section-split" data-scroll-section>
-          <Divider data-border-draw />
+        <section className="section-split">
+          <Divider />
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
             <SectionStickyHeading>
-              <SectionTitle as="h1" split data-flip-id="page-title">
+              <SectionTitle as="h1">
                 {ui.whatWeDo}
               </SectionTitle>
             </SectionStickyHeading>
@@ -27,7 +27,7 @@ export function ServicesPageSection({ locale, content }: LocalePageProps) {
             <SectionScrollColumn className="flex flex-col">
               {services.map((service, index) => (
                 <div key={service.id} className="services-page__item py-10" data-service-item>
-                  {index > 0 && <Divider className="mb-10" data-border-draw />}
+                  {index > 0 && <Divider className="mb-10" />}
                   <h2 className="text-h2 text-white">{service.title}</h2>
                   <p className="mt-6 max-w-md text-body-lg text-white/80">
                     {service.fullDescription}

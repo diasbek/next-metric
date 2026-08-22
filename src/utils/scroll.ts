@@ -18,16 +18,10 @@ export function resetScrollPosition(): void {
   document.body.scrollTop = 0;
 }
 
-/** Re-apply after layout/paint so Next.js cannot restore the previous offset. */
+/** Re-apply once after paint so Next.js cannot restore the previous offset. */
 export function resetScrollPositionAfterPaint(): void {
   resetScrollPosition();
-  requestAnimationFrame(() => {
-    resetScrollPosition();
-    requestAnimationFrame(resetScrollPosition);
-  });
-  // Images / fonts can shift layout after the first paint — re-pin once more.
-  window.setTimeout(resetScrollPosition, 0);
-  window.setTimeout(resetScrollPosition, 120);
+  requestAnimationFrame(resetScrollPosition);
 }
 
 /** First hash segment only — never allow `#a#b#c` concatenations. */

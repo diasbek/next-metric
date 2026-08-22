@@ -40,7 +40,6 @@ export function AgencyTestimonialsCarousel({
         className="agency-testimonials__swiper"
 
         data-testimonials-track
-        data-no-section-snap
         onSwiper={(swiper) => {
           swiperRef.current = swiper;
         }}

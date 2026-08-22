@@ -16,8 +16,7 @@
   padding-top: var(--header-height);
 }
 
-/* Ambient hero glow — pink + coral wash on the right (Figma / ref).
-   Soft disks with heavy blur; GSAP drifts them gently inside the hero. */
+/* Ambient hero glow — pink + coral wash on the right (Figma / ref). */
 .metric-hero__blobs {
   pointer-events: none;
   position: absolute;
@@ -31,7 +30,6 @@
   width: min(100vw, 820px);
   height: min(100vw, 820px);
   border-radius: 50%;
-  will-change: transform;
   pointer-events: none;
   user-select: none;
   transform: translateZ(0);

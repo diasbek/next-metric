@@ -189,7 +189,7 @@ export function ProjectBriefForm({
   };
 
   return (
-    <form className="project-brief__form" onSubmit={handleSubmit} data-no-section-snap>
+    <form className="project-brief__form" onSubmit={handleSubmit}>
       {captcha.provider === "turnstile" ? (
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"

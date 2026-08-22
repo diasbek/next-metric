@@ -9,11 +9,9 @@ export function ContactsPageSection({ content }: LocalePageProps) {
   return (
     <div className="contacts-page bg-black pb-16 pt-28 md:pb-24">
       <PageContainer>
-        <section className="contacts-page__layout" data-scroll-section>
+        <section className="contacts-page__layout">
           <SectionTitle
             as="h1"
-            split
-            data-flip-id="page-title"
             className="contacts-page__title"
           >
             {ui.contactUs}

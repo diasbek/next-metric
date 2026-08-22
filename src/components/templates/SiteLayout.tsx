@@ -38,7 +38,7 @@ export async function SiteLayout({
         home={home}
       />
       <div id="site-content">
-        <main id="main-content" data-page-transition-root>
+        <main id="main-content">
           {children}
         </main>
       </div>

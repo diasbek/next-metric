@@ -240,8 +240,6 @@ export function ContactForm({
     <form
       onSubmit={handleSubmit}
       className={formClassName}
-      data-no-section-snap
-
     >
       {captcha.provider === "turnstile" ? (
         <Script

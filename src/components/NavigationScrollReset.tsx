@@ -2,13 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { settleScrollAfterNavigation } from "@/utils/scroll";
+import {
+  scrollToHashAfterPaint,
+  settleScrollAfterNavigation,
+} from "@/utils/scroll";
 
 /**
  * Keeps client navigations pinned to the top (or a hash target).
- * GSAP page transitions used to call settleScrollAfterNavigation; without
- * them we need an explicit pathname listener so Next.js / the browser cannot
- * restore the previous page's scroll offset.
+ * Runs only on pathname changes — not on first mount (browser handles initial scroll).
  */
 export function NavigationScrollReset() {
   const pathname = usePathname();
@@ -23,7 +24,10 @@ export function NavigationScrollReset() {
   useEffect(() => {
     if (isFirstRun.current) {
       isFirstRun.current = false;
-      settleScrollAfterNavigation();
+      const hash = window.location.hash.replace(/^#/, "").split("#")[0]?.trim();
+      if (hash) {
+        scrollToHashAfterPaint(hash);
+      }
       return;
     }
 

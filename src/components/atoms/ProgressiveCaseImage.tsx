@@ -23,7 +23,7 @@ export function ProgressiveCaseImage({
   sizes = CASE_GALLERY_SIZES,
   className = "",
   onLoad,
-  skeleton = true,
+  skeleton = false,
   priority,
   ...rest
 }: ProgressiveCaseImageProps) {
@@ -50,7 +50,7 @@ export function ProgressiveCaseImage({
           quality={quality}
           sizes={sizes}
           className={`progressive-case-image__full ${className}`.trim()}
-          skeleton={skeleton && !fullReady}
+          skeleton={false}
           loading={priority ? undefined : "lazy"}
           onLoad={(event) => {
             setFullReady(true);

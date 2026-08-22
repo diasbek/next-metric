@@ -2,7 +2,7 @@
 
 /* —— Metric CTAs ——
    Rounded parallelogram: skew shell + counter-skew label.
-   Prefer <Button variant size /> — CSS classes remain for GSAP / legacy.
+   Prefer <Button variant size /> — CSS classes remain for legacy markup.
 
    Skew containment: --cta-skew-overhang is reserved on each side inside the
    layout box (extra padding + matching ::before inset). Tips land on the
@@ -34,7 +34,7 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  /* Fill/skew live on ::before so GSAP reveal/hover transforms
+  /* Fill/skew live on ::before so hover transforms
      cannot flatten the parallelogram into a rectangle. */
   background: transparent;
   box-shadow: none;

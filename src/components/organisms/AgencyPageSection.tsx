@@ -19,9 +19,8 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
       <PageContainer>
         <section
           className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start lg:gap-[30px]"
-          data-scroll-section
         >
-          <h1 className="max-w-[701px] text-h2 text-white" data-split-title data-flip-id="page-title">
+          <h1 className="max-w-[701px] text-h2 text-white">
             {agency.about.titleLines[0]}{" "}
             <br />
             {agency.about.titleLines[1]}
@@ -38,8 +37,6 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
 
         <section
           className="agency-t-banner relative mt-16 w-full bg-accent"
-          data-scroll-section
-
         >
           <div className="agency-t-banner__stage">
             <div
@@ -60,7 +57,7 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
           </p>
         </section>
 
-        <section className="mt-16" data-scroll-section>
+        <section className="mt-16">
           <Divider className="mb-0" />
           <SectionTitle className="mb-16 mt-10">
             {ui.factsTitle}
@@ -75,7 +72,6 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
               >
                 <span
                   className="text-[clamp(3.5rem,10vw,6.4375rem)] font-medium leading-[1.1] tracking-[-0.02em] text-white"
-                  data-counter
                 >
                   {stat.value}
                 </span>
@@ -87,7 +83,7 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
 
         <AgencyTeamSection locale={locale} content={content} />
 
-        <section data-scroll-section>
+        <section>
           <Divider className="mt-16 mb-0" />
           <AgencyTestimonialsCarousel
             title={ui.clientsTitle}
@@ -97,7 +93,7 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
           />
         </section>
 
-        <section className="agency-faq mt-10" data-scroll-section>
+        <section className="agency-faq mt-10">
           <Divider className="mb-0" />
           <div className="agency-faq__grid">
             <SectionStickyHeading>

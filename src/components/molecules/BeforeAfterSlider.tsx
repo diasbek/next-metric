@@ -41,7 +41,7 @@ export function BeforeAfterSlider({
   }, []);
 
   return (
-    <div ref={rootRef} data-before-after data-no-section-snap className="case-slider">
+    <div ref={rootRef} data-before-after className="case-slider">
       <div className="case-slider__frame">
         <MediaImage
           src={afterImage}

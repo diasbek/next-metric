@@ -267,7 +267,6 @@ export function MetricCaseStudiesSection({
 
         <div
           className="metric-case-studies__list"
-          data-case-steps
         >
           {caseStudies.items.map((item) => (
             <MetricCaseCard

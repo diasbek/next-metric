@@ -23,7 +23,6 @@ export async function ContactSection({
     <section
       id="contacts"
       className={`contact-section section-y bg-black ${className}`.trim()}
-      data-scroll-section
     >
       <PageContainer>
         <Divider />

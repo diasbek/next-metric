@@ -181,7 +181,6 @@ export function ProjectBriefMultiSelect({
       className={`project-brief__multiselect${open ? " is-open" : ""}${
         isEmpty ? " is-empty" : ""
       }`.trim()}
-      data-no-section-snap
     >
       <button
         ref={triggerRef}

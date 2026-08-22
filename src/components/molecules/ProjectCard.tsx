@@ -31,7 +31,6 @@ export function ProjectCard({
     <article className={`flex flex-col gap-5 ${className}`.trim()}>
       <div
         className="relative aspect-[701/486] w-full overflow-hidden"
-        data-flip-id={`work-image-${project.slug}`}
       >
         <MediaImage
           src={project.image}

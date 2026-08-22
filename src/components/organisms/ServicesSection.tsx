@@ -18,7 +18,6 @@ export function ServicesSection({ locale, content }: LocalePageProps) {
       id="services"
       data-blobs-section
       className="services-section section-y relative bg-black"
-      data-scroll-section
     >
       <div className="services-blobs pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         {SERVICE_BLOBS.map((className) => (

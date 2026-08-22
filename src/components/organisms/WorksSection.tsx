@@ -11,7 +11,7 @@ export function WorksSection({ locale, content }: LocalePageProps) {
   const gridProjects = projects.filter((project) => !project.featured).slice(0, 6);
 
   return (
-    <section id="works" className="bg-black py-10 lg:py-16" data-scroll-section>
+    <section id="works" className="bg-black py-10 lg:py-16">
       <PageContainer>
         {featured && (
           <Link
@@ -19,7 +19,7 @@ export function WorksSection({ locale, content }: LocalePageProps) {
             className="group mb-10 block"
 
           >
-            <div className="js-parallax relative aspect-[1432/902] w-full overflow-hidden">
+            <div className="relative aspect-[1432/902] w-full overflow-hidden">
               <MediaImage
                 src={featured.image}
                 alt={featured.title}

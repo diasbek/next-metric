@@ -17,7 +17,7 @@ export function FAQAccordion({
 
   if (isAgency) {
     return (
-      <div className="faq-agency" data-no-section-snap>
+      <div className="faq-agency">
         {items.map((item, index) => {
           const isOpen = openIndex === index;
           return (
@@ -48,7 +48,7 @@ export function FAQAccordion({
   }
 
   return (
-    <div className="mx-auto flex max-w-[716px] flex-col gap-0" data-no-section-snap>
+    <div className="mx-auto flex max-w-[716px] flex-col gap-0">
       {items.map((item, index) => {
         const isOpen = openIndex === index;
         return (

@@ -6,7 +6,7 @@ export function AgencyTeamSection({ content }: LocalePageProps) {
   const { agency, ui } = content;
 
   return (
-    <section className="agency-team" data-scroll-section>
+    <section className="agency-team">
       <Divider className="mb-0" />
 
       <div className="agency-team__head">

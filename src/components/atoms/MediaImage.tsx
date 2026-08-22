@@ -63,14 +63,14 @@ export function MediaImage({
     };
   }, [loaded, src]);
 
-  const showSkeleton = skeleton && !loaded;
+  const showSkeleton = skeleton && !priority && !loaded;
 
   return (
     <span
       ref={rootRef}
       className={`media-image${fill ? " media-image--fill" : ""}${loaded ? " is-loaded" : ""}`}
     >
-      {skeleton ? (
+      {skeleton && !priority ? (
         <span
           className="media-image__skeleton"
           aria-hidden

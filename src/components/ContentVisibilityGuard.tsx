@@ -10,14 +10,10 @@ function removeStreamingShellDuplicates() {
   });
 }
 
-/** Post-hydration safety net — clears stale GSAP hide gates if cached CSS returns. */
+/** Post-hydration: remove stale streaming shells and mark decoded images loaded. */
 export function ContentVisibilityGuard() {
   useEffect(() => {
-    const unlock = () => {
-      const html = document.documentElement;
-      html.classList.remove("gsap-pending");
-      html.classList.add("content-visible", "gsap-ready", "gsap-force-show");
-
+    const cleanup = () => {
       removeStreamingShellDuplicates();
 
       document.querySelectorAll<HTMLElement>(".media-image").forEach((root) => {
@@ -28,9 +24,9 @@ export function ContentVisibilityGuard() {
       });
     };
 
-    unlock();
-    window.addEventListener("pageshow", unlock);
-    return () => window.removeEventListener("pageshow", unlock);
+    cleanup();
+    window.addEventListener("pageshow", cleanup);
+    return () => window.removeEventListener("pageshow", cleanup);
   }, []);
 
   return null;
