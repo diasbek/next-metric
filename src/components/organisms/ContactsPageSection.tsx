@@ -19,12 +19,12 @@ export function ContactsPageSection({ content }: LocalePageProps) {
             {ui.contactUs}
           </SectionTitle>
 
-          <div className="contacts-page__intro" data-reveal>
+          <div className="contacts-page__intro">
             <p className="contacts-page__subtitle text-body-lg text-white">
               {ui.respondWithinHour}
             </p>
 
-            <div className="contacts-page__links" data-reveal-group>
+            <div className="contacts-page__links">
               <div className="contacts-page__link-item">
                 <p className="contacts-page__link-label">Telegram</p>
                 <a
@@ -77,7 +77,7 @@ export function ContactsPageSection({ content }: LocalePageProps) {
 
           <OfficeMap className="contacts-page__map" ariaLabel={ui.mapAlt} />
 
-          <div className="contacts-page__address" data-reveal>
+          <div className="contacts-page__address">
             <p className="contacts-page__link-label">{ui.addressLabel}</p>
             <address className="contacts-page__address-value not-italic">
               {site.address.map((line) => (
@@ -88,7 +88,7 @@ export function ContactsPageSection({ content }: LocalePageProps) {
             </address>
           </div>
 
-          <div className="contacts-page__downloads" data-reveal-group="pop">
+          <div className="contacts-page__downloads">
             <a
               href={site.files.presentation}
               className="contacts-page__card contacts-page__card--presentation"

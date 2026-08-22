@@ -24,7 +24,7 @@ export function ServicesPageSection({ locale, content }: LocalePageProps) {
               </SectionTitle>
             </SectionStickyHeading>
 
-            <SectionScrollColumn className="flex flex-col" data-reveal-group>
+            <SectionScrollColumn className="flex flex-col">
               {services.map((service, index) => (
                 <div key={service.id} className="services-page__item py-10" data-service-item>
                   {index > 0 && <Divider className="mb-10" data-border-draw />}
@@ -43,8 +43,8 @@ export function ServicesPageSection({ locale, content }: LocalePageProps) {
               <TransitionLink
                 href={localePath(locale, "/contacts/")}
                 className="cta-bar mt-6 bg-white text-lg font-medium text-black transition-opacity hover:opacity-90"
-                data-reveal
-                data-reveal-delay="0.2"
+
+
               >
                 {ui.orderService}
               </TransitionLink>

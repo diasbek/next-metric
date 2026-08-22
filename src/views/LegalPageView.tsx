@@ -44,7 +44,7 @@ export async function LegalPageView({
     <SiteLayout locale={locale} headerVariant="compact">
       <div className="metric-legal bg-white py-16 md:py-24">
         <PageContainer>
-          <div className="metric-legal__inner" data-reveal>
+          <div className="metric-legal__inner">
             <p className="metric-legal__eyebrow">{home.footer.cities[0]}</p>
             <h1 className="metric-legal__title font-display text-foreground">
               {content.title}

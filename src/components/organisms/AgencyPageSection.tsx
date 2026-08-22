@@ -28,7 +28,7 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
           </h1>
           <div
             className="flex max-w-[440px] flex-col gap-4 text-body-lg leading-[1.1] text-white lg:ml-auto"
-            data-reveal
+
           >
             {agency.about.paragraphs.map((p) => (
               <p key={p}>{p}</p>
@@ -39,7 +39,7 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
         <section
           className="agency-t-banner relative mt-16 w-full bg-accent"
           data-scroll-section
-          data-reveal
+
         >
           <div className="agency-t-banner__stage">
             <div
@@ -62,10 +62,10 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
 
         <section className="mt-16" data-scroll-section>
           <Divider className="mb-0" />
-          <SectionTitle className="mb-16 mt-10" data-reveal>
+          <SectionTitle className="mb-16 mt-10">
             {ui.factsTitle}
           </SectionTitle>
-          <div className="grid grid-cols-2 gap-y-12 lg:grid-cols-4" data-reveal-group="pop">
+          <div className="grid grid-cols-2 gap-y-12 lg:grid-cols-4">
             {agency.stats.map((stat, i) => (
               <div
                 key={stat.label}
@@ -101,7 +101,7 @@ export function AgencyPageSection({ locale, content }: LocalePageProps) {
           <Divider className="mb-0" />
           <div className="agency-faq__grid">
             <SectionStickyHeading>
-              <SectionTitle data-reveal>{ui.faqTitle}</SectionTitle>
+              <SectionTitle>{ui.faqTitle}</SectionTitle>
             </SectionStickyHeading>
             <SectionScrollColumn>
               <FAQAccordion items={faq} variant="agency" />

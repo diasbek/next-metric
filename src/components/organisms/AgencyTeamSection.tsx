@@ -6,15 +6,15 @@ export function AgencyTeamSection({ content }: LocalePageProps) {
   const { agency, ui } = content;
 
   return (
-    <section className="agency-team" data-scroll-section data-reveal-group="pop">
+    <section className="agency-team" data-scroll-section>
       <Divider className="mb-0" />
 
       <div className="agency-team__head">
-        <h2 className="agency-team__title text-h2 text-white" data-reveal>
+        <h2 className="agency-team__title text-h2 text-white">
           {ui.teamTitle}
         </h2>
 
-        <article className="agency-team__director" data-reveal>
+        <article className="agency-team__director">
           <div className="agency-team__director-photo">
             <MediaImage
               src={agency.director.image}
@@ -33,7 +33,7 @@ export function AgencyTeamSection({ content }: LocalePageProps) {
 
       <div className="agency-team__grid">
         {agency.team.map((member, index) => (
-          <article key={member.name} className="agency-team__member" data-reveal>
+          <article key={member.name} className="agency-team__member">
             <div className="agency-team__member-photo">
               <MediaImage
                 src={member.image}

@@ -17,7 +17,7 @@ export function WorksSection({ locale, content }: LocalePageProps) {
           <Link
             href={localePath(locale, `/works/${featured.slug}/`)}
             className="group mb-10 block"
-            data-reveal
+
           >
             <div className="js-parallax relative aspect-[1432/902] w-full overflow-hidden">
               <MediaImage
@@ -46,13 +46,13 @@ export function WorksSection({ locale, content }: LocalePageProps) {
           </Link>
         )}
 
-        <div className="grid-projects" data-reveal-group>
+        <div className="grid-projects">
           {gridProjects.map((project) => (
             <ProjectCard key={project.slug} locale={locale} project={project} />
           ))}
         </div>
 
-        <div className="mt-16 grid-projects" data-reveal>
+        <div className="mt-16 grid-projects">
           <Link
             href={localePath(locale, "/works/")}
             className="cta-bar col-span-1 border border-white/30 text-lg font-medium text-white transition-colors hover:border-white lg:col-start-2"

@@ -410,7 +410,7 @@ export async function PrivacyPolicyView({ locale }: { locale: Locale }) {
     <SiteLayout locale={locale} headerVariant="compact">
       <div className="metric-legal privacy-policy bg-white py-16 md:py-24">
         <PageContainer>
-          <div className="metric-legal__inner privacy-policy__inner" data-reveal>
+          <div className="metric-legal__inner privacy-policy__inner">
             <p className="metric-legal__eyebrow">{copy.eyebrow}</p>
             <h1 className="metric-legal__title privacy-policy__title font-display text-foreground">
               {copy.title}

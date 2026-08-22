@@ -241,7 +241,7 @@ export function ContactForm({
       onSubmit={handleSubmit}
       className={formClassName}
       data-no-section-snap
-      data-reveal-group="pop"
+
     >
       {captcha.provider === "turnstile" ? (
         <Script

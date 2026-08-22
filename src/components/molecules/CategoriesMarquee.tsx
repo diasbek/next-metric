@@ -13,12 +13,44 @@ function getReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function subscribeMobileLayout(onStoreChange: () => void) {
+  const mq = window.matchMedia("(max-width: 1023px)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function getMobileLayout() {
+  return window.matchMedia("(max-width: 1023px)").matches;
+}
+
 type CategoriesMarqueeProps = {
   images: readonly string[];
 };
 
 function categoryAlt(index: number) {
   return `Amazon product listing photography example ${index + 1}`;
+}
+
+function StaticTrack({ images }: { images: readonly string[] }) {
+  return (
+    <div className="metric-categories__track-wrap">
+      <div className="metric-categories__track">
+        {images.map((src, index) => (
+          <div key={`${src}-${index}`} className="metric-categories__card">
+            <MediaImage
+              src={src}
+              alt={categoryAlt(index)}
+              fill
+              className="object-cover"
+              sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
+              quality={75}
+              draggable={false}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function CardStrip({
@@ -52,15 +84,14 @@ function CardStrip({
 const AUTO_SCROLL_PX_PER_SEC = 34;
 const RESUME_AFTER_MS = 1200;
 
-/**
- * Infinite loop via `translate3d` on the track — not `scrollLeft`.
- * iOS Safari often ignores programmatic `scrollLeft` on nested overflow
- * containers (especially under a GSAP `data-reveal` transform), so the
- * marquee looked frozen on phones. Transform animation runs everywhere;
- * a finger/mouse drag pauses it, then it resumes after things go quiet.
- */
-function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
+/** Desktop-only auto loop via translate3d — phones use native horizontal scroll. */
+function useAutoScrollLoop(
+  trackRef: React.RefObject<HTMLDivElement | null>,
+  enabled: boolean,
+) {
   useEffect(() => {
+    if (!enabled) return;
+
     const track = trackRef.current;
     if (!track) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -74,7 +105,7 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
 
     const seq = track.querySelector<HTMLElement>(".metric-categories__seq");
     const wrap = track.closest<HTMLElement>(".metric-categories__track-wrap");
-    let inView = true;
+    let inView = false;
 
     const measure = () => {
       loopWidth = seq?.offsetWidth ?? 0;
@@ -135,7 +166,7 @@ function useAutoScrollLoop(trackRef: React.RefObject<HTMLDivElement | null>) {
       track.removeEventListener("pointerdown", pause);
       track.removeEventListener("wheel", pause);
     };
-  }, [trackRef]);
+  }, [trackRef, enabled]);
 }
 
 export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
@@ -144,37 +175,22 @@ export function CategoriesMarquee({ images }: CategoriesMarqueeProps) {
     getReducedMotion,
     () => false,
   );
+  const mobileLayout = useSyncExternalStore(
+    subscribeMobileLayout,
+    getMobileLayout,
+    () => true,
+  );
   const trackRef = useRef<HTMLDivElement>(null);
+  const useStaticTrack = reducedMotion || mobileLayout;
 
-  useAutoScrollLoop(trackRef);
+  useAutoScrollLoop(trackRef, !useStaticTrack);
 
-  if (reducedMotion) {
-    return (
-      <div className="metric-categories__track-wrap" data-reveal>
-        <div className="metric-categories__track">
-          {images.map((src, index) => (
-            <div key={`${src}-${index}`} className="metric-categories__card">
-              <MediaImage
-                src={src}
-                alt={categoryAlt(index)}
-                fill
-                className="object-cover"
-                sizes="(max-width: 767px) 72vw, (max-width: 1799px) 320px, (max-width: 2559px) min(18vw, 520px), min(16vw, 640px)"
-                quality={75}
-                draggable={false}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  if (useStaticTrack) {
+    return <StaticTrack images={images} />;
   }
 
   return (
-    <div
-      className="metric-categories__track-wrap metric-categories__track-wrap--marquee"
-      data-reveal
-    >
+    <div className="metric-categories__track-wrap metric-categories__track-wrap--marquee">
       <div ref={trackRef} className="metric-categories__track metric-categories__track--marquee">
         <CardStrip images={images} keyPrefix="a" />
         <CardStrip images={images} keyPrefix="b" inert />

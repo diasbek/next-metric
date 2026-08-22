@@ -28,7 +28,7 @@ export function MetricCaseCard({
   viewLabel,
 }: MetricCaseCardProps) {
   return (
-    <article className="metric-case-card" data-reveal>
+    <article className="metric-case-card">
       <div className="metric-case-card__body">
         <div className="metric-case-card__tags">
           {tags.map((tag) => (

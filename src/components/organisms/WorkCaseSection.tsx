@@ -122,7 +122,7 @@ export async function WorkCaseSection({
         </header>
 
         {stripImages.length ? (
-          <section className="metric-case__stack mt-12 md:mt-16" data-reveal>
+          <section className="metric-case__stack mt-12 md:mt-16">
             {stripImages.map((src, index) => (
               <div key={`${src}-${index}`} className="metric-case__stack-item">
                 <MediaImage
@@ -155,7 +155,7 @@ export async function WorkCaseSection({
         ) : null}
 
         {project.quote ? (
-          <section className="mt-16 md:mt-20" data-reveal>
+          <section className="mt-16 md:mt-20">
             <div className="mb-8 flex items-end justify-between gap-4">
               <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
                 {ui.reviewsTitle}
@@ -192,7 +192,7 @@ export async function WorkCaseSection({
           </section>
         ) : null}
 
-        <section className="mt-16 md:mt-20" data-reveal>
+        <section className="mt-16 md:mt-20">
           <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
               {ui.otherWorks}
@@ -203,8 +203,8 @@ export async function WorkCaseSection({
           </div>
           <div
             className="metric-case-studies__list"
-            data-reveal-group="pop"
-            data-reveal-stagger="0.12"
+
+
           >
             {nextProjects.slice(0, 2).map((item) => {
               const fromHome = homeCaseBySlug.get(item.slug);

@@ -11,7 +11,10 @@ import { getResolvedAnalytics } from "@/lib/cms/settings";
 import { rootMetadata } from "@/utils/metadata";
 import { getGlobalJsonLdGraph } from "@/utils/seo/json-ld";
 import { SITE_CONFIG } from "@/utils/consts";
-import { WEBVIEW_BOOT_SCRIPT } from "@/utils/webview";
+import {
+  WEBVIEW_BOOT_CRITICAL_CSS,
+  WEBVIEW_BOOT_SCRIPT,
+} from "@/utils/webview";
 
 export const viewport: Viewport = {
   themeColor: SITE_CONFIG.themeColor,
@@ -56,6 +59,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <style
+          dangerouslySetInnerHTML={{ __html: WEBVIEW_BOOT_CRITICAL_CSS }}
+        />
         <script dangerouslySetInnerHTML={{ __html: WEBVIEW_BOOT_SCRIPT }} />
       </head>
       <body className="antialiased">

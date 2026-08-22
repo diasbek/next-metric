@@ -198,7 +198,7 @@ export function MetricCategoriesSection({
       <PageContainer>
         <h2
           className="metric-categories__title font-display text-white"
-          data-reveal
+
         >
           {categories.titleLines.map((line, index) => {
             if (typeof line === "string") {
@@ -256,7 +256,7 @@ export function MetricCaseStudiesSection({
   return (
     <section id="case-studies" className="metric-section metric-case-studies">
       <PageContainer>
-        <div className="metric-case-studies__header" data-reveal>
+        <div className="metric-case-studies__header">
           <h2 className="metric-case-studies__title font-display">
             {titleParts[0]}
             <span className="text-accent">{caseStudies.titleAccent}</span>
@@ -285,7 +285,7 @@ export function MetricCaseStudiesSection({
           ))}
         </div>
 
-        <div className="metric-case-studies__more" data-reveal>
+        <div className="metric-case-studies__more">
           <Button href={localePath(locale, "/works/")} variant="outline">
             {caseStudies.moreLabel}
           </Button>
@@ -307,7 +307,7 @@ export function MetricServicesSection({
   return (
     <section id={services.id} className="metric-services">
       <PageContainer className="metric-services__inner">
-        <h2 className="metric-services__title font-display" data-reveal>
+        <h2 className="metric-services__title font-display">
           {services.titleLines.map((line) => (
             <span key={line} className="metric-services__title-line">
               {line}
@@ -329,10 +329,10 @@ export function MetricServicesSection({
 
         <div className="metric-services__layout">
           <div className="metric-services__pin">
-            <p className="metric-services__subtitle" data-reveal>
+            <p className="metric-services__subtitle">
               {services.subtitle}
             </p>
-            <div className="metric-services__cta" data-reveal>
+            <div className="metric-services__cta">
               <ProjectBriefCta href={briefHref} variant="onAccent">
                 {services.cta}
               </ProjectBriefCta>
@@ -341,11 +341,11 @@ export function MetricServicesSection({
 
           <div
             className="metric-services__list"
-            data-reveal-group="pop"
-            data-reveal-stagger="0.1"
+
+
           >
             {services.items.map((item) => (
-              <article key={item.n} className="metric-services-card" data-reveal>
+              <article key={item.n} className="metric-services-card">
                 <div className="metric-services-card__head">
                   <span className="metric-services-card__num" aria-hidden>
                     {item.n}
@@ -390,7 +390,7 @@ export function MetricWorkflowSection({
   return (
     <section id={workflow.id} className="metric-section metric-workflow">
       <PageContainer>
-        <div className="metric-workflow__header" data-reveal>
+        <div className="metric-workflow__header">
           <h2 className="metric-workflow__title font-display text-foreground">
             <span className="metric-workflow__title-line">{workflow.titleLine1}</span>
             <span className="metric-workflow__title-line metric-workflow__title-line--brand">
@@ -409,8 +409,8 @@ export function MetricWorkflowSection({
 
         <div
           className="metric-workflow__grid"
-          data-reveal-group="pop"
-          data-reveal-stagger="0.12"
+
+
         >
           {workflow.cards.map((card, index) => {
             const [imgW, imgH] = workflowImageSize(card.image);
@@ -440,7 +440,7 @@ export function MetricWorkflowSection({
                 className={`metric-workflow-card metric-workflow-card--${card.layout}${
                   index === 1 ? " metric-workflow-card--offset" : ""
                 }`}
-                data-reveal
+
               >
                 {card.layout === "media-bottom" ? (
                   <>
@@ -458,7 +458,7 @@ export function MetricWorkflowSection({
           })}
         </div>
 
-        <div className="metric-workflow__cta" data-reveal>
+        <div className="metric-workflow__cta">
           <p className="metric-workflow__note">{workflow.note}</p>
           <ProjectBriefCta href={briefHref} variant="primary">
             {workflow.cta}

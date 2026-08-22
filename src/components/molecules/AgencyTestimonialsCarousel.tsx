@@ -38,7 +38,7 @@ export function AgencyTestimonialsCarousel({
 
       <Swiper
         className="agency-testimonials__swiper"
-        data-reveal-group
+
         data-testimonials-track
         data-no-section-snap
         onSwiper={(swiper) => {

@@ -16,7 +16,7 @@ export function MetricFaqSection({
     <section id={faq.id} className="metric-gradient-pink metric-section metric-faq">
       <PageContainer>
         <div className="metric-faq__grid">
-          <div data-reveal>
+          <div>
             <h2 className="metric-faq__title font-display text-white">
               {faq.title}
             </h2>

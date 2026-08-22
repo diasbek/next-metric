@@ -83,8 +83,8 @@ export async function WorksListingSection({
         {filtered.length ? (
           <div
             className="metric-case-studies__list"
-            data-reveal-group="pop"
-            data-reveal-stagger="0.12"
+
+
           >
             {filtered.map((item) => (
               <MetricCaseCard
@@ -102,7 +102,7 @@ export async function WorksListingSection({
             ))}
           </div>
         ) : (
-          <p className="works-filters__empty" data-reveal>
+          <p className="works-filters__empty">
             {ui.filterEmpty}
           </p>
         )}

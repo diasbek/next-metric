@@ -29,7 +29,7 @@ export function ServicesSection({ locale, content }: LocalePageProps) {
       <PageContainer className="relative z-[1]">
         <Divider />
         <div className="section-split grid grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-x-[30px]">
-          <SectionStickyHeading reveal>
+          <SectionStickyHeading>
             <h2 className="text-h2 text-white">{ui.whatWeDo}</h2>
           </SectionStickyHeading>
 

@@ -51,7 +51,7 @@ export function WorksListingFilters({
     (category && category !== ui.filterAll) || (type && type !== ui.filterAll);
 
   return (
-    <div className="works-filters" data-reveal>
+    <div className="works-filters">
       <div className="works-filters__row">
         <FilterDropdown
           label={ui.filterSphere}

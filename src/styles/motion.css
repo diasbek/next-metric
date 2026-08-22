@@ -1,5 +1,18 @@
 /* Lightweight hover feedback — desktop pointer devices only. */
 
+/* Fail-open if a stale GSAP stylesheet is still cached in the browser. */
+html [data-reveal],
+html [data-reveal-group] > *,
+html [data-case-steps] > *,
+html .metric-hero__subtitle,
+html .metric-hero__copy .metric-cta,
+html .metric-hero__trust > * {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: none !important;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .metric-case-card,
   .metric-workflow-card,

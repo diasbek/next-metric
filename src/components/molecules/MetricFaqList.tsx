@@ -5,8 +5,8 @@ export function MetricFaqList({ items }: { items: FAQItem[] }) {
   return (
     <div
       className="metric-faq__list"
-      data-reveal-group="pop"
-      data-reveal-stagger="0.08"
+
+
     >
       {items.map((item, index) => (
         <details
@@ -14,7 +14,7 @@ export function MetricFaqList({ items }: { items: FAQItem[] }) {
           className="faq-item"
           name="metric-faq"
           {...(index === 0 ? { open: true } : {})}
-          data-reveal
+
         >
           <summary className="faq-item__trigger">
             <span>{item.question}</span>

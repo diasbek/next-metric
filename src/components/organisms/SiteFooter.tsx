@@ -59,7 +59,7 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
   return (
     <footer className="site-footer">
       <PageContainer>
-        <div className="site-footer__main" data-reveal>
+        <div className="site-footer__main">
           <TransitionLink
             href={localePath(locale, "/")}
             aria-label={site.name}

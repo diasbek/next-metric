@@ -27,13 +27,13 @@ export async function ContactSection({
     >
       <PageContainer>
         <Divider />
-        <div className="contact-section__head section-split" data-reveal-group>
+        <div className="contact-section__head section-split">
           <div>
             <h2 className="text-h1 text-white">{ui.oneStep}</h2>
             <h2 className="text-h1 text-white">{ui.strongBrand}</h2>
           </div>
 
-          <p className="contact-section__subtitle text-body-lg text-white" data-reveal>
+          <p className="contact-section__subtitle text-body-lg text-white">
             {subtitleLine1}
             {subtitleLine2 && (
               <>
@@ -44,7 +44,7 @@ export async function ContactSection({
         </div>
 
         <div className="contact-section__body">
-          <div className="contact-section__info" data-reveal>
+          <div className="contact-section__info">
             <div className="contact-section__info-block">
               <p>{ui.phoneLabel}</p>
               <a
