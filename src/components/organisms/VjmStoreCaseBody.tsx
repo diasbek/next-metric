@@ -1,4 +1,5 @@
 import { MediaImage } from "@/components/atoms/MediaImage";
+import { getCaseImageMeta, CASE_GALLERY_SIZES } from "@/data/case-image-meta";
 
 const VJM_CASE_FRAMES = [
   {
@@ -46,20 +47,23 @@ const VJM_CASE_FRAMES = [
 export function VjmStoreCaseBody() {
   return (
     <div className="vjm-case">
-      {VJM_CASE_FRAMES.map((frame, index) => (
+      {VJM_CASE_FRAMES.map((frame, index) => {
+        const { width, height } = getCaseImageMeta(frame.src);
+        return (
         <figure key={frame.src} className="vjm-case__frame">
           <MediaImage
             src={frame.src}
             alt={frame.alt}
-            width={2400}
-            height={1600}
+            width={width}
+            height={height}
             className="vjm-case__img"
-            sizes="100vw"
-            quality={index === 0 ? 85 : 80}
+            sizes={CASE_GALLERY_SIZES}
+            quality={90}
             priority={index === 0}
           />
         </figure>
-      ))}
+        );
+      })}
     </div>
   );
 }

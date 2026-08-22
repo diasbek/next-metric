@@ -55,8 +55,8 @@ export function MetricCaseCard({
           alt={imageAlt || author}
           fill
           className="object-cover"
-          sizes="(max-width: 1023px) 92vw, 42vw"
-          quality={75}
+          sizes="(max-width: 1023px) 92vw, (max-width: 1799px) 42vw, 1200px"
+          quality={90}
         />
       </div>
       <TransitionLink

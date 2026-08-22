@@ -4,6 +4,10 @@
   padding-block: 40px 80px;
 }
 
+.metric-case__shell {
+  width: 100%;
+}
+
 /* Case intro — full-width title, then 2-col body:
    | Role                          | Tags        |
    | Task (optional)               | Lede        |
@@ -163,6 +167,7 @@
   overflow: hidden;
   border-radius: var(--radius-xl);
   background: var(--surface);
+  isolation: isolate;
 }
 
 .metric-case__stack-item {
@@ -171,6 +176,11 @@
   overflow: hidden;
   background: var(--surface);
   line-height: 0;
+}
+
+/* Kill 1px hairlines between full-bleed JPEG frames on flat backgrounds. */
+.metric-case__stack-item + .metric-case__stack-item {
+  margin-top: -1px;
 }
 
 .metric-case__stack-item .media-image {
@@ -297,9 +307,9 @@
   margin-top: 0;
 }
 
-/* VJM-STORE — full-bleed case frames (10 ordered sections) */
+/* VJM-STORE — ordered gallery frames inside the shared page shell */
 .metric-case--vjm-store {
-  padding-block: 0 80px;
+  padding-block: 40px 80px;
 }
 
 .vjm-case {
@@ -307,6 +317,9 @@
   flex-direction: column;
   gap: 0;
   width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  isolation: isolate;
 }
 
 .vjm-case__frame {
@@ -314,6 +327,10 @@
   width: 100%;
   line-height: 0;
   background: var(--surface);
+}
+
+.vjm-case__frame + .vjm-case__frame {
+  margin-top: -1px;
 }
 
 .vjm-case__frame .media-image {

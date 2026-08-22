@@ -5,6 +5,7 @@ import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
 import { VjmStoreCaseBody } from "@/components/organisms/VjmStoreCaseBody";
 import type { Project } from "@/data/projects";
+import { getCaseImageMeta, CASE_GALLERY_SIZES } from "@/data/case-image-meta";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -75,10 +76,11 @@ export async function WorkCaseSection({
 
   return (
     <article className={`metric-case${isVjmStore ? " metric-case--vjm-store" : ""}`}>
-      {isVjmStore ? (
-        <VjmStoreCaseBody />
-      ) : (
-        <PageContainer>
+      <PageContainer className="metric-case__shell">
+        {isVjmStore ? (
+          <VjmStoreCaseBody />
+        ) : (
+          <>
         {/* Full-width title, then 2-col: role+task | tags+lede+solution. */}
         <header className="metric-case__intro">
           <h1 className="metric-case__title font-display">{authorName}</h1>
@@ -128,7 +130,9 @@ export async function WorkCaseSection({
 
         {stripImages.length ? (
           <section className="metric-case__stack mt-12 md:mt-16">
-            {stripImages.map((src, index) => (
+            {stripImages.map((src, index) => {
+              const { width, height } = getCaseImageMeta(src);
+              return (
               <div key={`${src}-${index}`} className="metric-case__stack-item">
                 <MediaImage
                   src={src}
@@ -137,11 +141,11 @@ export async function WorkCaseSection({
                       ? `${project.title} — Amazon listing visuals`
                       : `${project.title} — project image ${index + 1}`
                   }
-                  width={2400}
-                  height={1600}
+                  width={width}
+                  height={height}
                   className="metric-case__stack-img"
-                  sizes="(max-width: 1512px) 100vw, 1512px"
-                  quality={index === 0 ? 85 : 75}
+                  sizes={CASE_GALLERY_SIZES}
+                  quality={90}
                   priority={index === 0}
                 />
                 {index === 0 && caseStudy?.metricValue ? (
@@ -155,7 +159,8 @@ export async function WorkCaseSection({
                   </div>
                 ) : null}
               </div>
-            ))}
+            );
+            })}
           </section>
         ) : null}
 
@@ -196,9 +201,9 @@ export async function WorkCaseSection({
             </div>
           </section>
         ) : null}
-
-        </PageContainer>
-      )}
+          </>
+        )}
+      </PageContainer>
 
       <PageContainer>
         <section className="mt-16 md:mt-20">

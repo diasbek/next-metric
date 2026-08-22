@@ -88,7 +88,7 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     // Next 16 only allows qualities listed here. 75 = default; 85 for
     // product / case photos that sit large on screen.
-    qualities: [75, 85],
+    qualities: [75, 85, 90],
     // 320 matches category-card CSS width; 640 covers 2x.
     imageSizes: [32, 48, 64, 96, 128, 256, 320, 384, 640],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2560, 3840],

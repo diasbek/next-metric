@@ -13,9 +13,9 @@ import sharp from "sharp";
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const TARGET = path.join(ROOT, "public/images/metric");
 
-/** Longest edge — covers 1392px case-detail @ 2x with headroom. */
-const MAX_EDGE = 2400;
-const JPEG_QUALITY = 86;
+/** Longest edge — covers case-detail @ 2x with headroom. */
+const MAX_EDGE = 2800;
+const JPEG_QUALITY = 92;
 
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
