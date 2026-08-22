@@ -1,3 +1,5 @@
+import { VJM_STORE_FRAME_PATHS } from "./vjm-store-frames";
+
 export type ProjectTag = string;
 
 export type CaseBlock =
@@ -67,7 +69,7 @@ export const projects: Project[] = [
     title: "VJM-STORE",
     description:
       "Visual identity and Amazon listing system for a drill brush attachment set — listing images, A+ Content, and EBC modules.",
-    image: "/images/metric/case-detail/vjm-store/1.jpg",
+    image: "/images/metric/case-detail/vjm-store/01-phone-listing.jpg",
     tags: ["Listing", "A+ Content", "EBC"],
     sphere: "Home & Garden",
     featured: true,
@@ -76,16 +78,14 @@ export const projects: Project[] = [
       task: "Create a cohesive visual identity and commercial image series for a drill brush kit on Amazon.",
       solution:
         "Delivered a full Metric system: hero listing visuals, feature slides, lifestyle frames, A+ Content modules, and EBC storytelling with measurable conversion uplift.",
-      heroImage: "/images/metric/case-detail/vjm-store/1.jpg",
+      heroImage: "/images/metric/case-detail/vjm-store/01-phone-listing.jpg",
       metricLabel: "Conversion rate:",
       metricValue: "9,5% → 22%",
       blocks: [
         {
           id: "vjm-gal",
           type: "gallery",
-          images: Array.from({ length: 10 }, (_, i) =>
-            `/images/metric/case-detail/vjm-store/${i + 1}.jpg`,
-          ),
+          images: [...VJM_STORE_FRAME_PATHS],
         },
       ],
     },
@@ -94,7 +94,7 @@ export const projects: Project[] = [
       metaDescription:
         "How METRIC built a full Amazon visual system for VJM-STORE drill brush attachments — +132% conversion and 3× turnover growth.",
       keywords: "VJM-STORE, Amazon listing, A+ Content, EBC, drill brush, case study",
-      ogImage: "/images/metric/case-detail/vjm-store/1.jpg",
+      ogImage: "/images/metric/case-detail/vjm-store/01-phone-listing.jpg",
       indexable: true,
     },
   },

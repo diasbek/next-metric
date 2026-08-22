@@ -75,7 +75,7 @@ const metricHomeEn = {
         quote: "Conversion grew from 9.5% to 22% in three days",
         author: "VJM-STORE",
         role: "Drill brush attachment set — Amazon DE",
-        image: "/images/metric/case-detail/vjm-store/1.jpg",
+        image: "/images/metric/case-detail/vjm-store/01-phone-listing.jpg",
       },
       {
         slug: "matolux",
@@ -254,7 +254,7 @@ const metricHomeDe = {
         quote: "Conversion stieg in drei Tagen von 9,5 % auf 22 %",
         author: "VJM-STORE",
         role: "Bohrbürsten-Set — Amazon DE",
-        image: "/images/metric/case-detail/vjm-store/1.jpg",
+        image: "/images/metric/case-detail/vjm-store/01-phone-listing.jpg",
       },
       {
         slug: "matolux",
