@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { stripLocalePrefix } from "@/i18n/paths";
 import { LOCATION_CHANGE_EVENT } from "@/utils/scroll";
@@ -17,63 +17,101 @@ function hashFromItemPath(path: string): string {
   return path.slice(index + 1).split("#")[0]?.trim() ?? "";
 }
 
+type SpyListener = () => void;
+
+let spyHash = "";
+let spyIdsKey = "";
+let spyAttached = false;
+let spyFrame = 0;
+let spyTicking = false;
+const spyListeners = new Set<SpyListener>();
+
+function notifySpyListeners() {
+  spyListeners.forEach((listener) => listener());
+}
+
+function readSpyHash(ids: string[]) {
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
+  const probe = (header?.getBoundingClientRect().height ?? 88) + 12;
+  let current = "";
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    if (el.getBoundingClientRect().top <= probe) current = id;
+  }
+  const next = current ? `#${current}` : "";
+  if (next === spyHash) return;
+  spyHash = next;
+  notifySpyListeners();
+}
+
+function onSpyScroll() {
+  if (spyTicking || !spyIdsKey) return;
+  spyTicking = true;
+  requestAnimationFrame(() => {
+    spyTicking = false;
+    readSpyHash(spyIdsKey.split("|").filter(Boolean));
+  });
+}
+
+function attachSpy(idsKey: string) {
+  spyIdsKey = idsKey;
+  if (spyAttached) {
+    onSpyScroll();
+    return;
+  }
+  spyAttached = true;
+  spyFrame = requestAnimationFrame(onSpyScroll);
+  window.addEventListener("scroll", onSpyScroll, { passive: true });
+  window.addEventListener("resize", onSpyScroll, { passive: true });
+  window.addEventListener(LOCATION_CHANGE_EVENT, onSpyScroll);
+  window.addEventListener("hashchange", onSpyScroll);
+}
+
+function detachSpy() {
+  if (!spyAttached) return;
+  spyAttached = false;
+  spyIdsKey = "";
+  spyHash = "";
+  cancelAnimationFrame(spyFrame);
+  window.removeEventListener("scroll", onSpyScroll);
+  window.removeEventListener("resize", onSpyScroll);
+  window.removeEventListener(LOCATION_CHANGE_EVENT, onSpyScroll);
+  window.removeEventListener("hashchange", onSpyScroll);
+}
+
+function subscribeSpy(listener: SpyListener, idsKey: string) {
+  spyListeners.add(listener);
+  if (spyListeners.size === 1) attachSpy(idsKey);
+  else if (idsKey !== spyIdsKey) attachSpy(idsKey);
+
+  return () => {
+    spyListeners.delete(listener);
+    if (spyListeners.size === 0) detachSpy();
+  };
+}
+
 /**
  * Home-page scroll spy. Returns the in-view section hash (`#services`)
  * so nav underlines match hash links while scrolling. `null` when not
  * on the homepage (caller should fall back to the URL hash).
+ *
+ * One shared window listener for all SiteNav instances.
  */
 export function useActiveSectionHash(itemPaths: string[]): string | null {
   const pathname = usePathname();
   const onHome = isHomePath(pathname);
-  const [activeHash, setActiveHash] = useState<string | null>(null);
   const idsKey = itemPaths.map(hashFromItemPath).filter(Boolean).join("|");
+  const enabled = onHome && Boolean(idsKey);
 
-  useEffect(() => {
-    if (!onHome) return;
+  const hash = useSyncExternalStore(
+    (listener) => {
+      if (!enabled) return () => undefined;
+      return subscribeSpy(listener, idsKey);
+    },
+    () => (enabled ? spyHash : ""),
+    () => "",
+  );
 
-    const ids = idsKey.split("|").filter(Boolean);
-    if (!ids.length) return;
-
-    let ticking = false;
-    let frame = 0;
-
-    const read = () => {
-      const header = document.querySelector<HTMLElement>("[data-site-header]");
-      const probe =
-        (header?.getBoundingClientRect().height ?? 88) + 12;
-      let current = "";
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top <= probe) current = id;
-      }
-      const next = current ? `#${current}` : "";
-      setActiveHash((prev) => (prev === next ? prev : next));
-    };
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        read();
-      });
-    };
-
-    frame = requestAnimationFrame(read);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    window.addEventListener(LOCATION_CHANGE_EVENT, onScroll);
-    window.addEventListener("hashchange", onScroll);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      window.removeEventListener(LOCATION_CHANGE_EVENT, onScroll);
-      window.removeEventListener("hashchange", onScroll);
-    };
-  }, [onHome, idsKey]);
-
-  return onHome ? activeHash : null;
+  return enabled ? hash : null;
 }

@@ -36,7 +36,10 @@ export function SiteNav({
 }: SiteNavProps) {
   const pathname = usePathname();
   const hash = useLocationHash();
-  const spyHash = useActiveSectionHash(items.map((item) => item.path));
+  // Footer only needs URL hash; header + mobile share one scroll spy.
+  const spyHash = useActiveSectionHash(
+    variant === "footer" ? [] : items.map((item) => item.path),
+  );
   const effectiveHash = spyHash !== null ? spyHash : hash;
   const LinkComponent = TransitionLink;
 

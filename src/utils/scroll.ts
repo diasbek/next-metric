@@ -197,7 +197,9 @@ export function navigateSameDocumentHash(hash: string): void {
     window.history.pushState(null, "", nextUrl);
     emitLocationChange();
   }
-  scrollToHash(clean, "smooth");
+  // Instant — smooth scroll under hero blur / sticky header feels laggy and
+  // makes rapid nav taps miss or queue behind an unfinished animation.
+  scrollToHash(clean, "instant");
 }
 
 /** Clear hash and scroll to top on the current document (logo / home). */
@@ -208,7 +210,7 @@ export function navigateSameDocumentTop(): void {
     emitLocationChange();
   }
   stopOngoingWindowScroll();
-  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 }
 
 /** Top of page or in-page hash, depending on the current location. */

@@ -103,11 +103,17 @@ export function Header({
     const header = headerRef.current;
     if (!header) return;
 
+    let ticking = false;
     const syncScrolled = () => {
-      header.classList.toggle(
-        "is-scrolled",
-        window.scrollY > HERO_SCROLL_SOLIDIFY_PX,
-      );
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        header.classList.toggle(
+          "is-scrolled",
+          window.scrollY > HERO_SCROLL_SOLIDIFY_PX,
+        );
+      });
     };
 
     syncScrolled();

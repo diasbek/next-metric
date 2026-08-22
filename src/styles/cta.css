@@ -39,6 +39,8 @@
   background: transparent;
   box-shadow: none;
   transition: opacity 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .metric-cta--full {

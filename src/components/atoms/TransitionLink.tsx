@@ -41,8 +41,8 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
     <Link
       href={href}
       {...props}
+      prefetch={props.prefetch ?? true}
       onClick={(event) => {
-        onClick?.(event);
         if (
           event.defaultPrevented ||
           event.metaKey ||
@@ -50,11 +50,15 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
           event.shiftKey ||
           event.altKey
         ) {
+          onClick?.(event);
           return;
         }
 
         const url = hrefToUrl(href);
-        if (!url || url.startsWith("http")) return;
+        if (!url || url.startsWith("http")) {
+          onClick?.(event);
+          return;
+        }
 
         const hash = getHashFromHref(url);
         const sameDoc = url.startsWith("#") || isSameDocumentPath(url, pathname);
@@ -64,21 +68,28 @@ export function TransitionLink({ href, onClick, ...props }: TransitionLinkProps)
 
         if (hash && sameDoc) {
           event.preventDefault();
+          // Scroll first, then close mobile menu / other side effects so
+          // body overflow unlock does not fight the jump.
           navigateSameDocumentHash(hash);
+          onClick?.(event);
           return;
         }
 
         if (!hash && sameDoc && nextSearch !== currentSearch) {
           event.preventDefault();
           router.replace(url, { scroll: false });
+          onClick?.(event);
           return;
         }
 
         if (!hash && sameDoc) {
           event.preventDefault();
           navigateSameDocumentTop();
+          onClick?.(event);
           return;
         }
+
+        onClick?.(event);
       }}
     />
   );
