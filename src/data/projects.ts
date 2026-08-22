@@ -70,9 +70,11 @@ export const projects: Project[] = [
     description:
       "Visual identity and Amazon listing system for a drill brush attachment set — listing images, A+ Content, and EBC modules.",
     image: "/images/metric/case-detail/vjm-store/1.jpg",
-    tags: ["Listing", "A+ Content", "EBC"],
-    sphere: "Home & Garden",
-    featured: true,
+    tags: ["Listing", "Premium A+", "Home"],
+    sphere: "Home",
+    quote: "Conversion grew from 9.5% to 22% in three days",
+    author: "VJM-STORE",
+    role: "Drill brush attachment set — Amazon DE",
     caseStudy: {
       year: "2026",
       task: "Create a cohesive visual identity and commercial image series for a drill brush kit on Amazon.",

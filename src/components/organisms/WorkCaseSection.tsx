@@ -3,7 +3,6 @@ import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
-import { VjmStoreCaseBody } from "@/components/organisms/VjmStoreCaseBody";
 import type { Project } from "@/data/projects";
 import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
 import { getCaseImageMeta } from "@/data/case-image-meta";
@@ -57,7 +56,6 @@ export async function WorkCaseSection({
   const caseStudy = project.caseStudy;
   const nextProjects = await getNextProjects(locale, project.slug);
   const stripImages = caseStripImages(project);
-  const isVjmStore = project.slug === "vjm-store";
 
   const authorName = project.author ?? project.title;
   const reviews = [
@@ -76,13 +74,8 @@ export async function WorkCaseSection({
   ];
 
   return (
-    <article className={`metric-case${isVjmStore ? " metric-case--vjm-store" : ""}`}>
+    <article className="metric-case">
       <PageContainer className="metric-case__shell">
-        {isVjmStore ? (
-          <VjmStoreCaseBody />
-        ) : (
-          <>
-        {/* Full-width title, then 2-col: role+task | tags+lede+solution. */}
         <header className="metric-case__intro">
           <h1 className="metric-case__title font-display">{authorName}</h1>
 
@@ -134,31 +127,31 @@ export async function WorkCaseSection({
             {stripImages.map((src, index) => {
               const { width, height } = getCaseImageMeta(src);
               return (
-              <div key={`${src}-${index}`} className="metric-case__stack-item">
-                <ProgressiveCaseImage
-                  src={src}
-                  alt={
-                    index === 0
-                      ? `${project.title} — Amazon listing visuals`
-                      : `${project.title} — project image ${index + 1}`
-                  }
-                  width={width}
-                  height={height}
-                  className="metric-case__stack-img"
-                  priority={index === 0}
-                />
-                {index === 0 && caseStudy?.metricValue ? (
-                  <div className="metric-glass absolute bottom-6 left-6 px-5 py-4 md:bottom-10 md:left-10">
-                    <p className="text-sm text-foreground/70">
-                      {caseStudy.metricLabel}
-                    </p>
-                    <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
-                      {caseStudy.metricValue}
-                    </p>
-                  </div>
-                ) : null}
-              </div>
-            );
+                <div key={`${src}-${index}`} className="metric-case__stack-item">
+                  <ProgressiveCaseImage
+                    src={src}
+                    alt={
+                      index === 0
+                        ? `${project.title} — Amazon listing visuals`
+                        : `${project.title} — project image ${index + 1}`
+                    }
+                    width={width}
+                    height={height}
+                    className="metric-case__stack-img"
+                    priority={index === 0}
+                  />
+                  {index === 0 && caseStudy?.metricValue ? (
+                    <div className="metric-glass absolute bottom-6 left-6 px-5 py-4 md:bottom-10 md:left-10">
+                      <p className="text-sm text-foreground/70">
+                        {caseStudy.metricLabel}
+                      </p>
+                      <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
+                        {caseStudy.metricValue}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              );
             })}
           </section>
         ) : null}
@@ -172,7 +165,10 @@ export async function WorkCaseSection({
             </div>
             <div className="metric-case__reviews">
               {reviews.map((review) => (
-                <article key={review.author + review.quote.slice(0, 24)} className="metric-case__review">
+                <article
+                  key={review.author + review.quote.slice(0, 24)}
+                  className="metric-case__review"
+                >
                   <p className="text-[clamp(16px,1.4vw,20px)] leading-[1.3] tracking-[-0.02em]">
                     {review.quote}
                   </p>
@@ -200,8 +196,6 @@ export async function WorkCaseSection({
             </div>
           </section>
         ) : null}
-          </>
-        )}
       </PageContainer>
 
       <PageContainer>

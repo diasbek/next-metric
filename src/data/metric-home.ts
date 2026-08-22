@@ -71,7 +71,7 @@ const metricHomeEn = {
     items: [
       {
         slug: "vjm-store",
-        tags: ["Listing", "A+ Content", "EBC"],
+        tags: ["Listing", "Premium A+", "Home"],
         quote: "Conversion grew from 9.5% to 22% in three days",
         author: "VJM-STORE",
         role: "Drill brush attachment set — Amazon DE",
@@ -250,7 +250,7 @@ const metricHomeDe = {
     items: [
       {
         slug: "vjm-store",
-        tags: ["Listing", "A+ Content", "EBC"],
+        tags: ["Listing", "Premium A+", "Home"],
         quote: "Conversion stieg in drei Tagen von 9,5 % auf 22 %",
         author: "VJM-STORE",
         role: "Bohrbürsten-Set — Amazon DE",
