@@ -74,7 +74,7 @@ export const projects: Project[] = [
     sphere: "Home",
     quote: "Conversion grew from 9.5% to 22% in three days",
     author: "VJM-STORE",
-    role: "Drill brush attachment set — Amazon DE",
+    role: "VJM-STORE, Amazon DE",
     caseStudy: {
       year: "2026",
       task: "Create a cohesive visual identity and commercial image series for a drill brush kit on Amazon.",
