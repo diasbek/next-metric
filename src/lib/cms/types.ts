@@ -30,9 +30,13 @@ export type DbProjectTranslation = {
   case_year: string | null;
   case_task: string | null;
   case_solution: string | null;
+  author?: string | null;
+  role?: string | null;
+  quote?: string | null;
   meta_title?: string;
   meta_description?: string;
   keywords?: string;
+  og_image?: string | null;
 };
 
 export type DbProjectMedia = {
@@ -213,11 +217,14 @@ export function mapProjectRow(
     sphere: row.sphere,
     featured: row.featured,
     caseStudy,
+    author: (tr.author ?? "").trim() || undefined,
+    role: (tr.role ?? "").trim() || undefined,
+    quote: (tr.quote ?? "").trim() || undefined,
     seo: {
       metaTitle: (tr.meta_title ?? "").trim(),
       metaDescription: (tr.meta_description ?? "").trim(),
       keywords: (tr.keywords ?? "").trim(),
-      ogImage: (row.og_image ?? "").trim(),
+      ogImage: (row.og_image ?? tr.og_image ?? "").trim(),
       indexable: row.seo_indexable !== false,
     },
   };

@@ -450,6 +450,7 @@ export type AdminMessages = {
       description: string;
       preview: string;
       caseText: string;
+      caseTextHint: string;
       gallery: string;
       general: string;
       save: string;
@@ -460,6 +461,12 @@ export type AdminMessages = {
       caseYear: string;
       caseTask: string;
       caseSolution: string;
+      author: string;
+      authorPlaceholder: string;
+      role: string;
+      rolePlaceholder: string;
+      quote: string;
+      quotePlaceholder: string;
       coverUrl: string;
       fromLibrary: string;
       addMedia: string;
@@ -487,11 +494,13 @@ export type AdminMessages = {
       youtubeUrl: string;
       seoSection: string;
       seoHint: string;
+      fillSeo: string;
       metaTitle: string;
       metaDescription: string;
       keywords: string;
       seoIndexable: string;
       ogImage: string;
+      ogImageUrl: string;
       heroImage: string;
     };
   };

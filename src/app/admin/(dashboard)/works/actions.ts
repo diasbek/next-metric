@@ -21,6 +21,8 @@ export async function createProjectAction() {
       status: "draft",
       cover_image: "",
       sphere: "",
+      seo_indexable: true,
+      og_image: "",
     })
     .select("id")
     .single();
@@ -31,11 +33,21 @@ export async function createProjectAction() {
     (["en", "de"] as const).map((locale) => ({
       project_id: data.id,
       locale,
-      title: "New project",
+      title: "",
       description: "",
       tags: [],
+      author: "",
+      role: "",
+      quote: "",
     })),
   );
+
+  // Start with one gallery block so editors can upload frames immediately.
+  await supabase.from("metric_project_blocks").insert({
+    project_id: data.id,
+    type: "gallery",
+    sort_order: 0,
+  });
 
   revalidateCms(["cms", "projects"]);
   return adminRedirect(`/admin/works/${data.id}/`);
@@ -101,6 +113,9 @@ export async function saveProjectAction(formData: FormData) {
       case_year: String(formData.get(`${locale}_case_year`) ?? "") || null,
       case_task: String(formData.get(`${locale}_case_task`) ?? "") || null,
       case_solution: String(formData.get(`${locale}_case_solution`) ?? "") || null,
+      author: String(formData.get(`${locale}_author`) ?? ""),
+      role: String(formData.get(`${locale}_role`) ?? ""),
+      quote: String(formData.get(`${locale}_quote`) ?? ""),
       meta_title: String(formData.get(`${locale}_meta_title`) ?? ""),
       meta_description: String(formData.get(`${locale}_meta_description`) ?? ""),
       keywords: String(formData.get(`${locale}_keywords`) ?? ""),

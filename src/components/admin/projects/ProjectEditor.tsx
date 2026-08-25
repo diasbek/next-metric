@@ -2,6 +2,7 @@
 
 import { HardNavForm } from "@/components/admin/HardNavForm";
 import { useMemo, useState, type CSSProperties } from "react";
+import Link from "next/link";
 import { ImageField } from "@/components/admin/image-field";
 import { LibraryImagePicker } from "@/components/admin/form/LibraryImagePicker";
 import {
@@ -33,7 +34,6 @@ import {
   adminBtnPrimary,
   adminInput,
 } from "@/components/admin/ui/styles";
-import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { ADMIN_LOCALES } from "@/components/admin/ui/locales";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
@@ -59,8 +59,45 @@ const sectionTitle: CSSProperties = {
   letterSpacing: "0.02em",
 };
 
+const stickyBar: CSSProperties = {
+  position: "sticky",
+  top: 0,
+  zIndex: 20,
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 10,
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "12px 14px",
+  margin: "0 0 8px",
+  border: "1px solid #333",
+  background: "rgba(10,10,10,0.94)",
+  backdropFilter: "blur(8px)",
+};
+
 function isLocaleFilled(tr: ProjectTranslationDraft): boolean {
-  return Boolean(tr.title.trim() && tr.description.trim());
+  return Boolean(tr.title.trim());
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+function isAutoSlug(slug: string): boolean {
+  return !slug.trim() || /^project-\d+$/.test(slug.trim());
+}
+
+function seoLenColor(length: number, soft: number, hard: number): string {
+  if (length === 0) return "#666";
+  if (length > hard) return "#f66";
+  if (length > soft) return "#da6";
+  return "#6a6";
 }
 
 export function ProjectEditor({ project, library }: Props) {
@@ -68,6 +105,7 @@ export function ProjectEditor({ project, library }: Props) {
   const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(project);
   const [coverPreview, setCoverPreview] = useState(project.cover_image);
+  const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const tr = draft.translations[locale];
 
   const filled = useMemo(
@@ -103,7 +141,35 @@ export function ProjectEditor({ project, library }: Props) {
     }));
   };
 
-  const heroMedia = draft.media.find((m) => m.kind === "hero");
+  const onTitleChange = (title: string) => {
+    updateLocale({ title });
+    if (!slugLocked) {
+      const next = slugify(title);
+      if (next) setDraft((p) => ({ ...p, slug: next }));
+    }
+  };
+
+  const fillSeoFromCase = () => {
+    const title = tr.title.trim();
+    const description = tr.description.trim();
+    updateLocale({
+      meta_title: tr.meta_title.trim() || (title ? `${title} — METRIC` : ""),
+      meta_description: tr.meta_description.trim() || description.slice(0, 160),
+      keywords:
+        tr.keywords.trim() ||
+        [tr.tags, draft.sphere].filter(Boolean).join(", "),
+    });
+    if (!draft.og_image && draft.cover_image) {
+      setDraft((p) => ({ ...p, og_image: p.cover_image }));
+    }
+  };
+
+  const metaTitleLen = (tr.meta_title || (tr.title ? `${tr.title} — METRIC` : "")).length;
+  const metaDescLen = (tr.meta_description || tr.description).length;
+  const publicPath =
+    locale === "de"
+      ? `metric.graphics/de/works/${draft.slug || "…"}/`
+      : `metric.graphics/works/${draft.slug || "…"}/`;
 
   return (
     <div
@@ -123,16 +189,20 @@ export function ProjectEditor({ project, library }: Props) {
         }
       `}</style>
 
-      <div style={{ display: "grid", gap: 20, minWidth: 0 }}>
-        <AdminPageHeader
-          title={tr.title || t.pages.project.title}
-          description={formatAdminMessage(t.pages.project.description, { filled })}
-        />
+      <div style={{ display: "grid", gap: 16, minWidth: 0 }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap" }}>
+          <Link href="/admin/works/" style={{ color: "#888", fontSize: 13, textDecoration: "none" }}>
+            ← {t.pages.works.title}
+          </Link>
+          <span style={{ color: "#555", fontSize: 13 }}>
+            {formatAdminMessage(t.pages.project.description, { filled })}
+          </span>
+        </div>
 
         <HardNavForm
           action={saveProjectAction}
           encType="multipart/form-data"
-          style={{ display: "grid", gap: 20 }}
+          style={{ display: "grid", gap: 16 }}
         >
           <input type="hidden" name="id" value={draft.id} />
           {ADMIN_LOCALES.map((l) => {
@@ -140,45 +210,70 @@ export function ProjectEditor({ project, library }: Props) {
             return (
               <div key={l.code} style={{ display: "none" }} aria-hidden>
                 <input type="hidden" name={`${l.code}_title`} value={row.title} />
-                <input
-                  type="hidden"
-                  name={`${l.code}_description`}
-                  value={row.description}
-                />
+                <input type="hidden" name={`${l.code}_description`} value={row.description} />
                 <input type="hidden" name={`${l.code}_tags`} value={row.tags} />
-                <input
-                  type="hidden"
-                  name={`${l.code}_case_year`}
-                  value={row.case_year}
-                />
-                <input
-                  type="hidden"
-                  name={`${l.code}_case_task`}
-                  value={row.case_task}
-                />
-                <input
-                  type="hidden"
-                  name={`${l.code}_case_solution`}
-                  value={row.case_solution}
-                />
-                <input
-                  type="hidden"
-                  name={`${l.code}_meta_title`}
-                  value={row.meta_title}
-                />
+                <input type="hidden" name={`${l.code}_case_year`} value={row.case_year} />
+                <input type="hidden" name={`${l.code}_case_task`} value={row.case_task} />
+                <input type="hidden" name={`${l.code}_case_solution`} value={row.case_solution} />
+                <input type="hidden" name={`${l.code}_author`} value={row.author} />
+                <input type="hidden" name={`${l.code}_role`} value={row.role} />
+                <input type="hidden" name={`${l.code}_quote`} value={row.quote} />
+                <input type="hidden" name={`${l.code}_meta_title`} value={row.meta_title} />
                 <input
                   type="hidden"
                   name={`${l.code}_meta_description`}
                   value={row.meta_description}
                 />
-                <input
-                  type="hidden"
-                  name={`${l.code}_keywords`}
-                  value={row.keywords}
-                />
+                <input type="hidden" name={`${l.code}_keywords`} value={row.keywords} />
               </div>
             );
           })}
+
+          <div style={stickyBar}>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+              {ADMIN_LOCALES.map((l) => {
+                const active = locale === l.code;
+                const ok = isLocaleFilled(draft.translations[l.code]);
+                return (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setLocale(l.code)}
+                    style={{
+                      ...adminBtn,
+                      background: active ? "#fff" : "#1a1a1a",
+                      color: active ? "#000" : "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 99,
+                        background: ok ? "#3d3" : "#555",
+                      }}
+                    />
+                    {l.short}
+                  </button>
+                );
+              })}
+              <select
+                name="status"
+                value={draft.status}
+                onChange={(e) => setDraft((p) => ({ ...p, status: e.target.value }))}
+                style={{ ...adminInput, width: "auto", margin: 0 }}
+              >
+                <option value="draft">{t.common.draft}</option>
+                <option value="published">{t.common.published}</option>
+              </select>
+            </div>
+            <button type="submit" style={{ ...adminBtnPrimary, padding: "10px 18px" }}>
+              {t.pages.project.save}
+            </button>
+          </div>
 
           <section style={sectionBox}>
             <h2 style={sectionTitle}>1. {t.pages.project.general}</h2>
@@ -188,35 +283,24 @@ export function ProjectEditor({ project, library }: Props) {
                 <input
                   name="slug"
                   value={draft.slug}
-                  onChange={(e) =>
-                    setDraft((p) => ({ ...p, slug: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    setSlugLocked(true);
+                    setDraft((p) => ({ ...p, slug: e.target.value }));
+                  }}
                   style={adminInput}
                 />
-              </label>
-              <label style={{ fontSize: 13 }}>
-                Status
-                <select
-                  name="status"
-                  value={draft.status}
-                  onChange={(e) =>
-                    setDraft((p) => ({ ...p, status: e.target.value }))
-                  }
-                  style={adminInput}
-                >
-                  <option value="draft">draft</option>
-                  <option value="published">published</option>
-                </select>
+                <span style={{ fontSize: 11, color: "#666" }}>
+                  /works/{draft.slug || "…"}/
+                </span>
               </label>
               <label style={{ fontSize: 13 }}>
                 {t.pages.project.sphere}
                 <input
                   name="sphere"
                   value={draft.sphere}
-                  onChange={(e) =>
-                    setDraft((p) => ({ ...p, sphere: e.target.value }))
-                  }
+                  onChange={(e) => setDraft((p) => ({ ...p, sphere: e.target.value }))}
                   style={adminInput}
+                  placeholder="Home, Tools, …"
                 />
               </label>
               <label style={{ fontSize: 13 }}>
@@ -240,9 +324,7 @@ export function ProjectEditor({ project, library }: Props) {
                 type="checkbox"
                 name="featured"
                 checked={draft.featured}
-                onChange={(e) =>
-                  setDraft((p) => ({ ...p, featured: e.target.checked }))
-                }
+                onChange={(e) => setDraft((p) => ({ ...p, featured: e.target.checked }))}
               />
               {t.pages.project.featured}
             </label>
@@ -258,18 +340,6 @@ export function ProjectEditor({ project, library }: Props) {
                 setCoverPreview(URL.createObjectURL(file));
               }}
             />
-            <label style={{ fontSize: 13 }}>
-              {t.pages.project.coverUrl}
-              <input
-                name="cover_image"
-                value={draft.cover_image}
-                onChange={(e) => {
-                  setDraft((p) => ({ ...p, cover_image: e.target.value }));
-                  setCoverPreview(e.target.value);
-                }}
-                style={adminInput}
-              />
-            </label>
             {library.length > 0 ? (
               <LibraryImagePicker
                 name="cover_from_library"
@@ -283,49 +353,57 @@ export function ProjectEditor({ project, library }: Props) {
                 }}
               />
             ) : null}
+            <details>
+              <summary style={{ cursor: "pointer", fontSize: 13, color: "#888" }}>
+                {t.pages.project.coverUrl}
+              </summary>
+              <input
+                name="cover_image"
+                value={draft.cover_image}
+                onChange={(e) => {
+                  setDraft((p) => ({ ...p, cover_image: e.target.value }));
+                  setCoverPreview(e.target.value);
+                }}
+                style={adminInput}
+                placeholder={t.pages.project.urlPlaceholder}
+              />
+            </details>
           </section>
 
           <section style={sectionBox}>
             <h2 style={sectionTitle}>2. {t.pages.project.caseText}</h2>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {ADMIN_LOCALES.map((l) => {
-                const active = locale === l.code;
-                const ok = isLocaleFilled(draft.translations[l.code]);
-                return (
-                  <button
-                    key={l.code}
-                    type="button"
-                    onClick={() => setLocale(l.code)}
-                    style={{
-                      ...adminBtn,
-                      background: active ? "#fff" : "#1a1a1a",
-                      color: active ? "#000" : "#fff",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 8,
-                        height: 8,
-                        background: ok ? "#3d3" : "#555",
-                      }}
-                    />
-                    {l.short}
-                  </button>
-                );
-              })}
-            </div>
+            <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+              {t.pages.project.caseTextHint}
+            </p>
             <label style={{ fontSize: 13 }}>
               {t.pages.project.title}
               <input
                 value={tr.title}
-                onChange={(e) => updateLocale({ title: e.target.value })}
+                onChange={(e) => onTitleChange(e.target.value)}
                 style={adminInput}
                 placeholder={t.pages.project.titlePlaceholder}
               />
             </label>
+            <div className="admin-form-2col">
+              <label style={{ fontSize: 13 }}>
+                {t.pages.project.author}
+                <input
+                  value={tr.author}
+                  onChange={(e) => updateLocale({ author: e.target.value })}
+                  style={adminInput}
+                  placeholder={t.pages.project.authorPlaceholder}
+                />
+              </label>
+              <label style={{ fontSize: 13 }}>
+                {t.pages.project.role}
+                <input
+                  value={tr.role}
+                  onChange={(e) => updateLocale({ role: e.target.value })}
+                  style={adminInput}
+                  placeholder={t.pages.project.rolePlaceholder}
+                />
+              </label>
+            </div>
             <label style={{ fontSize: 13 }}>
               {t.pages.project.descriptionLabel}
               <textarea
@@ -336,20 +414,31 @@ export function ProjectEditor({ project, library }: Props) {
               />
             </label>
             <label style={{ fontSize: 13 }}>
-              {t.pages.project.tags}
-              <input
-                value={tr.tags}
-                onChange={(e) => updateLocale({ tags: e.target.value })}
-                style={adminInput}
+              {t.pages.project.quote}
+              <textarea
+                value={tr.quote}
+                onChange={(e) => updateLocale({ quote: e.target.value })}
+                style={{ ...adminInput, minHeight: 64 }}
+                placeholder={t.pages.project.quotePlaceholder}
               />
             </label>
             <div className="admin-form-2col">
+              <label style={{ fontSize: 13 }}>
+                {t.pages.project.tags}
+                <input
+                  value={tr.tags}
+                  onChange={(e) => updateLocale({ tags: e.target.value })}
+                  style={adminInput}
+                  placeholder="Listing, Premium A+, Home"
+                />
+              </label>
               <label style={{ fontSize: 13 }}>
                 {t.pages.project.caseYear}
                 <input
                   value={tr.case_year}
                   onChange={(e) => updateLocale({ case_year: e.target.value })}
                   style={adminInput}
+                  placeholder="2026"
                 />
               </label>
             </div>
@@ -371,12 +460,76 @@ export function ProjectEditor({ project, library }: Props) {
             </label>
           </section>
 
-          <button type="submit" style={{ ...adminBtnPrimary, padding: 14, fontSize: 14 }}>
-            {t.pages.project.save}
-          </button>
+          <section style={sectionBox}>
+            <h2 style={sectionTitle}>3. {t.pages.project.contentBlocks}</h2>
+            <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+              {t.pages.project.contentBlocksHint}
+            </p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {(
+                [
+                  ["gallery", t.pages.project.addGalleryBlock],
+                  ["before_after", t.pages.project.addBeforeAfterBlock],
+                  ["youtube", t.pages.project.addYoutubeBlock],
+                ] as const
+              ).map(([type, label]) => (
+                <HardNavForm key={type} action={addProjectBlockAction}>
+                  <input type="hidden" name="project_id" value={draft.id} />
+                  <input type="hidden" name="type" value={type} />
+                  <button type="submit" style={adminBtn}>
+                    {label}
+                  </button>
+                </HardNavForm>
+              ))}
+            </div>
+
+            <ReorderStatus pending={pending} saved={saved} />
+            <SortableCardGrid
+              items={ordered}
+              onDragEnd={onDragEnd}
+              style={{ gridTemplateColumns: "1fr" }}
+              renderItem={(block) => (
+                <SortableCard id={block.id} onActivate={() => undefined}>
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  >
+                    <BlockCard
+                      block={block}
+                      projectId={draft.id}
+                      media={draft.media}
+                      library={library}
+                      title={tr.title}
+                      onYoutubeChange={(url) => {
+                        setDraft((prev) => ({
+                          ...prev,
+                          blocks: prev.blocks.map((b) =>
+                            b.id === block.id ? { ...b, youtube_url: url } : b,
+                          ),
+                        }));
+                      }}
+                    />
+                  </div>
+                </SortableCard>
+              )}
+            />
+          </section>
 
           <section style={sectionBox}>
-            <h2 style={sectionTitle}>4. {t.pages.project.seoSection}</h2>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 12,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <h2 style={sectionTitle}>4. {t.pages.project.seoSection}</h2>
+              <button type="button" style={adminBtn} onClick={fillSeoFromCase}>
+                {t.pages.project.fillSeo}
+              </button>
+            </div>
             <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
               {t.pages.project.seoHint}
             </p>
@@ -401,24 +554,22 @@ export function ProjectEditor({ project, library }: Props) {
                 value={tr.meta_title}
                 onChange={(e) => updateLocale({ meta_title: e.target.value })}
                 style={adminInput}
-                placeholder={tr.title || `${tr.title} — METRIC`}
+                placeholder={tr.title ? `${tr.title} — METRIC` : "… — METRIC"}
               />
-              <span style={{ fontSize: 11, color: "#666" }}>
-                {(tr.meta_title || tr.title).length}/60
+              <span style={{ fontSize: 11, color: seoLenColor(metaTitleLen, 60, 70) }}>
+                {metaTitleLen}/60
               </span>
             </label>
             <label style={{ fontSize: 13 }}>
               {t.pages.project.metaDescription}
               <textarea
                 value={tr.meta_description}
-                onChange={(e) =>
-                  updateLocale({ meta_description: e.target.value })
-                }
+                onChange={(e) => updateLocale({ meta_description: e.target.value })}
                 style={{ ...adminInput, minHeight: 72 }}
                 placeholder={tr.description}
               />
-              <span style={{ fontSize: 11, color: "#666" }}>
-                {(tr.meta_description || tr.description).length}/160
+              <span style={{ fontSize: 11, color: seoLenColor(metaDescLen, 155, 170) }}>
+                {metaDescLen}/160
               </span>
             </label>
             <label style={{ fontSize: 13 }}>
@@ -427,7 +578,7 @@ export function ProjectEditor({ project, library }: Props) {
                 value={tr.keywords}
                 onChange={(e) => updateLocale({ keywords: e.target.value })}
                 style={adminInput}
-                placeholder="logo, branding, …"
+                placeholder="Amazon listing, A+ Content, …"
               />
             </label>
             <div
@@ -439,33 +590,22 @@ export function ProjectEditor({ project, library }: Props) {
               }}
             >
               <p style={{ margin: "0 0 4px", color: "#1a0dab", fontSize: 16 }}>
-                {tr.meta_title || `${tr.title || "METRIC"} — METRIC`}
+                {tr.meta_title || (tr.title ? `${tr.title} — METRIC` : "METRIC")}
               </p>
               <p style={{ margin: "0 0 4px", color: "#006621", fontSize: 12 }}>
-                metric.graphics/works/{draft.slug}/
+                {publicPath}
               </p>
               <p style={{ margin: 0, color: "#545454", fontSize: 13 }}>
                 {tr.meta_description || tr.description || "…"}
               </p>
             </div>
-            <label style={{ fontSize: 13 }}>
-              {t.pages.project.ogImage}
-              <input
-                name="og_image"
-                value={draft.og_image}
-                onChange={(e) =>
-                  setDraft((p) => ({ ...p, og_image: e.target.value }))
-                }
-                style={adminInput}
-                placeholder={t.pages.project.urlPlaceholder}
-              />
-            </label>
             <ImageField
               name="og_file"
               preset="free"
-              currentUrl={draft.og_image || null}
+              currentUrl={draft.og_image || draft.cover_image || null}
               label={t.pages.project.ogImage}
             />
+            <input type="hidden" name="og_image" value={draft.og_image} />
             {library.length > 0 ? (
               <LibraryImagePicker
                 name="og_from_library"
@@ -478,93 +618,23 @@ export function ProjectEditor({ project, library }: Props) {
                 }}
               />
             ) : null}
+            <details>
+              <summary style={{ cursor: "pointer", fontSize: 13, color: "#888" }}>
+                {t.pages.project.ogImageUrl}
+              </summary>
+              <input
+                value={draft.og_image}
+                onChange={(e) => setDraft((p) => ({ ...p, og_image: e.target.value }))}
+                style={adminInput}
+                placeholder={t.pages.project.urlPlaceholder}
+              />
+            </details>
           </section>
 
           <button type="submit" style={{ ...adminBtnPrimary, padding: 14, fontSize: 14 }}>
             {t.pages.project.save}
           </button>
         </HardNavForm>
-
-        <section style={sectionBox}>
-          <h2 style={sectionTitle}>3. {t.pages.project.contentBlocks}</h2>
-          <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
-            {t.pages.project.contentBlocksHint}
-          </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {(
-              [
-                ["gallery", t.pages.project.addGalleryBlock],
-                ["before_after", t.pages.project.addBeforeAfterBlock],
-                ["youtube", t.pages.project.addYoutubeBlock],
-              ] as const
-            ).map(([type, label]) => (
-              <HardNavForm key={type} action={addProjectBlockAction}>
-                <input type="hidden" name="project_id" value={draft.id} />
-                <input type="hidden" name="type" value={type} />
-                <button type="submit" style={adminBtn}>
-                  {label}
-                </button>
-              </HardNavForm>
-            ))}
-          </div>
-
-          <HardNavForm
-            action={addProjectMediaAction}
-            encType="multipart/form-data"
-            style={{ display: "grid", gap: 10, borderTop: "1px solid #222", paddingTop: 12 }}
-          >
-            <input type="hidden" name="project_id" value={draft.id} />
-            <input type="hidden" name="kind" value="hero" />
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 600 }}>
-              {t.pages.project.heroImage}
-            </p>
-            {heroMedia ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={heroMedia.url}
-                alt=""
-                style={{ width: "100%", maxWidth: 360, aspectRatio: "16/9", objectFit: "cover" }}
-              />
-            ) : null}
-            <ImageField name="file" preset="projectCase" label={t.common.file} />
-            <button type="submit" style={adminBtn}>
-              {heroMedia ? t.pages.project.replaceImage : t.pages.project.addMedia}
-            </button>
-          </HardNavForm>
-
-          <ReorderStatus pending={pending} saved={saved} />
-          <SortableCardGrid
-            items={ordered}
-            onDragEnd={onDragEnd}
-            style={{
-              gridTemplateColumns: "1fr",
-            }}
-            renderItem={(block) => (
-              <SortableCard id={block.id} onActivate={() => undefined}>
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => e.stopPropagation()}
-                >
-                  <BlockCard
-                    block={block}
-                    projectId={draft.id}
-                    media={draft.media}
-                    library={library}
-                    title={tr.title}
-                    onYoutubeChange={(url) => {
-                      setDraft((prev) => ({
-                        ...prev,
-                        blocks: prev.blocks.map((b) =>
-                          b.id === block.id ? { ...b, youtube_url: url } : b,
-                        ),
-                      }));
-                    }}
-                  />
-                </div>
-              </SortableCard>
-            )}
-          />
-        </section>
 
         <HardNavForm action={deleteProjectAction}>
           <input type="hidden" name="id" value={draft.id} />
@@ -683,7 +753,10 @@ function BlockCard({
                     <HardNavForm action={deleteProjectMediaAction}>
                       <input type="hidden" name="project_id" value={projectId} />
                       <input type="hidden" name="media_id" value={current.id} />
-                      <button type="submit" style={{ ...adminBtn, color: "#f66", borderColor: "#633" }}>
+                      <button
+                        type="submit"
+                        style={{ ...adminBtn, color: "#f66", borderColor: "#633" }}
+                      >
                         {t.common.delete}
                       </button>
                     </HardNavForm>
@@ -745,7 +818,16 @@ function BlockCard({
                   <HardNavForm action={deleteProjectMediaAction}>
                     <input type="hidden" name="project_id" value={projectId} />
                     <input type="hidden" name="media_id" value={item.id} />
-                    <button type="submit" style={{ ...adminBtn, color: "#f66", borderColor: "#633", padding: 4, fontSize: 11 }}>
+                    <button
+                      type="submit"
+                      style={{
+                        ...adminBtn,
+                        color: "#f66",
+                        borderColor: "#633",
+                        padding: 4,
+                        fontSize: 11,
+                      }}
+                    >
                       {t.common.delete}
                     </button>
                   </HardNavForm>
@@ -760,11 +842,12 @@ function BlockCard({
             <input type="hidden" name="project_id" value={projectId} />
             <input type="hidden" name="block_id" value={block.id} />
             <input type="hidden" name="kind" value="gallery" />
-            <ImageField name="file" preset="projectCase" label={t.common.file} previewTitle={title} />
-            <label style={{ fontSize: 13 }}>
-              URL
-              <input name="url" style={adminInput} placeholder={t.pages.project.urlPlaceholder} />
-            </label>
+            <ImageField
+              name="file"
+              preset="projectCase"
+              label={t.pages.project.addMedia}
+              previewTitle={title}
+            />
             {library.length > 0 ? (
               <LibraryImagePicker
                 name="library_url"

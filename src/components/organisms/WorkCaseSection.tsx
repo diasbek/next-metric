@@ -140,16 +140,6 @@ export async function WorkCaseSection({
                     className="metric-case__stack-img"
                     priority={index === 0}
                   />
-                  {index === 0 && caseStudy?.metricValue ? (
-                    <div className="metric-glass absolute bottom-6 left-6 px-5 py-4 md:bottom-10 md:left-10">
-                      <p className="text-sm text-foreground/70">
-                        {caseStudy.metricLabel}
-                      </p>
-                      <p className="text-[28px] font-semibold tracking-[-0.04em] text-foreground">
-                        {caseStudy.metricValue}
-                      </p>
-                    </div>
-                  ) : null}
                 </div>
               );
             })}

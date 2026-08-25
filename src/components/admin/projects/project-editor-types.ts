@@ -9,6 +9,9 @@ export type ProjectTranslationDraft = {
   case_year: string;
   case_task: string;
   case_solution: string;
+  author: string;
+  role: string;
+  quote: string;
   meta_title: string;
   meta_description: string;
   keywords: string;
