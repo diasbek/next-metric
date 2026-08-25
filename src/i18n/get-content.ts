@@ -41,6 +41,12 @@ export function getContent(locale: Locale): SiteContent {
 export async function getProjectsForLocale(locale: Locale): Promise<Project[]> {
   const fromCms = await getPublishedProjects(locale);
   if (fromCms.length > 0) return fromCms;
+  // Soft fallback for local/dev without CMS; production should always have published rows.
+  if (process.env.NODE_ENV === "production") {
+    console.error(
+      `[cms] getProjectsForLocale(${locale}): no published projects — falling back to static seed`,
+    );
+  }
   return getContent(locale).projects;
 }
 

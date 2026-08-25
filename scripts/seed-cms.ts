@@ -43,6 +43,35 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
   let order = 0;
   for (const [slug, variants] of bySlug) {
     const base = variants.en ?? Object.values(variants)[0]!;
+
+    const { data: existing } = await supabase
+      .from("metric_projects")
+      .select("id, cover_image, og_image")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    const { data: existingMedia } = existing
+      ? await supabase
+          .from("metric_project_media")
+          .select("url")
+          .eq("project_id", existing.id)
+      : { data: [] as Array<{ url: string }> };
+
+    const hasStorageMedia = Boolean(
+      (existing?.cover_image && isStorageMediaUrl(existing.cover_image)) ||
+        (existing?.og_image && isStorageMediaUrl(existing.og_image)) ||
+        (existingMedia ?? []).some((m) => isStorageMediaUrl(m.url)),
+    );
+
+    const coverImage =
+      hasStorageMedia && existing?.cover_image
+        ? existing.cover_image
+        : base.image;
+    const ogImage =
+      hasStorageMedia && existing?.og_image
+        ? existing.og_image
+        : (base.seo?.ogImage ?? "");
+
     const { data: project, error } = await supabase
       .from("metric_projects")
       .upsert(
@@ -52,8 +81,8 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
           sort_order: order++,
           sphere: base.sphere,
           featured: Boolean(base.featured),
-          cover_image: base.image,
-          og_image: base.seo?.ogImage ?? "",
+          cover_image: coverImage,
+          og_image: ogImage,
           seo_indexable: base.seo?.indexable !== false,
           published_at: new Date().toISOString(),
         },
@@ -88,6 +117,11 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
         { onConflict: "project_id,locale" },
       );
       if (trError) throw new Error(`project tr ${slug}/${locale}: ${trError.message}`);
+    }
+
+    if (hasStorageMedia) {
+      console.log(`projects: ${slug} — metadata only (Storage media preserved)`);
+      continue;
     }
 
     await supabase.from("metric_project_media").delete().eq("project_id", project.id);
@@ -141,11 +175,11 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
         }
 
         if (block.type === "gallery") {
-          block.images.forEach((url, i) => {
+          block.images.forEach((image, i) => {
             media.push({
               project_id: project.id,
               kind: "gallery",
-              url,
+              url: image.url,
               sort_order: i,
               alt: `${base.title} ${i + 1}`,
               block_id: blockRow.id,
@@ -183,6 +217,10 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
   }
 
   console.log(`projects: ${bySlug.size}`);
+}
+
+function isStorageMediaUrl(url: string): boolean {
+  return url.includes("/storage/v1/object/public/metric-media/");
 }
 
 async function seedServices(supabase: ReturnType<typeof admin>) {

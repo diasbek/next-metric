@@ -12,20 +12,32 @@ import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
-/** Flatten a case into an ordered 16:9 strip — images only, no gaps. */
-function caseStripImages(project: Project): string[] {
+/** Flatten a case into an ordered strip — images only, no gaps. */
+function caseStripImages(
+  project: Project,
+): Array<{ src: string; width?: number | null; height?: number | null }> {
   const seen = new Set<string>();
-  const images: string[] = [];
-  const push = (src?: string) => {
+  const images: Array<{
+    src: string;
+    width?: number | null;
+    height?: number | null;
+  }> = [];
+  const push = (
+    src?: string,
+    width?: number | null,
+    height?: number | null,
+  ) => {
     const url = src?.trim();
     if (!url || seen.has(url)) return;
     seen.add(url);
-    images.push(url);
+    images.push({ src: url, width, height });
   };
 
   for (const block of project.caseStudy?.blocks ?? []) {
     if (block.type === "gallery") {
-      block.images.forEach(push);
+      for (const image of block.images) {
+        push(image.url, image.width, image.height);
+      }
     }
   }
 
@@ -124,12 +136,22 @@ export async function WorkCaseSection({
 
         {stripImages.length ? (
           <section className="metric-case__stack mt-12 md:mt-16">
-            {stripImages.map((src, index) => {
-              const { width, height } = getCaseImageMeta(src);
+            {stripImages.map((item, index) => {
+              const fromCms =
+                item.width != null &&
+                item.height != null &&
+                item.width > 0 &&
+                item.height > 0
+                  ? { width: item.width, height: item.height }
+                  : null;
+              const { width, height } = fromCms ?? getCaseImageMeta(item.src);
               return (
-                <div key={`${src}-${index}`} className="metric-case__stack-item">
+                <div
+                  key={`${item.src}-${index}`}
+                  className="metric-case__stack-item"
+                >
                   <ProgressiveCaseImage
-                    src={src}
+                    src={item.src}
                     alt={
                       index === 0
                         ? `${project.title} — Amazon listing visuals`

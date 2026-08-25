@@ -4,6 +4,8 @@ import { revalidateCms } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
+  CASE_MEDIA_MAX_EDGE_PX,
+  CASE_MEDIA_WEBP_QUALITY,
   deleteMediaByPublicUrl,
   isFileUpload,
   uploadMediaFile,
@@ -245,12 +247,29 @@ export async function addProjectMediaAction(formData: FormData) {
     String(formData.get("library_url") ?? "").trim() ||
     String(formData.get("url") ?? "").trim();
 
+  const isCaseQuality =
+    kind === "gallery" ||
+    kind === "before" ||
+    kind === "after" ||
+    kind === "hero";
+
+  let width: number | null = null;
+  let height: number | null = null;
+
   if (isFileUpload(file)) {
     const uploaded = await uploadMediaFile(file, {
       folder: `projects/${projectId}/${kind}`,
       filenameHint: kind,
+      ...(isCaseQuality
+        ? {
+            maxEdge: CASE_MEDIA_MAX_EDGE_PX,
+            quality: CASE_MEDIA_WEBP_QUALITY,
+          }
+        : {}),
     });
     url = uploaded.publicUrl;
+    width = uploaded.width;
+    height = uploaded.height;
   }
 
   if (!url) {
@@ -260,6 +279,8 @@ export async function addProjectMediaAction(formData: FormData) {
   const alt = String(formData.get("alt") ?? "");
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   const isComparePair = kind === "before" || kind === "after";
+  const dimensions =
+    width != null && height != null ? { width, height } : {};
 
   if (isComparePair) {
     let query = supabase
@@ -276,7 +297,13 @@ export async function addProjectMediaAction(formData: FormData) {
       }
       await supabase
         .from("metric_project_media")
-        .update({ url, alt, sort_order: sortOrder, block_id: blockId })
+        .update({
+          url,
+          alt,
+          sort_order: sortOrder,
+          block_id: blockId,
+          ...dimensions,
+        })
         .eq("id", existing.id);
     } else {
       await supabase.from("metric_project_media").insert({
@@ -286,6 +313,7 @@ export async function addProjectMediaAction(formData: FormData) {
         url,
         sort_order: sortOrder,
         alt,
+        ...dimensions,
       });
     }
   } else if (kind === "hero") {
@@ -302,7 +330,7 @@ export async function addProjectMediaAction(formData: FormData) {
       }
       await supabase
         .from("metric_project_media")
-        .update({ url, alt, sort_order: sortOrder })
+        .update({ url, alt, sort_order: sortOrder, ...dimensions })
         .eq("id", existing.id);
     } else {
       await supabase.from("metric_project_media").insert({
@@ -312,6 +340,7 @@ export async function addProjectMediaAction(formData: FormData) {
         url,
         sort_order: sortOrder,
         alt,
+        ...dimensions,
       });
     }
   } else {
@@ -322,6 +351,7 @@ export async function addProjectMediaAction(formData: FormData) {
       url,
       sort_order: sortOrder,
       alt,
+      ...dimensions,
     });
   }
 

@@ -50,12 +50,13 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     label: "Case / gallery",
     surface: "caseFigure",
     surfaceLabel: "Case study figure",
-    aspect: 1432 / 806,
-    maxWidth: 1600,
-    maxHeight: 900,
-    quality: 0.82,
+    // Free aspect — case frames are often portrait / square, not 16:9.
+    aspect: undefined,
+    maxWidth: 2800,
+    maxHeight: 2800,
+    quality: 0.9,
     preferWebp: true,
-    hint: "As on case study gallery (1432×806).",
+    hint: "Full gallery frame (up to ~2800px long edge, no forced crop).",
   },
   team: {
     key: "team",

@@ -14,8 +14,13 @@ const ALLOWED_MIME = new Set([
   "image/avif",
 ]);
 
-const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+/** Default long-edge for general media (covers, avatars, library). */
 const MAX_EDGE_PX = 1920;
+/** Case gallery / hero masters — match static optimize-metric-images. */
+export const CASE_MEDIA_MAX_EDGE_PX = 2800;
+export const CASE_MEDIA_WEBP_QUALITY = 90;
+const DEFAULT_WEBP_QUALITY = 82;
 
 function sanitizeFilename(name: string) {
   return name
@@ -41,6 +46,15 @@ export type UploadMediaOptions = {
   filenameHint?: string;
   /** Long-edge limit after sharp (default 1920) */
   maxEdge?: number;
+  /** WebP quality 1–100 (default 82; case galleries use 90) */
+  quality?: number;
+};
+
+export type UploadMediaResult = {
+  path: string;
+  publicUrl: string;
+  width: number | null;
+  height: number | null;
 };
 
 /**
@@ -51,10 +65,17 @@ async function optimizeForWeb(
   buffer: Buffer,
   mime: string,
   maxEdge = MAX_EDGE_PX,
-): Promise<{ buffer: Buffer; contentType: string; ext: string }> {
+  quality = DEFAULT_WEBP_QUALITY,
+): Promise<{
+  buffer: Buffer;
+  contentType: string;
+  ext: string;
+  width: number | null;
+  height: number | null;
+}> {
   if (mime === "image/svg+xml" || mime === "image/gif") {
     const ext = mime === "image/svg+xml" ? "svg" : "gif";
-    return { buffer, contentType: mime, ext };
+    return { buffer, contentType: mime, ext, width: null, height: null };
   }
 
   const image = sharp(buffer, { failOn: "none" }).rotate();
@@ -73,19 +94,28 @@ async function optimizeForWeb(
     });
   }
 
-  const webp = await pipeline.webp({ quality: 82, effort: 4 }).toBuffer();
-  return { buffer: webp, contentType: "image/webp", ext: "webp" };
+  const webp = await pipeline
+    .webp({ quality: Math.min(100, Math.max(1, quality)), effort: 4 })
+    .toBuffer();
+  const outMeta = await sharp(webp).metadata();
+  return {
+    buffer: webp,
+    contentType: "image/webp",
+    ext: "webp",
+    width: outMeta.width ?? (needsResize ? Math.min(width, maxEdge) : width),
+    height: outMeta.height ?? (needsResize ? Math.min(height, maxEdge) : height),
+  };
 }
 
 export async function uploadMediaFile(
   file: File,
   options: UploadMediaOptions = {},
-): Promise<{ path: string; publicUrl: string }> {
+): Promise<UploadMediaResult> {
   if (!(file instanceof File) || file.size === 0) {
     throw new Error("Empty file");
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    throw new Error("File too large (max 12 MB)");
+    throw new Error("File too large (max 20 MB)");
   }
 
   const mime = file.type || "application/octet-stream";
@@ -100,9 +130,20 @@ export async function uploadMediaFile(
     : original.replace(/\.[^.]+$/, "");
 
   const raw = Buffer.from(await file.arrayBuffer());
-  let optimized: { buffer: Buffer; contentType: string; ext: string };
+  let optimized: {
+    buffer: Buffer;
+    contentType: string;
+    ext: string;
+    width: number | null;
+    height: number | null;
+  };
   try {
-    optimized = await optimizeForWeb(raw, mime, options.maxEdge ?? MAX_EDGE_PX);
+    optimized = await optimizeForWeb(
+      raw,
+      mime,
+      options.maxEdge ?? MAX_EDGE_PX,
+      options.quality ?? DEFAULT_WEBP_QUALITY,
+    );
   } catch (err) {
     throw new Error(
       err instanceof Error
@@ -123,7 +164,12 @@ export async function uploadMediaFile(
 
   if (error) throw new Error(describeStorageError(error.message));
 
-  return { path, publicUrl: getPublicMediaUrl(path) };
+  return {
+    path,
+    publicUrl: getPublicMediaUrl(path),
+    width: optimized.width,
+    height: optimized.height,
+  };
 }
 
 function describeStorageError(message: string): string {

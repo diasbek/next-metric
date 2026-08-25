@@ -47,6 +47,8 @@ export type DbProjectMedia = {
   sort_order: number;
   alt: string;
   block_id?: string | null;
+  width?: number | null;
+  height?: number | null;
 };
 
 export type DbProjectBlock = {
@@ -152,7 +154,11 @@ function buildBlocks(
         const images = media
           .filter((m) => m.block_id === block.id && m.kind === "gallery")
           .sort((a, b) => a.sort_order - b.sort_order)
-          .map((m) => m.url);
+          .map((m) => ({
+            url: m.url,
+            width: m.width ?? null,
+            height: m.height ?? null,
+          }));
         return { id: block.id, type: "gallery", images };
       })
       .filter((b): b is CaseBlock => Boolean(b));
@@ -173,7 +179,11 @@ function buildBlocks(
   const gallery = media
     .filter((m) => m.kind === "gallery")
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map((m) => m.url);
+    .map((m) => ({
+      url: m.url,
+      width: m.width ?? null,
+      height: m.height ?? null,
+    }));
   if (gallery.length) {
     legacy.push({ id: "legacy-gallery", type: "gallery", images: gallery });
   }

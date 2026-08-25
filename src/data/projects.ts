@@ -2,8 +2,14 @@ import { VJM_STORE_FRAME_PATHS } from "./vjm-store-frames";
 
 export type ProjectTag = string;
 
+export type CaseGalleryImage = {
+  url: string;
+  width?: number | null;
+  height?: number | null;
+};
+
 export type CaseBlock =
-  | { id: string; type: "gallery"; images: string[] }
+  | { id: string; type: "gallery"; images: CaseGalleryImage[] }
   | {
       id: string;
       type: "before_after";
@@ -63,6 +69,10 @@ export function youtubeEmbedUrl(url: string): string | null {
   return null;
 }
 
+/**
+ * Legacy static catalog — seed source / fallback when CMS is empty.
+ * Public site is CMS-first via getProjectsForLocale.
+ */
 export const projects: Project[] = [
   {
     slug: "vjm-store",
@@ -87,7 +97,7 @@ export const projects: Project[] = [
         {
           id: "vjm-gal",
           type: "gallery",
-          images: [...VJM_STORE_FRAME_PATHS],
+          images: VJM_STORE_FRAME_PATHS.map((url) => ({ url })),
         },
       ],
     },
@@ -131,9 +141,17 @@ export const projects: Project[] = [
             "/images/metric/case-detail/imgRectangle70.jpg",
             "/images/metric/case-detail/imgRectangle71.jpg",
             "/images/metric/case-detail/imgRectangle72.jpg",
-          ],
+          ].map((url) => ({ url })),
         },
       ],
+    },
+    seo: {
+      metaTitle: "MATOLUX — Amazon listing redesign & Premium A+ | METRIC",
+      metaDescription:
+        "METRIC rebuilt MATOLUX Amazon listing visuals and Premium A+ Content — stronger CTR and clearer product storytelling for agriculture buyers.",
+      keywords: "MATOLUX, Amazon listing, Premium A+, agriculture, case study",
+      ogImage: "/images/metric/cases/case-1.jpg",
+      indexable: true,
     },
   },
   {
@@ -143,6 +161,9 @@ export const projects: Project[] = [
     image: "/images/metric/cases/case-2.jpg",
     tags: ["Listing", "Agriculture", "Premium A+"],
     sphere: "Agriculture",
+    author: "CRAFTUS",
+    role: "Amazon brand",
+    quote: "A coherent visual system that finally matched how we sell",
     caseStudy: {
       year: "2026",
       task: "Create a coherent visual system across listing and A+ Content.",
@@ -158,9 +179,17 @@ export const projects: Project[] = [
           images: [
             "/images/metric/cases/case-2.jpg",
             "/images/metric/categories/cat-3.jpg",
-          ],
+          ].map((url) => ({ url })),
         },
       ],
+    },
+    seo: {
+      metaTitle: "CRAFTUS — Amazon listing & A+ Content system | METRIC",
+      metaDescription:
+        "How METRIC designed a conversion-focused Amazon listing and Premium A+ system for CRAFTUS — clearer benefits and stronger brand trust.",
+      keywords: "CRAFTUS, Amazon listing, A+ Content, agriculture, case study",
+      ogImage: "/images/metric/cases/case-2.jpg",
+      indexable: true,
     },
   },
   {
@@ -189,9 +218,17 @@ export const projects: Project[] = [
           images: [
             "/images/metric/cases/case-3.jpg",
             "/images/metric/categories/cat-4.jpg",
-          ],
+          ].map((url) => ({ url })),
         },
       ],
+    },
+    seo: {
+      metaTitle: "Tobias / Home Essentials — Amazon visuals case study | METRIC",
+      metaDescription:
+        "METRIC produced conversion-led Amazon listing visuals for Tobias Fraikin’s Home Essentials brand — clearer benefits and +1.5× conversion.",
+      keywords: "Tobias Fraikin, Home Essentials, Amazon listing, conversion, case study",
+      ogImage: "/images/metric/cases/case-3.jpg",
+      indexable: true,
     },
   },
 ];

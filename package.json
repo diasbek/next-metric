@@ -20,6 +20,7 @@
     "generate:icons": "node scripts/generate-icons.js",
     "seed:cms": "tsx scripts/seed-cms.ts",
     "seed:metric": "tsx scripts/seed-metric-home.ts",
+    "migrate:case-images": "tsx scripts/migrate-case-images-to-storage.ts",
     "check:metric-env": "tsx scripts/check-metric-env.ts",
     "create:cms-admin": "tsx scripts/create-cms-admin.ts",
     "db:migrations:bundle": "tsx scripts/apply-migrations.ts --bundle",
