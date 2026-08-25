@@ -5,7 +5,10 @@ import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
 import type { Project } from "@/data/projects";
 import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
-import { getCaseImageMeta } from "@/data/case-image-meta";
+import {
+  CASE_GALLERY_SIZES,
+  getCaseImageMeta,
+} from "@/data/case-image-meta";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
@@ -61,12 +64,14 @@ export async function WorkCaseSection({
   project,
 }: WorkCaseSectionProps) {
   const { ui } = content;
-  const home = await getMetricHomeResolved(locale);
+  const [home, nextProjects] = await Promise.all([
+    getMetricHomeResolved(locale),
+    getNextProjects(locale, project.slug),
+  ]);
   const homeCaseBySlug = new Map<string, (typeof home.caseStudies.items)[number]>(
     home.caseStudies.items.map((item) => [item.slug, item]),
   );
   const caseStudy = project.caseStudy;
-  const nextProjects = await getNextProjects(locale, project.slug);
   const stripImages = caseStripImages(project);
 
   const authorName = project.author ?? project.title;
@@ -145,23 +150,42 @@ export async function WorkCaseSection({
                   ? { width: item.width, height: item.height }
                   : null;
               const { width, height } = fromCms ?? getCaseImageMeta(item.src);
+              const alt =
+                index === 0
+                  ? `${project.title} — Amazon listing visuals`
+                  : `${project.title} — project image ${index + 1}`;
+              const isHero = index === 0;
+
               return (
                 <div
                   key={`${item.src}-${index}`}
-                  className="metric-case__stack-item"
+                  className={
+                    isHero
+                      ? "metric-case__stack-item"
+                      : "metric-case__stack-item metric-case__stack-item--lazy"
+                  }
                 >
-                  <ProgressiveCaseImage
-                    src={item.src}
-                    alt={
-                      index === 0
-                        ? `${project.title} — Amazon listing visuals`
-                        : `${project.title} — project image ${index + 1}`
-                    }
-                    width={width}
-                    height={height}
-                    className="metric-case__stack-img"
-                    priority={index === 0}
-                  />
+                  {isHero ? (
+                    <ProgressiveCaseImage
+                      src={item.src}
+                      alt={alt}
+                      width={width}
+                      height={height}
+                      className="metric-case__stack-img"
+                      priority
+                    />
+                  ) : (
+                    <MediaImage
+                      src={item.src}
+                      alt={alt}
+                      width={width}
+                      height={height}
+                      className="metric-case__stack-img"
+                      quality={85}
+                      sizes={CASE_GALLERY_SIZES}
+                      loading="lazy"
+                    />
+                  )}
                 </div>
               );
             })}

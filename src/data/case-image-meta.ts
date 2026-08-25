@@ -68,10 +68,11 @@ export function getCaseImageMeta(src: string) {
   return CASE_IMAGE_META[src] ?? { width: 1920, height: 1502 };
 }
 
-/** Rendered width for full-bleed galleries inside `.page-container`. */
+/** Rendered width for full-bleed galleries inside `.page-container`.
+ * Cap at 2560 — case masters are ≤2800px; 3840 just inflates optimizer work. */
 export const CASE_GALLERY_SIZES =
-  "(max-width: 1512px) 100vw, (max-width: 3840px) 90vw, 3840px";
+  "(max-width: 768px) 100vw, (max-width: 1512px) 90vw, 2560px";
 
-/** Smaller srcset for the progressive preview pass. */
+/** Smaller srcset for the progressive preview pass (LCP hero only). */
 export const CASE_GALLERY_PREVIEW_SIZES =
   "(max-width: 768px) 100vw, (max-width: 1512px) 50vw, 960px";

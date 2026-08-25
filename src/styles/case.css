@@ -179,6 +179,12 @@
   transform: translateZ(0);
 }
 
+/* Skip layout/paint for offscreen frames until near viewport. */
+.metric-case__stack-item--lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: 1200px;
+}
+
 /* Overlap + trim JPEG block edges that cause hairlines between frames. */
 .metric-case__stack-item + .metric-case__stack-item {
   margin-top: -2px;
@@ -186,6 +192,7 @@
 
 .metric-case__stack-item:not(:last-child) .progressive-case-image__preview img,
 .metric-case__stack-item:not(:last-child) .progressive-case-image__full img,
+.metric-case__stack-item:not(:last-child) .media-image img,
 .metric-case__stack-item:not(:last-child) .metric-case__stack-img {
   clip-path: inset(0 0 2px 0);
   margin-bottom: -2px;
