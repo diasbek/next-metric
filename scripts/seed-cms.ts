@@ -53,6 +53,8 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
           sphere: base.sphere,
           featured: Boolean(base.featured),
           cover_image: base.image,
+          og_image: base.seo?.ogImage ?? "",
+          seo_indexable: base.seo?.indexable !== false,
           published_at: new Date().toISOString(),
         },
         { onConflict: "slug" },
@@ -76,6 +78,12 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
           case_year: p.caseStudy?.year ?? null,
           case_task: p.caseStudy?.task ?? null,
           case_solution: p.caseStudy?.solution ?? null,
+          author: p.author ?? "",
+          role: p.role ?? "",
+          quote: p.quote ?? "",
+          meta_title: p.seo?.metaTitle ?? "",
+          meta_description: p.seo?.metaDescription ?? "",
+          keywords: p.seo?.keywords ?? "",
         },
         { onConflict: "project_id,locale" },
       );
@@ -83,6 +91,7 @@ async function seedProjects(supabase: ReturnType<typeof admin>) {
     }
 
     await supabase.from("metric_project_media").delete().eq("project_id", project.id);
+    await supabase.from("metric_project_blocks").delete().eq("project_id", project.id);
 
     const media: Array<{
       project_id: string;
