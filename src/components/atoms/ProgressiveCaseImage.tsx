@@ -84,7 +84,7 @@ export function ProgressiveCaseImage({
   const markFullReady = useCallback(() => setFullReady(true), []);
 
   useImageReady(previewRef, !previewReady, markPreviewReady);
-  useImageReady(fullRef, previewReady && !fullReady, markFullReady);
+  useImageReady(fullRef, (previewReady || Boolean(priority)) && !fullReady, markFullReady);
 
   return (
     <span
@@ -101,7 +101,7 @@ export function ProgressiveCaseImage({
           onLoad={() => markPreviewReady()}
         />
       </span>
-      {previewReady ? (
+      {previewReady || priority ? (
         <span ref={fullRef} className="progressive-case-image__full">
           <MediaImage
             {...rest}
@@ -109,6 +109,8 @@ export function ProgressiveCaseImage({
             sizes={sizes}
             className={className}
             skeleton={false}
+            // Priority hero: fetch full in parallel with preview (faster sharp paint).
+            priority={priority}
             loading={priority ? undefined : "lazy"}
             onLoad={(event) => {
               markFullReady();
