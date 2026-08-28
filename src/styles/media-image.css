@@ -19,7 +19,9 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  overflow: hidden;
+  /* visible: overflow:hidden here created a clip rect that could crop
+     sibling/overlapping hero plaques (skewed redesign tag) in some layouts. */
+  overflow: visible;
   background: var(--surface);
   opacity: 0;
   visibility: hidden;

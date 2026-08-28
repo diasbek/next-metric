@@ -153,32 +153,28 @@ export function MetricHeroSection({
                 />
               </div>
 
-              {/* Position plaques on the white card inside cluster.png (not the
-                  full PNG canvas — transparent margins were clipping labels). */}
-              <div className="metric-hero__cluster-stage">
-                <div className="metric-hero__badge">
-                  <LiquidGlassPlaque className="metric-hero__plaque">
-                    <div className="metric-hero__badge-inner">
-                      <p className="metric-hero__badge-value">{hero.badgeValue}</p>
-                      <p className="metric-hero__badge-label">{hero.badgeLabel}</p>
-                    </div>
-                  </LiquidGlassPlaque>
-                </div>
-
-                <div className="metric-hero__redesign-tag">
-                  <div className="metric-hero__redesign-tag-glass">
-                    <LiquidGlassPlaque
-                      className="metric-hero__plaque"
-                      background="linear-gradient(90deg, #edd6e8, #f6d5c9)"
-                    />
+              <div className="metric-hero__badge">
+                <LiquidGlassPlaque className="metric-hero__plaque">
+                  <div className="metric-hero__badge-inner">
+                    <p className="metric-hero__badge-value">{hero.badgeValue}</p>
+                    <p className="metric-hero__badge-label">{hero.badgeLabel}</p>
                   </div>
-                  <span>{hero.redesignLabel}</span>
+                </LiquidGlassPlaque>
+              </div>
+
+              <div className="metric-hero__redesign-tag">
+                <div className="metric-hero__redesign-tag-glass">
+                  <LiquidGlassPlaque
+                    className="metric-hero__plaque"
+                    background="linear-gradient(90deg, #edd6e8, #f6d5c9)"
+                  />
                 </div>
-                <div className="metric-hero__redesign-card">
-                  <p className="metric-hero__redesign-value">{hero.redesignValue}</p>
-                  <p className="metric-hero__redesign-delta">{hero.redesignDelta}</p>
-                  <p className="metric-hero__redesign-caption">{hero.redesignCaption}</p>
-                </div>
+                <span>{hero.redesignLabel}</span>
+              </div>
+              <div className="metric-hero__redesign-card">
+                <p className="metric-hero__redesign-value">{hero.redesignValue}</p>
+                <p className="metric-hero__redesign-delta">{hero.redesignDelta}</p>
+                <p className="metric-hero__redesign-caption">{hero.redesignCaption}</p>
               </div>
             </div>
           </div>

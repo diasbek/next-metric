@@ -194,8 +194,8 @@
   overflow: visible;
 }
 
-/* Large screens: keep ambient wash inside the page shell without clipping
-   rotated / skewed plaques on the cluster's right edge. */
+/* Large screens: don't clip rotated / skewed plaques on the cluster edge.
+   (Was overflow:hidden on .metric-hero__visual — that cut the redesign tag tip.) */
 @media (min-width: 1800px) {
   .metric-hero__shell,
   .metric-hero__main {
@@ -204,11 +204,6 @@
 
   .metric-hero__visual {
     overflow: visible;
-  }
-
-  .metric-hero__cluster {
-    /* Small right inset so rotate(-8°) tag stays inside the clip rect. */
-    margin-right: 1.5cqw;
   }
 }
 
@@ -232,37 +227,20 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Never paint a decode skeleton over the composition — it reads as a
-     solid crop over product frames (fill + priority already skips it). */
+  /* Decode skeleton must not create a clipping box over the composition. */
   overflow: visible;
 }
 
+/* Skeleton's own overflow:hidden was cropping skewed plaques that paint
+   over the shot bounds during / after decode in some viewports. */
 .metric-hero__cluster-shot .media-image__skeleton {
+  overflow: visible;
   display: none;
 }
 
 .metric-hero__cluster-shot img {
   object-fit: contain;
   pointer-events: none;
-}
-
-/* White rounded card inside cluster.png (transparent PNG margins excluded).
-   Figma plaque % are authored against this stage, not the full canvas.
-   container-type so cqw/cqh fonts scale with the card, not the PNG margins. */
-.metric-hero__cluster-stage {
-  position: absolute;
-  left: 8.2%;
-  right: 10.2%;
-  top: 4.8%;
-  bottom: 3.5%;
-  z-index: 2;
-  container-type: size;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.metric-hero__cluster-stage > * {
-  pointer-events: auto;
 }
 
 .metric-hero__badge {
@@ -281,8 +259,11 @@
   box-shadow: none !important;
 }
 
-.metric-hero__redesign-tag-glass .metric-hero__plaque {
+.metric-hero__redesign-tag-glass .metric-hero__plaque,
+.metric-hero__redesign-tag-glass .liquid-glass-plaque {
   border-radius: var(--hero-r-tag);
+  /* Skewed parallelogram tips must not be clipped by the plaque shell. */
+  overflow: visible;
 }
 
 .metric-hero__badge-inner {
@@ -314,8 +295,6 @@
 }
 
 .metric-hero__redesign-tag {
-  /* Skew overhang like CTAs so the parallelogram isn't cropped mid-label. */
-  --hero-tag-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 6.9cqw);
   position: absolute;
   left: 79.098%;
   top: 54.669%;
@@ -323,24 +302,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
   width: 20.901%;
   height: 9.5%;
-  padding-inline: max(0.8cqw, var(--hero-tag-skew-overhang));
   font-size: 1.99cqw;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--foreground);
   white-space: nowrap;
   transform: rotate(var(--hero-tilt-tag));
-  transform-origin: center center;
   overflow: visible;
 }
 
 .metric-hero__redesign-tag-glass {
   position: absolute;
-  /* Match CTA skew containment: inset by overhang so tips stay inside the box. */
-  inset: 12% var(--hero-tag-skew-overhang);
+  inset: 12% 0;
   z-index: 0;
   transform: skewX(var(--cta-skew));
   pointer-events: none;
@@ -351,8 +326,6 @@
   position: relative;
   z-index: 1;
   display: inline-block;
-  max-width: 100%;
-  overflow: visible;
 }
 
 .metric-hero__redesign-card {
@@ -363,14 +336,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.6cqw;
-  box-sizing: border-box;
   width: 19.545%;
   height: 30.98%;
   padding: 2.12cqw 2.12cqw 1.67cqw;
   border-radius: var(--hero-r-plaque);
   background: var(--accent);
   color: #fff;
-  overflow: visible;
 }
 
 .metric-hero__redesign-value {
@@ -391,9 +362,9 @@
 
 .metric-hero__redesign-caption {
   margin: 1.21cqw 0 0;
-  max-width: 100%;
+  max-width: 13.5cqw;
   font-size: 2.42cqw;
-  line-height: 1.15;
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 
