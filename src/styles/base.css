@@ -51,15 +51,6 @@ html.restricted-webview body {
   touch-action: manipulation;
 }
 
-html.restricted-webview .metric-hero,
-html.restricted-webview .metric-section,
-html.restricted-webview #site-content,
-html.restricted-webview #main-content {
-  visibility: visible !important;
-  opacity: 1 !important;
-  content-visibility: visible !important;
-}
-
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

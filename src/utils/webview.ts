@@ -1,10 +1,26 @@
 /** Device / in-app browser helpers — keep boot script in sync with these checks. */
 
-export {
-  CONTENT_VISIBILITY_CRITICAL_CSS,
-  WEBVIEW_BOOT_CRITICAL_CSS,
-  WEBVIEW_BOOT_SCRIPT,
-} from "@/utils/content-visibility";
+/**
+ * Runs synchronously in <head> before paint — self-contained, no imports.
+ * Tags restricted in-app browsers so CSS can adjust scrolling behaviour.
+ */
+export const WEBVIEW_BOOT_SCRIPT = `
+(function(){
+  try {
+    var ua = navigator.userAgent || "";
+    var ref = document.referrer || "";
+    var restricted =
+      /Telegram|TelegramBot|Instagram|FBAN|FBAV|FBIOS|Line\\\\//i.test(ua) ||
+      /; wv\\\\)|\\\\bWebView\\\\b/i.test(ua) ||
+      /t\\\\.me|telegram\\\\.(me|org|dog)/i.test(ref) ||
+      !!(window.TelegramWebviewProxy || (window.Telegram && (window.Telegram.WebView || window.Telegram.WebApp)));
+
+    if (restricted) {
+      document.documentElement.classList.add("restricted-webview");
+    }
+  } catch (e) {}
+})();
+`.trim();
 
 export function isIOS(): boolean {
   if (typeof window === "undefined") return false;
