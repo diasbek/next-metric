@@ -59,7 +59,6 @@ function previewSectionFor(section: MetricHomeSectionId): MetricHomeSectionId {
 
 function faqItemsFor(faq: FaqDraft[], locale: AdminLocale): FAQItem[] {
   return faq
-    .filter((item) => item.status === "published")
     .map((item) => {
       const tr = item.translations[locale] ?? item.translations.en;
       return { question: tr?.question ?? "", answer: tr?.answer ?? "" };
@@ -128,7 +127,11 @@ export function HomeSitePreview({
       },
     };
   }, [payload, fallbackPayload, locale, projects]);
-  const faqItems = useMemo(() => faqItemsFor(faq, locale), [faq, locale]);
+  const faqItems = useMemo(() => {
+    const fromCms = faqItemsFor(faq, locale);
+    if (fromCms.length > 0) return fromCms;
+    return siteContent.faq ?? [];
+  }, [faq, locale, siteContent.faq]);
 
   const designWidth = device === "desktop" ? 1440 : 390;
   const viewportWidth = device === "desktop" ? 380 : 280;
@@ -284,7 +287,7 @@ export function HomeSitePreview({
         </p>
       ) : null}
 
-      <div style={{ maxHeight: 640, overflow: "auto" }}>
+      <div className="admin-site-preview__scroll" style={{ maxHeight: 640, overflow: "auto" }}>
         <AdminSiteScaleFrame
           key={`${device}-${showFullPage ? "page" : "section"}-${section}`}
           designWidth={designWidth}

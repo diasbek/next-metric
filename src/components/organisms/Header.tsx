@@ -70,6 +70,14 @@ export function Header({
   }));
 
   useEffect(() => {
+    const inPreview = Boolean(headerRef.current?.closest(".admin-site-preview"));
+    if (inPreview) {
+      if (!open) return;
+      const scroller = headerRef.current?.closest(".admin-site-preview__scroll");
+      scroller?.scrollTo({ top: 0 });
+      return;
+    }
+
     document.documentElement.classList.toggle("is-mobile-menu-open", open);
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
