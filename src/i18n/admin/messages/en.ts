@@ -329,7 +329,7 @@ export const enAdmin: AdminMessages = {
       projectCover: {
         label: "Project cover",
         surfaceLabel: "Works / case card",
-        hint: "As on /works/ case cards (3000×2347).",
+        hint: "Same frame as case cards (2800×2191).",
       },
       projectCase: {
         label: "Case / gallery",

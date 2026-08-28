@@ -78,10 +78,27 @@ export async function cropAndCompress(options: {
   let targetH = canvas.height;
   const maxW = options.preset.maxWidth;
   const maxH = options.preset.maxHeight;
-  const scale = Math.min(1, maxW / targetW, maxH / targetH);
-  if (scale < 1) {
-    targetW = Math.max(1, Math.round(targetW * scale));
-    targetH = Math.max(1, Math.round(targetH * scale));
+  // Fixed-aspect presets (cover, OG, team…): always export at master size
+  // so CMS uploads match the site frame one-to-one.
+  const exactMaster =
+    options.preset.aspect != null &&
+    Number.isFinite(maxW) &&
+    Number.isFinite(maxH) &&
+    maxW > 0 &&
+    maxH > 0;
+
+  if (exactMaster) {
+    targetW = maxW;
+    targetH = maxH;
+  } else {
+    const scale = Math.min(1, maxW / targetW, maxH / targetH);
+    if (scale < 1) {
+      targetW = Math.max(1, Math.round(targetW * scale));
+      targetH = Math.max(1, Math.round(targetH * scale));
+    }
+  }
+
+  if (targetW !== canvas.width || targetH !== canvas.height) {
     const resized = document.createElement("canvas");
     resized.width = targetW;
     resized.height = targetH;

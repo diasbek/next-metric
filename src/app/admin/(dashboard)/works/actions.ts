@@ -96,9 +96,12 @@ export async function saveProjectAction(formData: FormData) {
 
   const coverFile = formData.get("cover_file");
   if (isFileUpload(coverFile)) {
+    // Match optimized case-*.jpg masters (2800 long edge, high quality).
     const uploaded = await uploadMediaFile(coverFile, {
       folder: `projects/${id}/cover`,
       filenameHint: "cover",
+      maxEdge: CASE_MEDIA_MAX_EDGE_PX,
+      quality: CASE_MEDIA_WEBP_QUALITY,
     });
     coverImage = uploaded.publicUrl;
   }

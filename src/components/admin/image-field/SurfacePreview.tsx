@@ -75,8 +75,8 @@ function CaseCardChrome({
         viewportWidth={viewportWidth}
         label={
           layout === "desktop"
-            ? "Works → case card (desktop) · 3000 × 2347"
-            : "Works → case card (mobile) · 3000 × 2347"
+            ? "Works → case card (desktop) · 2800 × 2191"
+            : "Works → case card (mobile) · 2800 × 2191"
         }
         className={
           layout === "desktop"

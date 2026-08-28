@@ -90,9 +90,9 @@
   width: calc(100% - 32px);
   min-width: 0;
   margin: 16px 16px 0;
-  /* case-*.jpg are 3000×2347. Keep this ratio at every breakpoint so
-     object-cover fills the box without cropping or letterbox bars. */
-  aspect-ratio: 3000 / 2347;
+  /* case-*.jpg masters are 2800×2191 (was 3000×2347). Keep this ratio at
+     every breakpoint so object-cover fills the box without cropping or letterbox bars. */
+  aspect-ratio: 2800 / 2191;
   height: auto;
   overflow: hidden;
   border-radius: 20px;

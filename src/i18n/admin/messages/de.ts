@@ -329,7 +329,7 @@ export const deAdmin: AdminMessages = {
       projectCover: {
         label: "Projekt-Cover",
         surfaceLabel: "Works / Case-Card",
-        hint: "Wie auf /works/ Case-Cards (3000×2347).",
+        hint: "Gleicher Rahmen wie die Case-Cards (2800×2191).",
       },
       projectCase: {
         label: "Case / Galerie",

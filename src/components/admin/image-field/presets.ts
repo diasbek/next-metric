@@ -11,11 +11,15 @@ export const PROJECT_CASE_MAX_UPLOAD_BYTES = CASE_MEDIA_MAX_UPLOAD_BYTES;
 export const MEDIA_DEFAULT_MAX_UPLOAD_BYTES = MEDIA_MAX_UPLOAD_BYTES;
 
 /**
- * Public `/works/` + home MetricCaseCard media frame (case-*.jpg masters).
- * Keep cover crop + admin list thumbs on this ratio.
+ * Public `/works/` + home MetricCaseCard media frame.
+ * Matches optimized `public/images/metric/cases/case-*.jpg` (2800×2191;
+ * was 3000×2347 before optimize-metric-images). Cover crop must export
+ * this exact size so new CMS covers fill the card like the old masters.
  */
-export const CASE_CARD_MEDIA_ASPECT = 3000 / 2347;
-export const CASE_CARD_MEDIA_ASPECT_CSS = "3000 / 2347";
+export const CASE_COVER_WIDTH = 2800;
+export const CASE_COVER_HEIGHT = 2191;
+export const CASE_CARD_MEDIA_ASPECT = CASE_COVER_WIDTH / CASE_COVER_HEIGHT;
+export const CASE_CARD_MEDIA_ASPECT_CSS = `${CASE_COVER_WIDTH} / ${CASE_COVER_HEIGHT}`;
 
 export type ImagePresetKey =
   | "projectCover"
@@ -57,11 +61,11 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     surface: "worksHero",
     surfaceLabel: "Works / case card",
     aspect: CASE_CARD_MEDIA_ASPECT,
-    maxWidth: 2400,
-    maxHeight: 1878,
-    quality: 0.9,
+    maxWidth: CASE_COVER_WIDTH,
+    maxHeight: CASE_COVER_HEIGHT,
+    quality: 0.92,
     preferWebp: true,
-    hint: "As on /works/ case cards (3000×2347).",
+    hint: "Same frame as case cards (2800×2191).",
   },
   projectCase: {
     key: "projectCase",

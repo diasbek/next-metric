@@ -197,9 +197,9 @@
   min-width: 0;
   width: calc(100% - 40px);
   margin: 20px 20px 0;
-  /* Same source ratio as homepage case cards (case-*.jpg 3000×2347 /
-     2400×1878). 4/5 was taller than the photo and object-cover cropped it. */
-  aspect-ratio: 3000 / 2347;
+  /* Same source ratio as homepage case cards (case-*.jpg 2800×2191).
+     4/5 was taller than the photo and object-cover cropped it. */
+  aspect-ratio: 2800 / 2191;
   height: auto;
   overflow: hidden;
   border-radius: 30px;
