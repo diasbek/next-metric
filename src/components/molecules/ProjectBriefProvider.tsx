@@ -76,14 +76,15 @@ export function ProjectBriefProvider({
   return (
     <ProjectBriefContext.Provider value={value}>
       {children}
-      <ProjectBriefModal
-        open={isOpen}
-        onClose={close}
-        locale={locale}
-        ui={ui}
-        captcha={captcha}
-        brief={brief}
-      />
+      {isOpen ? (
+        <ProjectBriefModal
+          onClose={close}
+          locale={locale}
+          ui={ui}
+          captcha={captcha}
+          brief={brief}
+        />
+      ) : null}
     </ProjectBriefContext.Provider>
   );
 }

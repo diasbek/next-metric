@@ -74,6 +74,9 @@ export default function GlobalError({
             >
               Try again
             </button>
+            {/* Root layout crashed — a full document load is the only reliable
+                way back; the client router cannot be trusted here. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
               style={{

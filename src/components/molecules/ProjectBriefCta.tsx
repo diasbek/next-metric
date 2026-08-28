@@ -1,6 +1,6 @@
 "use client";
 
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { Button, type ButtonSize, type ButtonVariant } from "@/components/atoms/Button";
 import { useProjectBrief } from "@/components/molecules/ProjectBriefProvider";
 
@@ -11,6 +11,17 @@ type ProjectBriefCtaProps = {
   size?: ButtonSize;
   className?: string;
 } & Omit<ButtonHTMLAttributes<HTMLAnchorElement>, "type" | "children" | "href">;
+
+/** Modified clicks keep the plain-link behaviour (new tab, download, …). */
+function opensInBrowser(event: MouseEvent<HTMLAnchorElement>): boolean {
+  return (
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  );
+}
 
 export function ProjectBriefCta({
   href,
@@ -30,12 +41,14 @@ export function ProjectBriefCta({
       size={size}
       className={className}
       {...rest}
-      onClick={(event) => {
-        onClick?.(event);
-        if (event.defaultPrevented) return;
+      // Capture phase: TransitionLink handles same-document hrefs in its own
+      // click handler and would consume the event before the modal can open.
+      onClickCapture={(event: MouseEvent<HTMLAnchorElement>) => {
+        if (opensInBrowser(event)) return;
         event.preventDefault();
         open();
       }}
+      onClick={onClick}
     >
       {children}
     </Button>

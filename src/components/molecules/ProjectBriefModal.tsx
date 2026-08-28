@@ -12,15 +12,14 @@ function subscribeNever() {
   return () => undefined;
 }
 
+/** Mounted only while open — closing unmounts and resets the success state. */
 export function ProjectBriefModal({
-  open,
   onClose,
   locale,
   ui,
   captcha,
   brief,
 }: {
-  open: boolean;
   onClose: () => void;
   locale: Locale;
   ui: SiteContent["ui"];
@@ -36,10 +35,6 @@ export function ProjectBriefModal({
   );
 
   useEffect(() => {
-    if (!open) {
-      setSubmitted(false);
-      return;
-    }
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.classList.add("project-brief-open");
@@ -47,18 +42,17 @@ export function ProjectBriefModal({
       document.body.style.overflow = prev;
       document.documentElement.classList.remove("project-brief-open");
     };
-  }, [open]);
+  }, []);
 
   useEffect(() => {
-    if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [onClose]);
 
-  if (!mounted || !open) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <div className="project-brief">
