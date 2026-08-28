@@ -3,6 +3,7 @@
 import { adminFail, adminRedirect } from "@/lib/cms/admin-redirect";
 import { revalidateCms } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
+import { writeAuditLog } from "@/lib/cms/audit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { T } from "@/lib/cms/tables";
 import { slugifyTagLabel } from "@/lib/cms/tags";
@@ -66,7 +67,7 @@ export async function createTagAction(formData: FormData) {
 }
 
 export async function saveTagAction(formData: FormData) {
-  await requirePermission("content");
+  const actor = await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return adminFail("Missing tag id");
@@ -100,12 +101,21 @@ export async function saveTagAction(formData: FormData) {
     ["en", enLabel],
     ["de", deLabel],
   ] as const) {
-    await supabase.from(T.tagTranslations).upsert({
+    const { error: trError } = await supabase.from(T.tagTranslations).upsert({
       tag_id: id,
       locale,
       label,
     });
+    if (trError) return adminFail(`${locale}: ${trError.message}`);
   }
+
+  await writeAuditLog({
+    actor,
+    action: "content.update",
+    entityType: "tag",
+    entityId: id,
+    meta: { kind, slug },
+  });
 
   revalidateCms(["cms", "tags", "projects"]);
   return adminRedirect(`/admin/tags/?edit=${id}`);

@@ -22,15 +22,18 @@ export async function writeAuditLog(options: {
 }) {
   try {
     const supabase = createSupabaseAdminClient();
-    await supabase.from("metric_admin_audit_log").insert({
-      actor_id: options.actor.id,
+    const { error } = await supabase.from("metric_admin_audit_log").insert({
+      actor_user_id: options.actor.id,
       actor_email: options.actor.email,
       action: options.action,
-      entity_type: options.entityType ?? null,
+      entity: options.entityType ?? null,
       entity_id: options.entityId ?? null,
       meta: options.meta ?? {},
     });
-  } catch {
-    // non-blocking; table may be missing before migration
+    if (error) {
+      console.error("[audit] insert failed:", error.message);
+    }
+  } catch (err) {
+    console.error("[audit] write failed:", err);
   }
 }

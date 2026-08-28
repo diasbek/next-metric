@@ -20,7 +20,7 @@ export default async function AdminHomePage() {
     canAccess(admin.role, "audit")
       ? supabase
           .from("metric_admin_audit_log")
-          .select("id, actor_email, action, created_at, entity_type")
+          .select("id, actor_email, action, created_at, entity")
           .order("created_at", { ascending: false })
           .limit(8)
       : Promise.resolve({ data: null }),
@@ -53,8 +53,14 @@ export default async function AdminHomePage() {
         actor_email: string;
         action: string;
         created_at: string;
-        entity_type: string | null;
-      }>)
+        entity: string | null;
+      }>).map((row) => ({
+        id: row.id,
+        actor_email: row.actor_email,
+        action: row.action,
+        created_at: row.created_at,
+        entity_type: row.entity,
+      }))
     : null;
 
   return (

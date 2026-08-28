@@ -2,6 +2,7 @@
 
 import { revalidateCms } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
+import { writeAuditLog } from "@/lib/cms/audit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { adminFail, adminRedirect, runAdminAction } from "@/lib/cms/admin-redirect";
 import { getAdminMessages } from "@/i18n/admin/get-admin-messages";
@@ -21,7 +22,7 @@ function parsePayload(raw: string): Record<string, unknown> | null {
 
 export async function saveMetricHomeAction(formData: FormData) {
   return runAdminAction(async () => {
-    await requirePermission("content");
+    const actor = await requirePermission("content");
     const supabase = createSupabaseAdminClient();
     const localeUi = await getAdminUiLocale();
     const t = getAdminMessages(localeUi);
@@ -52,6 +53,14 @@ export async function saveMetricHomeAction(formData: FormData) {
     }
 
     const section = String(formData.get("section") ?? "hero").trim() || "hero";
+
+    await writeAuditLog({
+      actor,
+      action: "content.update",
+      entityType: "home",
+      entityId: "1",
+      meta: { status, section },
+    });
 
     revalidateCms(["cms", "home", "metric-home"]);
     return adminRedirect(

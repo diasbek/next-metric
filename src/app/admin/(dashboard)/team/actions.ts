@@ -53,6 +53,14 @@ export async function saveTeamMemberAction(formData: FormData) {
       return adminFail(t.common.actionFailed);
     }
 
+    if (status === "published") {
+      const enName = String(formData.get("en_name") ?? "").trim();
+      const enRole = String(formData.get("en_role") ?? "").trim();
+      if (!enName || !enRole) {
+        return adminFail(t.common.fillEnFirst);
+      }
+    }
+
     const sortOrder = Number(formData.get("sort_order") ?? 0);
     if (!Number.isFinite(sortOrder) || sortOrder < 0) {
       return adminFail(t.common.actionFailed);
@@ -79,14 +87,6 @@ export async function saveTeamMemberAction(formData: FormData) {
         role: String(formData.get(`${locale}_role`) ?? ""),
       });
       if (error) return adminFail(`${locale}: ${error.message}`);
-    }
-
-    if (status === "published") {
-      const enName = String(formData.get("en_name") ?? "").trim();
-      const enRole = String(formData.get("en_role") ?? "").trim();
-      if (!enName || !enRole) {
-        return adminFail(t.common.fillEnFirst);
-      }
     }
 
     revalidateCms(["cms", "team"]);
@@ -122,7 +122,7 @@ export async function createTeamMemberAction() {
 
     revalidateCms(["cms", "team"]);
     return adminRedirect(
-      `/admin/home/`,
+      `/admin/team/?edit=${data.id}`,
       t.pages.team.created,
     );
   });
@@ -140,7 +140,7 @@ export async function deleteTeamMemberAction(formData: FormData) {
     if (error) return adminFail(error.message);
 
     revalidateCms(["cms", "team"]);
-    return adminRedirect("/admin/home/", t.pages.team.deleted);
+    return adminRedirect("/admin/team/", t.pages.team.deleted);
   });
 }
 

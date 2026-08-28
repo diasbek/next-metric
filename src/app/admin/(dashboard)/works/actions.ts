@@ -2,6 +2,7 @@
 
 import { revalidateCms } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
+import { writeAuditLog } from "@/lib/cms/audit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   CASE_MEDIA_MAX_EDGE_PX,
@@ -77,11 +78,19 @@ export async function createProjectAction() {
 }
 
 export async function saveProjectAction(formData: FormData) {
-  await requirePermission("content");
+  const actor = await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const id = String(formData.get("id"));
 
   const status = String(formData.get("status") ?? "draft");
+  const slug = String(formData.get("slug") ?? "").trim();
+  const enTitle = String(formData.get("en_title") ?? "").trim();
+
+  if (status === "published") {
+    if (!slug) return adminFail("Slug is required to publish");
+    if (!enTitle) return adminFail("English title is required to publish");
+  }
+
   const fromLibrary = String(formData.get("cover_from_library") ?? "").trim();
   let coverImage = fromLibrary || String(formData.get("cover_image") ?? "");
 
@@ -120,7 +129,7 @@ export async function saveProjectAction(formData: FormData) {
   const { error } = await supabase
     .from("metric_projects")
     .update({
-      slug: String(formData.get("slug") ?? ""),
+      slug,
       status,
       sphere: tagSync.sphere,
       featured: formData.get("featured") === "on",
@@ -135,7 +144,7 @@ export async function saveProjectAction(formData: FormData) {
   if (error) return adminFail(error.message);
 
   for (const locale of ["en", "de"] as const) {
-    await supabase.from("metric_project_translations").upsert({
+    const { error: trError } = await supabase.from("metric_project_translations").upsert({
       project_id: id,
       locale,
       title: String(formData.get(`${locale}_title`) ?? ""),
@@ -151,7 +160,16 @@ export async function saveProjectAction(formData: FormData) {
       meta_description: String(formData.get(`${locale}_meta_description`) ?? ""),
       keywords: String(formData.get(`${locale}_keywords`) ?? ""),
     });
+    if (trError) return adminFail(`${locale}: ${trError.message}`);
   }
+
+  await writeAuditLog({
+    actor,
+    action: "content.update",
+    entityType: "project",
+    entityId: id,
+    meta: { status, slug },
+  });
 
   revalidateCms(["cms", "projects", "tags"]);
   return adminRedirect(projectEditPath(id, formData));

@@ -1306,3 +1306,16 @@ exception when duplicate_object then
   null;
 end $$;
 
+
+-- ---------------------------------------------------------------------------
+-- Appendix 2026-08-28 (applied via migrations 20260828150000–20260828150500)
+-- ---------------------------------------------------------------------------
+-- Secrets: column-level revoke of telegram_bot_token, telegram_webhook_secret,
+-- captcha_secret_key on metric_site_settings from anon/authenticated.
+-- metric_project_translations: author/role/quote (if not already present).
+-- metric_admin_audit_log: actor_email + index (action, created_at desc).
+-- Perf indexes: status/sort_order on projects/services/faq/team/testimonials;
+-- projects(seo_indexable).
+-- Dropped unused empty tables: metric_process_steps(+translations),
+-- metric_benefits(+translations).
+-- Seeded metric_page_seo for services/agency/contacts/imprint (en/de).
