@@ -36,7 +36,7 @@ After publish: spot-check `og:image` URL returns **200 image/png** (or JPEG for 
 
 ## Monitoring
 
-- Vercel Speed Insights (LCP / INP / CLS) on home + case pages.
+- Core Web Vitals (LCP / INP / CLS) on home + case pages via Lighthouse or field data. Vercel Speed Insights is gone: its script only exists on Vercel and 404s on Hostinger.
 - GSC Performance: queries, CTR on case titles.
 - Re-check FAQ / services JSON-LD after home FAQ or services CMS edits (rich results).
 

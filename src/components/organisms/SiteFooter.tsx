@@ -93,15 +93,17 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
           />
 
           <div className="site-footer__contact">
-            <div className="site-footer__contact-block">
-              <p className="site-footer__contact-label">{ui.phoneLabel}</p>
-              <a
-                href={`tel:${site.phone.replace(/\s+/g, "")}`}
-                className="site-footer__contact-value"
-              >
-                {site.phone}
-              </a>
-            </div>
+            {site.phone.trim() ? (
+              <div className="site-footer__contact-block">
+                <p className="site-footer__contact-label">{ui.phoneLabel}</p>
+                <a
+                  href={`tel:${site.phone.replace(/\s+/g, "")}`}
+                  className="site-footer__contact-value"
+                >
+                  {site.phone}
+                </a>
+              </div>
+            ) : null}
             <div className="site-footer__contact-block">
               <p className="site-footer__contact-label">{ui.addressLabel}</p>
               <p className="site-footer__contact-value site-footer__contact-value--address">

@@ -4,15 +4,18 @@
  * Runs synchronously in <head> before paint — self-contained, no imports.
  * Tags restricted in-app browsers so CSS can adjust scrolling behaviour.
  */
-export const WEBVIEW_BOOT_SCRIPT = `
+// String.raw: the regexes must reach the browser exactly as written below.
+// Escaping them for a normal template literal previously emitted `\\)`, which
+// is a parse error that killed the whole inline script.
+export const WEBVIEW_BOOT_SCRIPT = String.raw`
 (function(){
   try {
     var ua = navigator.userAgent || "";
     var ref = document.referrer || "";
     var restricted =
-      /Telegram|TelegramBot|Instagram|FBAN|FBAV|FBIOS|Line\\\\//i.test(ua) ||
-      /; wv\\\\)|\\\\bWebView\\\\b/i.test(ua) ||
-      /t\\\\.me|telegram\\\\.(me|org|dog)/i.test(ref) ||
+      /Telegram|TelegramBot|Instagram|FBAN|FBAV|FBIOS|Line\//i.test(ua) ||
+      /; wv\)|\bWebView\b/i.test(ua) ||
+      /t\.me|telegram\.(me|org|dog)/i.test(ref) ||
       !!(window.TelegramWebviewProxy || (window.Telegram && (window.Telegram.WebView || window.Telegram.WebApp)));
 
     if (restricted) {

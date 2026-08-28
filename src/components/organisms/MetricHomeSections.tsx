@@ -149,7 +149,7 @@ export function MetricHeroSection({
                   fill
                   priority
                   fetchPriority="high"
-                  unoptimized
+                  sizes="(max-width: 1023px) 100vw, 50vw"
                   className="object-contain"
                 />
               </div>

@@ -40,6 +40,9 @@ export function ProjectBriefCta({
       variant={variant}
       size={size}
       className={className}
+      // The href is a no-JS fallback; clicking opens the modal, so prefetching
+      // the homepage RSC payload is wasted work.
+      prefetch={false}
       {...rest}
       // Capture phase: TransitionLink handles same-document hrefs in its own
       // click handler and would consume the event before the modal can open.
