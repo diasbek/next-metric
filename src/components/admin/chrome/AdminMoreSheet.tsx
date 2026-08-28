@@ -65,19 +65,27 @@ export function AdminMoreSheet({
 
   useEffect(() => {
     if (open) {
-      setPresent(true);
-      setDragY(0);
-      cancelAnimationFrame(showFrame.current);
-      showFrame.current = requestAnimationFrame(() => {
-        showFrame.current = requestAnimationFrame(() => setShown(true));
+      const enter = requestAnimationFrame(() => {
+        setPresent(true);
+        setDragY(0);
+        cancelAnimationFrame(showFrame.current);
+        showFrame.current = requestAnimationFrame(() => {
+          showFrame.current = requestAnimationFrame(() => setShown(true));
+        });
       });
-      return () => cancelAnimationFrame(showFrame.current);
+      return () => cancelAnimationFrame(enter);
     }
-    setShown(false);
-    setDragging(false);
-    setDragY(0);
+
+    const leave = requestAnimationFrame(() => {
+      setShown(false);
+      setDragging(false);
+      setDragY(0);
+    });
     const timer = window.setTimeout(() => setPresent(false), EXIT_MS);
-    return () => window.clearTimeout(timer);
+    return () => {
+      cancelAnimationFrame(leave);
+      window.clearTimeout(timer);
+    };
   }, [open]);
 
   useEffect(() => {

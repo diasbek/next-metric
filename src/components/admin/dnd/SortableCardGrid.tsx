@@ -193,11 +193,20 @@ export function SortableCard({
       <DragHandle attributes={attributes} listeners={listeners} />
       {onActivate ? (
         <div
-          role="button"
           tabIndex={0}
-          onClick={onActivate}
+          onClick={(event) => {
+            const target = event.target as HTMLElement | null;
+            if (target?.closest("button, a, input, select, textarea, label")) {
+              return;
+            }
+            onActivate();
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
+              const target = e.target as HTMLElement | null;
+              if (target?.closest("button, a, input, select, textarea, label")) {
+                return;
+              }
               e.preventDefault();
               onActivate();
             }

@@ -298,7 +298,9 @@ export async function deleteProjectAction(formData: FormData) {
 
   const { data: project } = await supabase
     .from("metric_projects")
-    .select("cover_image, og_image, project_media(url)")
+    .select(
+      "cover_image, og_image, project_media:metric_project_media(url)",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -313,7 +315,9 @@ export async function deleteProjectAction(formData: FormData) {
     if (media.url) await deleteMediaByPublicUrl(media.url);
   }
 
-  await supabase.from("metric_projects").delete().eq("id", id);
+  const { error } = await supabase.from("metric_projects").delete().eq("id", id);
+  if (error) return adminFail(error.message);
+
   revalidateCms(["cms", "projects"]);
   return adminRedirect("/admin/works/");
 }

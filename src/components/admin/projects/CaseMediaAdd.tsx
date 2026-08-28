@@ -130,7 +130,11 @@ function GalleryBatchDrop({
   const [libraryQuery, setLibraryQuery] = useState("");
 
   const queueRef = useRef(queue);
-  queueRef.current = queue;
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+
+  const idSeq = useRef(0);
 
   const existingSet = useMemo(
     () => new Set(existingUrls.filter(Boolean)),
@@ -179,14 +183,15 @@ function GalleryBatchDrop({
 
     const next: QueuedFile[] = [];
     let tooLarge = 0;
-    let truncated = incoming.length > room;
+    const truncated = incoming.length > room;
     for (const file of incoming.slice(0, room)) {
       if (file.size > PROJECT_CASE_MAX_UPLOAD_BYTES) {
         tooLarge += 1;
         continue;
       }
+      idSeq.current += 1;
       next.push({
-        id: `file-${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2, 7)}`,
+        id: `file-${file.lastModified}-${file.size}-${idSeq.current}`,
         source: "file",
         file,
         preview: URL.createObjectURL(file),

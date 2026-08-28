@@ -275,6 +275,11 @@ export function ProjectsList({ projects, embedded = false }: Props) {
       });
       if (ok) {
         setConfirm(null);
+        setOrdered(
+          ordered.map((item) =>
+            item.id === projectId ? { ...item, status } : item,
+          ),
+        );
         router.refresh();
       }
     });
@@ -486,11 +491,20 @@ export function ProjectsList({ projects, embedded = false }: Props) {
         renderItem={(project) =>
           filtering ? (
             <div
-              role="button"
               tabIndex={0}
-              onClick={() => openProject(project.id)}
+              onClick={(event) => {
+                const target = event.target as HTMLElement | null;
+                if (target?.closest("button, a, input, select, textarea, label")) {
+                  return;
+                }
+                openProject(project.id);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
+                  const target = e.target as HTMLElement | null;
+                  if (target?.closest("button, a, input, select, textarea, label")) {
+                    return;
+                  }
                   e.preventDefault();
                   openProject(project.id);
                 }
