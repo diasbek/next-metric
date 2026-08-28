@@ -6,12 +6,16 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { SITE_CONFIG } from "@/utils/consts";
 import { getPageOgImagePath, isOgPageKey } from "@/utils/og/paths";
 import {
+  clearPageOgAction,
   deleteTelegramWebhookAction,
+  generatePageOgAction,
   pingTelegramChatAction,
+  previewPageOgAction,
   registerTelegramWebhookAction,
   saveSettingsAction,
   testTelegramNotifyAction,
 } from "@/app/admin/(dashboard)/settings/actions";
+import { OgModePanel, inferOgMode, type OgMode } from "@/components/admin/og/OgModePanel";
 import {
   adminBtn,
   adminBtnPrimary,
@@ -147,12 +151,23 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
     ? getPageOgImagePath(seoLocale, seoPage)
     : getPageOgImagePath(seoLocale, "home");
   const customOg = currentSeo.og_image.trim();
+  const [ogMode, setOgMode] = useState<OgMode>(() => inferOgMode(customOg));
+  const [ogPreviewDataUrl, setOgPreviewDataUrl] = useState<string | null>(null);
   const [ogPreviewSrc, setOgPreviewSrc] = useState(customOg || ogPath);
   const [ogLoading, setOgLoading] = useState(true);
 
   useEffect(() => {
+    setOgMode(inferOgMode(currentSeo.og_image));
+    setOgPreviewDataUrl(null);
+  }, [seoLocale, seoPage]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     const timer = window.setTimeout(() => {
       setOgLoading(true);
+      if (ogMode === "generate" && ogPreviewDataUrl) {
+        setOgPreviewSrc(ogPreviewDataUrl);
+        return;
+      }
       if (customOg) {
         setOgPreviewSrc(customOg);
         return;
@@ -166,7 +181,24 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
       setOgPreviewSrc(qs ? `${ogPath}?${qs}` : ogPath);
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [ogPath, customOg, currentSeo.title, currentSeo.description]);
+  }, [
+    ogPath,
+    customOg,
+    currentSeo.title,
+    currentSeo.description,
+    ogMode,
+    ogPreviewDataUrl,
+  ]);
+
+  const patchCurrentSeo = (patch: Partial<(typeof seoDraft)[string]>) => {
+    setSeoDraft((prev) => ({
+      ...prev,
+      [`${seoLocale}_${seoPage}`]: {
+        ...prev[`${seoLocale}_${seoPage}`],
+        ...patch,
+      },
+    }));
+  };
 
   return (
     <div style={{ width: "100%", maxWidth: 720 }}>
@@ -599,26 +631,69 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
           <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
             {t.settings.seoKeywordsHint}
           </p>
-          <label>
-            {t.settings.seoOgImage}
-            <input
-              value={currentSeo.og_image}
-              onChange={(e) =>
-                setSeoDraft((prev) => ({
-                  ...prev,
-                  [`${seoLocale}_${seoPage}`]: {
-                    ...prev[`${seoLocale}_${seoPage}`],
-                    og_image: e.target.value,
-                  },
-                }))
+          <div style={{ display: "grid", gap: 8 }}>
+            <span style={{ fontSize: 13 }}>{t.settings.seoOgImage}</span>
+            <OgModePanel
+              mode={ogMode}
+              onModeChange={setOgMode}
+              ogImageUrl={currentSeo.og_image}
+              onOgImageUrlChange={(url) => patchCurrentSeo({ og_image: url })}
+              previewDataUrl={ogPreviewDataUrl}
+              onPreviewDataUrlChange={setOgPreviewDataUrl}
+              previewKey={[seoLocale, seoPage, currentSeo.title, currentSeo.description].join("|")}
+              runPreview={async () => {
+                const result = await previewPageOgAction({
+                  pageKey: seoPage,
+                  locale: seoLocale,
+                  title: currentSeo.title,
+                  description: currentSeo.description,
+                });
+                if (!result.ok || !result.dataUrl) {
+                  return { ok: false, error: result.ok ? t.og.previewError : result.error };
+                }
+                return { ok: true, dataUrl: result.dataUrl };
+              }}
+              runGenerate={async () => {
+                const result = await generatePageOgAction({
+                  pageKey: seoPage,
+                  locale: seoLocale,
+                  title: currentSeo.title,
+                  description: currentSeo.description,
+                });
+                if (!result.ok || !result.ogImageUrl) {
+                  return {
+                    ok: false,
+                    error: result.ok ? t.og.previewError : result.error,
+                  };
+                }
+                return { ok: true, ogImageUrl: result.ogImageUrl };
+              }}
+              runClear={async () => {
+                const result = await clearPageOgAction({
+                  pageKey: seoPage,
+                  locale: seoLocale,
+                });
+                if (!result.ok) return { ok: false, error: result.error };
+                return { ok: true };
+              }}
+              dynamicOgPath={ogPath}
+              customSlot={
+                <label style={{ fontSize: 13, display: "grid", gap: 6 }}>
+                  {t.settings.seoOgImage}
+                  <input
+                    value={currentSeo.og_image}
+                    onChange={(e) => {
+                      patchCurrentSeo({ og_image: e.target.value });
+                      setOgMode(inferOgMode(e.target.value));
+                    }}
+                    placeholder={t.settings.seoOgImagePlaceholder}
+                    style={adminInput}
+                  />
+                  <span style={{ fontSize: 12, color: "#666" }}>{t.settings.seoOgImageHint}</span>
+                </label>
               }
-              placeholder={t.settings.seoOgImagePlaceholder}
-              style={adminInput}
             />
-          </label>
-          <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
-            {t.settings.seoOgImageHint}
-          </p>
+          </div>
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input
               type="checkbox"

@@ -16,6 +16,11 @@ import type { CaptchaProvider } from "@/lib/cms/types";
 import { parseSiteVerificationToken, parseYandexMetrikaId } from "@/lib/cms/verification";
 import { resolveSecretUpdate } from "@/lib/security/secrets";
 import { adminFail, adminRedirect } from "@/lib/cms/admin-redirect";
+import { uploadOgPngBuffer } from "@/lib/cms/storage";
+import { SITE_CONFIG } from "@/utils/consts";
+import { buildPageOgProps } from "@/utils/og/build";
+import { OG_GENERATED_FILENAME, type OgPageKey } from "@/utils/og/paths";
+import { ogPngBufferToDataUrl, renderOgPngBuffer } from "@/utils/og/render";
 
 function parseChatIds(raw: string): string[] {
   return raw
@@ -167,4 +172,134 @@ export async function pingTelegramChatAction(formData: FormData) {
     }`,
   );
   return adminRedirect("/admin/settings/?ping=1");
+}
+
+export type PageOgActionResult =
+  | { ok: true; dataUrl?: string; ogImageUrl?: string; message?: string }
+  | { ok: false; error: string };
+
+export async function previewPageOgAction(input: {
+  pageKey: string;
+  locale: "en" | "de";
+  title: string;
+  description: string;
+}): Promise<PageOgActionResult> {
+  await requireOwner();
+  const pageKey = String(input.pageKey ?? "").trim();
+  if (pageKey !== "home" && pageKey !== "works") {
+    return { ok: false, error: "Invalid page" };
+  }
+  try {
+    const props = await buildPageOgProps({
+      pageKey: pageKey as OgPageKey,
+      title: input.title,
+      description: input.description,
+      locale: input.locale,
+      siteUrl: SITE_CONFIG.url,
+    });
+    const buffer = await renderOgPngBuffer(props);
+    return { ok: true, dataUrl: ogPngBufferToDataUrl(buffer) };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "OG preview failed",
+    };
+  }
+}
+
+export async function generatePageOgAction(input: {
+  pageKey: string;
+  locale: "en" | "de";
+  title: string;
+  description: string;
+}): Promise<PageOgActionResult> {
+  const actor = await requireOwner();
+  const pageKey = String(input.pageKey ?? "").trim();
+  const locale = input.locale;
+  if (pageKey !== "home" && pageKey !== "works") {
+    return { ok: false, error: "Invalid page" };
+  }
+
+  try {
+    const props = await buildPageOgProps({
+      pageKey: pageKey as OgPageKey,
+      title: input.title,
+      description: input.description,
+      locale,
+      siteUrl: SITE_CONFIG.url,
+    });
+    const buffer = await renderOgPngBuffer(props);
+    const uploaded = await uploadOgPngBuffer(buffer, {
+      folder: `seo/${locale}/${pageKey}`,
+      filename: OG_GENERATED_FILENAME,
+    });
+
+    const supabase = createSupabaseAdminClient();
+    const { data: existing } = await supabase
+      .from("metric_page_seo")
+      .select("title, description, keywords, noindex")
+      .eq("locale", locale)
+      .eq("page_key", pageKey)
+      .maybeSingle();
+
+    const { error } = await supabase.from("metric_page_seo").upsert({
+      locale,
+      page_key: pageKey,
+      title: existing?.title ?? input.title,
+      description: existing?.description ?? input.description,
+      keywords: existing?.keywords ?? "",
+      noindex: existing?.noindex ?? false,
+      og_image: uploaded.publicUrl,
+    });
+
+    if (error) return { ok: false, error: error.message };
+
+    await writeAuditLog({
+      actor,
+      action: "settings.update",
+      entityType: "page_seo",
+      entityId: `${locale}:${pageKey}`,
+      meta: { op: "og_generate" },
+    });
+
+    revalidateCms(["cms", "page_seo"]);
+    return { ok: true, ogImageUrl: uploaded.publicUrl, message: "OG image generated" };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "OG generate failed",
+    };
+  }
+}
+
+export async function clearPageOgAction(input: {
+  pageKey: string;
+  locale: "en" | "de";
+}): Promise<PageOgActionResult> {
+  const actor = await requireOwner();
+  const pageKey = String(input.pageKey ?? "").trim();
+  const locale = input.locale;
+  if (pageKey !== "home" && pageKey !== "works") {
+    return { ok: false, error: "Invalid page" };
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase
+    .from("metric_page_seo")
+    .update({ og_image: "" })
+    .eq("locale", locale)
+    .eq("page_key", pageKey);
+
+  if (error) return { ok: false, error: error.message };
+
+  await writeAuditLog({
+    actor,
+    action: "settings.update",
+    entityType: "page_seo",
+    entityId: `${locale}:${pageKey}`,
+    meta: { op: "og_clear" },
+  });
+
+  revalidateCms(["cms", "page_seo"]);
+  return { ok: true, ogImageUrl: "", message: "Using auto OG" };
 }

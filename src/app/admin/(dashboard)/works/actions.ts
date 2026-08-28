@@ -11,9 +11,14 @@ import {
   isFileUpload,
   probeImageDimensions,
   uploadMediaFile,
+  uploadOgPngBuffer,
 } from "@/lib/cms/storage";
 import { adminFail, adminOk, adminRedirect } from "@/lib/cms/admin-redirect";
 import { replaceProjectTags } from "@/lib/cms/tags";
+import { SITE_CONFIG } from "@/utils/consts";
+import { buildCaseOgProps } from "@/utils/og/build";
+import { OG_GENERATED_FILENAME } from "@/utils/og/paths";
+import { ogPngBufferToDataUrl, renderOgPngBuffer } from "@/utils/og/render";
 
 function projectEditPath(projectId: string, formData?: FormData, extraQs?: Record<string, string>) {
   const locale = String(formData?.get("return_locale") ?? "").trim();
@@ -150,6 +155,97 @@ export async function saveProjectAction(formData: FormData) {
 
   revalidateCms(["cms", "projects", "tags"]);
   return adminRedirect(projectEditPath(id, formData));
+}
+
+export type OgActionOk = { ok: true; dataUrl?: string; ogImageUrl?: string; message?: string };
+export type OgActionFail = { ok: false; error: string };
+export type OgActionResult = OgActionOk | OgActionFail;
+
+export async function previewProjectOgAction(input: {
+  title: string;
+  description: string;
+  coverUrl: string;
+  locale: "en" | "de";
+}): Promise<OgActionResult> {
+  await requirePermission("content");
+  try {
+    const props = await buildCaseOgProps({
+      title: input.title,
+      description: input.description,
+      coverUrl: input.coverUrl || null,
+      locale: input.locale,
+      siteUrl: SITE_CONFIG.url,
+    });
+    const buffer = await renderOgPngBuffer(props);
+    return { ok: true, dataUrl: ogPngBufferToDataUrl(buffer) };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "OG preview failed",
+    };
+  }
+}
+
+export async function generateProjectOgAction(input: {
+  projectId: string;
+  title: string;
+  description: string;
+  coverUrl: string;
+  locale: "en" | "de";
+}): Promise<OgActionResult> {
+  await requirePermission("content");
+  const supabase = createSupabaseAdminClient();
+  const id = String(input.projectId ?? "").trim();
+  if (!id) return { ok: false, error: "Missing project id" };
+
+  try {
+    const props = await buildCaseOgProps({
+      title: input.title,
+      description: input.description,
+      coverUrl: input.coverUrl || null,
+      locale: input.locale,
+      siteUrl: SITE_CONFIG.url,
+    });
+    const buffer = await renderOgPngBuffer(props);
+    const uploaded = await uploadOgPngBuffer(buffer, {
+      folder: `projects/${id}/og`,
+      filename: OG_GENERATED_FILENAME,
+    });
+
+    const { error } = await supabase
+      .from("metric_projects")
+      .update({ og_image: uploaded.publicUrl })
+      .eq("id", id);
+
+    if (error) return { ok: false, error: error.message };
+
+    revalidateCms(["cms", "projects"]);
+    return { ok: true, ogImageUrl: uploaded.publicUrl, message: "OG image generated" };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "OG generate failed",
+    };
+  }
+}
+
+export async function clearProjectOgAction(input: {
+  projectId: string;
+}): Promise<OgActionResult> {
+  await requirePermission("content");
+  const supabase = createSupabaseAdminClient();
+  const id = String(input.projectId ?? "").trim();
+  if (!id) return { ok: false, error: "Missing project id" };
+
+  const { error } = await supabase
+    .from("metric_projects")
+    .update({ og_image: "" })
+    .eq("id", id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidateCms(["cms", "projects"]);
+  return { ok: true, ogImageUrl: "", message: "Using auto OG" };
 }
 
 export async function deleteProjectAction(formData: FormData) {

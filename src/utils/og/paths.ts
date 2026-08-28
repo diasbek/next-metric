@@ -21,6 +21,18 @@ export function getWorkOgImagePath(locale: Locale, slug: string): string {
   return `/og/${locale}/works/${slug}/`;
 }
 
+/** Stable filename used by CMS “Generate & save”. */
+export const OG_GENERATED_FILENAME = "og-generated.png";
+
+/** Detect CMS-generated OG files by storage path convention. */
+export function isGeneratedOgUrl(url: string): boolean {
+  const clean = url.split("?")[0] ?? "";
+  return (
+    clean.includes(`/${OG_GENERATED_FILENAME}`) ||
+    /\/og\/og-generated\.png$/i.test(clean)
+  );
+}
+
 export const ogEyebrows: Record<Locale, Record<OgPageKey, string>> = {
   en: {
     home: "Amazon design",

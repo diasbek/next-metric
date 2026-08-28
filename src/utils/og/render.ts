@@ -135,3 +135,21 @@ export async function renderOgImageResponse(
     },
   );
 }
+
+/** Same visual as public `/og` routes — PNG bytes for CMS generate / preview. */
+export async function renderOgPngBuffer(
+  props: Omit<OgTemplateProps, "logoDataUrl"> & { logoDataUrl?: string },
+): Promise<Buffer> {
+  const response = await renderOgImageResponse(props);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  // Ensure PNG (ImageResponse is PNG; re-encode if a proxy altered it).
+  try {
+    return await sharp(bytes).png().toBuffer();
+  } catch {
+    return bytes;
+  }
+}
+
+export function ogPngBufferToDataUrl(buffer: Buffer): string {
+  return `data:image/png;base64,${buffer.toString("base64")}`;
+}

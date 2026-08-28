@@ -212,6 +212,39 @@ export async function uploadMediaFile(
   };
 }
 
+/**
+ * Upload a pre-rendered OG PNG as-is (no WebP resize) so share cards stay 1200×630.
+ * Uses a stable path + upsert; public URL gets `?v=` cache bust.
+ */
+export async function uploadOgPngBuffer(
+  buffer: Buffer,
+  options: { folder: string; filename?: string },
+): Promise<UploadMediaResult> {
+  if (!buffer.length) throw new Error("Empty OG buffer");
+
+  const folder = (options.folder ?? "og").replace(/^\/+|\/+$/g, "");
+  const filename = sanitizeFilename(options.filename ?? "og-generated.png") || "og-generated.png";
+  const path = `${folder}/${filename}`;
+  const body = new Uint8Array(buffer);
+
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, body, {
+    contentType: "image/png",
+    upsert: true,
+    cacheControl: "31536000",
+  });
+
+  if (error) throw new Error(describeStorageError(error.message));
+
+  const bust = Date.now();
+  return {
+    path,
+    publicUrl: `${getPublicMediaUrl(path)}?v=${bust}`,
+    width: 1200,
+    height: 630,
+  };
+}
+
 function describeStorageError(message: string): string {
   const trimmed = message.trim() || "Storage upload failed";
   if (/fetch failed/i.test(trimmed)) {

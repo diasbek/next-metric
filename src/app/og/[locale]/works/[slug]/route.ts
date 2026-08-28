@@ -1,7 +1,7 @@
 import { locales, type Locale } from "@/i18n/config";
 import { getProjectBySlug, getResolvedContent } from "@/i18n/get-content";
-import { ogEyebrows } from "@/utils/og/paths";
-import { getImageDataUrl, renderOgImageResponse } from "@/utils/og/render";
+import { buildCaseOgProps, resolveOgSiteHostname } from "@/utils/og/build";
+import { renderOgImageResponse } from "@/utils/og/render";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,14 +10,6 @@ export const revalidate = 3600;
 type RouteParams = {
   params: Promise<{ locale: string; slug: string }>;
 };
-
-function siteHostname(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return "metric.graphics";
-  }
-}
 
 export async function GET(_request: Request, { params }: RouteParams) {
   const { locale: localeRaw, slug } = await params;
@@ -36,13 +28,15 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return new Response("Not found", { status: 404 });
   }
 
-  const image = await renderOgImageResponse({
+  const props = await buildCaseOgProps({
     title: project.title,
     description: project.description,
-    eyebrow: ogEyebrows[locale].works,
-    imageDataUrl: await getImageDataUrl(project.image),
-    siteUrl: siteHostname(content.site.url),
+    coverUrl: project.image,
+    locale,
+    siteUrl: resolveOgSiteHostname(content.site.url),
   });
+
+  const image = await renderOgImageResponse(props);
 
   image.headers.set(
     "Cache-Control",

@@ -1,0 +1,209 @@
+/* Admin scaled previews — force public site chrome independent of viewport
+   media queries (sidebar is always < 1024px, so @media never hits desktop). */
+
+.admin-site-preview {
+  --background: #ffffff;
+  --foreground: #090909;
+  --surface: #f5f5f5;
+  --muted: rgba(9, 9, 9, 0.6);
+  --dark: #090909;
+  color: var(--foreground);
+  background: transparent;
+  font-family: var(--font-degular), system-ui, sans-serif;
+}
+
+.admin-site-preview__label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #888;
+}
+
+.admin-site-preview__frame {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e8e8e8;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.admin-site-preview__scaler {
+  transform-origin: top left;
+}
+
+/* —— Case card (Works / home) —— */
+
+.admin-site-preview--case-card-desktop .metric-case-card {
+  grid-template-columns: 1fr 1.05fr !important;
+  grid-template-areas: "body media" !important;
+  align-items: stretch !important;
+  border-radius: var(--radius-2xl) !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__body {
+  gap: 24px !important;
+  padding: 50px !important;
+  min-height: 0 !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__media {
+  width: calc(100% - 50px) !important;
+  margin: 50px 50px 50px 0 !important;
+  align-self: center !important;
+  border-radius: 30px !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__quote {
+  font-size: 48px !important;
+  line-height: 0.95 !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__author {
+  margin-top: 32px !important;
+  font-size: 28px !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__role {
+  margin-top: 20px !important;
+  font-size: 20px !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__tags .metric-pill {
+  padding: 16px 20px !important;
+  font-size: 20px !important;
+}
+
+.admin-site-preview--case-card-desktop .metric-case-card__cta.metric-cta {
+  --cta-pad-x: 28px;
+  min-height: var(--cta-height);
+  font-size: var(--text-body-lg);
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card {
+  grid-template-columns: none !important;
+  grid-template-areas:
+    "media"
+    "body" !important;
+  border-radius: var(--radius-xl) !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__body {
+  gap: 20px !important;
+  padding: 20px !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__media {
+  width: calc(100% - 32px) !important;
+  margin: 16px 16px 0 !important;
+  border-radius: 20px !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__quote {
+  font-size: 28px !important;
+  line-height: 0.95 !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__author {
+  margin-top: 16px !important;
+  font-size: 18px !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__role {
+  margin-top: 8px !important;
+  font-size: 14px !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__tags .metric-pill {
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+}
+
+.admin-site-preview--case-card-mobile .metric-case-card__cta.metric-cta {
+  --cta-pad-x: 28px;
+  min-height: var(--cta-height-sm);
+  font-size: var(--text-nav);
+}
+
+.admin-site-preview .metric-case-card__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.admin-site-preview .metric-case-card__cover {
+  pointer-events: none;
+}
+
+/* —— Case study page —— */
+
+.admin-site-preview--case-page {
+  background: #fff;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__intro {
+  gap: 40px !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) !important;
+  column-gap: 64px !important;
+  align-items: start !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__col {
+  gap: 48px !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__meta {
+  gap: 40px !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__title {
+  font-size: 72px !important;
+  line-height: 0.9 !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__role {
+  font-size: 18px !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__lede {
+  font-size: 20px !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__brief-text {
+  font-size: 18px !important;
+}
+
+.admin-site-preview--case-page-desktop .metric-case__tag.metric-pill {
+  padding: 16px 20px !important;
+  font-size: 20px !important;
+}
+
+.admin-site-preview--case-page-mobile .metric-case__grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 28px !important;
+}
+
+.admin-site-preview--case-page-mobile .metric-case__title {
+  font-size: 42px !important;
+  line-height: 0.9 !important;
+}
+
+.admin-site-preview--case-page-mobile .metric-case__role,
+.admin-site-preview--case-page-mobile .metric-case__lede,
+.admin-site-preview--case-page-mobile .metric-case__brief-text {
+  font-size: 16px !important;
+}
+
+.admin-site-preview--case-page-mobile .metric-case__tag.metric-pill {
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+}

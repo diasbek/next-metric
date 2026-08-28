@@ -1,8 +1,8 @@
 import { locales, type Locale } from "@/i18n/config";
 import { getResolvedContent } from "@/i18n/get-content";
+import { buildPageOgProps, resolveOgSiteHostname } from "@/utils/og/build";
 import {
   isOgPageKey,
-  ogEyebrows,
   type OgPageKey,
 } from "@/utils/og/paths";
 import { renderOgImageResponse } from "@/utils/og/render";
@@ -14,14 +14,6 @@ export const revalidate = 3600;
 type RouteParams = {
   params: Promise<{ locale: string; page: string }>;
 };
-
-function siteHostname(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return "metric.graphics";
-  }
-}
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { locale: localeRaw, page: pageRaw } = await params;
@@ -39,12 +31,15 @@ export async function GET(request: Request, { params }: RouteParams) {
   const descriptionOverride = preview.get("description")?.trim();
   const isPreview = Boolean(titleOverride || descriptionOverride);
 
-  const image = await renderOgImageResponse({
-    title: (titleOverride || meta.title).replace(/ — METRIC$/i, ""),
+  const props = await buildPageOgProps({
+    pageKey: page,
+    title: titleOverride || meta.title,
     description: descriptionOverride || meta.description,
-    eyebrow: ogEyebrows[locale][page],
-    siteUrl: siteHostname(content.site.url),
+    locale,
+    siteUrl: resolveOgSiteHostname(content.site.url),
   });
+
+  const image = await renderOgImageResponse(props);
 
   image.headers.set(
     "Cache-Control",

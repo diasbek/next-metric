@@ -614,6 +614,27 @@ export const deAdmin: AdminMessages = {
       heroImage: "Case-Hero",
     },
   },
+  og: {
+    modeCustom: "Eigenes",
+    modeGenerate: "Generieren",
+    modeAuto: "Auto",
+    sourceCustom: "Eigene Datei / URL",
+    sourceGenerated: "Generierte Vorlage",
+    sourceAuto: "Auto (dynamisch /og)",
+    generate: "Generieren & speichern",
+    regenerate: "Neu generieren & speichern",
+    generating: "Wird generiert…",
+    previewLoading: "Vorschau wird gerendert…",
+    previewError: "OG-Vorschau konnte nicht erstellt werden",
+    generateHint:
+      "Erstellt die 1200×630-Marke-Karte aus Titel, Beschreibung und Cover der aktiven Locale. Speichert sofort in Media und setzt OG.",
+    autoHint:
+      "Löscht gespeichertes OG. Shares nutzen Cover (Cases) oder die live /og/…-Route nach Publish.",
+    autoDraftHint: "Case veröffentlichen, damit /og/{locale}/works/{slug}/ im Auto-Modus auflöst.",
+    dimensionsHint: "Open Graph · 1200 × 630",
+    clearToAuto: "Gespeichertes OG löschen",
+    openDynamic: "Dynamisches OG öffnen",
+  },
   auth: {
     loginTitle: "Admin login",
     submit: "Sign in",

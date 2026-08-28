@@ -1,6 +1,8 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { Button } from "@/components/atoms/Button";
+import { AdminSiteScaleFrame } from "@/components/admin/preview/AdminSiteScaleFrame";
 import type { ImagePreset, SurfaceKind } from "./presets";
 import { CASE_CARD_MEDIA_ASPECT_CSS } from "./presets";
 
@@ -33,7 +35,7 @@ const pageShell: CSSProperties = {
   overflow: "hidden",
 };
 
-/** Mirrors public `.metric-case-card` (works / home) — light card on dark admin chrome. */
+/** Public `.metric-case-card` markup, scaled — not a hand-rolled mock. */
 function CaseCardChrome({
   imageUrl,
   quote,
@@ -55,150 +57,60 @@ function CaseCardChrome({
   interactive?: boolean;
   children?: ReactNode;
 }) {
-  const ring = interactive
-    ? { outline: "1px solid #2600ff", outlineOffset: 2 }
-    : {};
-
-  const media = (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        aspectRatio: CASE_CARD_MEDIA_ASPECT_CSS,
-        overflow: "hidden",
-        borderRadius: layout === "desktop" ? 20 : 16,
-        background: "#111",
-        flexShrink: 0,
-      }}
-    >
-      {children ?? <CoverImage url={imageUrl} />}
-    </div>
-  );
-
-  const body = (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        gap: layout === "desktop" ? 16 : 14,
-        minWidth: 0,
-        padding: layout === "desktop" ? "4px 4px 4px 0" : 0,
-      }}
-    >
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-        {(tags.length ? tags : ["Listing"]).map((tag) => (
-          <span
-            key={tag}
-            style={{
-              border: "1px solid #111",
-              padding: "6px 10px",
-              fontSize: 11,
-              color: "#111",
-              background: "transparent",
-            }}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div style={{ display: "grid", gap: 8, minWidth: 0 }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: layout === "desktop" ? 22 : 18,
-            fontWeight: 600,
-            lineHeight: 0.95,
-            letterSpacing: "-0.02em",
-            color: "#111",
-            overflowWrap: "anywhere",
-          }}
-        >
-          {quote}
-        </p>
-        <p
-          style={{
-            margin: 0,
-            fontSize: layout === "desktop" ? 14 : 13,
-            fontWeight: 500,
-            letterSpacing: "-0.02em",
-            color: "#111",
-            overflowWrap: "anywhere",
-          }}
-        >
-          {author}
-        </p>
-        <p
-          style={{
-            margin: 0,
-            fontSize: layout === "desktop" ? 12 : 12,
-            letterSpacing: "-0.02em",
-            color: "#333",
-            overflowWrap: "anywhere",
-          }}
-        >
-          {role}
-        </p>
-      </div>
-      <span
-        style={{
-          display: "inline-flex",
-          alignSelf: "flex-start",
-          padding: "10px 16px",
-          fontSize: 12,
-          fontWeight: 600,
-          color: "#fff",
-          background: "#111",
-          border: "1px solid #111",
-        }}
-      >
-        {ctaLabel}
-      </span>
-    </div>
-  );
+  const designWidth = layout === "desktop" ? 1100 : 390;
+  const viewportWidth = layout === "desktop" ? 340 : 220;
+  const resolvedTags = tags.length ? tags : ["Listing"];
 
   return (
     <div
       className="admin-surface-preview"
-      style={{
-        ...pageShell,
-        ...ring,
-        background: "#f3f3f3",
-        border: "1px solid #ddd",
-        maxWidth: layout === "mobile" ? 240 : "100%",
-      }}
+      style={
+        interactive
+          ? { outline: "1px solid #2600ff", outlineOffset: 2, maxWidth: "100%" }
+          : { maxWidth: "100%" }
+      }
     >
-      <p style={{ margin: "0 0 12px", fontSize: 12, color: "#666" }}>
-        {layout === "desktop"
-          ? "Works → case card (desktop)"
-          : "Works → case card (mobile)"}
-        {" · "}
-        3000 × 2347
-      </p>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: layout === "desktop" ? "1fr 1.05fr" : "1fr",
-          gap: layout === "desktop" ? 16 : 12,
-          alignItems: "stretch",
-          background: "#fff",
-          borderRadius: layout === "desktop" ? 24 : 20,
-          padding: layout === "desktop" ? 20 : 14,
-          overflow: "hidden",
-        }}
+      <AdminSiteScaleFrame
+        designWidth={designWidth}
+        viewportWidth={viewportWidth}
+        label={
+          layout === "desktop"
+            ? "Works → case card (desktop) · 3000 × 2347"
+            : "Works → case card (mobile) · 3000 × 2347"
+        }
+        className={
+          layout === "desktop"
+            ? "admin-site-preview--case-card-desktop"
+            : "admin-site-preview--case-card-mobile"
+        }
       >
-        {layout === "desktop" ? (
-          <>
-            {body}
-            {media}
-          </>
-        ) : (
-          <>
-            {media}
-            {body}
-          </>
-        )}
-      </div>
+        <article className="metric-case-card">
+          <div className="metric-case-card__body">
+            <div className="metric-case-card__tags">
+              {resolvedTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="metric-pill border-foreground text-foreground"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <div className="metric-case-card__copy">
+              <h3 className="metric-case-card__quote font-display">{quote}</h3>
+              <p className="metric-case-card__author">{author}</p>
+              <p className="metric-case-card__role">{role}</p>
+            </div>
+            <Button as="span" variant="dark" className="metric-case-card__cta">
+              {ctaLabel}
+            </Button>
+          </div>
+          <div className="metric-case-card__media">
+            {children ?? <CoverImage url={imageUrl} />}
+          </div>
+          <span className="metric-case-card__cover" aria-hidden />
+        </article>
+      </AdminSiteScaleFrame>
     </div>
   );
 }

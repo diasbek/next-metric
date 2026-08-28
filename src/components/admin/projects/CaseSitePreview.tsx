@@ -6,6 +6,7 @@ import { youtubeEmbedUrl } from "@/data/projects";
 import { getWorkOgImagePath, ogEyebrows } from "@/utils/og/paths";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { adminBtn } from "@/components/admin/ui/styles";
+import { AdminSiteScaleFrame } from "@/components/admin/preview/AdminSiteScaleFrame";
 import { useAdminT } from "@/i18n/admin";
 import { orderedCaseContentBlocks } from "@/lib/cms/case-gallery";
 import type { ProjectEditorData } from "./project-editor-types";
@@ -15,6 +16,8 @@ type Props = {
   /** Last saved snapshot — used for unsaved-copy badge. */
   saved: ProjectEditorData;
   locale: AdminLocale;
+  /** Live generate preview (data URL) before/while Generate mode. */
+  ogPreviewDataUrl?: string | null;
 };
 
 function copyDirty(draft: ProjectEditorData, saved: ProjectEditorData): boolean {
@@ -70,18 +73,20 @@ function resolveOgCandidates(draft: ProjectEditorData, locale: AdminLocale): str
 function OgSharePreview({
   draft,
   locale,
+  previewDataUrl,
 }: {
   draft: ProjectEditorData;
   locale: AdminLocale;
+  previewDataUrl?: string | null;
 }) {
   const t = useAdminT();
   const tr = draft.translations[locale];
-  const candidateKey = `${draft.og_image}|${draft.cover_image}|${draft.status}|${draft.slug}|${locale}`;
-  const candidates = useMemo(
-    () => resolveOgCandidates(draft, locale),
+  const candidateKey = `${draft.og_image}|${draft.cover_image}|${draft.status}|${draft.slug}|${locale}|${previewDataUrl ?? ""}`;
+  const candidates = useMemo(() => {
+    if (previewDataUrl) return [previewDataUrl];
+    return resolveOgCandidates(draft, locale);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [candidateKey],
-  );
+  }, [candidateKey]);
   const [index, setIndex] = useState(0);
   const [failedAll, setFailedAll] = useState(false);
 
@@ -210,7 +215,7 @@ function OgSharePreview({
   );
 }
 
-export function CaseSitePreview({ draft, saved, locale }: Props) {
+export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Props) {
   const t = useAdminT();
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const tr = draft.translations[locale];
@@ -222,7 +227,6 @@ export function CaseSitePreview({ draft, saved, locale }: Props) {
 
   const designWidth = device === "desktop" ? 1280 : 390;
   const viewportWidth = device === "desktop" ? 380 : 280;
-  const scale = viewportWidth / designWidth;
   const publicPath =
     locale === "en"
       ? `/works/${draft.slug}/`
@@ -233,6 +237,8 @@ export function CaseSitePreview({ draft, saved, locale }: Props) {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+  const taskLabel = locale === "de" ? "Aufgabe:" : "Task:";
+  const solutionLabel = locale === "de" ? "Lösung:" : "Solution:";
 
   return (
     <aside
@@ -296,214 +302,152 @@ export function CaseSitePreview({ draft, saved, locale }: Props) {
         {t.pages.project.previewMediaHint}
       </p>
 
-      <div
-        style={{
-          border: "1px solid #333",
-          background: "#fafafa",
-          padding: 12,
-          overflow: "hidden",
-          borderRadius: 12,
-        }}
-      >
-        <div
-          style={{
-            width: viewportWidth,
-            maxWidth: "100%",
-            margin: "0 auto",
-            maxHeight: 640,
-            overflow: "auto",
-          }}
+      <div style={{ maxHeight: 640, overflow: "auto" }}>
+        <AdminSiteScaleFrame
+          designWidth={designWidth}
+          viewportWidth={viewportWidth}
+          className={[
+            "admin-site-preview--case-page",
+            device === "desktop"
+              ? "admin-site-preview--case-page-desktop"
+              : "admin-site-preview--case-page-mobile",
+          ].join(" ")}
         >
-          <div
-            style={{
-              width: designWidth,
-              zoom: scale,
-              background: "#fff",
-              color: "#111",
-              fontSize: 16,
-              lineHeight: 1.4,
-            }}
-          >
-            <div style={{ padding: "28px 28px 0", display: "grid", gap: 20 }}>
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: 48,
-                  fontWeight: 600,
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.05,
-                }}
-              >
-                {authorName}
-              </h1>
+          <article className="metric-case" style={{ paddingBlock: "40px 48px" }}>
+            <div className="page-container metric-case__shell" style={{ paddingInline: 40 }}>
+              <header className="metric-case__intro">
+                <h1 className="metric-case__title font-display">{authorName}</h1>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: device === "desktop" ? "1.2fr 1fr" : "1fr",
-                  gap: 24,
-                }}
-              >
-                <div style={{ display: "grid", gap: 16 }}>
-                  {tr.role ? (
-                    <p style={{ margin: 0, fontSize: 18, color: "#444" }}>{tr.role}</p>
-                  ) : null}
-                  {tr.case_task ? (
-                    <div>
-                      <p
-                        style={{
-                          margin: "0 0 6px",
-                          fontSize: 12,
-                          color: "#888",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.04em",
-                        }}
-                      >
-                        {t.pages.project.caseTask}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 16 }}>{tr.case_task}</p>
+                <div className="metric-case__grid">
+                  <div className="metric-case__col metric-case__col--main">
+                    {tr.role ? <p className="metric-case__role">{tr.role}</p> : null}
+                    {tr.case_task ? (
+                      <div className="metric-case__brief">
+                        <p className="metric-case__brief-label">{taskLabel}</p>
+                        <p className="metric-case__brief-text">{tr.case_task}</p>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="metric-case__col metric-case__col--aside">
+                    <div className="metric-case__meta">
+                      {tags.length ? (
+                        <div className="metric-case__tags">
+                          {tags.map((tag) => (
+                            <span key={tag} className="metric-pill metric-case__tag">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                      {tr.description ? (
+                        <p className="metric-case__lede">{tr.description}</p>
+                      ) : null}
                     </div>
-                  ) : null}
+                    {tr.case_solution ? (
+                      <div className="metric-case__brief">
+                        <p className="metric-case__brief-label">{solutionLabel}</p>
+                        <p className="metric-case__brief-text">{tr.case_solution}</p>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-                <div style={{ display: "grid", gap: 16 }}>
-                  {tags.length ? (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                      {tags.map((tag) => (
-                        <span
-                          key={tag}
+              </header>
+
+              <div className="metric-case__content" style={{ marginTop: 40 }}>
+                <div className="metric-case__stack">
+                  {contentBlocks.map((block) => {
+                    if (block.type === "gallery") {
+                      if (!block.images.length) {
+                        return (
+                          <p
+                            key={block.id}
+                            style={{ margin: 0, padding: 24, color: "#999", fontSize: 14 }}
+                          >
+                            Gallery
+                          </p>
+                        );
+                      }
+                      return block.images.map((img, i) => (
+                        <div
+                          key={`${block.id}-${img.src}-${i}`}
+                          className="metric-case__stack-item"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img.src}
+                            alt={img.alt || ""}
+                            className="metric-case__stack-img"
+                          />
+                        </div>
+                      ));
+                    }
+                    if (block.type === "before_after") {
+                      return (
+                        <div
+                          key={block.id}
+                          className="metric-case__stack-item metric-case__block--ba"
                           style={{
-                            padding: "4px 10px",
-                            borderRadius: 999,
-                            background: "#f0f0f0",
-                            fontSize: 13,
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gap: 4,
                           }}
                         >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                  {tr.description ? (
-                    <p style={{ margin: 0, fontSize: 16, color: "#333" }}>{tr.description}</p>
-                  ) : null}
-                  {tr.case_solution ? (
-                    <div>
-                      <p
-                        style={{
-                          margin: "0 0 6px",
-                          fontSize: 12,
-                          color: "#888",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.04em",
-                        }}
-                      >
-                        {t.pages.project.caseSolution}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 16 }}>{tr.case_solution}</p>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 28, display: "grid", gap: 0 }}>
-              {contentBlocks.map((block) => {
-                if (block.type === "gallery") {
-                  if (!block.images.length) {
+                          {block.beforeImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={block.beforeImage}
+                              alt={block.beforeAlt || "Before"}
+                              className="metric-case__stack-img"
+                            />
+                          ) : (
+                            <div style={{ minHeight: 120, background: "#eee" }} />
+                          )}
+                          {block.afterImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={block.afterImage}
+                              alt={block.afterAlt || "After"}
+                              className="metric-case__stack-img"
+                            />
+                          ) : (
+                            <div style={{ minHeight: 120, background: "#eee" }} />
+                          )}
+                        </div>
+                      );
+                    }
+                    const embed = youtubeEmbedUrl(block.youtubeUrl);
                     return (
-                      <p
-                        key={block.id}
-                        style={{ margin: 0, padding: 24, color: "#999", fontSize: 14 }}
-                      >
-                        Gallery
-                      </p>
-                    );
-                  }
-                  return (
-                    <div key={block.id} style={{ display: "grid", gap: 0 }}>
-                      {block.images.map((img, i) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          key={`${img.src}-${i}`}
-                          src={img.src}
-                          alt={img.alt || ""}
-                          style={{
-                            width: "100%",
-                            height: "auto",
-                            display: "block",
-                            verticalAlign: "top",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  );
-                }
-                if (block.type === "before_after") {
-                  return (
-                    <div
-                      key={block.id}
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: 4,
-                        padding: "12px 0",
-                      }}
-                    >
-                      {block.beforeImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={block.beforeImage}
-                          alt={block.beforeAlt || "Before"}
-                          style={{ width: "100%", height: "auto", display: "block" }}
-                        />
-                      ) : (
-                        <div style={{ minHeight: 120, background: "#eee" }} />
-                      )}
-                      {block.afterImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={block.afterImage}
-                          alt={block.afterAlt || "After"}
-                          style={{ width: "100%", height: "auto", display: "block" }}
-                        />
-                      ) : (
-                        <div style={{ minHeight: 120, background: "#eee" }} />
-                      )}
-                    </div>
-                  );
-                }
-                const embed = youtubeEmbedUrl(block.youtubeUrl);
-                return (
-                  <div key={block.id} style={{ padding: "12px 0" }}>
-                    {embed ? (
-                      <div style={{ aspectRatio: "16/9", background: "#111" }}>
-                        <iframe
-                          src={embed}
-                          title="YouTube"
-                          style={{ width: "100%", height: "100%", border: 0 }}
-                        />
+                      <div key={block.id} className="metric-case__stack-item">
+                        {embed ? (
+                          <div className="metric-case__youtube">
+                            <iframe src={embed} title="YouTube" />
+                          </div>
+                        ) : (
+                          <p style={{ margin: 0, color: "#999", fontSize: 14 }}>YouTube</p>
+                        )}
                       </div>
-                    ) : (
-                      <p style={{ margin: 0, color: "#999", fontSize: 14 }}>YouTube</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {tr.quote ? (
-              <div style={{ padding: 28, display: "grid", gap: 12 }}>
-                <p style={{ margin: 0, fontSize: 20, lineHeight: 1.3 }}>{tr.quote}</p>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 600 }}>{authorName}</p>
-                  {tr.role ? (
-                    <p style={{ margin: 0, fontSize: 14, color: "#666" }}>{tr.role}</p>
-                  ) : null}
+                    );
+                  })}
                 </div>
               </div>
-            ) : null}
-          </div>
-        </div>
+
+              {tr.quote ? (
+                <div className="metric-case__reviews" style={{ marginTop: 40 }}>
+                  <blockquote className="metric-case__review">
+                    <p style={{ margin: 0, fontSize: 28, lineHeight: 1.2 }}>{tr.quote}</p>
+                    <footer style={{ marginTop: 16 }}>
+                      <strong>{authorName}</strong>
+                      {tr.role ? (
+                        <p style={{ margin: "4px 0 0", color: "var(--muted)" }}>{tr.role}</p>
+                      ) : null}
+                    </footer>
+                  </blockquote>
+                </div>
+              ) : null}
+            </div>
+          </article>
+        </AdminSiteScaleFrame>
       </div>
 
       <div style={{ display: "grid", gap: 6 }}>
@@ -518,7 +462,7 @@ export function CaseSitePreview({ draft, saved, locale }: Props) {
         <span style={{ fontSize: 11, color: "#777" }}>{t.pages.project.previewLiveHint}</span>
       </div>
 
-      <OgSharePreview draft={draft} locale={locale} />
+      <OgSharePreview draft={draft} locale={locale} previewDataUrl={ogPreviewDataUrl} />
     </aside>
   );
 }

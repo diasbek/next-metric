@@ -29,14 +29,19 @@ import type {
 } from "@/components/admin/projects/project-editor-types";
 import {
   addProjectBlockAction,
+  clearProjectOgAction,
   deleteProjectAction,
   deleteProjectBlockAction,
   deleteProjectMediaAction,
+  generateProjectOgAction,
+  previewProjectOgAction,
   reorderProjectBlocksAction,
   reorderProjectMediaAction,
   saveProjectAction,
   updateProjectBlockYoutubeAction,
 } from "@/app/admin/(dashboard)/works/actions";
+import { OgModePanel, inferOgMode, type OgMode } from "@/components/admin/og/OgModePanel";
+import { getWorkOgImagePath } from "@/utils/og/paths";
 import {
   adminBtn,
   adminBtnPrimary,
@@ -148,6 +153,8 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   const [coverLibraryUrl, setCoverLibraryUrl] = useState("");
   const [ogSource, setOgSource] = useState<MediaSourceMode>("upload");
   const [ogLibraryUrl, setOgLibraryUrl] = useState("");
+  const [ogMode, setOgMode] = useState<OgMode>(() => inferOgMode(project.og_image));
+  const [ogPreviewDataUrl, setOgPreviewDataUrl] = useState<string | null>(null);
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const tr = draft.translations[locale];
 
@@ -158,6 +165,8 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
     setOgLibraryUrl("");
     setCoverSource("upload");
     setOgSource("upload");
+    setOgMode(inferOgMode(project.og_image));
+    setOgPreviewDataUrl(null);
     setCoverBlobUrl((prev) => {
       if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
       return null;
@@ -252,6 +261,7 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
     });
     if (!draft.og_image && draft.cover_image) {
       setDraft((p) => ({ ...p, og_image: p.cover_image }));
+      setOgMode("custom");
     }
   };
 
@@ -901,70 +911,138 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                 {tr.meta_description || tr.description || "…"}
               </p>
             </div>
-            <MediaSourceTabs
-              mode={ogSource}
-              onChange={setOgSource}
-              tabs={sourceTabs}
-              label={t.pages.project.ogImage}
-            >
-              {ogLibraryUrl ? (
-                <input type="hidden" name="og_from_library" value={ogLibraryUrl} />
-              ) : null}
-              {ogSource === "upload" ? (
-                <ImageField
-                  key={draft.og_image || draft.cover_image || "og-empty"}
-                  name="og_file"
-                  preset="ogSocial"
-                  currentUrl={draft.og_image || draft.cover_image || null}
-                  label={t.pages.project.ogImage}
-                  onReady={(file) => {
-                    if (file) setOgLibraryUrl("");
-                  }}
-                />
-              ) : null}
-              {ogSource === "library" ? (
-                library.length > 0 ? (
-                  <LibraryImagePicker
-                    name="_og_library_pick"
-                    items={library}
-                    label={t.pages.project.fromLibrary}
-                    noneLabel={t.pages.project.noneOption}
-                    hint={t.pages.project.libraryClickToAdd}
-                    showClear={false}
-                    onSelect={(url) => {
-                      if (!url) return;
-                      setOgLibraryUrl(url);
-                      setDraft((p) => ({ ...p, og_image: url }));
-                      setOgSource("upload");
-                    }}
-                  />
-                ) : (
-                  <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
-                    {t.pages.project.libraryEmpty}{" "}
-                    <Link href="/admin/media/" style={{ color: "#8af" }}>
-                      {t.pages.project.openMediaLibrary}
-                    </Link>
-                  </p>
-                )
-              ) : null}
-              {ogSource === "url" ? (
-                <label style={{ fontSize: 13 }}>
-                  {t.pages.project.ogImageUrl}
-                  <input
-                    name="og_image"
-                    value={draft.og_image}
-                    onChange={(e) => {
-                      setOgLibraryUrl("");
-                      setDraft((p) => ({ ...p, og_image: e.target.value }));
-                    }}
-                    style={adminInput}
-                    placeholder={t.pages.project.urlPlaceholder}
-                  />
-                </label>
-              ) : (
+            <div style={{ display: "grid", gap: 8 }}>
+              <span style={{ fontSize: 13 }}>{t.pages.project.ogImage}</span>
+              <OgModePanel
+                mode={ogMode}
+                onModeChange={setOgMode}
+                ogImageUrl={draft.og_image}
+                onOgImageUrlChange={(url) => {
+                  setOgLibraryUrl("");
+                  setDraft((p) => ({ ...p, og_image: url }));
+                }}
+                previewDataUrl={ogPreviewDataUrl}
+                onPreviewDataUrlChange={setOgPreviewDataUrl}
+                previewKey={[
+                  locale,
+                  tr.meta_title,
+                  tr.title,
+                  tr.meta_description,
+                  tr.description,
+                  coverPreview || draft.cover_image,
+                ].join("|")}
+                runPreview={async () => {
+                  const result = await previewProjectOgAction({
+                    locale,
+                    title: tr.meta_title.trim() || tr.title,
+                    description: tr.meta_description.trim() || tr.description,
+                    coverUrl: coverPreview || draft.cover_image,
+                  });
+                  if (!result.ok || !result.dataUrl) {
+                    return { ok: false, error: result.ok ? t.og.previewError : result.error };
+                  }
+                  return { ok: true, dataUrl: result.dataUrl };
+                }}
+                runGenerate={async () => {
+                  const result = await generateProjectOgAction({
+                    projectId: draft.id,
+                    locale,
+                    title: tr.meta_title.trim() || tr.title,
+                    description: tr.meta_description.trim() || tr.description,
+                    coverUrl: coverPreview || draft.cover_image,
+                  });
+                  if (!result.ok || !result.ogImageUrl) {
+                    return {
+                      ok: false,
+                      error: result.ok ? t.og.previewError : result.error,
+                    };
+                  }
+                  return { ok: true, ogImageUrl: result.ogImageUrl };
+                }}
+                runClear={async () => {
+                  const result = await clearProjectOgAction({ projectId: draft.id });
+                  if (!result.ok) return { ok: false, error: result.error };
+                  return { ok: true };
+                }}
+                dynamicOgPath={
+                  draft.slug.trim() ? getWorkOgImagePath(locale, draft.slug) : null
+                }
+                dynamicDisabledReason={
+                  draft.status !== "published" ? t.og.autoDraftHint : null
+                }
+                customSlot={
+                  <MediaSourceTabs
+                    mode={ogSource}
+                    onChange={setOgSource}
+                    tabs={sourceTabs}
+                    label={t.pages.project.ogImage}
+                  >
+                    {ogLibraryUrl ? (
+                      <input type="hidden" name="og_from_library" value={ogLibraryUrl} />
+                    ) : null}
+                    {ogSource === "upload" ? (
+                      <ImageField
+                        key={draft.og_image || draft.cover_image || "og-empty"}
+                        name="og_file"
+                        preset="ogSocial"
+                        currentUrl={draft.og_image || draft.cover_image || null}
+                        label={t.pages.project.ogImage}
+                        onReady={(file) => {
+                          if (file) setOgLibraryUrl("");
+                        }}
+                      />
+                    ) : null}
+                    {ogSource === "library" ? (
+                      library.length > 0 ? (
+                        <LibraryImagePicker
+                          name="_og_library_pick"
+                          items={library}
+                          label={t.pages.project.fromLibrary}
+                          noneLabel={t.pages.project.noneOption}
+                          hint={t.pages.project.libraryClickToAdd}
+                          showClear={false}
+                          onSelect={(url) => {
+                            if (!url) return;
+                            setOgLibraryUrl(url);
+                            setDraft((p) => ({ ...p, og_image: url }));
+                            setOgSource("upload");
+                            setOgMode("custom");
+                          }}
+                        />
+                      ) : (
+                        <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+                          {t.pages.project.libraryEmpty}{" "}
+                          <Link href="/admin/media/" style={{ color: "#8af" }}>
+                            {t.pages.project.openMediaLibrary}
+                          </Link>
+                        </p>
+                      )
+                    ) : null}
+                    {ogSource === "url" ? (
+                      <label style={{ fontSize: 13 }}>
+                        {t.pages.project.ogImageUrl}
+                        <input
+                          name="og_image"
+                          value={draft.og_image}
+                          onChange={(e) => {
+                            setOgLibraryUrl("");
+                            setDraft((p) => ({ ...p, og_image: e.target.value }));
+                            setOgMode(inferOgMode(e.target.value));
+                          }}
+                          style={adminInput}
+                          placeholder={t.pages.project.urlPlaceholder}
+                        />
+                      </label>
+                    ) : (
+                      <input type="hidden" name="og_image" value={draft.og_image} />
+                    )}
+                  </MediaSourceTabs>
+                }
+              />
+              {ogMode !== "custom" ? (
                 <input type="hidden" name="og_image" value={draft.og_image} />
-              )}
-            </MediaSourceTabs>
+              ) : null}
+            </div>
           </section>
 
           <button type="submit" style={{ ...adminBtnPrimary, padding: 14, fontSize: 14 }}>
@@ -986,7 +1064,12 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
         </HardNavForm>
       </div>
 
-      <CaseSitePreview draft={draft} saved={project} locale={locale} />
+      <CaseSitePreview
+        draft={draft}
+        saved={project}
+        locale={locale}
+        ogPreviewDataUrl={ogMode === "generate" ? ogPreviewDataUrl : null}
+      />
     </div>
   );
 }

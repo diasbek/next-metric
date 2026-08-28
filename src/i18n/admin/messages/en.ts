@@ -613,6 +613,27 @@ export const enAdmin: AdminMessages = {
       heroImage: "Case hero",
     },
   },
+  og: {
+    modeCustom: "Custom",
+    modeGenerate: "Generate",
+    modeAuto: "Auto",
+    sourceCustom: "Custom file / URL",
+    sourceGenerated: "Generated template",
+    sourceAuto: "Auto (dynamic /og)",
+    generate: "Generate & save",
+    regenerate: "Regenerate & save",
+    generating: "Generating…",
+    previewLoading: "Rendering preview…",
+    previewError: "Could not render OG preview",
+    generateHint:
+      "Builds the branded 1200×630 card from the active locale title, description, and cover. Saves to media and sets OG immediately.",
+    autoHint:
+      "Clears the stored OG. Shares use cover (cases) or the live /og/… route when published.",
+    autoDraftHint: "Publish the case so /og/{locale}/works/{slug}/ resolves for Auto mode.",
+    dimensionsHint: "Open Graph · 1200 × 630",
+    clearToAuto: "Clear stored OG",
+    openDynamic: "Open dynamic OG",
+  },
   auth: {
     loginTitle: "Admin login",
     submit: "Sign in",

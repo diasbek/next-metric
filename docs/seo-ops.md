@@ -15,9 +15,21 @@ Technical SEO from the excellence plan is in the app. Use this list to keep rank
 - Not indexed (by design): `/works/?category=` / `?type=`, admin, drafts, redirected agency/services/contacts.
 - Toggle case indexing in the project editor (`seo_indexable`). Sitemap omits `seo_indexable = false`.
 
+## OG / social images
+
+Priority for `og:image`:
+
+1. Stored `og_image` (custom upload / URL / CMS-generated PNG)
+2. Case cover (`cover_image`) when page is a work
+3. Dynamic `/og/{locale}/works/{slug}/` or `/og/{locale}/{page}/`
+
+In Admin → Works / Settings SEO use **Custom | Generate | Auto**. Generate writes `og-generated.png` to media and sets `og_image` immediately (works for drafts). Auto clears stored OG so the live route is used after publish.
+
+After publish: spot-check OG URL `/og/en/works/{slug}/` and share preview (Facebook / Telegram debugger).
+
 ## Content cadence
 
-- Ship 1–2 strong cases / month with unique EN + DE copy, real gallery/before-after, filled SEO title (~60) and description (120–160), OG/cover.
+- Ship 1–2 strong cases / month with unique EN + DE copy, real gallery/before-after, filled SEO title (~60) and description (120–160), OG/cover (Generate or Custom).
 - Use Admin → Tags for category/type vocabulary; assign on each case (not free text).
 - After publish: spot-check OG URL `/og/en/works/{slug}/` and share preview.
 

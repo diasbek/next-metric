@@ -555,6 +555,25 @@ export type AdminMessages = {
       heroImage: string;
     };
   };
+  og: {
+    modeCustom: string;
+    modeGenerate: string;
+    modeAuto: string;
+    sourceCustom: string;
+    sourceGenerated: string;
+    sourceAuto: string;
+    generate: string;
+    regenerate: string;
+    generating: string;
+    previewLoading: string;
+    previewError: string;
+    generateHint: string;
+    autoHint: string;
+    autoDraftHint: string;
+    dimensionsHint: string;
+    clearToAuto: string;
+    openDynamic: string;
+  };
   auth: {
     loginTitle: string;
     submit: string;
