@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { AdminSiteScaleFrame } from "@/components/admin/preview/AdminSiteScaleFrame";
 import type { MetricHomeSectionId } from "@/components/admin/metric-home/helpers";
 import type { ProjectOption } from "@/components/admin/metric-home/MetricHomeSectionEditors";
@@ -9,6 +9,7 @@ import type { FaqDraft } from "@/components/admin/list-cms/types";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { adminBtn } from "@/components/admin/ui/styles";
 import { ProjectBriefPreviewProvider } from "@/components/molecules/ProjectBriefProvider";
+import { Header } from "@/components/organisms/Header";
 import {
   MetricCaseStudiesSection,
   MetricCategoriesSection,
@@ -17,9 +18,11 @@ import {
   MetricWorkflowSection,
 } from "@/components/organisms/MetricHomeSections";
 import { MetricFaqSection } from "@/components/organisms/MetricFaqSection";
+import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { getMetricHome, type MetricHomeContent } from "@/data/metric-home";
 import type { FAQItem } from "@/data/faq";
 import { useAdminT } from "@/i18n/admin";
+import { getContent } from "@/i18n/get-content";
 import { applyProjectFieldsToCaseItems, mergeMetricHome } from "@/lib/cms/metric-home";
 import { deepFallbackEmpty } from "@/lib/cms/locale-fallback";
 
@@ -64,63 +67,6 @@ function faqItemsFor(faq: FaqDraft[], locale: AdminLocale): FAQItem[] {
     .filter((item) => item.question.trim() || item.answer.trim());
 }
 
-function NavFooterPreview({ home }: { home: MetricHomeContent }) {
-  const t = useAdminT();
-
-  return (
-    <div style={{ background: "#fff", padding: "28px 32px", display: "grid", gap: 28 }}>
-      <div style={{ display: "grid", gap: 10 }}>
-        <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-          {t.pages.home.previewNavLabel}
-        </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {home.nav.map((item) => (
-            <span
-              key={item.href}
-              className="metric-pill"
-              style={{ fontSize: 16, padding: "10px 16px" }}
-            >
-              {item.label}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gap: 10 }}>
-        <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-          {t.pages.home.previewFooterLabel}
-        </p>
-        <div style={{ display: "grid", gap: 12, color: "#090909" }}>
-          <strong className="font-display" style={{ fontSize: 28 }}>
-            {home.footer.startCta}
-          </strong>
-          <p style={{ margin: 0, fontSize: 16, color: "rgba(9,9,9,0.62)" }}>
-            {home.footer.cities.join(" · ")}
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", fontSize: 15 }}>
-            {home.footer.social.map((item) => (
-              <span key={item.key}>{item.label}</span>
-            ))}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              flexWrap: "wrap",
-              fontSize: 14,
-              color: "rgba(9,9,9,0.5)",
-            }}
-          >
-            {home.footer.links.map((link) => (
-              <span key={link.href}>{link.label}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function HomeSitePreview({
   payload,
   fallbackPayload = null,
@@ -133,6 +79,7 @@ export function HomeSitePreview({
   const t = useAdminT();
   const [device, setDevice] = useState<Device>("desktop");
   const [scope, setScope] = useState<Scope>("section");
+  const siteContent = useMemo(() => getContent(locale), [locale]);
 
   const home = useMemo(() => {
     let merged = mergeMetricHome(
@@ -187,6 +134,7 @@ export function HomeSitePreview({
   const viewportWidth = device === "desktop" ? 380 : 280;
   const publicPath = locale === "en" ? "/" : `/${locale}/`;
   const target = previewSectionFor(section);
+  const showFullPage = scope === "page" || section === "advanced";
 
   function renderSection(id: MetricHomeSectionId) {
     switch (id) {
@@ -209,16 +157,44 @@ export function HomeSitePreview({
     }
   }
 
+  const chrome = (
+    <>
+      <Header
+        locale={locale}
+        site={siteContent.site}
+        ui={siteContent.ui}
+        variant="hero"
+        home={home}
+      />
+      <div id="site-content">
+        <main id="main-content">
+          {SECTION_ORDER.map((id) => (
+            <Fragment key={id}>{renderSection(id)}</Fragment>
+          ))}
+        </main>
+      </div>
+      <SiteFooter locale={locale} content={siteContent} home={home} />
+    </>
+  );
+
   const body =
     section === "nav-footer" ? (
-      <NavFooterPreview home={home} />
-    ) : scope === "page" || section === "advanced" ? (
       <>
-        {SECTION_ORDER.map((id) => (
-          <div key={id}>{renderSection(id)}</div>
-        ))}
-        <NavFooterPreview home={home} />
+        <Header
+          locale={locale}
+          site={siteContent.site}
+          ui={siteContent.ui}
+          variant="hero"
+          home={home}
+        />
+        <div
+          aria-hidden
+          style={{ minHeight: 120, background: "#f5f5f5" }}
+        />
+        <SiteFooter locale={locale} content={siteContent} home={home} />
       </>
+    ) : showFullPage ? (
+      chrome
     ) : (
       renderSection(target)
     );
@@ -310,14 +286,20 @@ export function HomeSitePreview({
 
       <div style={{ maxHeight: 640, overflow: "auto" }}>
         <AdminSiteScaleFrame
+          key={`${device}-${showFullPage ? "page" : "section"}-${section}`}
           designWidth={designWidth}
           viewportWidth={viewportWidth}
           className={[
             "admin-site-preview--home",
+            showFullPage || section === "nav-footer"
+              ? "admin-site-preview--home-full"
+              : "",
             device === "desktop"
               ? "admin-site-preview--home-desktop"
               : "admin-site-preview--home-mobile",
-          ].join(" ")}
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
           <ProjectBriefPreviewProvider>{body}</ProjectBriefPreviewProvider>
         </AdminSiteScaleFrame>

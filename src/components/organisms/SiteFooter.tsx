@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { PageContainer } from "@/components/atoms/PageContainer";

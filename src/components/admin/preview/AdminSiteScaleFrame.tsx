@@ -26,22 +26,28 @@ export function AdminSiteScaleFrame({
   children,
 }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const scalerRef = useRef<HTMLDivElement>(null);
   const [fitWidth, setFitWidth] = useState(viewportWidth);
+  const [naturalHeight, setNaturalHeight] = useState(0);
 
   useLayoutEffect(() => {
-    const el = canvasRef.current;
-    if (!el) return;
+    const canvas = canvasRef.current;
+    const scaler = scalerRef.current;
+    if (!canvas || !scaler) return;
 
     const measure = () => {
-      const available = el.clientWidth || viewportWidth;
+      const available = canvas.clientWidth || viewportWidth;
       setFitWidth(Math.max(1, Math.min(viewportWidth, available)));
+      // scrollHeight before transform — transform does not affect layout size.
+      setNaturalHeight(scaler.scrollHeight);
     };
 
     measure();
     const ro = new ResizeObserver(measure);
-    ro.observe(el);
+    ro.observe(canvas);
+    ro.observe(scaler);
     return () => ro.disconnect();
-  }, [viewportWidth]);
+  }, [viewportWidth, designWidth]);
 
   const scale = fitWidth / designWidth;
   // Padding lives on the outer chrome so it does not steal width from the
@@ -54,11 +60,13 @@ export function AdminSiteScaleFrame({
   const canvasStyle: CSSProperties = {
     width: viewportWidth,
     maxWidth: "100%",
+    height: naturalHeight > 0 ? naturalHeight * scale : undefined,
     overflow: "hidden",
   };
   const scalerStyle: CSSProperties = {
     width: designWidth,
-    zoom: scale,
+    transform: `scale(${scale})`,
+    transformOrigin: "top left",
   };
 
   return (
@@ -70,7 +78,11 @@ export function AdminSiteScaleFrame({
           className="admin-site-preview__canvas"
           style={canvasStyle}
         >
-          <div className="admin-site-preview__scaler" style={scalerStyle}>
+          <div
+            ref={scalerRef}
+            className="admin-site-preview__scaler"
+            style={scalerStyle}
+          >
             {children}
           </div>
         </div>

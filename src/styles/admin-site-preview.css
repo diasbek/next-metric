@@ -31,7 +31,6 @@
 .admin-site-preview__canvas {
   max-width: 100%;
   overflow: hidden;
-  line-height: 0;
 }
 
 .admin-site-preview__scaler {
@@ -161,8 +160,8 @@
 }
 
 /* —— Home page sections ——
-   The admin slot is always < 1024px, so the public desktop media queries never
-   fire. Desktop mode re-applies the ≥1024px layout at the scaled design width. */
+   Media queries use the admin browser viewport, not the scaled phone/desktop
+   canvas. Both modes must force layout + gutters for the design width. */
 
 .admin-site-preview--home {
   background: #fff;
@@ -173,11 +172,92 @@
   pointer-events: none;
 }
 
+/* Sticky chrome sticks to the admin window, not the scaled canvas — pin it. */
+.admin-site-preview--home .site-header,
+.admin-site-preview--home .site-header.sticky {
+  position: relative !important;
+  top: auto !important;
+}
+
+.admin-site-preview--home .metric-services__pin {
+  position: static !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.admin-site-preview--home-desktop .metric-services__pin {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+}
+
+.admin-site-preview--home-full .mobile-menu-panel {
+  display: none !important;
+}
+
+.admin-site-preview--home-desktop .site-header__nav {
+  display: flex !important;
+}
+
+.admin-site-preview--home-desktop .site-header__menu-btn {
+  display: none !important;
+}
+
+.admin-site-preview--home-desktop .site-header__cta {
+  display: inline-flex !important;
+}
+
+.admin-site-preview--home-mobile .site-header__nav {
+  display: none !important;
+}
+
+.admin-site-preview--home-mobile .site-header__menu-btn {
+  display: inline-flex !important;
+}
+
+.admin-site-preview--home-mobile .site-header__cta {
+  display: none !important;
+}
+
+/* Phone design width (~390): keep gutters at the public mobile token, not
+   the admin window’s `100vw`-based --page-padding (often ~60px). */
+.admin-site-preview--home-mobile {
+  --page-padding: 20px;
+}
+
+.admin-site-preview--home-desktop {
+  --page-padding: 40px;
+}
+
+/* Section-only: no site header above — kill the public “pull under sticky nav”
+   margin so the hero top (copy / blobs) is not clipped by the frame. */
+.admin-site-preview--home:not(.admin-site-preview--home-full) .metric-hero {
+  margin-top: 0 !important;
+  padding-top: 24px !important;
+}
+
+/* Full page: keep hero tucked under the in-preview header, but don’t rely on
+   100svh / 100vw (those read the admin window, not the phone canvas). */
+.admin-site-preview--home-full .metric-hero {
+  margin-top: calc(-1 * var(--header-height)) !important;
+  padding-top: var(--header-height) !important;
+}
+
+.admin-site-preview--home .metric-hero-blob {
+  width: min(70%, 820px) !important;
+  height: min(70%, 820px) !important;
+}
+
 .admin-site-preview--home-desktop .metric-hero {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
-  padding-block: 48px !important;
+  padding-bottom: 48px !important;
+}
+
+.admin-site-preview--home-desktop:not(.admin-site-preview--home-full) .metric-hero {
+  padding-top: 48px !important;
 }
 
 .admin-site-preview--home-desktop .metric-hero__shell {
@@ -329,6 +409,295 @@
 .admin-site-preview--home-desktop .metric-faq__grid {
   grid-template-columns: 0.85fr 1.15fr !important;
   gap: 64px !important;
+  align-items: start !important;
+}
+
+/* Home · mobile — undo ≥1024px public rules that fire on a wide admin window. */
+
+.admin-site-preview--home-mobile .metric-hero {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-bottom: 40px !important;
+}
+
+.admin-site-preview--home-mobile:not(.admin-site-preview--home-full) .metric-hero {
+  padding-top: 24px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__shell {
+  gap: 59px !important;
+  padding-top: 19px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__main {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: 80px !important;
+  align-items: stretch !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__visual {
+  width: calc(100% + 2 * var(--page-padding)) !important;
+  margin-inline: calc(-1 * var(--page-padding)) !important;
+  order: -1 !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  padding-inline: max(16px, var(--page-padding)) !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__cluster {
+  width: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__copy {
+  max-width: none !important;
+  width: 100% !important;
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  order: 0 !important;
+  gap: 24px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__title {
+  font-size: 40px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__subtitle {
+  max-width: none !important;
+  font-size: 16px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero .metric-cta--lg {
+  min-height: 48px !important;
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 48px);
+  width: fit-content !important;
+  --cta-pad-x: 24px;
+  font-size: 18px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__trust {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__trust-card {
+  min-height: 168px !important;
+  border-radius: 24px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__trust-card:first-child,
+.admin-site-preview--home-mobile .metric-hero__trust-card:last-child {
+  grid-column: 1 / -1 !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__trust-inner {
+  padding: 16px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__trust-kicker,
+.admin-site-preview--home-mobile .metric-hero__trust-copy {
+  font-size: 14px !important;
+}
+
+.admin-site-preview--home-mobile .metric-hero__trust-value,
+.admin-site-preview--home-mobile .metric-hero__trust-icon {
+  --hero-trust-mark: 40px;
+  font-size: 40px !important;
+}
+
+.admin-site-preview--home-mobile .metric-categories__title-line--with-icon {
+  white-space: normal !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-studies__header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 12px !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-studies__subtitle {
+  justify-self: start !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-areas:
+    "media"
+    "body" !important;
+  align-items: stretch !important;
+  border-radius: var(--radius-xl) !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__body {
+  gap: 20px !important;
+  padding: 20px !important;
+  min-height: 0 !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__media {
+  width: calc(100% - 32px) !important;
+  max-width: none !important;
+  margin: 16px 16px 0 !important;
+  aspect-ratio: 2800 / 2191 !important;
+  border-radius: 20px !important;
+  align-self: stretch !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__quote {
+  font-size: 28px !important;
+  line-height: 0.95 !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__author {
+  margin-top: 16px !important;
+  font-size: 18px !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__role {
+  margin-top: 8px !important;
+  font-size: 14px !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__tags .metric-pill {
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+}
+
+.admin-site-preview--home-mobile .metric-case-card__cta.metric-cta {
+  --cta-height: 44px;
+  --cta-pad-x: 20px;
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 44px);
+  min-height: 44px !important;
+  font-size: 16px !important;
+  padding: 0 calc(20px + var(--cta-skew-overhang)) !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__layout {
+  display: contents !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__pin {
+  position: static !important;
+  height: auto !important;
+  max-height: none !important;
+  display: contents !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__title {
+  order: 1 !important;
+  font-size: 40px !important;
+  max-width: none !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__title-line--end {
+  white-space: normal !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__subtitle {
+  order: 2 !important;
+  max-width: min(100%, 32rem) !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__list {
+  order: 3 !important;
+  min-height: 0 !important;
+  gap: 16px !important;
+}
+
+.admin-site-preview--home-mobile .metric-services__cta {
+  order: 4 !important;
+  margin-top: 0 !important;
+  position: static !important;
+}
+
+.admin-site-preview--home-mobile .metric-services-card {
+  display: block !important;
+  width: calc(100% + 2 * var(--page-padding)) !important;
+  margin-inline: calc(-1 * var(--page-padding)) !important;
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+  padding: 12px var(--page-padding) 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background: transparent !important;
+}
+
+.admin-site-preview--home-mobile .metric-services-card__head {
+  position: relative !important;
+  z-index: 2 !important;
+  flex-shrink: 0 !important;
+  gap: 8px !important;
+}
+
+.admin-site-preview--home-mobile .metric-services-card__num {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 20px !important;
+}
+
+.admin-site-preview--home-mobile .metric-services-card__label.metric-cta {
+  min-height: 44px !important;
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 44px);
+  --cta-pad-x: 14px;
+  font-size: 16px !important;
+}
+
+.admin-site-preview--home-mobile .metric-services-card__media {
+  position: absolute !important;
+  inset: unset !important;
+  left: auto !important;
+  right: 0 !important;
+  top: 64px !important;
+  width: 58% !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+.admin-site-preview--home-mobile .metric-workflow__header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  column-gap: 0 !important;
+  align-items: start !important;
+  gap: 16px !important;
+}
+
+.admin-site-preview--home-mobile .metric-workflow__subtitle {
+  justify-self: start !important;
+  text-align: left !important;
+}
+
+.admin-site-preview--home-mobile .metric-workflow__grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 20px !important;
+}
+
+.admin-site-preview--home-mobile .metric-workflow-card--offset {
+  margin-top: 0 !important;
+}
+
+.admin-site-preview--home-mobile .metric-workflow-card--media-bottom {
+  flex-direction: column-reverse !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+  padding-top: 20px !important;
+}
+
+.admin-site-preview--home-mobile .metric-faq__grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 40px !important;
   align-items: start !important;
 }
 

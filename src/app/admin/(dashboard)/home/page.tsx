@@ -51,6 +51,7 @@ export default async function AdminHomePage({
   const section = params.section ?? "hero";
   const supabase = createSupabaseAdminClient();
 
+  // Always load FAQ — full-page site preview needs items on every section.
   const [{ data: home }, { data: translations }, { data: projectRows }, faqRes] =
     await Promise.all([
       supabase.from("metric_home").select("status").eq("id", 1).maybeSingle(),
@@ -59,12 +60,10 @@ export default async function AdminHomePage({
         .from("metric_projects")
         .select(`id, slug, status, cover_image, ${EMBED.projectTranslations}`)
         .order("sort_order"),
-      section === "faq"
-        ? supabase
-            .from("metric_faq_items")
-            .select(`*, ${EMBED.faqTranslations}`)
-            .order("sort_order")
-        : Promise.resolve({ data: null }),
+      supabase
+        .from("metric_faq_items")
+        .select(`*, ${EMBED.faqTranslations}`)
+        .order("sort_order"),
     ]);
 
   const byLocale = Object.fromEntries(
