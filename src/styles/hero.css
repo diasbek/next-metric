@@ -466,14 +466,11 @@
     gap: 80px;
   }
 
-  .metric-hero__visual,
-  .metric-hero__copy {
+  /* Only the artwork goes full-bleed; copy keeps the shell gutter so the
+     headline stays inside the horizontal safe area. */
+  .metric-hero__visual {
     width: calc(100% + 2 * var(--page-padding));
     margin-inline: calc(-1 * var(--page-padding));
-    padding-inline: 16px;
-  }
-
-  .metric-hero__visual {
     order: -1;
     justify-content: stretch;
     align-items: stretch;
