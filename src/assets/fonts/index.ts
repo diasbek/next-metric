@@ -27,7 +27,6 @@ export const degular = localFont({
   variable: "--font-degular",
   display: "swap",
   fallback: ["system-ui", "sans-serif"],
-  // Only Regular is needed before first paint; other weights swap in.
   preload: true,
 });
 
@@ -61,6 +60,7 @@ export const degularDisplay = localFont({
   // Metric-matched fallback + faux-bold of Regular were colliding
   // with Display’s tight sidebearings on large headlines.
   adjustFontFallback: false,
-  // Avoid preloading 4 Display files on every route (mobile LCP).
-  preload: false,
+  // Headlines are above the fold; without preload they paint in system-ui
+  // first and every heading reflows once Display swaps in.
+  preload: true,
 });
