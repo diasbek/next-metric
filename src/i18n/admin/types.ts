@@ -422,6 +422,18 @@ export type AdminMessages = {
       onHomeHint: string;
       onHomeEditLink: string;
       onHomeEmpty: string;
+      archived: string;
+      publishAction: string;
+      unpublishAction: string;
+      archiveAction: string;
+      toDraftAction: string;
+      confirmPublishTitle: string;
+      confirmPublishBody: string;
+      confirmArchiveTitle: string;
+      confirmArchiveBody: string;
+      confirmDeleteTitle: string;
+      confirmDeleteBody: string;
+      deletedToast: string;
     };
     tags: {
       title: string;

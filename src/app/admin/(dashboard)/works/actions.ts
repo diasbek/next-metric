@@ -98,6 +98,9 @@ export async function saveProjectAction(formData: FormData) {
     if (!slug) return adminFail("Slug is required to publish");
     if (!enTitle) return adminFail("English title is required to publish");
   }
+  if (status !== "draft" && status !== "published" && status !== "archived") {
+    return adminFail("Invalid status");
+  }
 
   const fromLibrary = String(formData.get("cover_from_library") ?? "").trim();
   let coverImage = String(formData.get("cover_image") ?? "").trim();
@@ -313,6 +316,63 @@ export async function deleteProjectAction(formData: FormData) {
   await supabase.from("metric_projects").delete().eq("id", id);
   revalidateCms(["cms", "projects"]);
   return adminRedirect("/admin/works/");
+}
+
+/** List / quick status changes: draft ↔ published ↔ archived. */
+export async function setProjectStatusAction(formData: FormData) {
+  await requirePermission("content");
+  const supabase = createSupabaseAdminClient();
+  const id = String(formData.get("id") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+
+  if (!id) return adminFail("Missing project id");
+  if (status !== "draft" && status !== "published" && status !== "archived") {
+    return adminFail("Invalid status");
+  }
+
+  if (status === "published") {
+    const { data, error } = await supabase
+      .from("metric_projects")
+      .select(
+        `slug, project_translations:metric_project_translations(locale, title)`,
+      )
+      .eq("id", id)
+      .maybeSingle();
+    if (error || !data) return adminFail(error?.message ?? "Project not found");
+    if (!String(data.slug ?? "").trim()) {
+      return adminFail("Slug is required to publish — open the case and set one");
+    }
+    const translations = Array.isArray(data.project_translations)
+      ? data.project_translations
+      : [];
+    const en = translations.find(
+      (row: { locale?: string }) => row.locale === "en",
+    ) as { title?: string } | undefined;
+    if (!String(en?.title ?? "").trim()) {
+      return adminFail(
+        "English title is required to publish — open the case and fill EN",
+      );
+    }
+  }
+
+  const { error } = await supabase
+    .from("metric_projects")
+    .update({
+      status,
+      published_at: status === "published" ? new Date().toISOString() : null,
+    })
+    .eq("id", id);
+
+  if (error) return adminFail(error.message);
+
+  revalidateCms(["cms", "projects"]);
+  return adminOk(
+    status === "published"
+      ? "Published"
+      : status === "archived"
+        ? "Archived"
+        : "Moved to draft",
+  );
 }
 
 export async function addProjectBlockAction(formData: FormData) {

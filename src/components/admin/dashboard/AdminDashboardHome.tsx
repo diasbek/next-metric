@@ -202,10 +202,19 @@ export function AdminDashboardHome({
                   <span
                     style={{
                       fontSize: 11,
-                      color: item.status === "published" ? "#8c8" : "#a86",
+                      color:
+                        item.status === "published"
+                          ? "#8c8"
+                          : item.status === "archived"
+                            ? "#888"
+                            : "#a86",
                     }}
                   >
-                    {item.status === "published" ? t.common.published : t.common.draft}
+                    {item.status === "published"
+                      ? t.common.published
+                      : item.status === "archived"
+                        ? t.pages.works.archived
+                        : t.common.draft}
                   </span>
                 </span>
               </Link>

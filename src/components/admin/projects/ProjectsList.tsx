@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { HardNavForm } from "@/components/admin/HardNavForm";
+import { HardNavForm, runAdminMutation } from "@/components/admin/HardNavForm";
 import {
   ReorderStatus,
   SortableCard,
@@ -11,11 +11,14 @@ import {
   usePersistReorder,
 } from "@/components/admin/dnd";
 import { CASE_CARD_MEDIA_ASPECT_CSS } from "@/components/admin/image-field/presets";
-import { useMemo, useState, type CSSProperties } from "react";
+import { AdminConfirmModal } from "@/components/admin/ui/AdminConfirmModal";
+import { useCallback, useMemo, useState, useTransition, type CSSProperties, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   createProjectAction,
+  deleteProjectAction,
   reorderProjectsAction,
+  setProjectStatusAction,
 } from "@/app/admin/(dashboard)/works/actions";
 import { adminBtn, adminBtnPrimary } from "@/components/admin/ui/styles";
 import { AdminPageHeader } from "@/components/admin/ui/AdminPageHeader";
@@ -34,19 +37,38 @@ export type ProjectListItem = {
 };
 
 type Props = { projects: ProjectListItem[]; embedded?: boolean };
-type StatusFilter = "all" | "published" | "draft" | "home";
+type StatusFilter = "all" | "published" | "draft" | "archived" | "home";
+type ConfirmKind = "publish" | "archive" | "delete";
 
 function parseWorksStatus(raw: string | null): StatusFilter {
-  if (raw === "published" || raw === "draft" || raw === "all" || raw === "home") {
+  if (
+    raw === "published" ||
+    raw === "draft" ||
+    raw === "archived" ||
+    raw === "all" ||
+    raw === "home"
+  ) {
     return raw;
   }
   return "all";
 }
 
-function ProjectCard({ project }: { project: ProjectListItem }) {
+function statusColor(status: string): string {
+  if (status === "published") return "#8c8";
+  if (status === "archived") return "#888";
+  return "#a86";
+}
+
+function ProjectCard({
+  project,
+  statusLabel,
+  actions,
+}: {
+  project: ProjectListItem;
+  statusLabel: string;
+  actions?: ReactNode;
+}) {
   const t = useAdminT();
-  const statusLabel =
-    project.status === "published" ? t.common.published : t.common.draft;
 
   return (
     <div
@@ -114,12 +136,11 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
           </span>
         ) : null}
       </div>
-      <div style={{ padding: 14, display: "grid", gap: 6, flex: 1 }}>
+      <div style={{ padding: 14, display: "grid", gap: 8, flex: 1 }}>
         <strong style={{ fontSize: 15 }}>{project.title || project.slug}</strong>
         <span style={{ fontSize: 12, color: "#777" }}>{project.slug}</span>
         <div
           style={{
-            marginTop: "auto",
             display: "flex",
             flexWrap: "wrap",
             gap: 8,
@@ -130,7 +151,7 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
             style={{
               fontSize: 11,
               fontWeight: 600,
-              color: project.status === "published" ? "#8c8" : "#a86",
+              color: statusColor(project.status),
             }}
           >
             {statusLabel}
@@ -149,10 +170,31 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
             </Link>
           ) : null}
         </div>
+        {actions ? (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            style={{
+              marginTop: "auto",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 6,
+              paddingTop: 4,
+            }}
+          >
+            {actions}
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
+
+const actionBtn: CSSProperties = {
+  ...adminBtn,
+  padding: "6px 10px",
+  fontSize: 11,
+};
 
 export function ProjectsList({ projects, embedded = false }: Props) {
   const t = useAdminT();
@@ -175,6 +217,11 @@ export function ProjectsList({ projects, embedded = false }: Props) {
     setOrdered,
     reorderProjectsAction,
   );
+  const [confirm, setConfirm] = useState<{
+    kind: ConfirmKind;
+    project: ProjectListItem;
+  } | null>(null);
+  const [busy, startBusy] = useTransition();
 
   const setFilter = (next: StatusFilter) => {
     setFilterState(next);
@@ -207,6 +254,125 @@ export function ProjectsList({ projects, embedded = false }: Props) {
   const openProject = (id: string) => {
     router.push(`/admin/works/${id}/`);
   };
+
+  const statusLabel = useCallback(
+    (status: string) => {
+      if (status === "published") return t.common.published;
+      if (status === "archived") return t.pages.works.archived;
+      return t.common.draft;
+    },
+    [t],
+  );
+
+  const runStatus = (projectId: string, status: "draft" | "published" | "archived") => {
+    const fd = new FormData();
+    fd.set("id", projectId);
+    fd.set("status", status);
+    startBusy(async () => {
+      const ok = await runAdminMutation(setProjectStatusAction, fd, {
+        stayOnPage: true,
+        fallbackError: t.common.actionFailed,
+      });
+      if (ok) {
+        setConfirm(null);
+        router.refresh();
+      }
+    });
+  };
+
+  const runDelete = (projectId: string) => {
+    const fd = new FormData();
+    fd.set("id", projectId);
+    startBusy(async () => {
+      const ok = await runAdminMutation(deleteProjectAction, fd, {
+        successMessage: t.pages.works.deletedToast,
+        fallbackError: t.common.actionFailed,
+      });
+      if (ok) {
+        setConfirm(null);
+        router.refresh();
+      }
+    });
+  };
+
+  const confirmCopy = confirm
+    ? {
+        publish: {
+          title: t.pages.works.confirmPublishTitle,
+          body: t.pages.works.confirmPublishBody.replace(
+            "{title}",
+            confirm.project.title || confirm.project.slug,
+          ),
+          label: t.pages.works.publishAction,
+          tone: "accent" as const,
+        },
+        archive: {
+          title: t.pages.works.confirmArchiveTitle,
+          body: t.pages.works.confirmArchiveBody.replace(
+            "{title}",
+            confirm.project.title || confirm.project.slug,
+          ),
+          label: t.pages.works.archiveAction,
+          tone: "default" as const,
+        },
+        delete: {
+          title: t.pages.works.confirmDeleteTitle,
+          body: t.pages.works.confirmDeleteBody.replace(
+            "{title}",
+            confirm.project.title || confirm.project.slug,
+          ),
+          label: t.common.delete,
+          tone: "danger" as const,
+        },
+      }[confirm.kind]
+    : null;
+
+  const cardActions = (project: ProjectListItem) => (
+    <>
+      {project.status !== "published" ? (
+        <button
+          type="button"
+          style={{ ...actionBtn, borderColor: "#2600ff", color: "#bcb" }}
+          onClick={() => setConfirm({ kind: "publish", project })}
+        >
+          {t.pages.works.publishAction}
+        </button>
+      ) : null}
+      {project.status === "published" ? (
+        <button
+          type="button"
+          style={actionBtn}
+          onClick={() => runStatus(project.id, "draft")}
+        >
+          {t.pages.works.unpublishAction}
+        </button>
+      ) : null}
+      {project.status !== "archived" ? (
+        <button
+          type="button"
+          style={actionBtn}
+          onClick={() => setConfirm({ kind: "archive", project })}
+        >
+          {t.pages.works.archiveAction}
+        </button>
+      ) : (
+        <button
+          type="button"
+          style={actionBtn}
+          onClick={() => runStatus(project.id, "draft")}
+        >
+          {t.pages.works.toDraftAction}
+        </button>
+      )}
+      <button
+        type="button"
+        style={{ ...actionBtn, color: "#f66", borderColor: "#633" }}
+        onClick={() => setConfirm({ kind: "delete", project })}
+      >
+        {t.common.delete}
+      </button>
+    </>
+  );
 
   const hint: CSSProperties = { color: "#888", margin: "8px 0 0" };
 
@@ -262,7 +428,11 @@ export function ProjectsList({ projects, embedded = false }: Props) {
             ["all", t.common.all],
             ["published", t.common.published],
             ["draft", t.common.draft],
-            ["home", `${t.pages.works.onHomeFilter}${homeCount ? ` (${homeCount})` : ""}`],
+            ["archived", t.pages.works.archived],
+            [
+              "home",
+              `${t.pages.works.onHomeFilter}${homeCount ? ` (${homeCount})` : ""}`,
+            ],
           ] as const
         ).map(([item, label]) => (
           <button
@@ -315,18 +485,34 @@ export function ProjectsList({ projects, embedded = false }: Props) {
         }}
         renderItem={(project) =>
           filtering ? (
-            <a
-              href={`/admin/works/${project.id}/`}
-              style={{ display: "block", height: "100%", textDecoration: "none" }}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => openProject(project.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openProject(project.id);
+                }
+              }}
+              style={{ display: "block", height: "100%", cursor: "pointer" }}
             >
-              <ProjectCard project={project} />
-            </a>
+              <ProjectCard
+                project={project}
+                statusLabel={statusLabel(project.status)}
+                actions={cardActions(project)}
+              />
+            </div>
           ) : (
             <SortableCard
               id={project.id}
               onActivate={() => openProject(project.id)}
             >
-              <ProjectCard project={project} />
+              <ProjectCard
+                project={project}
+                statusLabel={statusLabel(project.status)}
+                actions={cardActions(project)}
+              />
             </SortableCard>
           )
         }
@@ -340,6 +526,24 @@ export function ProjectsList({ projects, embedded = false }: Props) {
               : t.common.emptyList}
         </p>
       ) : null}
+
+      <AdminConfirmModal
+        open={Boolean(confirm && confirmCopy)}
+        title={confirmCopy?.title ?? ""}
+        body={confirmCopy?.body ?? ""}
+        confirmLabel={confirmCopy?.label ?? ""}
+        tone={confirmCopy?.tone ?? "default"}
+        busy={busy}
+        onCancel={() => {
+          if (!busy) setConfirm(null);
+        }}
+        onConfirm={() => {
+          if (!confirm) return;
+          if (confirm.kind === "publish") runStatus(confirm.project.id, "published");
+          else if (confirm.kind === "archive") runStatus(confirm.project.id, "archived");
+          else runDelete(confirm.project.id);
+        }}
+      />
     </div>
   );
 }

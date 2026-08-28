@@ -456,8 +456,8 @@ export const enAdmin: AdminMessages = {
     works: {
       title: "Works",
       description:
-        "The /works/ page and case studies. Drag by the handle to reorder. Click to edit. Blue badge = shown on the homepage.",
-      newItem: "New project",
+        "Draft → Publish → Archive. Drag by the handle to reorder. Click a card to edit. Blue badge = on the homepage.",
+      newItem: "New draft",
       searchPlaceholder: "Search…",
       filterReorderOff: " (reorder disabled while filtering/searching)",
       noCover: "No cover",
@@ -468,6 +468,21 @@ export const enAdmin: AdminMessages = {
       onHomeHint: "These slugs are selected in Home → Case studies.",
       onHomeEditLink: "Edit homepage lineup →",
       onHomeEmpty: "No cases are linked on the homepage yet.",
+      archived: "Archived",
+      publishAction: "Publish",
+      unpublishAction: "Unpublish",
+      archiveAction: "Archive",
+      toDraftAction: "To draft",
+      confirmPublishTitle: "Publish this case?",
+      confirmPublishBody:
+        "“{title}” will appear on /works/ and can be linked on the homepage.",
+      confirmArchiveTitle: "Archive this case?",
+      confirmArchiveBody:
+        "“{title}” will leave the public site. You can restore it to draft later.",
+      confirmDeleteTitle: "Delete this case?",
+      confirmDeleteBody:
+        "Permanently delete “{title}” and its media? This cannot be undone.",
+      deletedToast: "Case deleted",
     },
     tags: {
       title: "Tags",

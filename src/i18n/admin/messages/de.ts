@@ -460,8 +460,8 @@ export const deAdmin: AdminMessages = {
     works: {
       title: "Works",
       description:
-        "Die /works/-Seite und Cases. Am Griff ziehen zum Sortieren. Klicken zum Bearbeiten. Blauer Badge = auf der Startseite.",
-      newItem: "Neues Projekt",
+        "Entwurf → Veröffentlichen → Archiv. Am Griff ziehen zum Sortieren. Karte klicken zum Bearbeiten. Blauer Badge = auf der Startseite.",
+      newItem: "Neuer Entwurf",
       searchPlaceholder: "Suchen…",
       filterReorderOff: " (Sortieren bei Filter/Suche deaktiviert)",
       noCover: "Kein Cover",
@@ -472,6 +472,21 @@ export const deAdmin: AdminMessages = {
       onHomeHint: "Diese Slugs sind unter Startseite → Case studies ausgewählt.",
       onHomeEditLink: "Startseiten-Auswahl bearbeiten →",
       onHomeEmpty: "Noch keine Cases auf der Startseite verknüpft.",
+      archived: "Archiviert",
+      publishAction: "Veröffentlichen",
+      unpublishAction: "Zurückziehen",
+      archiveAction: "Archivieren",
+      toDraftAction: "Als Entwurf",
+      confirmPublishTitle: "Diesen Case veröffentlichen?",
+      confirmPublishBody:
+        "„{title}“ erscheint auf /works/ und kann auf der Startseite verlinkt werden.",
+      confirmArchiveTitle: "Diesen Case archivieren?",
+      confirmArchiveBody:
+        "„{title}“ verschwindet von der öffentlichen Site. Später wieder als Entwurf möglich.",
+      confirmDeleteTitle: "Diesen Case löschen?",
+      confirmDeleteBody:
+        "„{title}“ und Medien endgültig löschen? Das kann nicht rückgängig gemacht werden.",
+      deletedToast: "Case gelöscht",
     },
     tags: {
       title: "Tags",

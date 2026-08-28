@@ -1,7 +1,7 @@
 "use client";
 
-import { HardNavForm } from "@/components/admin/HardNavForm";
-import { useDeferredValue, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { HardNavForm, runAdminMutation } from "@/components/admin/HardNavForm";
+import { useDeferredValue, useEffect, useMemo, useState, useTransition, type CSSProperties } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ImageField } from "@/components/admin/image-field";
@@ -46,6 +46,7 @@ import {
   adminBtnPrimary,
   adminInput,
 } from "@/components/admin/ui/styles";
+import { AdminConfirmModal } from "@/components/admin/ui/AdminConfirmModal";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { ADMIN_LOCALES } from "@/components/admin/ui/locales";
 import { ADMIN_TOPBAR_HEIGHT } from "@/components/admin/chrome/AdminTopBar";
@@ -162,6 +163,8 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   const [ogMode, setOgMode] = useState<OgMode>(() => inferOgMode(project.og_image));
   const [ogPreviewDataUrl, setOgPreviewDataUrl] = useState<string | null>(null);
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteBusy, startDelete] = useTransition();
   const tr = draft.translations[locale];
 
   useUnsavedChangesGuard(isProjectEditorDirty(draft, project));
@@ -465,6 +468,7 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
               >
                 <option value="draft">{t.common.draft}</option>
                 <option value="published">{t.common.published}</option>
+                <option value="archived">{t.pages.works.archived}</option>
               </select>
             </div>
             <button type="submit" style={{ ...adminBtnPrimary, padding: "10px 18px" }}>
@@ -1037,19 +1041,39 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
           </section>
         </HardNavForm>
 
-        <HardNavForm action={deleteProjectAction}>
-          <input type="hidden" name="id" value={draft.id} />
-          <button
-            type="submit"
-            style={{ ...adminBtn, color: "#f66", borderColor: "#633" }}
-            onClick={(e) => {
-              if (!confirm(t.common.deleteConfirm)) e.preventDefault();
-            }}
-          >
-            {t.common.delete}
-          </button>
-        </HardNavForm>
+        <button
+          type="button"
+          style={{ ...adminBtn, color: "#f66", borderColor: "#633" }}
+          onClick={() => setDeleteOpen(true)}
+        >
+          {t.common.delete}
+        </button>
       </div>
+
+      <AdminConfirmModal
+        open={deleteOpen}
+        title={t.pages.works.confirmDeleteTitle}
+        body={t.pages.works.confirmDeleteBody.replace(
+          "{title}",
+          draft.translations.en?.title || draft.slug,
+        )}
+        confirmLabel={t.common.delete}
+        tone="danger"
+        busy={deleteBusy}
+        onCancel={() => {
+          if (!deleteBusy) setDeleteOpen(false);
+        }}
+        onConfirm={() => {
+          const fd = new FormData();
+          fd.set("id", draft.id);
+          startDelete(async () => {
+            await runAdminMutation(deleteProjectAction, fd, {
+              successMessage: t.pages.works.deletedToast,
+              fallbackError: t.common.actionFailed,
+            });
+          });
+        }}
+      />
 
       <CaseSitePreview
         draft={previewDraft}
