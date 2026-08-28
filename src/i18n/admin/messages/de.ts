@@ -580,14 +580,24 @@ export const deAdmin: AdminMessages = {
       openMediaLibrary: "Mediathek öffnen",
       addMedia: "Bild hinzufügen",
       galleryHint:
-        "Packe mehrere Fotos in die Fläche darunter — das wird die Serie auf der Case-Seite. Zum Sortieren die Vorschaubilder ziehen. Kein Zuschnitt.",
+        "Fotos ablegen oder aus der Bibliothek in dieselbe Warteschlange legen, dann hinzufügen. Zum Sortieren ziehen. Kein Zuschnitt.",
       galleryDropTitle: "Bilderserie hier ablegen",
       galleryDropHint:
         "Mehrere Fotos auf einmal ablegen oder klicken zum Auswählen. JPEG, PNG, WebP · max. 5 MB pro Bild · kein Zuschnitt.",
       galleryAddCount: "{count} Frames hinzufügen",
-      galleryUploading: "Lade {done} / {total} hoch…",
+      galleryUploading: "Füge {done} / {total} hinzu…",
       galleryAdded: "{count} Frames hinzugefügt",
       galleryRemoveQueued: "Aus der Warteschlange entfernen",
+      galleryShowLibrary: "Aus der Bibliothek",
+      galleryHideLibrary: "Bibliothek ausblenden",
+      galleryLibraryHint:
+        "Klicken zum Auswählen oder Abwählen. Ausgewählte Frames kommen in dieselbe Warteschlange wie abgelegte Dateien.",
+      galleryClearQueue: "Warteschlange leeren",
+      galleryQueueFull: "Warteschlange voll (max. {max} Frames).",
+      galleryQueueCapped: "Nur so viele Frames wie in das Limit von {max} passen wurden übernommen.",
+      gallerySkippedLarge: "{count} Datei(en) über {max} MB übersprungen.",
+      gallerySkippedDupes: "{count} bereits in dieser Galerie übersprungen.",
+      galleryAlreadyInBlock: "Bereits in dieser Galerie",
       beforeAfter: "Vorher / Nachher",
       beforeAfterHint:
         "Ein Vergleichspaar für den Slider. Ersetzen aktualisiert diese Seite — ohne Duplikate.",
@@ -610,9 +620,9 @@ export const deAdmin: AdminMessages = {
         "Galerie und Blöcke werden sofort gespeichert, wenn du sie hinzufügst oder sortierst.",
       previewLiveHint: "„Auf der Site öffnen“ zeigt die zuletzt gespeicherte Version.",
       caseYearNotOnSite: "Wird auf der öffentlichen Case-Seite nicht angezeigt",
-      contentBlocks: "Galerie & Blöcke",
+      contentBlocks: "Galerie",
       contentBlocksHint:
-        "Neue Cases starten mit einer Galerie. Bei Bedarf Vorher/Nachher oder YouTube ergänzen und per Drag & Drop sortieren.",
+        "Fotos in die Galerie legen — das ist die Serie für Besucher. Frames zum Sortieren ziehen.",
       addGalleryBlock: "+ Galerie",
       addBeforeAfterBlock: "+ Vorher / Nachher",
       addYoutubeBlock: "+ YouTube",

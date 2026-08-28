@@ -28,7 +28,6 @@ import type {
   TagOption,
 } from "@/components/admin/projects/project-editor-types";
 import {
-  addProjectBlockAction,
   clearProjectOgAction,
   deleteProjectAction,
   deleteProjectBlockAction,
@@ -761,24 +760,6 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
             <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
               {t.pages.project.contentBlocksHint}
             </p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {(
-                [
-                  ["gallery", t.pages.project.addGalleryBlock],
-                  ["before_after", t.pages.project.addBeforeAfterBlock],
-                  ["youtube", t.pages.project.addYoutubeBlock],
-                ] as const
-              ).map(([type, label]) => (
-                <HardNavForm key={type} action={addProjectBlockAction}>
-                  <input type="hidden" name="project_id" value={draft.id} />
-                  <input type="hidden" name="type" value={type} />
-                  <ReturnFields locale={locale} focus="gallery" />
-                  <button type="submit" style={adminBtn}>
-                    {label}
-                  </button>
-                </HardNavForm>
-              ))}
-            </div>
 
             <ReorderStatus pending={pending} saved={saved} />
             <SortableCardGrid
@@ -1245,6 +1226,7 @@ function BlockCard({
             kind="gallery"
             library={library}
             locale={locale}
+            existingUrls={galleryItems.map((item) => item.url)}
             previewTitle={title}
           />
           <ReorderStatus pending={galleryPending} saved={gallerySaved} />

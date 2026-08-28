@@ -9,6 +9,7 @@ import {
   CASE_MEDIA_MAX_UPLOAD_BYTES,
   CASE_MEDIA_WEBP_QUALITY,
   deleteMediaByPublicUrl,
+  getStoragePathFromPublicUrl,
   isFileUpload,
   probeImageDimensions,
   uploadMediaFile,
@@ -544,28 +545,61 @@ export async function addProjectMediaAction(formData: FormData) {
   return adminRedirect(projectEditPath(projectId, formData));
 }
 
-/** One gallery frame. No redirect — the client refreshes after a batch. */
+/** One gallery frame (file upload or library URL). No redirect — client finishes the batch. */
 export async function addProjectGalleryFrameAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();
   const projectId = String(formData.get("project_id"));
   const blockId = String(formData.get("block_id") ?? "").trim() || null;
   const file = formData.get("file");
+  const libraryUrl = String(formData.get("library_url") ?? "").trim();
 
-  if (!isFileUpload(file)) {
+  let url = "";
+  let width: number | null = null;
+  let height: number | null = null;
+
+  if (isFileUpload(file)) {
+    const uploaded = await uploadMediaFile(file, {
+      folder: `projects/${projectId}/gallery`,
+      filenameHint: `gallery-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      maxEdge: CASE_MEDIA_MAX_EDGE_PX,
+      quality: CASE_MEDIA_WEBP_QUALITY,
+      maxUploadBytes: CASE_MEDIA_MAX_UPLOAD_BYTES,
+    });
+    url = uploaded.publicUrl;
+    width = uploaded.width;
+    height = uploaded.height;
+  } else if (libraryUrl) {
+    if (!getStoragePathFromPublicUrl(libraryUrl)) {
+      const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+      const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+      const t = getAdminMessages(await getAdminUiLocale());
+      return adminFail(t.flash.errorMedia);
+    }
+    url = libraryUrl;
+    const probed = await probeImageDimensions(url);
+    width = probed.width;
+    height = probed.height;
+  } else {
     const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
     const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
     const t = getAdminMessages(await getAdminUiLocale());
     return adminFail(t.flash.errorMedia);
   }
 
-  const uploaded = await uploadMediaFile(file, {
-    folder: `projects/${projectId}/gallery`,
-    filenameHint: `gallery-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    maxEdge: CASE_MEDIA_MAX_EDGE_PX,
-    quality: CASE_MEDIA_WEBP_QUALITY,
-    maxUploadBytes: CASE_MEDIA_MAX_UPLOAD_BYTES,
-  });
+  // Skip exact duplicates already in this gallery block.
+  let dupQuery = supabase
+    .from("metric_project_media")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("kind", "gallery")
+    .eq("url", url)
+    .limit(1);
+  dupQuery = blockId
+    ? dupQuery.eq("block_id", blockId)
+    : dupQuery.is("block_id", null);
+  const { data: existing } = await dupQuery.maybeSingle();
+  if (existing) return adminOk("skipped");
 
   let maxQuery = supabase
     .from("metric_project_media")
@@ -581,15 +615,13 @@ export async function addProjectGalleryFrameAction(formData: FormData) {
   const sortOrder = (maxRow?.sort_order ?? -1) + 1;
 
   const dimensions =
-    uploaded.width != null && uploaded.height != null
-      ? { width: uploaded.width, height: uploaded.height }
-      : {};
+    width != null && height != null ? { width, height } : {};
 
   const { error } = await supabase.from("metric_project_media").insert({
     project_id: projectId,
     block_id: blockId,
     kind: "gallery",
-    url: uploaded.publicUrl,
+    url,
     sort_order: sortOrder,
     alt: "",
     ...dimensions,

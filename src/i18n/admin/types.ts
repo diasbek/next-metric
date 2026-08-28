@@ -529,6 +529,15 @@ export type AdminMessages = {
       galleryUploading: string;
       galleryAdded: string;
       galleryRemoveQueued: string;
+      galleryShowLibrary: string;
+      galleryHideLibrary: string;
+      galleryLibraryHint: string;
+      galleryClearQueue: string;
+      galleryQueueFull: string;
+      galleryQueueCapped: string;
+      gallerySkippedLarge: string;
+      gallerySkippedDupes: string;
+      galleryAlreadyInBlock: string;
       beforeAfter: string;
       beforeAfterHint: string;
       beforeAfterEmpty: string;

@@ -578,14 +578,24 @@ export const enAdmin: AdminMessages = {
       openMediaLibrary: "Open media library",
       addMedia: "Add image",
       galleryHint:
-        "Drop a pack of photos into the area below — they become the series on the case page. Drag thumbs to reorder. No cropping.",
+        "Drop photos or pick from the library into one queue, then add the series. Drag thumbs to reorder. No cropping.",
       galleryDropTitle: "Drop a series of images",
       galleryDropHint:
         "Drop several photos at once, or click to choose. JPEG, PNG, WebP · max 5 MB each · no crop.",
       galleryAddCount: "Add {count} frames",
-      galleryUploading: "Uploading {done} / {total}…",
+      galleryUploading: "Adding {done} / {total}…",
       galleryAdded: "Added {count} frames",
       galleryRemoveQueued: "Remove from queue",
+      galleryShowLibrary: "From library",
+      galleryHideLibrary: "Hide library",
+      galleryLibraryHint:
+        "Click to select or deselect. Selected frames join the same queue as dropped files.",
+      galleryClearQueue: "Clear queue",
+      galleryQueueFull: "Queue is full (max {max} frames).",
+      galleryQueueCapped: "Only the first frames that fit the {max} limit were queued.",
+      gallerySkippedLarge: "Skipped {count} file(s) over {max} MB.",
+      gallerySkippedDupes: "Skipped {count} already in this gallery.",
+      galleryAlreadyInBlock: "Already in this gallery",
       beforeAfter: "Before / After",
       beforeAfterHint:
         "One compare pair for the slider. Replacing an image updates that side — no duplicates.",
@@ -607,9 +617,9 @@ export const enAdmin: AdminMessages = {
       previewMediaHint: "Gallery and blocks save immediately when you add or reorder them.",
       previewLiveHint: "“Open on site” shows the last saved version.",
       caseYearNotOnSite: "Not shown on the public case page",
-      contentBlocks: "Gallery & blocks",
+      contentBlocks: "Gallery",
       contentBlocksHint:
-        "New cases start with a gallery. Add before/after or YouTube if needed, then drag to reorder.",
+        "Drop photos into the gallery to build the series visitors see. Drag frames to reorder.",
       addGalleryBlock: "+ Gallery",
       addBeforeAfterBlock: "+ Before / After",
       addYoutubeBlock: "+ YouTube",
