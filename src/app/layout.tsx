@@ -21,7 +21,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  viewportFit: "cover",
+  // No `viewportFit: cover`: the layout gutter is a fixed --page-padding and
+  // does not add env(safe-area-inset-*), so content would sit under the notch.
 };
 
 export async function generateMetadata(): Promise<Metadata> {
