@@ -10,6 +10,7 @@ const staticPaths = [
   "/",
   "/works/",
   "/privacy/",
+  "/imprint/",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

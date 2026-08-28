@@ -5,6 +5,8 @@ import { ogLocale, pagePaths } from "@/i18n/config";
 import { getAllProjectSlugs, getContent, getProjectBySlug, getResolvedContent } from "@/i18n/get-content";
 import { getLocalizedPageMetadata } from "@/i18n/metadata";
 import {
+  getLocalizedAboutPageSchema,
+  getLocalizedContactPageSchema,
   getLocalizedCreativeWorkSchema,
   getLocalizedFaqSchema,
   getLocalizedLocalBusinessSchema,
@@ -196,6 +198,7 @@ export function createAgencyPage(locale: Locale) {
         <>
           <JsonLd
             data={await withPageDateModified(locale, meta, path, ["home", "agency"], [
+              getLocalizedAboutPageSchema(locale),
               getLocalizedFaqSchema(locale),
             ])}
           />
@@ -290,6 +293,7 @@ export function createContactsPage(locale: Locale) {
         <>
           <JsonLd
             data={await withPageDateModified(locale, meta, path, ["home", "contacts"], [
+              getLocalizedContactPageSchema(locale),
               getLocalizedLocalBusinessSchema(locale),
             ])}
           />

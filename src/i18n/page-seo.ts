@@ -3,6 +3,8 @@ import { htmlLang } from "./config";
 import { getContent, getProjectBySlug, getProjectsForLocale } from "./get-content";
 import { localePath } from "./paths";
 import {
+  getAboutPageSchema,
+  getContactPageSchema,
   getCreativeWorkSchema,
   getFaqPageSchema,
   getLocalBusinessSchema,
@@ -103,6 +105,14 @@ export function getLocalizedServicesCatalogSchema(locale: Locale) {
 
 export function getLocalizedLocalBusinessSchema(locale: Locale) {
   return getLocalBusinessSchema(locale);
+}
+
+export function getLocalizedAboutPageSchema(locale: Locale) {
+  return getAboutPageSchema(locale);
+}
+
+export function getLocalizedContactPageSchema(locale: Locale) {
+  return getContactPageSchema(locale);
 }
 
 export function getLocalizedInLanguage(locale: Locale) {

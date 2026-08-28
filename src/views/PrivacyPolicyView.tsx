@@ -173,19 +173,18 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
             "Verantwortlich für die Datenverarbeitung auf dieser Website ist:",
           ],
           list: [
-            "[Vollständiger rechtlicher Firmenname]",
-            "[Eingetragene Geschäftsadresse]",
-            "[Land / Registrierungsjurisdiktion]",
-            "[Handelsregisternummer, falls zutreffend]",
+            "METRIC",
+            ...SITE_CONFIG.address,
+            "Usbekistan",
             `E-Mail: ${contactEmail}`,
+            ...(SITE_CONFIG.phone ? [`Telefon: ${SITE_CONFIG.phone}`] : []),
           ],
         },
         {
           heading: "2. EU-Vertreter (Art. 27 DSGVO)",
           paragraphs: [
-            "Sofern METRIC keine Niederlassung in der EU hat, aber Daten von Personen in der EU verarbeitet, benennen wir einen EU-Vertreter gemäß Art. 27 DSGVO:",
+            "Sofern METRIC keine Niederlassung in der EU hat, aber Daten von Personen in der EU verarbeitet, benennen wir einen EU-Vertreter gemäß Art. 27 DSGVO. Kontaktdaten erhalten Sie auf Anfrage unter der oben genannten E-Mail-Adresse.",
           ],
-          list: ["[Name und Anschrift des EU-Vertreters, falls zutreffend]"],
         },
         {
           heading: "3. Welche Daten wir verarbeiten",
@@ -296,19 +295,18 @@ function buildCopy(locale: Locale, contactEmail: string): PrivacyCopy {
         heading: "1. Data controller",
         paragraphs: ["The controller responsible for processing on this website is:"],
         list: [
-          "[Full legal company name]",
-          "[Registered business address]",
-          "[Country / jurisdiction of registration]",
-          "[Commercial register number, if applicable]",
+          "METRIC",
+          ...SITE_CONFIG.address,
+          "Uzbekistan",
           `Email: ${contactEmail}`,
+          ...(SITE_CONFIG.phone ? [`Phone: ${SITE_CONFIG.phone}`] : []),
         ],
       },
       {
         heading: "2. EU representative (Art. 27 GDPR)",
         paragraphs: [
-          "If METRIC has no establishment in the EU but processes personal data of individuals located in the EU, we appoint an EU representative under Art. 27 GDPR:",
+          "If METRIC has no establishment in the EU but processes personal data of individuals located in the EU, we appoint an EU representative under Art. 27 GDPR. Contact details are available on request at the email address above.",
         ],
-        list: ["[EU representative name and address, if applicable]"],
       },
       {
         heading: "3. What data we process",

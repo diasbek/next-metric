@@ -129,11 +129,15 @@ export function getFaqPageSchema(items: FAQItem[]) {
 export function getProjectListSchema(
   projects: Project[],
   locale: Locale = "en",
-  listName = "Портфолио METRIC",
+  listName?: string,
 ) {
+  const name =
+    listName?.trim() ||
+    (locale === "de" ? "METRIC Projekte" : "METRIC projects");
+
   return {
     "@type": "ItemList",
-    name: listName,
+    name,
     itemListElement: projects.map((project, index) => ({
       "@type": "ListItem",
       position: index + 1,
@@ -210,15 +214,16 @@ export function getServicesCatalogSchema(services: Service[], locale: Locale = "
 }
 
 export function getLocalBusinessSchema(locale: Locale = "en") {
-  const path = localePath(locale, "/");
+  const path = localePath(locale, "/contacts/");
 
   return {
-    "@type": "ProfessionalService",
+    "@type": ["ProfessionalService", "LocalBusiness"],
     "@id": `${absoluteUrl(path)}#localbusiness`,
     name: SITE_CONFIG.name,
     description: SITE_CONFIG.description,
     url: absoluteUrl(path),
     telephone: SITE_CONFIG.phone,
+    email: SITE_CONFIG.email,
     image: absoluteUrl("/og/en/home/"),
     address: {
       "@type": "PostalAddress",
@@ -232,6 +237,35 @@ export function getLocalBusinessSchema(locale: Locale = "en") {
       SITE_CONFIG.social.instagram,
     ],
     parentOrganization: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export function getAboutPageSchema(locale: Locale = "en") {
+  const path = localePath(locale, "/agency/");
+  return {
+    "@type": "AboutPage",
+    "@id": `${absoluteUrl(path)}#about`,
+    url: absoluteUrl(path),
+    name: locale === "de" ? "Über METRIC" : "About METRIC",
+    description: SITE_CONFIG.description,
+    inLanguage: htmlLang[locale],
+    isPartOf: { "@id": WEBSITE_ID },
+    about: { "@id": ORGANIZATION_ID },
+    mainEntity: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export function getContactPageSchema(locale: Locale = "en") {
+  const path = localePath(locale, "/contacts/");
+  return {
+    "@type": "ContactPage",
+    "@id": `${absoluteUrl(path)}#contact`,
+    url: absoluteUrl(path),
+    name: locale === "de" ? "Kontakt" : "Contact",
+    description: SITE_CONFIG.description,
+    inLanguage: htmlLang[locale],
+    isPartOf: { "@id": WEBSITE_ID },
+    mainEntity: { "@id": `${absoluteUrl(path)}#localbusiness` },
   };
 }
 
