@@ -159,6 +159,12 @@
   }
 }
 
+.metric-case__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 /* Full-bleed case gallery: width = container, height from intrinsic image ratio. */
 .metric-case__stack {
   display: flex;
@@ -182,20 +188,12 @@
 /* Skip layout/paint for offscreen frames until near viewport. */
 .metric-case__stack-item--lazy {
   content-visibility: auto;
-  contain-intrinsic-size: 1200px;
+  contain-intrinsic-size: auto 800px;
 }
 
-/* Overlap + trim JPEG block edges that cause hairlines between frames. */
+/* Slight overlap to hide subpixel seams between stacked frames. */
 .metric-case__stack-item + .metric-case__stack-item {
-  margin-top: -2px;
-}
-
-.metric-case__stack-item:not(:last-child) .progressive-case-image__preview img,
-.metric-case__stack-item:not(:last-child) .progressive-case-image__full img,
-.metric-case__stack-item:not(:last-child) .media-image img,
-.metric-case__stack-item:not(:last-child) .metric-case__stack-img {
-  clip-path: inset(0 0 2px 0);
-  margin-bottom: -2px;
+  margin-top: -1px;
 }
 
 .metric-case__stack-item .media-image {
@@ -338,7 +336,7 @@
 
 @media (min-width: 768px) {
   .metric-case__reviews {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
   }
 }
@@ -347,6 +345,28 @@
   border-radius: var(--radius-xl);
   background: var(--surface);
   padding: 28px;
+}
+
+.metric-case__youtube {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: #000;
+}
+
+.metric-case__youtube iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.metric-case__block--ba {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
 }
 
 .metric-case .metric-case-studies__list {

@@ -58,7 +58,7 @@ function Frame({
           width: "100%",
           maxWidth: "100%",
           minWidth: 0,
-          aspectRatio: aspect,
+          ...(aspect ? { aspectRatio: aspect } : { minHeight: 120 }),
           overflow: "hidden",
           background: "#000",
           border: "1px solid #222",
@@ -171,8 +171,22 @@ export function SurfacePreview({
         <p style={{ margin: "0 0 12px", fontSize: 12, color: "#888" }}>
           Case study → gallery
         </p>
-        <Frame aspect="1432 / 806" label="1432 × 806">
-          {children ?? <CoverImage url={imageUrl} />}
+        <Frame label="Free aspect">
+          {children ?? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl ?? ""}
+              alt=""
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+                maxHeight: 360,
+                objectFit: "contain",
+                background: "#000",
+              }}
+            />
+          )}
         </Frame>
       </div>
     );
@@ -346,7 +360,7 @@ export function surfaceAspectCss(preset: ImagePreset): string | undefined {
   if (!preset.aspect) return undefined;
   // approximate CSS aspect-ratio string
   if (preset.surface === "worksHero") return "1432 / 902";
-  if (preset.surface === "caseFigure") return "1432 / 806";
   if (preset.surface === "teamMember" || preset.surface === "testimonial") return "1 / 1";
+  if (preset.key === "ogSocial") return "1200 / 630";
   return `${Math.round(preset.aspect * 1000)} / 1000`;
 }

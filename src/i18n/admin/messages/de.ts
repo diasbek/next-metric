@@ -318,9 +318,14 @@ export const deAdmin: AdminMessages = {
         hint: "As on the works featured block (1432×902).",
       },
       projectCase: {
-        label: "Case / gallery",
-        surfaceLabel: "Case gallery",
-        hint: "As in the case gallery (1432×806).",
+        label: "Case / Galerie",
+        surfaceLabel: "Case-Galerie",
+        hint: "Galeriebild — freies Seitenverhältnis, bis ~2800px.",
+      },
+      ogSocial: {
+        label: "OG / Social",
+        surfaceLabel: "Link-Vorschau",
+        hint: "Open-Graph-Bild (~1200×630).",
       },
       team: {
         label: "Team photo",
@@ -533,6 +538,12 @@ export const deAdmin: AdminMessages = {
       altLabel: "Bildunterschrift",
       sitePreview: "Site-Vorschau",
       openOnSite: "Auf der Site öffnen",
+      previewUnsaved:
+        "Ungespeichert — Speichern, um Text/SEO zu veröffentlichen. Die Live-Site zeigt noch den letzten Stand.",
+      previewMediaHint:
+        "Galerie und Blöcke werden sofort gespeichert, wenn du sie hinzufügst oder sortierst.",
+      previewLiveHint: "„Auf der Site öffnen“ zeigt die zuletzt gespeicherte Version.",
+      caseYearNotOnSite: "Wird auf der öffentlichen Case-Seite nicht angezeigt",
       contentBlocks: "Galerie & Blöcke",
       contentBlocksHint:
         "Neue Cases starten mit einer Galerie. Bei Bedarf Vorher/Nachher oder YouTube ergänzen und per Drag & Drop sortieren.",

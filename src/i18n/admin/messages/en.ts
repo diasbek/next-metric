@@ -320,7 +320,12 @@ export const enAdmin: AdminMessages = {
       projectCase: {
         label: "Case / gallery",
         surfaceLabel: "Case gallery",
-        hint: "As in the case gallery (1432×806).",
+        hint: "Full gallery frame — free aspect, up to ~2800px.",
+      },
+      ogSocial: {
+        label: "OG / social",
+        surfaceLabel: "Link preview",
+        hint: "Open Graph share image (~1200×630).",
       },
       team: {
         label: "Team photo",
@@ -533,6 +538,11 @@ export const enAdmin: AdminMessages = {
       altLabel: "Photo caption",
       sitePreview: "Site preview",
       openOnSite: "Open on site",
+      previewUnsaved:
+        "Unsaved — Save project to publish copy/SEO. Live site still shows the last save.",
+      previewMediaHint: "Gallery and blocks save immediately when you add or reorder them.",
+      previewLiveHint: "“Open on site” shows the last saved version.",
+      caseYearNotOnSite: "Not shown on the public case page",
       contentBlocks: "Gallery & blocks",
       contentBlocksHint:
         "New cases start with a gallery. Add before/after or YouTube if needed, then drag to reorder.",

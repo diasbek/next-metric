@@ -3,59 +3,35 @@ import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
+import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
 import type { Project } from "@/data/projects";
+import { youtubeEmbedUrl } from "@/data/projects";
 import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
 import {
   CASE_GALLERY_SIZES,
   getCaseImageMeta,
 } from "@/data/case-image-meta";
+import { caseStripFromBlocks } from "@/lib/cms/case-gallery";
 import { getNextProjects } from "@/i18n/get-content";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
-/** Flatten a case into an ordered strip — images only, no gaps. */
-function caseStripImages(
-  project: Project,
-): Array<{ src: string; width?: number | null; height?: number | null }> {
-  const seen = new Set<string>();
-  const images: Array<{
-    src: string;
-    width?: number | null;
-    height?: number | null;
-  }> = [];
-  const push = (
-    src?: string,
-    width?: number | null,
-    height?: number | null,
-  ) => {
-    const url = src?.trim();
-    if (!url || seen.has(url)) return;
-    seen.add(url);
-    images.push({ src: url, width, height });
-  };
-
-  for (const block of project.caseStudy?.blocks ?? []) {
-    if (block.type === "gallery") {
-      for (const image of block.images) {
-        push(image.url, image.width, image.height);
-      }
-    }
-  }
-
-  if (!images.length) {
-    push(project.caseStudy?.heroImage);
-    push(project.image);
-  }
-
-  return images;
-}
-
 interface WorkCaseSectionProps {
   locale: Locale;
   content: SiteContent;
   project: Project;
+}
+
+function frameAlt(
+  projectTitle: string,
+  index: number,
+  cmsAlt?: string,
+): string {
+  const trimmed = cmsAlt?.trim();
+  if (trimmed) return trimmed;
+  return `${projectTitle} — ${index + 1}`;
 }
 
 export async function WorkCaseSection({
@@ -72,23 +48,17 @@ export async function WorkCaseSection({
     home.caseStudies.items.map((item) => [item.slug, item]),
   );
   const caseStudy = project.caseStudy;
-  const stripImages = caseStripImages(project);
+  const blocks = caseStudy?.blocks ?? [];
+  const hasStructuredBlocks = blocks.length > 0;
+  const legacyStrip = hasStructuredBlocks
+    ? []
+    : caseStripFromBlocks([], {
+        heroImage: caseStudy?.heroImage,
+        coverImage: project.image,
+      });
 
   const authorName = project.author ?? project.title;
-  const reviews = [
-    {
-      quote: project.quote ?? project.description,
-      author: authorName,
-      role: project.role ?? project.title,
-      avatar: project.image,
-    },
-    ...nextProjects.slice(0, 2).map((item) => ({
-      quote: item.quote ?? item.description,
-      author: item.author ?? item.title,
-      role: item.role ?? item.title,
-      avatar: item.image,
-    })),
-  ];
+  let galleryIndex = 0;
 
   return (
     <article className="metric-case">
@@ -139,9 +109,116 @@ export async function WorkCaseSection({
           </div>
         </header>
 
-        {stripImages.length ? (
+        {hasStructuredBlocks ? (
+          <div className="metric-case__content mt-12 md:mt-16">
+            {blocks.map((block) => {
+              if (block.type === "gallery") {
+                if (!block.images.length) return null;
+                return (
+                  <section key={block.id} className="metric-case__stack">
+                    {block.images.map((image) => {
+                      const index = galleryIndex++;
+                      const fromCms =
+                        image.width != null &&
+                        image.height != null &&
+                        image.width > 0 &&
+                        image.height > 0
+                          ? { width: image.width, height: image.height }
+                          : null;
+                      const { width, height } =
+                        fromCms ?? getCaseImageMeta(image.url);
+                      const alt = frameAlt(project.title, index, image.alt);
+                      const isHero = index === 0;
+                      const intrinsicH =
+                        width > 0 && height > 0
+                          ? Math.round((height / width) * 1200)
+                          : 800;
+
+                      return (
+                        <div
+                          key={`${block.id}-${image.url}-${index}`}
+                          className={
+                            isHero
+                              ? "metric-case__stack-item"
+                              : "metric-case__stack-item metric-case__stack-item--lazy"
+                          }
+                          style={
+                            isHero
+                              ? undefined
+                              : {
+                                  containIntrinsicSize: `auto ${intrinsicH}px`,
+                                }
+                          }
+                        >
+                          {isHero ? (
+                            <ProgressiveCaseImage
+                              src={image.url}
+                              alt={alt}
+                              width={width}
+                              height={height}
+                              className="metric-case__stack-img"
+                              priority
+                            />
+                          ) : (
+                            <MediaImage
+                              src={image.url}
+                              alt={alt}
+                              width={width}
+                              height={height}
+                              className="metric-case__stack-img"
+                              quality={85}
+                              sizes={CASE_GALLERY_SIZES}
+                              loading="lazy"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </section>
+                );
+              }
+
+              if (block.type === "before_after") {
+                if (!block.beforeImage || !block.afterImage) return null;
+                return (
+                  <section
+                    key={block.id}
+                    className="metric-case__block metric-case__block--ba mt-4"
+                  >
+                    <BeforeAfterSlider
+                      beforeImage={block.beforeImage}
+                      afterImage={block.afterImage}
+                      beforeLabel={ui.logoCompareBefore}
+                      afterLabel={ui.logoCompareAfter}
+                      compareAriaLabel={ui.beforeAfterLabel}
+                    />
+                  </section>
+                );
+              }
+
+              const embed = youtubeEmbedUrl(block.youtubeUrl);
+              if (!embed) return null;
+              return (
+                <section
+                  key={block.id}
+                  className="metric-case__block metric-case__block--youtube mt-4"
+                >
+                  <div className="metric-case__youtube">
+                    <iframe
+                      src={embed}
+                      title={`${project.title} — YouTube`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      loading="lazy"
+                    />
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        ) : legacyStrip.length ? (
           <section className="metric-case__stack mt-12 md:mt-16">
-            {stripImages.map((item, index) => {
+            {legacyStrip.map((item, index) => {
               const fromCms =
                 item.width != null &&
                 item.height != null &&
@@ -150,11 +227,12 @@ export async function WorkCaseSection({
                   ? { width: item.width, height: item.height }
                   : null;
               const { width, height } = fromCms ?? getCaseImageMeta(item.src);
-              const alt =
-                index === 0
-                  ? `${project.title} — Amazon listing visuals`
-                  : `${project.title} — project image ${index + 1}`;
+              const alt = frameAlt(project.title, index, item.alt);
               const isHero = index === 0;
+              const intrinsicH =
+                width > 0 && height > 0
+                  ? Math.round((height / width) * 1200)
+                  : 800;
 
               return (
                 <div
@@ -163,6 +241,11 @@ export async function WorkCaseSection({
                     isHero
                       ? "metric-case__stack-item"
                       : "metric-case__stack-item metric-case__stack-item--lazy"
+                  }
+                  style={
+                    isHero
+                      ? undefined
+                      : { containIntrinsicSize: `auto ${intrinsicH}px` }
                   }
                 >
                   {isHero ? (
@@ -200,35 +283,32 @@ export async function WorkCaseSection({
               </h2>
             </div>
             <div className="metric-case__reviews">
-              {reviews.map((review) => (
-                <article
-                  key={review.author + review.quote.slice(0, 24)}
-                  className="metric-case__review"
-                >
-                  <p className="text-[clamp(16px,1.4vw,20px)] leading-[1.3] tracking-[-0.02em]">
-                    {review.quote}
-                  </p>
-                  <div className="mt-8 flex items-center gap-3">
-                    <div className="relative size-12 overflow-hidden rounded-full bg-[color:var(--surface)]">
-                      <MediaImage
-                        src={review.avatar}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="48px"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-[18px] font-medium tracking-[-0.02em]">
-                        {review.author}
-                      </p>
-                      <p className="text-[14px] text-[color:var(--muted)]">
-                        {review.role}
-                      </p>
-                    </div>
+              <article className="metric-case__review">
+                <p className="text-[clamp(16px,1.4vw,20px)] leading-[1.3] tracking-[-0.02em]">
+                  {project.quote}
+                </p>
+                <div className="mt-8 flex items-center gap-3">
+                  <div className="relative size-12 overflow-hidden rounded-full bg-[color:var(--surface)]">
+                    <MediaImage
+                      src={project.image}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
                   </div>
-                </article>
-              ))}
+                  <div>
+                    <p className="text-[18px] font-medium tracking-[-0.02em]">
+                      {authorName}
+                    </p>
+                    {project.role ? (
+                      <p className="text-[14px] text-[color:var(--muted)]">
+                        {project.role}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </article>
             </div>
           </section>
         ) : null}

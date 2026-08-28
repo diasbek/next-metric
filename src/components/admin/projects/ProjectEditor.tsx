@@ -1,8 +1,9 @@
 "use client";
 
 import { HardNavForm } from "@/components/admin/HardNavForm";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ImageField } from "@/components/admin/image-field";
 import { LibraryImagePicker } from "@/components/admin/form/LibraryImagePicker";
 import {
@@ -17,6 +18,7 @@ import type {
   LibraryItem,
   ProjectBlockDraft,
   ProjectEditorData,
+  ProjectMediaDraft,
   ProjectTranslationDraft,
 } from "@/components/admin/projects/project-editor-types";
 import {
@@ -26,6 +28,7 @@ import {
   deleteProjectBlockAction,
   deleteProjectMediaAction,
   reorderProjectBlocksAction,
+  reorderProjectMediaAction,
   saveProjectAction,
   updateProjectBlockYoutubeAction,
 } from "@/app/admin/(dashboard)/works/actions";
@@ -100,13 +103,50 @@ function seoLenColor(length: number, soft: number, hard: number): string {
   return "#6a6";
 }
 
+function ReturnFields({
+  locale,
+  focus,
+}: {
+  locale: AdminLocale;
+  focus?: string;
+}) {
+  return (
+    <>
+      <input type="hidden" name="return_locale" value={locale} />
+      {focus ? <input type="hidden" name="return_focus" value={focus} /> : null}
+    </>
+  );
+}
+
 export function ProjectEditor({ project, library }: Props) {
   const t = useAdminT();
-  const [locale, setLocale] = useState<AdminLocale>("en");
+  const searchParams = useSearchParams();
+  const [locale, setLocale] = useState<AdminLocale>(() =>
+    searchParams.get("locale") === "de" ? "de" : "en",
+  );
   const [draft, setDraft] = useState(project);
   const [coverPreview, setCoverPreview] = useState(project.cover_image);
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const tr = draft.translations[locale];
+
+  useEffect(() => {
+    setDraft(project);
+    setCoverPreview(project.cover_image);
+  }, [project]);
+
+  useEffect(() => {
+    const fromUrl = searchParams.get("locale");
+    if (fromUrl === "en" || fromUrl === "de") setLocale(fromUrl);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace("#", "");
+    if (!hash) return;
+    requestAnimationFrame(() => {
+      document.getElementById(hash)?.scrollIntoView({ block: "start" });
+    });
+  }, [project.id]);
 
   const filled = useMemo(
     () => ADMIN_LOCALES.filter((l) => isLocaleFilled(draft.translations[l.code])).length,
@@ -164,6 +204,14 @@ export function ProjectEditor({ project, library }: Props) {
     }
   };
 
+  const switchLocale = (code: AdminLocale) => {
+    setLocale(code);
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("locale", code);
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  };
+
   const metaTitleLen = (tr.meta_title || (tr.title ? `${tr.title} — METRIC` : "")).length;
   const metaDescLen = (tr.meta_description || tr.description).length;
   const publicPath =
@@ -205,6 +253,7 @@ export function ProjectEditor({ project, library }: Props) {
           style={{ display: "grid", gap: 16 }}
         >
           <input type="hidden" name="id" value={draft.id} />
+          <ReturnFields locale={locale} />
           {ADMIN_LOCALES.map((l) => {
             const row = draft.translations[l.code];
             return (
@@ -238,7 +287,7 @@ export function ProjectEditor({ project, library }: Props) {
                   <button
                     key={l.code}
                     type="button"
-                    onClick={() => setLocale(l.code)}
+                    onClick={() => switchLocale(l.code)}
                     style={{
                       ...adminBtn,
                       background: active ? "#fff" : "#1a1a1a",
@@ -440,6 +489,9 @@ export function ProjectEditor({ project, library }: Props) {
                   style={adminInput}
                   placeholder="2026"
                 />
+                <span style={{ display: "block", marginTop: 4, fontSize: 11, color: "#777" }}>
+                  {t.pages.project.caseYearNotOnSite}
+                </span>
               </label>
             </div>
             <label style={{ fontSize: 13 }}>
@@ -460,7 +512,7 @@ export function ProjectEditor({ project, library }: Props) {
             </label>
           </section>
 
-          <section style={sectionBox}>
+          <section id="gallery" style={sectionBox}>
             <h2 style={sectionTitle}>3. {t.pages.project.contentBlocks}</h2>
             <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
               {t.pages.project.contentBlocksHint}
@@ -476,6 +528,7 @@ export function ProjectEditor({ project, library }: Props) {
                 <HardNavForm key={type} action={addProjectBlockAction}>
                   <input type="hidden" name="project_id" value={draft.id} />
                   <input type="hidden" name="type" value={type} />
+                  <ReturnFields locale={locale} focus="gallery" />
                   <button type="submit" style={adminBtn}>
                     {label}
                   </button>
@@ -500,6 +553,10 @@ export function ProjectEditor({ project, library }: Props) {
                       media={draft.media}
                       library={library}
                       title={tr.title}
+                      locale={locale}
+                      onMediaChange={(nextMedia) =>
+                        setDraft((prev) => ({ ...prev, media: nextMedia }))
+                      }
                       onYoutubeChange={(url) => {
                         setDraft((prev) => ({
                           ...prev,
@@ -601,7 +658,7 @@ export function ProjectEditor({ project, library }: Props) {
             </div>
             <ImageField
               name="og_file"
-              preset="free"
+              preset="ogSocial"
               currentUrl={draft.og_image || draft.cover_image || null}
               label={t.pages.project.ogImage}
             />
@@ -650,7 +707,7 @@ export function ProjectEditor({ project, library }: Props) {
         </HardNavForm>
       </div>
 
-      <CaseSitePreview draft={draft} locale={locale} />
+      <CaseSitePreview draft={draft} saved={project} locale={locale} />
     </div>
   );
 }
@@ -661,6 +718,8 @@ function BlockCard({
   media,
   library,
   title,
+  locale,
+  onMediaChange,
   onYoutubeChange,
 }: {
   block: ProjectBlockDraft;
@@ -668,6 +727,8 @@ function BlockCard({
   media: ProjectEditorData["media"];
   library: LibraryItem[];
   title: string;
+  locale: AdminLocale;
+  onMediaChange: (media: ProjectMediaDraft[]) => void;
   onYoutubeChange?: (url: string) => void;
 }) {
   const t = useAdminT();
@@ -679,6 +740,33 @@ function BlockCard({
         : "YouTube";
 
   const blockMedia = media.filter((m) => m.block_id === block.id);
+  const galleryItems = useMemo(
+    () =>
+      media
+        .filter((m) => m.block_id === block.id && m.kind === "gallery")
+        .sort((a, b) => a.sort_order - b.sort_order),
+    [media, block.id],
+  );
+  const [orderedGallery, setOrderedGallery] = useOrderedItems(galleryItems);
+  const {
+    pending: galleryPending,
+    saved: gallerySaved,
+    onDragEnd: onGalleryDragEnd,
+  } = usePersistReorder(
+    galleryItems,
+    orderedGallery,
+    (next) => {
+      setOrderedGallery(next);
+      const others = media.filter(
+        (m) => !(m.block_id === block.id && m.kind === "gallery"),
+      );
+      onMediaChange([
+        ...others,
+        ...next.map((item, index) => ({ ...item, sort_order: index })),
+      ]);
+    },
+    reorderProjectMediaAction,
+  );
 
   return (
     <article
@@ -702,6 +790,7 @@ function BlockCard({
         <HardNavForm action={deleteProjectBlockAction}>
           <input type="hidden" name="project_id" value={projectId} />
           <input type="hidden" name="block_id" value={block.id} />
+          <ReturnFields locale={locale} focus="gallery" />
           <button
             type="submit"
             style={{ ...adminBtn, color: "#f66", borderColor: "#633", padding: "6px 10px" }}
@@ -715,6 +804,7 @@ function BlockCard({
         <HardNavForm action={updateProjectBlockYoutubeAction} style={{ display: "grid", gap: 8 }}>
           <input type="hidden" name="project_id" value={projectId} />
           <input type="hidden" name="block_id" value={block.id} />
+          <ReturnFields locale={locale} focus="gallery" />
           <label style={{ fontSize: 13 }}>
             {t.pages.project.youtubeUrl}
             <input
@@ -748,11 +838,18 @@ function BlockCard({
                     <img
                       src={current.url}
                       alt=""
-                      style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        maxHeight: 180,
+                        objectFit: "contain",
+                        background: "#111",
+                      }}
                     />
                     <HardNavForm action={deleteProjectMediaAction}>
                       <input type="hidden" name="project_id" value={projectId} />
                       <input type="hidden" name="media_id" value={current.id} />
+                      <ReturnFields locale={locale} focus="gallery" />
                       <button
                         type="submit"
                         style={{ ...adminBtn, color: "#f66", borderColor: "#633" }}
@@ -770,6 +867,7 @@ function BlockCard({
                   <input type="hidden" name="project_id" value={projectId} />
                   <input type="hidden" name="block_id" value={block.id} />
                   <input type="hidden" name="kind" value={kind} />
+                  <ReturnFields locale={locale} focus="gallery" />
                   <ImageField
                     name="file"
                     preset="projectCase"
@@ -797,27 +895,38 @@ function BlockCard({
 
       {block.type === "gallery" ? (
         <div style={{ display: "grid", gap: 10 }}>
-          <div
+          <ReorderStatus pending={galleryPending} saved={gallerySaved} />
+          <SortableCardGrid
+            items={orderedGallery}
+            onDragEnd={onGalleryDragEnd}
             style={{
-              display: "grid",
               gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
               gap: 8,
             }}
-          >
-            {blockMedia
-              .filter((m) => m.kind === "gallery")
-              .sort((a, b) => a.sort_order - b.sort_order)
-              .map((item) => (
-                <div key={item.id} style={{ display: "grid", gap: 4 }}>
+            renderItem={(item) => (
+              <SortableCard id={item.id} onActivate={() => undefined}>
+                <div
+                  style={{ display: "grid", gap: 4 }}
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.url}
                     alt=""
-                    style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: 140,
+                      objectFit: "contain",
+                      background: "#111",
+                      display: "block",
+                    }}
                   />
                   <HardNavForm action={deleteProjectMediaAction}>
                     <input type="hidden" name="project_id" value={projectId} />
                     <input type="hidden" name="media_id" value={item.id} />
+                    <ReturnFields locale={locale} focus="gallery" />
                     <button
                       type="submit"
                       style={{
@@ -832,8 +941,9 @@ function BlockCard({
                     </button>
                   </HardNavForm>
                 </div>
-              ))}
-          </div>
+              </SortableCard>
+            )}
+          />
           <HardNavForm
             action={addProjectMediaAction}
             encType="multipart/form-data"
@@ -842,6 +952,7 @@ function BlockCard({
             <input type="hidden" name="project_id" value={projectId} />
             <input type="hidden" name="block_id" value={block.id} />
             <input type="hidden" name="kind" value="gallery" />
+            <ReturnFields locale={locale} focus="gallery" />
             <ImageField
               name="file"
               preset="projectCase"

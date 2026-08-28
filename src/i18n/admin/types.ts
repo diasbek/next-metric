@@ -304,6 +304,7 @@ export type AdminMessages = {
     presets: {
       projectCover: { label: string; surfaceLabel: string; hint: string };
       projectCase: { label: string; surfaceLabel: string; hint: string };
+      ogSocial: { label: string; surfaceLabel: string; hint: string };
       team: { label: string; surfaceLabel: string; hint: string };
       avatar: { label: string; surfaceLabel: string; hint: string };
       logo: { label: string; surfaceLabel: string; hint: string };
@@ -486,6 +487,10 @@ export type AdminMessages = {
       altLabel: string;
       sitePreview: string;
       openOnSite: string;
+      previewUnsaved: string;
+      previewMediaHint: string;
+      previewLiveHint: string;
+      caseYearNotOnSite: string;
       contentBlocks: string;
       contentBlocksHint: string;
       addGalleryBlock: string;

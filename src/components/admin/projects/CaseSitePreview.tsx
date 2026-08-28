@@ -7,25 +7,61 @@ import { getWorkOgImagePath } from "@/utils/og/paths";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { adminBtn } from "@/components/admin/ui/styles";
 import { useAdminT } from "@/i18n/admin";
-import type { ProjectEditorData, ProjectBlockDraft } from "./project-editor-types";
+import { orderedCaseContentBlocks } from "@/lib/cms/case-gallery";
+import type { ProjectEditorData } from "./project-editor-types";
 
 type Props = {
   draft: ProjectEditorData;
+  /** Last saved snapshot — used for unsaved-copy badge. */
+  saved: ProjectEditorData;
   locale: AdminLocale;
 };
 
-export function CaseSitePreview({ draft, locale }: Props) {
+function copyDirty(draft: ProjectEditorData, saved: ProjectEditorData): boolean {
+  if (
+    draft.slug !== saved.slug ||
+    draft.status !== saved.status ||
+    draft.sphere !== saved.sphere ||
+    draft.sort_order !== saved.sort_order ||
+    draft.featured !== saved.featured ||
+    draft.cover_image !== saved.cover_image ||
+    draft.og_image !== saved.og_image ||
+    draft.seo_indexable !== saved.seo_indexable
+  ) {
+    return true;
+  }
+  for (const locale of Object.keys(draft.translations) as AdminLocale[]) {
+    const a = draft.translations[locale];
+    const b = saved.translations[locale];
+    if (!a || !b) return true;
+    if (
+      a.title !== b.title ||
+      a.description !== b.description ||
+      a.tags !== b.tags ||
+      a.case_year !== b.case_year ||
+      a.case_task !== b.case_task ||
+      a.case_solution !== b.case_solution ||
+      a.author !== b.author ||
+      a.role !== b.role ||
+      a.quote !== b.quote ||
+      a.meta_title !== b.meta_title ||
+      a.meta_description !== b.meta_description ||
+      a.keywords !== b.keywords
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function CaseSitePreview({ draft, saved, locale }: Props) {
   const t = useAdminT();
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const tr = draft.translations[locale];
-  const hero =
-    draft.media.find((m) => m.kind === "hero")?.url || draft.cover_image;
-  const blocks = useMemo(
-    () =>
-      draft.blocks
-        .slice()
-        .sort((a, b) => a.sort_order - b.sort_order),
-    [draft.blocks],
+  const unsaved = copyDirty(draft, saved);
+  const contentBlocks = useMemo(
+    () => orderedCaseContentBlocks(draft.blocks, draft.media),
+    [draft.blocks, draft.media],
   );
 
   const designWidth = device === "desktop" ? 1280 : 390;
@@ -35,6 +71,12 @@ export function CaseSitePreview({ draft, locale }: Props) {
     locale === "en"
       ? `/works/${draft.slug}/`
       : `/${locale}/works/${draft.slug}/`;
+
+  const authorName = (tr.author || tr.title || "").trim() || t.pages.project.titlePlaceholder;
+  const tags = tr.tags
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   return (
     <aside
@@ -78,12 +120,33 @@ export function CaseSitePreview({ draft, locale }: Props) {
         </div>
       </div>
 
+      {unsaved ? (
+        <p
+          style={{
+            margin: 0,
+            padding: "8px 10px",
+            borderRadius: 8,
+            background: "#3a2a00",
+            border: "1px solid #a67c00",
+            color: "#f5d78e",
+            fontSize: 12,
+            lineHeight: 1.35,
+          }}
+        >
+          {t.pages.project.previewUnsaved}
+        </p>
+      ) : null}
+      <p style={{ margin: 0, fontSize: 11, color: "#777", lineHeight: 1.35 }}>
+        {t.pages.project.previewMediaHint}
+      </p>
+
       <div
         style={{
           border: "1px solid #333",
-          background: "#050505",
+          background: "#fafafa",
           padding: 12,
           overflow: "hidden",
+          borderRadius: 12,
         }}
       >
         <div
@@ -98,81 +161,206 @@ export function CaseSitePreview({ draft, locale }: Props) {
           <div
             style={{
               width: designWidth,
-              // zoom shrinks layout box (Chromium/WebKit admin UIs)
               zoom: scale,
-              background: "#000",
-              color: "#fff",
+              background: "#fff",
+              color: "#111",
               fontSize: 16,
               lineHeight: 1.4,
             }}
           >
-            <div style={{ padding: 28, display: "grid", gap: 16 }}>
-              <p style={{ margin: 0, fontSize: 32, fontWeight: 600 }}>
-                {tr.title || t.pages.project.titlePlaceholder}
-              </p>
-              {tr.case_year ? (
-                <p style={{ margin: 0, color: "#888" }}>{tr.case_year}</p>
-              ) : null}
-              <p style={{ margin: 0, color: "#ccc", fontSize: 18 }}>
-                {tr.description || t.pages.project.descriptionPlaceholder}
-              </p>
-              {tr.tags ? (
-                <p style={{ margin: 0, color: "#777", fontSize: 14 }}>{tr.tags}</p>
-              ) : null}
-              {tr.case_task ? (
-                <div>
-                  <p style={{ margin: "0 0 6px", color: "#888", fontSize: 12 }}>
-                    {t.pages.project.caseTask}
-                  </p>
-                  <p style={{ margin: 0 }}>{tr.case_task}</p>
-                </div>
-              ) : null}
-              {tr.case_solution ? (
-                <div>
-                  <p style={{ margin: "0 0 6px", color: "#888", fontSize: 12 }}>
-                    {t.pages.project.caseSolution}
-                  </p>
-                  <p style={{ margin: 0 }}>{tr.case_solution}</p>
-                </div>
-              ) : null}
-            </div>
-
-            {hero ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={hero}
-                alt=""
-                style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover" }}
-              />
-            ) : (
-              <div
+            <div style={{ padding: "28px 28px 0", display: "grid", gap: 20 }}>
+              <h1
                 style={{
-                  height: 280,
-                  background: "#161616",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "#555",
+                  margin: 0,
+                  fontSize: 48,
+                  fontWeight: 600,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.05,
                 }}
               >
-                Hero
-              </div>
-            )}
+                {authorName}
+              </h1>
 
-            {blocks.map((block) => (
-              <BlockPreview key={block.id} block={block} media={draft.media} />
-            ))}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: device === "desktop" ? "1.2fr 1fr" : "1fr",
+                  gap: 24,
+                }}
+              >
+                <div style={{ display: "grid", gap: 16 }}>
+                  {tr.role ? (
+                    <p style={{ margin: 0, fontSize: 18, color: "#444" }}>{tr.role}</p>
+                  ) : null}
+                  {tr.case_task ? (
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 6px",
+                          fontSize: 12,
+                          color: "#888",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        {t.pages.project.caseTask}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 16 }}>{tr.case_task}</p>
+                    </div>
+                  ) : null}
+                </div>
+                <div style={{ display: "grid", gap: 16 }}>
+                  {tags.length ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {tags.map((tag) => (
+                        <span
+                          key={tag}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: 999,
+                            background: "#f0f0f0",
+                            fontSize: 13,
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  {tr.description ? (
+                    <p style={{ margin: 0, fontSize: 16, color: "#333" }}>{tr.description}</p>
+                  ) : null}
+                  {tr.case_solution ? (
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 6px",
+                          fontSize: 12,
+                          color: "#888",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        {t.pages.project.caseSolution}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 16 }}>{tr.case_solution}</p>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 28, display: "grid", gap: 0 }}>
+              {contentBlocks.map((block) => {
+                if (block.type === "gallery") {
+                  if (!block.images.length) {
+                    return (
+                      <p
+                        key={block.id}
+                        style={{ margin: 0, padding: 24, color: "#999", fontSize: 14 }}
+                      >
+                        Gallery
+                      </p>
+                    );
+                  }
+                  return (
+                    <div key={block.id} style={{ display: "grid", gap: 0 }}>
+                      {block.images.map((img, i) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={`${img.src}-${i}`}
+                          src={img.src}
+                          alt={img.alt || ""}
+                          style={{
+                            width: "100%",
+                            height: "auto",
+                            display: "block",
+                            verticalAlign: "top",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  );
+                }
+                if (block.type === "before_after") {
+                  return (
+                    <div
+                      key={block.id}
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 4,
+                        padding: "12px 0",
+                      }}
+                    >
+                      {block.beforeImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={block.beforeImage}
+                          alt={block.beforeAlt || "Before"}
+                          style={{ width: "100%", height: "auto", display: "block" }}
+                        />
+                      ) : (
+                        <div style={{ minHeight: 120, background: "#eee" }} />
+                      )}
+                      {block.afterImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={block.afterImage}
+                          alt={block.afterAlt || "After"}
+                          style={{ width: "100%", height: "auto", display: "block" }}
+                        />
+                      ) : (
+                        <div style={{ minHeight: 120, background: "#eee" }} />
+                      )}
+                    </div>
+                  );
+                }
+                const embed = youtubeEmbedUrl(block.youtubeUrl);
+                return (
+                  <div key={block.id} style={{ padding: "12px 0" }}>
+                    {embed ? (
+                      <div style={{ aspectRatio: "16/9", background: "#111" }}>
+                        <iframe
+                          src={embed}
+                          title="YouTube"
+                          style={{ width: "100%", height: "100%", border: 0 }}
+                        />
+                      </div>
+                    ) : (
+                      <p style={{ margin: 0, color: "#999", fontSize: 14 }}>YouTube</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {tr.quote ? (
+              <div style={{ padding: 28, display: "grid", gap: 12 }}>
+                <p style={{ margin: 0, fontSize: 20, lineHeight: 1.3 }}>{tr.quote}</p>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600 }}>{authorName}</p>
+                  {tr.role ? (
+                    <p style={{ margin: 0, fontSize: 14, color: "#666" }}>{tr.role}</p>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
 
-      <Link
-        href={publicPath}
-        target="_blank"
-        rel="noreferrer"
-        style={{ ...adminBtn, textDecoration: "none", justifySelf: "start" }}
-      >
-        {t.pages.project.openOnSite} →
-      </Link>
+      <div style={{ display: "grid", gap: 6 }}>
+        <Link
+          href={publicPath}
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...adminBtn, textDecoration: "none", justifySelf: "start" }}
+        >
+          {t.pages.project.openOnSite} →
+        </Link>
+        <span style={{ fontSize: 11, color: "#777" }}>{t.pages.project.previewLiveHint}</span>
+      </div>
 
       <div style={{ display: "grid", gap: 6 }}>
         <span style={{ fontSize: 12, color: "#888" }}>OG</span>
@@ -180,10 +368,7 @@ export function CaseSitePreview({ draft, locale }: Props) {
         <img
           src={
             draft.og_image ||
-            getWorkOgImagePath(
-              locale,
-              draft.slug,
-            )
+            getWorkOgImagePath(locale, draft.slug)
           }
           alt="OG preview"
           style={{
@@ -192,92 +377,10 @@ export function CaseSitePreview({ draft, locale }: Props) {
             objectFit: "cover",
             border: "1px solid #333",
             background: "#111",
+            borderRadius: 8,
           }}
         />
       </div>
     </aside>
-  );
-}
-
-function BlockPreview({
-  block,
-  media,
-}: {
-  block: ProjectBlockDraft;
-  media: ProjectEditorData["media"];
-}) {
-  if (block.type === "youtube") {
-    const embed = youtubeEmbedUrl(block.youtube_url || "");
-    return (
-      <div style={{ padding: 20 }}>
-        {embed ? (
-          <div style={{ aspectRatio: "16/9", background: "#111" }}>
-            <iframe
-              src={embed}
-              title="preview"
-              style={{ width: "100%", height: "100%", border: 0 }}
-            />
-          </div>
-        ) : (
-          <p style={{ margin: 0, color: "#666", fontSize: 14 }}>YouTube</p>
-        )}
-      </div>
-    );
-  }
-
-  if (block.type === "before_after") {
-    const before = media.find((m) => m.block_id === block.id && m.kind === "before");
-    const after = media.find((m) => m.block_id === block.id && m.kind === "after");
-    return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 4,
-          padding: 20,
-        }}
-      >
-        {before ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={before.url}
-            alt=""
-            style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }}
-          />
-        ) : (
-          <div style={{ aspectRatio: "1", background: "#1a1a1a" }} />
-        )}
-        {after ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={after.url}
-            alt=""
-            style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }}
-          />
-        ) : (
-          <div style={{ aspectRatio: "1", background: "#1a1a1a" }} />
-        )}
-      </div>
-    );
-  }
-
-  const images = media
-    .filter((m) => m.block_id === block.id && m.kind === "gallery")
-    .sort((a, b) => a.sort_order - b.sort_order);
-  return (
-    <div style={{ display: "grid", gap: 10, padding: 20 }}>
-      {images.map((img) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={img.id}
-          src={img.url}
-          alt=""
-          style={{ width: "100%", aspectRatio: "16/10", objectFit: "cover" }}
-        />
-      ))}
-      {images.length === 0 ? (
-        <p style={{ margin: 0, color: "#666", fontSize: 14 }}>Gallery</p>
-      ) : null}
-    </div>
   );
 }

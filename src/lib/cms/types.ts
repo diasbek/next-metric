@@ -158,6 +158,7 @@ function buildBlocks(
             url: m.url,
             width: m.width ?? null,
             height: m.height ?? null,
+            alt: m.alt || undefined,
           }));
         return { id: block.id, type: "gallery", images };
       })
@@ -183,6 +184,7 @@ function buildBlocks(
       url: m.url,
       width: m.width ?? null,
       height: m.height ?? null,
+      alt: m.alt || undefined,
     }));
   if (gallery.length) {
     legacy.push({ id: "legacy-gallery", type: "gallery", images: gallery });

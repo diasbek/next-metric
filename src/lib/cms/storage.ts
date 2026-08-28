@@ -57,6 +57,32 @@ export type UploadMediaResult = {
   height: number | null;
 };
 
+/** Read intrinsic pixel size from a Storage public URL (or any fetchable image). */
+export async function probeImageDimensions(
+  url: string,
+): Promise<{ width: number | null; height: number | null }> {
+  try {
+    const path = getStoragePathFromPublicUrl(url);
+    let buffer: Buffer;
+    if (path) {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase.storage
+        .from(MEDIA_BUCKET)
+        .download(path);
+      if (error || !data) return { width: null, height: null };
+      buffer = Buffer.from(await data.arrayBuffer());
+    } else {
+      const res = await fetch(url);
+      if (!res.ok) return { width: null, height: null };
+      buffer = Buffer.from(await res.arrayBuffer());
+    }
+    const meta = await sharp(buffer, { failOn: "none" }).metadata();
+    return { width: meta.width ?? null, height: meta.height ?? null };
+  } catch {
+    return { width: null, height: null };
+  }
+}
+
 /**
  * Normalize uploads for the web: strip metadata, cap dimensions, prefer WebP.
  * SVG/GIF pass through unchanged (animation / vectors).

@@ -8,9 +8,23 @@ import {
   CASE_MEDIA_WEBP_QUALITY,
   deleteMediaByPublicUrl,
   isFileUpload,
+  probeImageDimensions,
   uploadMediaFile,
 } from "@/lib/cms/storage";
 import { adminFail, adminOk, adminRedirect } from "@/lib/cms/admin-redirect";
+
+function projectEditPath(projectId: string, formData?: FormData, extraQs?: Record<string, string>) {
+  const locale = String(formData?.get("return_locale") ?? "").trim();
+  const focus = String(formData?.get("return_focus") ?? "").trim();
+  const params = new URLSearchParams();
+  if (locale === "en" || locale === "de") params.set("locale", locale);
+  if (extraQs) {
+    for (const [k, v] of Object.entries(extraQs)) params.set(k, v);
+  }
+  const qs = params.toString();
+  const hash = focus ? `#${focus}` : "";
+  return `/admin/works/${projectId}/${qs ? `?${qs}` : ""}${hash}`;
+}
 
 export async function createProjectAction() {
   await requirePermission("content");
@@ -125,7 +139,7 @@ export async function saveProjectAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "projects"]);
-  return adminRedirect(`/admin/works/${id}/`);
+  return adminRedirect(projectEditPath(id, formData));
 }
 
 export async function deleteProjectAction(formData: FormData) {
@@ -182,7 +196,7 @@ export async function addProjectBlockAction(formData: FormData) {
   if (error) return adminFail(error.message);
 
   revalidateCms(["cms", "projects"]);
-  return adminRedirect(`/admin/works/${projectId}/`);
+  return adminRedirect(projectEditPath(projectId, formData));
 }
 
 export async function deleteProjectBlockAction(formData: FormData) {
@@ -201,7 +215,7 @@ export async function deleteProjectBlockAction(formData: FormData) {
 
   await supabase.from("metric_project_blocks").delete().eq("id", blockId);
   revalidateCms(["cms", "projects"]);
-  return adminRedirect(`/admin/works/${projectId}/`);
+  return adminRedirect(projectEditPath(projectId, formData));
 }
 
 export async function reorderProjectBlocksAction(orderedIds: string[]) {
@@ -213,6 +227,21 @@ export async function reorderProjectBlocksAction(orderedIds: string[]) {
   await Promise.all(
     orderedIds.map((id, index) =>
       supabase.from("metric_project_blocks").update({ sort_order: index }).eq("id", id),
+    ),
+  );
+  revalidateCms(["cms", "projects"]);
+  return adminOk(t.common.orderSaved);
+}
+
+export async function reorderProjectMediaAction(orderedIds: string[]) {
+  await requirePermission("content");
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const t = getAdminMessages(await getAdminUiLocale());
+  const supabase = createSupabaseAdminClient();
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase.from("metric_project_media").update({ sort_order: index }).eq("id", id),
     ),
   );
   revalidateCms(["cms", "projects"]);
@@ -233,7 +262,7 @@ export async function updateProjectBlockYoutubeAction(formData: FormData) {
   if (error) return adminFail(error.message);
 
   revalidateCms(["cms", "projects"]);
-  return adminRedirect(`/admin/works/${projectId}/`);
+  return adminRedirect(projectEditPath(projectId, formData));
 }
 
 export async function addProjectMediaAction(formData: FormData) {
@@ -273,11 +302,32 @@ export async function addProjectMediaAction(formData: FormData) {
   }
 
   if (!url) {
-    return adminRedirect(`/admin/works/${projectId}/?error=media`);
+    return adminRedirect(projectEditPath(projectId, formData, { error: "media" }));
+  }
+
+  if (width == null || height == null) {
+    const probed = await probeImageDimensions(url);
+    width = probed.width;
+    height = probed.height;
   }
 
   const alt = String(formData.get("alt") ?? "");
-  const sortOrder = Number(formData.get("sort_order") ?? 0);
+  let sortOrder = Number(formData.get("sort_order") ?? NaN);
+  if (kind === "gallery" || !Number.isFinite(sortOrder)) {
+    let maxQuery = supabase
+      .from("metric_project_media")
+      .select("sort_order")
+      .eq("project_id", projectId)
+      .eq("kind", kind)
+      .order("sort_order", { ascending: false })
+      .limit(1);
+    maxQuery = blockId
+      ? maxQuery.eq("block_id", blockId)
+      : maxQuery.is("block_id", null);
+    const { data: maxRow } = await maxQuery.maybeSingle();
+    sortOrder = (maxRow?.sort_order ?? -1) + 1;
+  }
+
   const isComparePair = kind === "before" || kind === "after";
   const dimensions =
     width != null && height != null ? { width, height } : {};
@@ -360,7 +410,7 @@ export async function addProjectMediaAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "projects"]);
-  return adminRedirect(`/admin/works/${projectId}/`);
+  return adminRedirect(projectEditPath(projectId, formData));
 }
 
 export async function deleteProjectMediaAction(formData: FormData) {
@@ -381,7 +431,7 @@ export async function deleteProjectMediaAction(formData: FormData) {
 
   await supabase.from("metric_project_media").delete().eq("id", mediaId);
   revalidateCms(["cms", "projects"]);
-  return adminRedirect(`/admin/works/${projectId}/`);
+  return adminRedirect(projectEditPath(projectId, formData));
 }
 
 export async function reorderProjectsAction(orderedIds: string[]) {

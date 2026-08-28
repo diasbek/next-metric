@@ -203,7 +203,7 @@ export function ImageField({
   };
 
   const displayPreview = editing ? sourceUrl || previewUrl : previewUrl;
-  const cropFrameAspect = surfaceAspectCss(presetConfig) ?? "4 / 3";
+  const cropFrameAspect = surfaceAspectCss(presetConfig);
   const idleDensity =
     preset === "team" || preset === "avatar"
       ? "thumb"
@@ -385,6 +385,7 @@ export function ImageField({
                   boxShadow: "0 0 0 1px rgba(38,0,255,0.35)",
                   overflow: "hidden",
                   minHeight: stackEditLayout ? 200 : 280,
+                  height: cropFrameAspect ? undefined : stackEditLayout ? 280 : 360,
                 }}
               >
                 {sourceUrl ? (
@@ -393,7 +394,9 @@ export function ImageField({
                     crop={crop}
                     zoom={zoom}
                     rotation={rotation}
-                    aspect={presetConfig.aspect ?? 4 / 3}
+                    {...(presetConfig.aspect != null
+                      ? { aspect: presetConfig.aspect }
+                      : {})}
                     onCropChange={setCrop}
                     onZoomChange={setZoom}
                     onRotationChange={setRotation}

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/cms/auth";
 import { getAdminProjectById } from "@/lib/cms/projects";
@@ -69,6 +70,8 @@ export default async function AdminProjectEditPage({
       alt: m.alt ?? "",
       sort_order: m.sort_order ?? 0,
       block_id: m.block_id ?? null,
+      width: m.width ?? null,
+      height: m.height ?? null,
     })),
     blocks: (project.project_blocks ?? [])
       .slice()
@@ -81,5 +84,9 @@ export default async function AdminProjectEditPage({
       })),
   };
 
-  return <ProjectEditor project={data} library={library} />;
+  return (
+    <Suspense fallback={null}>
+      <ProjectEditor project={data} library={library} />
+    </Suspense>
+  );
 }

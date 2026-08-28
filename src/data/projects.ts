@@ -6,6 +6,7 @@ export type CaseGalleryImage = {
   url: string;
   width?: number | null;
   height?: number | null;
+  alt?: string;
 };
 
 export type CaseBlock =

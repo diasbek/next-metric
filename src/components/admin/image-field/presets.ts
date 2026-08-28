@@ -3,6 +3,7 @@
 export type ImagePresetKey =
   | "projectCover"
   | "projectCase"
+  | "ogSocial"
   | "team"
   | "avatar"
   | "logo"
@@ -57,6 +58,18 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     quality: 0.9,
     preferWebp: true,
     hint: "Full gallery frame (up to ~2800px long edge, no forced crop).",
+  },
+  ogSocial: {
+    key: "ogSocial",
+    label: "OG / social",
+    surface: "free",
+    surfaceLabel: "Link preview",
+    aspect: 1200 / 630,
+    maxWidth: 1200,
+    maxHeight: 630,
+    quality: 0.85,
+    preferWebp: true,
+    hint: "Open Graph share image (~1200×630).",
   },
   team: {
     key: "team",

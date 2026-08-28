@@ -24,6 +24,8 @@ export type ProjectMediaDraft = {
   alt: string;
   sort_order: number;
   block_id: string | null;
+  width?: number | null;
+  height?: number | null;
 };
 
 export type ProjectBlockDraft = {
