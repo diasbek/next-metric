@@ -88,7 +88,7 @@ export function createWorkCasePage(locale: Locale) {
       const description =
         project.seo?.metaDescription || project.description;
       const path = localePath(locale, `/works/${slug}/`);
-      const creativeWork = getLocalizedCreativeWorkSchema(locale, slug);
+      const creativeWork = await getLocalizedCreativeWorkSchema(locale, slug);
       const dateModified =
         cmsSlugs.find((item) => item.slug === slug)?.updated_at ??
         (await getContentFreshnessDate()).toISOString();
@@ -222,7 +222,7 @@ export function createWorksPage(locale: Locale) {
         <>
           <JsonLd
             data={await withPageDateModified(locale, meta, path, ["home", "works"], [
-              getLocalizedProjectListSchema(locale),
+              await getLocalizedProjectListSchema(locale),
             ])}
           />
           <WorksPageView locale={locale} category={category} type={type} />

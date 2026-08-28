@@ -39,21 +39,11 @@ export function getContent(locale: Locale): SiteContent {
 }
 
 export async function getProjectsForLocale(locale: Locale): Promise<Project[]> {
-  const fromCms = await getPublishedProjects(locale);
-  if (fromCms.length > 0) return fromCms;
-  // Soft fallback for local/dev without CMS; production should always have published rows.
-  if (process.env.NODE_ENV === "production") {
-    console.error(
-      `[cms] getProjectsForLocale(${locale}): no published projects — falling back to static seed`,
-    );
-  }
-  return getContent(locale).projects;
+  return getPublishedProjects(locale);
 }
 
 export async function getProjectBySlug(locale: Locale, slug: string) {
-  const fromCms = await getProjectBySlugFromCms(locale, slug);
-  if (fromCms) return fromCms;
-  return getContent(locale).projects.find((project) => project.slug === slug);
+  return getProjectBySlugFromCms(locale, slug);
 }
 
 export async function getNextProjects(locale: Locale, slug: string, count = 2) {
@@ -69,8 +59,7 @@ export async function getNextProjects(locale: Locale, slug: string, count = 2) {
 
 export async function getAllProjectSlugs(): Promise<string[]> {
   const fromCms = await getAllPublishedSlugsFromCms();
-  if (fromCms.length > 0) return fromCms.map((row) => row.slug);
-  return enContent.projects.map((project) => project.slug);
+  return fromCms.map((row) => row.slug);
 }
 
 /** Merge CMS entities into locale content when available. */

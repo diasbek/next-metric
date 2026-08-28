@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { locales } from "@/i18n/config";
-import { getAllProjectSlugs } from "@/i18n/get-content";
 import { getContentFreshnessDate } from "@/lib/cms/freshness";
 import { getAllPublishedSlugsFromCms } from "@/lib/cms/projects";
 import { localePath } from "@/i18n/paths";
@@ -23,14 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAllPublishedSlugsFromCms(),
     getContentFreshnessDate(),
   ]);
-  const fallbackSlugs = await getAllProjectSlugs();
-  const projectEntries =
-    cmsSlugs.length > 0
-      ? cmsSlugs
-      : fallbackSlugs.map((slug) => ({
-          slug,
-          updated_at: staticLastModified.toISOString(),
-        }));
+  const projectEntries = cmsSlugs;
 
   const entries: MetadataRoute.Sitemap = [];
 

@@ -1,5 +1,4 @@
 import { SITE_CONFIG, PAGE_META } from "@/utils/consts";
-import { projects } from "@/data/projects";
 import { services } from "@/data/services";
 import { faqItems } from "@/data/faq";
 import { sphereFilters, directionFilters } from "@/data/filters";
@@ -11,7 +10,8 @@ import {
 } from "@/data/agency";
 import type { SiteContent } from "../types";
 
-/** Shared Metric public copy (Figma EN) used by all locales until translations land. */
+/** Shared Metric public copy (Figma EN) used by all locales until translations land.
+ *  Projects live in CMS only — see `data/projects.ts` seed catalog + `npm run seed:cms`. */
 export const metricSiteContent: SiteContent = {
   site: {
     name: SITE_CONFIG.name,
@@ -176,7 +176,7 @@ export const metricSiteContent: SiteContent = {
     servicesLines: ["Product images", "A+ Content", "Brand Store"],
     tagline: "Amazon design that converts",
   },
-  projects,
+  projects: [],
   services,
   agency: {
     about: {

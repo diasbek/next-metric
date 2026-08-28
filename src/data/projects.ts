@@ -71,8 +71,8 @@ export function youtubeEmbedUrl(url: string): string | null {
 }
 
 /**
- * Legacy static catalog — seed source / fallback when CMS is empty.
- * Public site is CMS-first via getProjectsForLocale.
+ * Seed catalog for `npm run seed:cms` only.
+ * Public site and admin read cases exclusively from Supabase (`metric_projects`).
  */
 export const projects: Project[] = [
   {

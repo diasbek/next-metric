@@ -4,6 +4,7 @@ config({ path: ".env.local" });
 import { createClient } from "@supabase/supabase-js";
 import { enContent } from "@/i18n/locales/en";
 import { deContent } from "@/i18n/locales/de";
+import { projects as catalogProjects } from "@/data/projects";
 import type { Project } from "@/data/projects";
 import type { SiteContent } from "@/i18n/types";
 
@@ -12,6 +13,12 @@ type Locale = "en" | "de";
 const locales: Record<Locale, SiteContent> = {
   en: enContent,
   de: deContent,
+};
+
+/** Case studies are seeded from the static catalog into CMS (not from SiteContent). */
+const projectLocales: Record<Locale, Project[]> = {
+  en: catalogProjects,
+  de: catalogProjects,
 };
 
 function requireEnv(...keys: string[]) {
@@ -32,8 +39,8 @@ function admin() {
 
 async function seedProjects(supabase: ReturnType<typeof admin>) {
   const bySlug = new Map<string, Partial<Record<Locale, Project>>>();
-  for (const locale of Object.keys(locales) as Locale[]) {
-    for (const project of locales[locale].projects) {
+  for (const locale of Object.keys(projectLocales) as Locale[]) {
+    for (const project of projectLocales[locale]) {
       const entry = bySlug.get(project.slug) ?? {};
       entry[locale] = project;
       bySlug.set(project.slug, entry);

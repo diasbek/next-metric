@@ -1,6 +1,6 @@
 import type { Locale } from "./config";
 import { htmlLang } from "./config";
-import { getContent } from "./get-content";
+import { getContent, getProjectBySlug, getProjectsForLocale } from "./get-content";
 import { localePath } from "./paths";
 import {
   getCreativeWorkSchema,
@@ -78,16 +78,17 @@ export function getLocalizedFaqSchema(locale: Locale) {
   return getFaqPageSchema(getContent(locale).faq);
 }
 
-export function getLocalizedProjectListSchema(locale: Locale) {
+export async function getLocalizedProjectListSchema(locale: Locale) {
   const content = getContent(locale);
-  return getProjectListSchema(content.projects, locale, content.ui.breadcrumbWorks);
+  const projects = await getProjectsForLocale(locale);
+  return getProjectListSchema(projects, locale, content.ui.breadcrumbWorks);
 }
 
-export function getLocalizedCreativeWorkSchema(
+export async function getLocalizedCreativeWorkSchema(
   locale: Locale,
   slug: string,
 ) {
-  const project = getContent(locale).projects.find((item) => item.slug === slug);
+  const project = await getProjectBySlug(locale, slug);
   if (!project) return null;
   return getCreativeWorkSchema(project, locale);
 }

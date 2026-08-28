@@ -86,6 +86,8 @@ export function AdminDesktopSidebar({ items, pathname }: Props) {
       >
         <Link
           href="/"
+          target="_blank"
+          rel="noreferrer"
           style={{
             ...adminChromeNavLink,
             color: "#aaa",

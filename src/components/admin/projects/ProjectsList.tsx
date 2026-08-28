@@ -167,10 +167,9 @@ export function ProjectsList({ projects, embedded = false }: Props) {
           </div>
         ) : (
           <div>
-            <p style={{ ...hint, margin: 0 }}>
-              {t.pages.works.description}
-              {filtering ? t.pages.works.filterReorderOff : ""}
-            </p>
+            {filtering ? (
+              <p style={{ ...hint, margin: 0 }}>{t.pages.works.filterReorderOff}</p>
+            ) : null}
             <ReorderStatus pending={pending} saved={saved} />
           </div>
         )}
