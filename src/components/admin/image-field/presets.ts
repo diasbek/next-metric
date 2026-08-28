@@ -3,6 +3,13 @@
 /** Max source file size for case gallery / before-after frames. */
 export const PROJECT_CASE_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
+/**
+ * Public `/works/` + home MetricCaseCard media frame (case-*.jpg masters).
+ * Keep cover crop + admin list thumbs on this ratio.
+ */
+export const CASE_CARD_MEDIA_ASPECT = 3000 / 2347;
+export const CASE_CARD_MEDIA_ASPECT_CSS = "3000 / 2347";
+
 export type ImagePresetKey =
   | "projectCover"
   | "projectCase"
@@ -41,13 +48,13 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     key: "projectCover",
     label: "Project cover",
     surface: "worksHero",
-    surfaceLabel: "Works / featured hero",
-    aspect: 1432 / 902,
-    maxWidth: 1600,
-    maxHeight: 1008,
-    quality: 0.82,
+    surfaceLabel: "Works / case card",
+    aspect: CASE_CARD_MEDIA_ASPECT,
+    maxWidth: 2400,
+    maxHeight: 1878,
+    quality: 0.9,
     preferWebp: true,
-    hint: "As on Works featured block (1432×902).",
+    hint: "As on /works/ case cards (3000×2347).",
   },
   projectCase: {
     key: "projectCase",

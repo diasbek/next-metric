@@ -314,8 +314,8 @@ export const enAdmin: AdminMessages = {
     presets: {
       projectCover: {
         label: "Project cover",
-        surfaceLabel: "Works / featured block",
-        hint: "As on the works featured block (1432×902).",
+        surfaceLabel: "Works / case card",
+        hint: "As on /works/ case cards (3000×2347).",
       },
       projectCase: {
         label: "Case / gallery",

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { hardNavCreate } from "@/components/admin/HardNavForm";
 import {
   ReorderStatus,
@@ -8,6 +9,7 @@ import {
   useOrderedItems,
   usePersistReorder,
 } from "@/components/admin/dnd";
+import { CASE_CARD_MEDIA_ASPECT_CSS } from "@/components/admin/image-field/presets";
 import { useMemo, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -48,23 +50,27 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
         color: "#fff",
         background: "#0a0a0a",
         overflow: "hidden",
-        minHeight: 220,
         height: "100%",
       }}
     >
       <div
         style={{
-          aspectRatio: "16 / 10",
+          position: "relative",
+          aspectRatio: CASE_CARD_MEDIA_ASPECT_CSS,
           background: "#161616",
           borderBottom: "1px solid #222",
+          overflow: "hidden",
         }}
       >
         {project.cover_image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={project.cover_image}
             alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            fill
+            sizes="(max-width: 640px) 92vw, (max-width: 1200px) 40vw, 420px"
+            quality={90}
+            className="object-cover"
+            style={{ objectPosition: "center" }}
           />
         ) : (
           <div
@@ -234,7 +240,8 @@ export function ProjectsList({ projects, embedded = false }: Props) {
         onDragEnd={onDragEnd}
         disabled={filtering}
         style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: 16,
         }}
         renderItem={(project) =>
           filtering ? (

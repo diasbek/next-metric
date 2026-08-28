@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import type { ImagePreset, SurfaceKind } from "./presets";
+import { CASE_CARD_MEDIA_ASPECT_CSS } from "./presets";
 
 type SurfacePreviewProps = {
   surface: SurfaceKind;
@@ -120,16 +121,16 @@ export function SurfacePreview({
     return (
       <div className="admin-surface-preview" style={{ ...pageShell, ...ring }}>
         <p style={{ margin: "0 0 12px", fontSize: 12, color: "#888" }}>
-          Works → featured
+          Works → case card
         </p>
-        <Frame aspect="1432 / 902" label="1432 × 902">
+        <Frame aspect={CASE_CARD_MEDIA_ASPECT_CSS} label="3000 × 2347">
           {children ?? <CoverImage url={imageUrl} />}
         </Frame>
         <div style={{ marginTop: 14, display: "grid", gap: 6, minWidth: 0 }}>
           <strong style={{ fontSize: 18, overflowWrap: "anywhere" }}>{title}</strong>
           <span style={{ fontSize: 13, color: "#bbb", overflowWrap: "anywhere" }}>{subtitle}</span>
           <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-            {["Branding", "Logo"].map((tag) => (
+            {["Listing", "Premium A+"].map((tag) => (
               <span
                 key={tag}
                 style={{
@@ -150,11 +151,11 @@ export function SurfacePreview({
 
   if (surface === "projectCard") {
     return (
-      <div className="admin-surface-preview" style={{ ...pageShell, ...ring, maxWidth: 200 }}>
+      <div className="admin-surface-preview" style={{ ...pageShell, ...ring, maxWidth: 240 }}>
         <p style={{ margin: "0 0 12px", fontSize: 12, color: "#888" }}>
           Project card
         </p>
-        <Frame aspect="701 / 486" label="701 × 486">
+        <Frame aspect={CASE_CARD_MEDIA_ASPECT_CSS} label="3000 × 2347">
           {children ?? <CoverImage url={imageUrl} />}
         </Frame>
         <div style={{ marginTop: 12, display: "grid", gap: 6, minWidth: 0 }}>
@@ -351,7 +352,7 @@ export function ProjectCardPeek({
       surface="projectCard"
       imageUrl={imageUrl}
       title={title ?? "In the grid"}
-      subtitle="How cover looks inside Project cards"
+      subtitle="How cover looks on /works/ case cards"
     />
   );
 }
@@ -359,7 +360,9 @@ export function ProjectCardPeek({
 export function surfaceAspectCss(preset: ImagePreset): string | undefined {
   if (!preset.aspect) return undefined;
   // approximate CSS aspect-ratio string
-  if (preset.surface === "worksHero") return "1432 / 902";
+  if (preset.surface === "worksHero" || preset.surface === "projectCard") {
+    return CASE_CARD_MEDIA_ASPECT_CSS;
+  }
   if (preset.surface === "teamMember" || preset.surface === "testimonial") return "1 / 1";
   if (preset.key === "ogSocial") return "1200 / 630";
   return `${Math.round(preset.aspect * 1000)} / 1000`;

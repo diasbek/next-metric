@@ -313,9 +313,9 @@ export const deAdmin: AdminMessages = {
     rotation: "Rotation",
     presets: {
       projectCover: {
-        label: "Project cover",
-        surfaceLabel: "Works / featured block",
-        hint: "As on the works featured block (1432×902).",
+        label: "Projekt-Cover",
+        surfaceLabel: "Works / Case-Card",
+        hint: "Wie auf /works/ Case-Cards (3000×2347).",
       },
       projectCase: {
         label: "Case / Galerie",
