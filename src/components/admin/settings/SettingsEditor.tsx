@@ -156,10 +156,16 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
   const [ogPreviewSrc, setOgPreviewSrc] = useState(customOg || ogPath);
   const [ogLoading, setOgLoading] = useState(true);
 
-  useEffect(() => {
+  const seoSelectionKey = `${seoLocale}_${seoPage}`;
+  const [renderedSeoSelection, setRenderedSeoSelection] =
+    useState(seoSelectionKey);
+
+  // Switching locale/page shows a different row — drop the previous OG draft.
+  if (renderedSeoSelection !== seoSelectionKey) {
+    setRenderedSeoSelection(seoSelectionKey);
     setOgMode(inferOgMode(currentSeo.og_image));
     setOgPreviewDataUrl(null);
-  }, [seoLocale, seoPage]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

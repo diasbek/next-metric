@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
+import { flushSync } from "react-dom";
 import { HardNavForm } from "@/components/admin/HardNavForm";
 import { LibraryImagePicker } from "@/components/admin/form/LibraryImagePicker";
 import { ImageField } from "@/components/admin/image-field";
@@ -76,16 +77,8 @@ export function CaseMediaAdd({
   const [mode, setMode] = useState<Mode>("upload");
   const [fileReady, setFileReady] = useState(false);
   const [libraryUrl, setLibraryUrl] = useState("");
-  const [pendingLibrarySubmit, setPendingLibrarySubmit] = useState(false);
   const [librarySubmitting, setLibrarySubmitting] = useState(false);
   const libraryFormRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (!pendingLibrarySubmit || !libraryUrl || librarySubmitting) return;
-    setPendingLibrarySubmit(false);
-    setLibrarySubmitting(true);
-    libraryFormRef.current?.requestSubmit();
-  }, [pendingLibrarySubmit, libraryUrl, librarySubmitting]);
 
   const submitLabel = replacing
     ? t.pages.project.replaceImage
@@ -98,7 +91,6 @@ export function CaseMediaAdd({
   const resetModes = () => {
     setFileReady(false);
     setLibraryUrl("");
-    setPendingLibrarySubmit(false);
     setLibrarySubmitting(false);
   };
 
@@ -200,8 +192,12 @@ export function CaseMediaAdd({
             showClear={false}
             onSelect={(url) => {
               if (!url || librarySubmitting) return;
-              setLibraryUrl(url);
-              setPendingLibrarySubmit(true);
+              // Commit the hidden input before submitting the form with it.
+              flushSync(() => {
+                setLibraryUrl(url);
+                setLibrarySubmitting(true);
+              });
+              libraryFormRef.current?.requestSubmit();
             }}
           />
         </HardNavForm>

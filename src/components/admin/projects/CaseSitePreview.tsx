@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { youtubeEmbedUrl } from "@/data/projects";
 import { getWorkOgImagePath, ogEyebrows } from "@/utils/og/paths";
@@ -96,11 +96,14 @@ function OgSharePreview({
   }, [candidateKey]);
   const [index, setIndex] = useState(0);
   const [failedAll, setFailedAll] = useState(false);
+  const [renderedKey, setRenderedKey] = useState(candidateKey);
 
-  useEffect(() => {
+  // Restart the candidate walk when the source list changes.
+  if (renderedKey !== candidateKey) {
+    setRenderedKey(candidateKey);
     setIndex(0);
     setFailedAll(false);
-  }, [candidateKey]);
+  }
 
   const src = !failedAll && index < candidates.length ? candidates[index] : null;
   const title =

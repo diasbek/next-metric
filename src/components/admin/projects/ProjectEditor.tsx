@@ -161,7 +161,13 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
 
   useUnsavedChangesGuard(isProjectEditorDirty(draft, project));
 
-  useEffect(() => {
+  const [renderedProject, setRenderedProject] = useState(project);
+  const urlLocale = searchParams.get("locale");
+  const [renderedUrlLocale, setRenderedUrlLocale] = useState(urlLocale);
+
+  // Server sent a newer snapshot (save / revalidate) — rebuild the draft.
+  if (renderedProject !== project) {
+    setRenderedProject(project);
     setDraft(project);
     setCoverPreview(project.cover_image);
     setCoverLibraryUrl("");
@@ -170,16 +176,18 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
     setOgSource("upload");
     setOgMode(inferOgMode(project.og_image));
     setOgPreviewDataUrl(null);
-    setCoverBlobUrl((prev) => {
-      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
-      return null;
-    });
-  }, [project]);
+    setCoverBlobUrl(null);
+  }
+
+  if (renderedUrlLocale !== urlLocale) {
+    setRenderedUrlLocale(urlLocale);
+    if (urlLocale === "en" || urlLocale === "de") setLocale(urlLocale);
+  }
 
   useEffect(() => {
-    const fromUrl = searchParams.get("locale");
-    if (fromUrl === "en" || fromUrl === "de") setLocale(fromUrl);
-  }, [searchParams]);
+    if (!coverBlobUrl?.startsWith("blob:")) return;
+    return () => URL.revokeObjectURL(coverBlobUrl);
+  }, [coverBlobUrl]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -546,9 +554,6 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                   label={t.common.cover}
                   {...coverCaseChrome}
                   onReady={(file) => {
-                    if (coverBlobUrl?.startsWith("blob:")) {
-                      URL.revokeObjectURL(coverBlobUrl);
-                    }
                     if (!file) {
                       setCoverBlobUrl(null);
                       setCoverPreview(draft.cover_image);
@@ -575,10 +580,7 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                       setCoverLibraryUrl(url);
                       setDraft((p) => ({ ...p, cover_image: url }));
                       setCoverPreview(url);
-                      setCoverBlobUrl((prev) => {
-                        if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
-                        return null;
-                      });
+                      setCoverBlobUrl(null);
                       setCoverSource("upload");
                     }}
                   />

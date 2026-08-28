@@ -79,13 +79,26 @@
   padding-bottom: 12px;
 }
 
+/* Desktop is laid out in the marquee geometry from the server render, so
+   hydration — which only clones the strip and starts the loop — cannot shift
+   it sideways. */
+@media (min-width: 1024px) {
+  .metric-categories__track-wrap {
+    padding-inline: 0;
+    /* Pull the extra hover gutter back so section spacing stays the same. */
+    margin-top: calc(clamp(40px, 4.5vw, 64px) - 16px);
+    margin-bottom: -12px;
+  }
+
+  .metric-categories__track {
+    padding-bottom: 0;
+    scroll-snap-type: none;
+  }
+}
+
 .metric-categories__track-wrap--marquee {
   overflow: hidden;
   overflow-x: clip;
-  padding-inline: 0;
-  /* Pull the extra hover gutter back so section spacing stays the same. */
-  margin-top: calc(clamp(40px, 4.5vw, 64px) - 16px);
-  margin-bottom: -12px;
 }
 
 .metric-categories__track {
@@ -106,8 +119,6 @@
   width: max-content;
   gap: 0;
   overflow: visible;
-  padding-bottom: 0;
-  scroll-snap-type: none;
   touch-action: pan-y;
 }
 
