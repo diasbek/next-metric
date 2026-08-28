@@ -10,6 +10,7 @@ import { saveMetricHomeAction } from "@/app/admin/(dashboard)/home/actions";
 import type { FaqDraft } from "@/components/admin/list-cms/types";
 import {
   isMetricHomeSection,
+  patchSection,
   type MetricHomeSectionId,
 } from "@/components/admin/metric-home/helpers";
 import {
@@ -102,6 +103,16 @@ export function MetricHomeAdmin({
   function updateLocalePayload(next: Record<string, unknown>) {
     setDrafts((prev) => ({ ...prev, [locale]: next }));
     setJsonDraft(JSON.stringify(next, null, 2));
+  }
+
+  function syncCaseLineup(items: Array<{ slug: string }>) {
+    setDrafts((prev) => {
+      const en = patchSection(prev.en, "caseStudies", { items });
+      const de = patchSection(prev.de, "caseStudies", { items });
+      const next = { en, de };
+      setJsonDraft(JSON.stringify(next[locale], null, 2));
+      return next;
+    });
   }
 
   function switchLocale(next: AdminLocale) {
@@ -212,6 +223,7 @@ export function MetricHomeAdmin({
                 current={current}
                 update={updateLocalePayload}
                 projects={projects}
+                onLineupChange={syncCaseLineup}
               />
             ) : null}
             {active === "services" ? (
@@ -267,10 +279,12 @@ export function MetricHomeAdmin({
 
         <HomeSitePreview
           payload={previewPayload}
+          fallbackPayload={locale === "de" ? drafts.en : null}
           locale={locale}
           section={active}
           dirty={dirty}
           faq={faq}
+          projects={projects}
         />
       </div>
     </AdminPageShell>

@@ -25,7 +25,25 @@ import {
 } from "@/components/admin/metric-home/fieldStyles";
 import { useAdminT } from "@/i18n/admin";
 
-export type ProjectOption = { slug: string; title: string };
+export type ProjectOption = {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  cover_image: string;
+  /** Locale-keyed card fields from the case editor. */
+  byLocale: Record<
+    string,
+    {
+      title: string;
+      description: string;
+      tags: string[];
+      author: string;
+      role: string;
+      quote: string;
+    }
+  >;
+};
 
 type LocalePayloadProps = {
   locale: "en" | "de";
@@ -41,11 +59,40 @@ function Field({
   children: ReactNode;
 }) {
   return (
-    <div>
-      <span style={label}>{title}</span>
+    <label style={label}>
+      <span>{title}</span>
       {children}
-    </div>
+    </label>
   );
+}
+
+function projectCardForLocale(
+  project: ProjectOption | undefined,
+  locale: string,
+): {
+  id: string;
+  slug: string;
+  title: string;
+  tags: string[];
+  quote: string;
+  author: string;
+  role: string;
+  image: string;
+} | null {
+  if (!project) return null;
+  const tr = project.byLocale[locale];
+  const en = project.byLocale.en;
+  const title = (tr?.title || en?.title || project.title || project.slug).trim();
+  return {
+    id: project.id,
+    slug: project.slug,
+    title,
+    tags: (tr?.tags?.length ? tr.tags : en?.tags) ?? [],
+    quote: (tr?.quote || en?.quote || title).trim(),
+    author: (tr?.author || en?.author || title).trim(),
+    role: (tr?.role || en?.role || tr?.description || en?.description || "").trim(),
+    image: project.cover_image,
+  };
 }
 
 export function HeroSectionEditor({ locale, current, update }: LocalePayloadProps) {
@@ -363,37 +410,57 @@ export function CaseStudiesSectionEditor({
   current,
   update,
   projects,
-}: LocalePayloadProps & { projects: ProjectOption[] }) {
+  onLineupChange,
+}: LocalePayloadProps & {
+  projects: ProjectOption[];
+  /** Keep EN/DE case lineup in sync (card copy comes from projects). */
+  onLineupChange?: (items: Array<{ slug: string }>) => void;
+}) {
+  const t = useAdminT();
   const section = asRecord(current.caseStudies);
   const items = asArray(section.items).map((item) => asRecord(item));
+  const projectsBySlug = new Map<string, ProjectOption>(
+    projects.map((p) => [p.slug, p]),
+  );
 
   function patch(partial: Record<string, unknown>) {
     update(patchSection(current, "caseStudies", partial));
   }
 
-  function patchItem(index: number, partial: Record<string, unknown>) {
-    const next = items.map((item, i) => (i === index ? { ...item, ...partial } : item));
-    patch({ items: next });
+  function setLineup(nextItems: Array<Record<string, unknown>>) {
+    const normalized = nextItems.map((item) => ({
+      slug: String(item.slug ?? "").trim(),
+    }));
+    if (onLineupChange) onLineupChange(normalized);
+    else patch({ items: normalized });
   }
 
   return (
     <fieldset style={fieldset}>
-      <legend style={legend}>Case studies ({locale.toUpperCase()})</legend>
-      <Field title="Title">
+      <legend style={legend}>
+        {t.pages.home.caseStudiesLegend} ({locale.toUpperCase()})
+      </legend>
+      <p style={{ margin: 0, fontSize: 12, color: "#888", lineHeight: 1.45 }}>
+        {t.pages.home.caseStudiesHint}{" "}
+        <Link href="/admin/works/" style={{ color: "#8af" }}>
+          {t.pages.home.caseStudiesWorksLink}
+        </Link>
+      </p>
+      <Field title={t.pages.home.caseStudiesTitle}>
         <input
           style={adminInput}
           value={readString(section, "title")}
           onChange={(e) => patch({ title: e.target.value })}
         />
       </Field>
-      <Field title="Title accent (substring highlighted)">
+      <Field title={t.pages.home.caseStudiesTitleAccent}>
         <input
           style={adminInput}
           value={readString(section, "titleAccent")}
           onChange={(e) => patch({ titleAccent: e.target.value })}
         />
       </Field>
-      <Field title="Subtitle">
+      <Field title={t.pages.home.caseStudiesSubtitle}>
         <textarea
           style={{ ...adminInput, minHeight: 80 }}
           value={readString(section, "subtitle")}
@@ -401,14 +468,14 @@ export function CaseStudiesSectionEditor({
         />
       </Field>
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
-        <Field title="More label">
+        <Field title={t.pages.home.caseStudiesMoreLabel}>
           <input
             style={adminInput}
             value={readString(section, "moreLabel")}
             onChange={(e) => patch({ moreLabel: e.target.value })}
           />
         </Field>
-        <Field title="View label">
+        <Field title={t.pages.home.caseStudiesViewLabel}>
           <input
             style={adminInput}
             value={readString(section, "viewLabel")}
@@ -416,107 +483,133 @@ export function CaseStudiesSectionEditor({
           />
         </Field>
       </div>
-      {items.map((item, index) => (
-        <div key={`case-${index}`} style={cardBox}>
-          <div style={row}>
-            <strong style={{ color: "#fff", fontSize: 13 }}>
-              Case {index + 1}
-            </strong>
-            <button
-              type="button"
-              style={adminBtn}
-              onClick={() =>
-                patch({ items: items.filter((_, i) => i !== index) })
-              }
-            >
-              Remove
-            </button>
-          </div>
-          <Field title="Project slug">
-            <select
-              style={adminInput}
-              value={readString(item, "slug")}
-              onChange={(e) => patchItem(index, { slug: e.target.value })}
-            >
-              <option value="">Select project…</option>
-              {projects.map((project) => (
-                <option key={project.slug} value={project.slug}>
-                  {project.title} ({project.slug})
-                </option>
-              ))}
-              {readString(item, "slug") &&
-              !projects.some((p) => p.slug === readString(item, "slug")) ? (
-                <option value={readString(item, "slug")}>
-                  {readString(item, "slug")} (missing)
-                </option>
-              ) : null}
-            </select>
-          </Field>
-          <Field title="Tags (comma-separated)">
-            <input
-              style={adminInput}
-              value={readStringArray(item, "tags").join(", ")}
-              onChange={(e) =>
-                patchItem(index, {
-                  tags: e.target.value
-                    .split(",")
-                    .map((part) => part.trim())
-                    .filter(Boolean),
-                })
-              }
-            />
-          </Field>
-          <Field title="Quote">
-            <textarea
-              style={{ ...adminInput, minHeight: 64 }}
-              value={readString(item, "quote")}
-              onChange={(e) => patchItem(index, { quote: e.target.value })}
-            />
-          </Field>
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
-            <Field title="Author">
-              <input
+
+      {items.map((item, index) => {
+        const slug = readString(item, "slug");
+        const card = projectCardForLocale(projectsBySlug.get(slug), locale);
+        return (
+          <div key={`case-${index}`} style={cardBox}>
+            <div style={row}>
+              <strong style={{ color: "#fff", fontSize: 13 }}>
+                {t.pages.home.caseStudiesItemLabel} {index + 1}
+              </strong>
+              <button
+                type="button"
+                style={adminBtn}
+                onClick={() => setLineup(items.filter((_, i) => i !== index))}
+              >
+                {t.common.delete}
+              </button>
+            </div>
+            <Field title={t.pages.home.caseStudiesPickProject}>
+              <select
                 style={adminInput}
-                value={readString(item, "author")}
-                onChange={(e) => patchItem(index, { author: e.target.value })}
-              />
+                value={slug}
+                onChange={(e) => {
+                  const next = items.map((row, i) =>
+                    i === index
+                      ? { slug: e.target.value }
+                      : { slug: readString(row, "slug") },
+                  );
+                  setLineup(next);
+                }}
+              >
+                <option value="">{t.pages.home.caseStudiesSelectPlaceholder}</option>
+                {projects.map((project) => (
+                  <option key={project.slug} value={project.slug}>
+                    {project.title} ({project.slug})
+                    {project.status !== "published" ? ` · ${project.status}` : ""}
+                  </option>
+                ))}
+                {slug && !projects.some((p) => p.slug === slug) ? (
+                  <option value={slug}>
+                    {slug} ({t.pages.home.caseStudiesMissing})
+                  </option>
+                ) : null}
+              </select>
             </Field>
-            <Field title="Role">
-              <input
-                style={adminInput}
-                value={readString(item, "role")}
-                onChange={(e) => patchItem(index, { role: e.target.value })}
-              />
-            </Field>
+            {card ? (
+              <div
+                style={{
+                  display: "grid",
+                  gap: 8,
+                  padding: 12,
+                  background: "#111",
+                  border: "1px solid #2a2a2a",
+                }}
+              >
+                <p style={{ margin: 0, fontSize: 11, color: "#777" }}>
+                  {t.pages.home.caseStudiesFromCase}
+                </p>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  {card.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={card.image}
+                      alt=""
+                      style={{
+                        width: 96,
+                        height: 75,
+                        objectFit: "cover",
+                        background: "#000",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: 96,
+                        height: 75,
+                        background: "#1a1a1a",
+                        color: "#555",
+                        fontSize: 11,
+                        display: "grid",
+                        placeItems: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      —
+                    </div>
+                  )}
+                  <div style={{ display: "grid", gap: 4, minWidth: 0 }}>
+                    <strong style={{ fontSize: 13, overflowWrap: "anywhere" }}>
+                      «{card.quote}»
+                    </strong>
+                    <span style={{ fontSize: 12, color: "#aaa" }}>{card.author}</span>
+                    <span style={{ fontSize: 12, color: "#777" }}>{card.role}</span>
+                    {card.tags.length ? (
+                      <span style={{ fontSize: 11, color: "#666" }}>
+                        {card.tags.join(" · ")}
+                      </span>
+                    ) : null}
+                    <Link
+                      href={`/admin/works/${card.id}/`}
+                      style={{ fontSize: 12, color: "#8af", marginTop: 4 }}
+                    >
+                      {t.pages.home.caseStudiesEditCase} →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ) : slug ? (
+              <p style={{ margin: 0, fontSize: 12, color: "#a86" }}>
+                {t.pages.home.caseStudiesMissingHint}
+              </p>
+            ) : null}
           </div>
-          <PayloadImageInput
-            label="Image"
-            value={readString(item, "image")}
-            folder="metric-home/cases"
-            onChange={(url) => patchItem(index, { image: url })}
-          />
-        </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         style={adminBtn}
         onClick={() =>
-          patch({
-            items: [
-              ...items,
-              {
-                slug: "",
-                tags: [],
-                quote: "",
-                author: "",
-                role: "",
-                image: "",
-              },
-            ],
-          })
+          setLineup([
+            ...items.map((row) => ({ slug: readString(row, "slug") })),
+            { slug: "" },
+          ])
         }
       >
-        Add case study
+        {t.pages.home.caseStudiesAdd}
       </button>
     </fieldset>
   );

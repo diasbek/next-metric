@@ -1,4 +1,5 @@
 import type { CaseBlock, CaseStudy, Project } from "@/data/projects";
+import { coalesceLocalized, pickTranslationRow } from "@/lib/cms/locale-fallback";
 
 export type CmsLocale = "en" | "de";
 export type PublishStatus = "draft" | "published";
@@ -217,9 +218,8 @@ export function mapProjectRow(
   row: ProjectWithRelations,
   locale: CmsLocale,
 ): Project | null {
-  const tr =
-    row.project_translations.find((t) => t.locale === locale) ??
-    row.project_translations.find((t) => t.locale === "en");
+  const { primary, en } = pickTranslationRow(row.project_translations, locale);
+  const tr = primary ?? en;
   if (!tr) return null;
 
   const media = row.project_media ?? [];
@@ -229,13 +229,27 @@ export function mapProjectRow(
 
   const blocks = buildBlocks(row.project_blocks, media);
 
+  const title = coalesceLocalized(primary?.title, en?.title);
+  const description = coalesceLocalized(primary?.description, en?.description);
+  const caseYear = coalesceLocalized(primary?.case_year, en?.case_year);
+  const caseTask = coalesceLocalized(primary?.case_task, en?.case_task);
+  const caseSolution = coalesceLocalized(primary?.case_solution, en?.case_solution);
+  const author = coalesceLocalized(primary?.author, en?.author) || undefined;
+  const role = coalesceLocalized(primary?.role, en?.role) || undefined;
+  const quote = coalesceLocalized(primary?.quote, en?.quote) || undefined;
+  const tags =
+    (primary?.tags?.length ? primary.tags : null) ??
+    (en?.tags?.length ? en.tags : null) ??
+    tr.tags ??
+    [];
+
   let caseStudy: CaseStudy | undefined;
-  const hasCaseCopy = Boolean(tr.case_year || tr.case_task || tr.case_solution);
+  const hasCaseCopy = Boolean(caseYear || caseTask || caseSolution);
   if (hasCaseCopy || blocks.length > 0 || hero) {
     caseStudy = {
-      year: tr.case_year ?? "",
-      task: tr.case_task ?? "",
-      solution: tr.case_solution ?? "",
+      year: caseYear,
+      task: caseTask,
+      solution: caseSolution,
       heroImage: hero?.url,
       blocks,
     };
@@ -243,23 +257,26 @@ export function mapProjectRow(
 
   return {
     slug: row.slug,
-    title: tr.title,
-    description: tr.description,
+    title,
+    description,
     image: row.cover_image || hero?.url || "",
-    tags: tr.tags ?? [],
+    tags,
     sphere: row.sphere,
     featured: row.featured,
     caseStudy,
-    author: (tr.author ?? "").trim() || undefined,
-    role: (tr.role ?? "").trim() || undefined,
-    quote: (tr.quote ?? "").trim() || undefined,
+    author,
+    role,
+    quote,
     publishedAt: row.published_at ?? null,
     updatedAt: row.updated_at ?? null,
     seo: {
-      metaTitle: (tr.meta_title ?? "").trim(),
-      metaDescription: (tr.meta_description ?? "").trim(),
-      keywords: (tr.keywords ?? "").trim(),
-      ogImage: (row.og_image ?? tr.og_image ?? "").trim(),
+      metaTitle: coalesceLocalized(primary?.meta_title, en?.meta_title),
+      metaDescription: coalesceLocalized(
+        primary?.meta_description,
+        en?.meta_description,
+      ),
+      keywords: coalesceLocalized(primary?.keywords, en?.keywords),
+      ogImage: coalesceLocalized(row.og_image, primary?.og_image, en?.og_image),
       indexable: row.seo_indexable !== false,
     },
   };

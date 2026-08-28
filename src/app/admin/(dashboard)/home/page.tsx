@@ -2,6 +2,7 @@ import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getMetricHome, toMetricHomePayload } from "@/data/metric-home";
 import { MetricHomeAdmin } from "@/components/admin/page-shell/MetricHomeAdmin";
+import type { ProjectOption } from "@/components/admin/metric-home/MetricHomeSectionEditors";
 import {
   ADMIN_LOCALES,
   type FaqDraft,
@@ -56,7 +57,7 @@ export default async function AdminHomePage({
       supabase.from("metric_home_translations").select("locale, payload"),
       supabase
         .from("metric_projects")
-        .select(`slug, status, ${EMBED.projectTranslations}`)
+        .select(`id, slug, status, cover_image, ${EMBED.projectTranslations}`)
         .order("sort_order"),
       section === "faq"
         ? supabase
@@ -85,13 +86,30 @@ export default async function AdminHomePage({
       const translationsList = Array.isArray(row.project_translations)
         ? row.project_translations
         : [];
-      const enTitle = translationsList.find(
-        (tr: { locale?: string; title?: string }) => tr.locale === "en",
-      )?.title;
-      const anyTitle = translationsList[0]?.title;
+      const byLocale: ProjectOption["byLocale"] = {};
+      for (const tr of translationsList) {
+        const loc = String(tr?.locale ?? "").trim();
+        if (!loc) continue;
+        byLocale[loc] = {
+          title: String(tr?.title ?? "").trim(),
+          description: String(tr?.description ?? "").trim(),
+          tags: Array.isArray(tr?.tags)
+            ? tr.tags.map((tag: unknown) => String(tag ?? "").trim()).filter(Boolean)
+            : [],
+          author: String(tr?.author ?? "").trim(),
+          role: String(tr?.role ?? "").trim(),
+          quote: String(tr?.quote ?? "").trim(),
+        };
+      }
+      const enTitle = byLocale.en?.title;
+      const anyTitle = Object.values(byLocale)[0]?.title;
       return {
+        id: String(row.id),
         slug: String(row.slug),
         title: String(enTitle || anyTitle || row.slug),
+        status: String(row.status ?? "draft"),
+        cover_image: String(row.cover_image ?? "").trim(),
+        byLocale,
       };
     });
 

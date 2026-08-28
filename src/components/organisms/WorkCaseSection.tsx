@@ -49,9 +49,6 @@ export async function WorkCaseSection({
     getNextProjects(locale, project.slug),
     getActiveTags(locale),
   ]);
-  const homeCaseBySlug = new Map<string, (typeof home.caseStudies.items)[number]>(
-    home.caseStudies.items.map((item) => [item.slug, item]),
-  );
   const caseStudy = project.caseStudy;
   const blocks = caseStudy?.blocks ?? [];
   const hasStructuredBlocks = blocks.length > 0;
@@ -345,18 +342,17 @@ export async function WorkCaseSection({
           </div>
           <div className="metric-case-studies__list">
             {nextProjects.slice(0, 2).map((item) => {
-              const fromHome = homeCaseBySlug.get(item.slug);
-              const rawTags = fromHome?.tags ?? item.tags;
+              const rawTags = item.tags;
               return (
                 <MetricCaseCard
                   key={item.slug}
                   locale={locale}
                   href={localePath(locale, `/works/${item.slug}/`)}
                   tags={resolveTagDisplays(rawTags, taxonomy)}
-                  quote={fromHome?.quote ?? item.quote ?? item.title}
-                  author={fromHome?.author ?? item.author ?? item.title}
-                  role={fromHome?.role ?? item.role ?? item.description}
-                  image={fromHome?.image ?? item.image}
+                  quote={item.quote ?? item.title}
+                  author={item.author ?? item.title}
+                  role={item.role ?? item.description}
+                  image={item.image}
                   imageAlt={item.title}
                   viewLabel={home.caseStudies.viewLabel}
                 />

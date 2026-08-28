@@ -10,5 +10,5 @@ export const EMBED = {
   testimonialTranslations:
     "testimonial_translations:metric_testimonial_translations(*)",
   projectTranslations:
-    "project_translations:metric_project_translations(locale, title)",
+    "project_translations:metric_project_translations(locale, title, description, tags, author, role, quote)",
 } as const;

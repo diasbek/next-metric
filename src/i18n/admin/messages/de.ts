@@ -438,6 +438,24 @@ export const deAdmin: AdminMessages = {
       previewFooterLabel: "Footer",
       contactsSettingsHint:
         "Telefon, Adresse und Social-URLs werden unter Kontakt / Einstellungen verwaltet — nicht in diesem Payload dupliziert.",
+      caseStudiesLegend: "Case Studies",
+      caseStudiesHint:
+        "Wählen Sie, welche Cases auf der Startseite erscheinen. Zitat, Autor, Rolle, Tags und Cover kommen immer aus dem Case selbst — bearbeiten unter Works.",
+      caseStudiesWorksLink: "Works öffnen →",
+      caseStudiesTitle: "Abschnittstitel",
+      caseStudiesTitleAccent: "Titel-Akzent (hervorgehobener Teil)",
+      caseStudiesSubtitle: "Untertitel",
+      caseStudiesMoreLabel: "Label „Mehr Projekte“",
+      caseStudiesViewLabel: "Label „Case ansehen“",
+      caseStudiesItemLabel: "Case",
+      caseStudiesPickProject: "Projekt",
+      caseStudiesSelectPlaceholder: "Case wählen…",
+      caseStudiesMissing: "fehlt",
+      caseStudiesMissingHint:
+        "Dieser Slug ist nicht in Works — anderen Case wählen oder anlegen.",
+      caseStudiesFromCase: "Aus dem Case (hier nur Lesen)",
+      caseStudiesEditCase: "Case bearbeiten",
+      caseStudiesAdd: "Case hinzufügen",
     },
     works: {
       title: "Works",

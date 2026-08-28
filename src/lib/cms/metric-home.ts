@@ -6,17 +6,43 @@ import {
 import type { Locale } from "@/i18n/config";
 import { createSupabasePublicClient, hasSupabasePublicConfig } from "@/lib/supabase/public";
 import { mergeMetricHome } from "@/lib/cms/metric-home-merge";
+import {
+  coalesceLocalized,
+  deepFallbackEmpty,
+  pickTranslationRow,
+} from "@/lib/cms/locale-fallback";
+
+export type HomeCaseCardFields = {
+  slug: string;
+  tags: string[];
+  quote: string;
+  author: string;
+  role: string;
+  image: string;
+  title?: string;
+};
 
 type ProjectEnrichment = {
   cover_image: string | null;
   title: string | null;
+  description: string | null;
+  tags: string[];
+  author: string | null;
+  role: string | null;
+  quote: string | null;
 };
 
 export { mergeMetricHome };
 
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((v) => String(v ?? "").trim()).filter(Boolean);
+}
+
 /**
- * Soft-enrich case study cards from published `metric_projects`.
- * Keeps quote/author/role from the home payload; only fills cover/title when present.
+ * Fill homepage case cards from published `metric_projects`.
+ * Home payload only needs `{ slug }` per item — quote/author/role/tags/cover
+ * always come from the case itself.
  */
 export async function enrichCaseStudiesFromProjects(
   content: MetricHomeContent,
@@ -40,7 +66,7 @@ export async function enrichCaseStudiesFromProjects(
     const { data, error } = await supabase
       .from("metric_projects")
       .select(
-        "slug, cover_image, metric_project_translations ( locale, title )",
+        "slug, cover_image, metric_project_translations ( locale, title, description, tags, author, role, quote )",
       )
       .eq("status", "published")
       .in("slug", slugs);
@@ -54,33 +80,45 @@ export async function enrichCaseStudiesFromProjects(
       const translations = Array.isArray(row.metric_project_translations)
         ? row.metric_project_translations
         : [];
-      const match =
-        translations.find(
-          (tr: { locale?: string; title?: string }) => tr.locale === locale,
-        ) ??
-        translations.find(
-          (tr: { locale?: string; title?: string }) => tr.locale === "en",
-        );
+      const { primary, en } = pickTranslationRow(translations, locale);
+      const match = primary ?? en;
       bySlug.set(slug, {
         cover_image:
           typeof row.cover_image === "string" && row.cover_image.trim()
             ? row.cover_image.trim()
             : null,
-        title:
-          typeof match?.title === "string" && match.title.trim()
-            ? match.title.trim()
-            : null,
+        title: coalesceLocalized(primary?.title, en?.title) || null,
+        description:
+          coalesceLocalized(primary?.description, en?.description) || null,
+        tags: asStringArray(
+          primary?.tags?.length ? primary.tags : en?.tags?.length ? en.tags : match?.tags,
+        ),
+        author: coalesceLocalized(primary?.author, en?.author) || null,
+        role: coalesceLocalized(primary?.role, en?.role) || null,
+        quote: coalesceLocalized(primary?.quote, en?.quote) || null,
       });
     }
 
     if (bySlug.size === 0) return content;
 
     const enrichedItems = items.map((item) => {
-      const project = bySlug.get(item.slug);
+      const slug = typeof item.slug === "string" ? item.slug.trim() : "";
+      const project = slug ? bySlug.get(slug) : undefined;
       if (!project) return item;
+
+      const quote = project.quote || project.title || item.quote;
+      const author = project.author || project.title || item.author;
+      const role = project.role || project.description || item.role;
+      const image = project.cover_image || item.image;
+      const tags = project.tags.length ? project.tags : [...item.tags];
+
       return {
-        ...item,
-        image: project.cover_image ?? item.image,
+        slug,
+        tags,
+        quote,
+        author,
+        role,
+        image,
         ...(project.title ? { title: project.title } : {}),
       };
     });
@@ -95,6 +133,29 @@ export async function enrichCaseStudiesFromProjects(
   } catch {
     return content;
   }
+}
+
+/** Client-side enrich for admin preview (same rules as public). */
+export function applyProjectFieldsToCaseItems(
+  items: Array<{ slug?: string } & Record<string, unknown>>,
+  projectsBySlug: Map<string, HomeCaseCardFields>,
+): HomeCaseCardFields[] {
+  return items
+    .map((item) => {
+      const slug = String(item.slug ?? "").trim();
+      if (!slug) return null;
+      const project = projectsBySlug.get(slug);
+      if (project) return { ...project, slug };
+      return {
+        slug,
+        tags: asStringArray(item.tags),
+        quote: String(item.quote ?? ""),
+        author: String(item.author ?? ""),
+        role: String(item.role ?? ""),
+        image: String(item.image ?? ""),
+      };
+    })
+    .filter((row): row is HomeCaseCardFields => row != null);
 }
 
 async function loadMetricHomePayload(
@@ -132,7 +193,16 @@ async function loadMetricHomePayload(
 async function resolveMetricHome(locale: Locale): Promise<MetricHomeContent> {
   const base = getMetricHome(locale);
   const payload = await loadMetricHomePayload(locale);
-  const merged = payload ? mergeMetricHome(base, payload) : base;
+  let merged = payload ? mergeMetricHome(base, payload) : base;
+
+  // DE CMS/static gaps → EN (published payload + static defaults).
+  if (locale === "de") {
+    const enBase = getMetricHome("en");
+    const enPayload = await loadMetricHomePayload("en");
+    const enMerged = enPayload ? mergeMetricHome(enBase, enPayload) : enBase;
+    merged = deepFallbackEmpty(merged, enMerged);
+  }
+
   return enrichCaseStudiesFromProjects(merged, locale);
 }
 

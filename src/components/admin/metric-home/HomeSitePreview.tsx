@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AdminSiteScaleFrame } from "@/components/admin/preview/AdminSiteScaleFrame";
 import type { MetricHomeSectionId } from "@/components/admin/metric-home/helpers";
+import type { ProjectOption } from "@/components/admin/metric-home/MetricHomeSectionEditors";
 import type { FaqDraft } from "@/components/admin/list-cms/types";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { adminBtn } from "@/components/admin/ui/styles";
+import { ProjectBriefPreviewProvider } from "@/components/molecules/ProjectBriefProvider";
 import {
   MetricCaseStudiesSection,
   MetricCategoriesSection,
@@ -18,14 +20,18 @@ import { MetricFaqSection } from "@/components/organisms/MetricFaqSection";
 import { getMetricHome, type MetricHomeContent } from "@/data/metric-home";
 import type { FAQItem } from "@/data/faq";
 import { useAdminT } from "@/i18n/admin";
-import { mergeMetricHome } from "@/lib/cms/metric-home-merge";
+import { applyProjectFieldsToCaseItems, mergeMetricHome } from "@/lib/cms/metric-home";
+import { deepFallbackEmpty } from "@/lib/cms/locale-fallback";
 
 type Props = {
   payload: Record<string, unknown>;
+  /** EN payload used when `locale` is DE and a string is empty. */
+  fallbackPayload?: Record<string, unknown> | null;
   locale: AdminLocale;
   section: MetricHomeSectionId;
   dirty: boolean;
   faq: FaqDraft[];
+  projects: ProjectOption[];
 };
 
 type Device = "desktop" | "mobile";
@@ -115,19 +121,66 @@ function NavFooterPreview({ home }: { home: MetricHomeContent }) {
   );
 }
 
-export function HomeSitePreview({ payload, locale, section, dirty, faq }: Props) {
+export function HomeSitePreview({
+  payload,
+  fallbackPayload = null,
+  locale,
+  section,
+  dirty,
+  faq,
+  projects,
+}: Props) {
   const t = useAdminT();
   const [device, setDevice] = useState<Device>("desktop");
   const [scope, setScope] = useState<Scope>("section");
 
-  const home = useMemo(
-    () =>
-      mergeMetricHome(
-        getMetricHome(locale),
-        payload as Partial<MetricHomeContent>,
-      ),
-    [payload, locale],
-  );
+  const home = useMemo(() => {
+    let merged = mergeMetricHome(
+      getMetricHome(locale),
+      payload as Partial<MetricHomeContent>,
+    );
+    if (locale === "de") {
+      const enMerged = mergeMetricHome(
+        getMetricHome("en"),
+        (fallbackPayload ?? {}) as Partial<MetricHomeContent>,
+      );
+      merged = deepFallbackEmpty(merged, enMerged);
+    }
+    const bySlug = new Map(
+      projects.map((project) => {
+        const tr =
+          project.byLocale[locale] ??
+          project.byLocale.en ??
+          Object.values(project.byLocale)[0];
+        const en = project.byLocale.en;
+        const title =
+          (tr?.title || en?.title || project.title || project.slug).trim();
+        return [
+          project.slug,
+          {
+            slug: project.slug,
+            tags: (tr?.tags?.length ? tr.tags : en?.tags) ?? [],
+            quote: (tr?.quote || en?.quote || title).trim(),
+            author: (tr?.author || en?.author || title).trim(),
+            role: (tr?.role || en?.role || tr?.description || en?.description || "").trim(),
+            image: project.cover_image,
+            title,
+          },
+        ] as const;
+      }),
+    );
+    const items = applyProjectFieldsToCaseItems(
+      [...merged.caseStudies.items] as Array<{ slug?: string } & Record<string, unknown>>,
+      bySlug,
+    );
+    return {
+      ...merged,
+      caseStudies: {
+        ...merged.caseStudies,
+        items: items as unknown as MetricHomeContent["caseStudies"]["items"],
+      },
+    };
+  }, [payload, fallbackPayload, locale, projects]);
   const faqItems = useMemo(() => faqItemsFor(faq, locale), [faq, locale]);
 
   const designWidth = device === "desktop" ? 1440 : 390;
@@ -266,7 +319,7 @@ export function HomeSitePreview({ payload, locale, section, dirty, faq }: Props)
               : "admin-site-preview--home-mobile",
           ].join(" ")}
         >
-          {body}
+          <ProjectBriefPreviewProvider>{body}</ProjectBriefPreviewProvider>
         </AdminSiteScaleFrame>
       </div>
 

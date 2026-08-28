@@ -20,6 +20,31 @@ function parsePayload(raw: string): Record<string, unknown> | null {
   }
 }
 
+/** Persist case-study lineup as slug-only — card copy lives on the project. */
+function normalizeHomePayload(payload: Record<string, unknown>): Record<string, unknown> {
+  const caseStudies = payload.caseStudies;
+  if (!caseStudies || typeof caseStudies !== "object" || Array.isArray(caseStudies)) {
+    return payload;
+  }
+  const section = caseStudies as Record<string, unknown>;
+  const rawItems = Array.isArray(section.items) ? section.items : [];
+  const items = rawItems
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const slug = String((item as { slug?: unknown }).slug ?? "").trim();
+      return slug ? { slug } : null;
+    })
+    .filter((row): row is { slug: string } => row != null);
+
+  return {
+    ...payload,
+    caseStudies: {
+      ...section,
+      items,
+    },
+  };
+}
+
 export async function saveMetricHomeAction(formData: FormData) {
   return runAdminAction(async () => {
     const actor = await requirePermission("content");
@@ -46,7 +71,7 @@ export async function saveMetricHomeAction(formData: FormData) {
 
       const { error } = await supabase.from("metric_home_translations").upsert({
         locale,
-        payload,
+        payload: normalizeHomePayload(payload),
         updated_at: new Date().toISOString(),
       });
       if (error) return adminFail(error.message);

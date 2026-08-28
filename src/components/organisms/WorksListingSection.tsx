@@ -27,22 +27,18 @@ export async function WorksListingSection({
     getMetricHomeResolved(locale),
     getActiveTags(locale),
   ]);
-  const homeCaseBySlug = new Map<string, (typeof home.caseStudies.items)[number]>(
-    home.caseStudies.items.map((item) => [item.slug, item]),
-  );
   const breadcrumbs = getLocalizedBreadcrumbs(locale, ["home", "works"]);
 
   const items = projects.map((project) => {
-    const fromHome = homeCaseBySlug.get(project.slug);
-    const rawTags = fromHome?.tags ?? project.tags;
+    const rawTags = project.tags;
     return {
       slug: project.slug,
       href: localePath(locale, `/works/${project.slug}/`),
       tags: resolveTagDisplays(rawTags, taxonomy),
-      quote: fromHome?.quote ?? project.quote ?? project.title,
-      author: fromHome?.author ?? project.author ?? project.title,
-      role: fromHome?.role ?? project.role ?? project.description,
-      image: fromHome?.image ?? project.image,
+      quote: project.quote ?? project.title,
+      author: project.author ?? project.title,
+      role: project.role ?? project.description,
+      image: project.image,
       imageAlt: project.title,
       sphere: project.sphere,
       rawTags,

@@ -30,6 +30,21 @@ export function useProjectBrief() {
   return ctx;
 }
 
+/** No-op brief context for admin site previews (no modal chrome). */
+export function ProjectBriefPreviewProvider({ children }: { children: ReactNode }) {
+  const value = useMemo<ProjectBriefContextValue>(
+    () => ({
+      open: () => {},
+      close: () => {},
+      isOpen: false,
+    }),
+    [],
+  );
+  return (
+    <ProjectBriefContext.Provider value={value}>{children}</ProjectBriefContext.Provider>
+  );
+}
+
 function clearBriefQuery() {
   if (typeof window === "undefined") return;
   const url = new URL(window.location.href);

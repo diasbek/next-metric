@@ -391,6 +391,22 @@ export type AdminMessages = {
       previewFullPage: string;
       previewNavLabel: string;
       previewFooterLabel: string;
+      caseStudiesLegend: string;
+      caseStudiesHint: string;
+      caseStudiesWorksLink: string;
+      caseStudiesTitle: string;
+      caseStudiesTitleAccent: string;
+      caseStudiesSubtitle: string;
+      caseStudiesMoreLabel: string;
+      caseStudiesViewLabel: string;
+      caseStudiesItemLabel: string;
+      caseStudiesPickProject: string;
+      caseStudiesSelectPlaceholder: string;
+      caseStudiesMissing: string;
+      caseStudiesMissingHint: string;
+      caseStudiesFromCase: string;
+      caseStudiesEditCase: string;
+      caseStudiesAdd: string;
     };
     works: {
       title: string;

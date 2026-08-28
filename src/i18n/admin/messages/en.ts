@@ -435,6 +435,23 @@ export const enAdmin: AdminMessages = {
       previewFooterLabel: "Footer",
       contactsSettingsHint:
         "Phone, address, and social URLs are managed in Contacts / Settings — not duplicated in this payload.",
+      caseStudiesLegend: "Case studies",
+      caseStudiesHint:
+        "Pick which cases appear on the homepage. Quote, author, role, tags, and cover always come from the case itself — edit them under Works.",
+      caseStudiesWorksLink: "Open Works →",
+      caseStudiesTitle: "Section title",
+      caseStudiesTitleAccent: "Title accent (highlighted substring)",
+      caseStudiesSubtitle: "Subtitle",
+      caseStudiesMoreLabel: "More projects label",
+      caseStudiesViewLabel: "View case label",
+      caseStudiesItemLabel: "Case",
+      caseStudiesPickProject: "Project",
+      caseStudiesSelectPlaceholder: "Select a case…",
+      caseStudiesMissing: "missing",
+      caseStudiesMissingHint: "This slug is not in Works — pick another case or create it.",
+      caseStudiesFromCase: "From the case (read-only here)",
+      caseStudiesEditCase: "Edit case",
+      caseStudiesAdd: "Add case",
     },
     works: {
       title: "Works",
