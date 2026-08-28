@@ -1,4 +1,6 @@
 import { canAccess, requireAdmin } from "@/lib/cms/auth";
+import { getHomeCaseStudySlugs } from "@/lib/cms/home-cases";
+import { getAdminProjects } from "@/lib/cms/projects";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminMessages } from "@/i18n/admin";
 import { getAdminUiLocale } from "@/i18n/admin/get-admin-locale";
@@ -10,7 +12,7 @@ export default async function AdminHomePage() {
   const t = getAdminMessages(locale);
   const supabase = await createSupabaseServerClient();
 
-  const [projects, drafts, leads, audit] = await Promise.all([
+  const [projectsCount, drafts, leads, audit, homeSlugs, projects] = await Promise.all([
     supabase.from("metric_projects").select("id", { count: "exact", head: true }),
     supabase
       .from("metric_projects")
@@ -24,10 +26,35 @@ export default async function AdminHomePage() {
           .order("created_at", { ascending: false })
           .limit(8)
       : Promise.resolve({ data: null }),
+    getHomeCaseStudySlugs(),
+    getAdminProjects(),
   ]);
 
+  const bySlug = new Map(projects.map((p) => [p.slug, p]));
+  const homeCases = homeSlugs
+    .map((slug, index) => {
+      const project = bySlug.get(slug);
+      if (!project) return null;
+      const title =
+        project.project_translations.find((tr) => tr.locale === "en")?.title ||
+        project.slug;
+      return {
+        id: project.id,
+        slug: project.slug,
+        title,
+        status: project.status,
+        homeOrder: index + 1,
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => row != null);
+
   const kpi = [
-    { label: t.dashboard.works, value: String(projects.count ?? 0), href: "/admin/works/" },
+    { label: t.dashboard.works, value: String(projectsCount.count ?? 0), href: "/admin/works/" },
+    {
+      label: t.dashboard.onHomeWorks,
+      value: String(homeCases.length),
+      href: "/admin/works/?status=home",
+    },
     {
       label: t.dashboard.draftWorks,
       value: String(drafts.count ?? 0),
@@ -73,6 +100,7 @@ export default async function AdminHomePage() {
       noAudit={t.dashboard.noAudit}
       auditRows={auditRows}
       locale={locale}
+      homeCases={homeCases}
     />
   );
 }

@@ -140,6 +140,7 @@ export type AdminMessages = {
     title: string;
     works: string;
     draftWorks: string;
+    onHomeWorks: string;
     newLeads: string;
     services: string;
     homePage: string;
@@ -148,6 +149,11 @@ export type AdminMessages = {
     quickLinks: string;
     recentAudit: string;
     noAudit: string;
+    homeCasesTitle: string;
+    homeCasesHint: string;
+    homeCasesEmpty: string;
+    homeCasesEdit: string;
+    homeCasesOrder: string;
   };
   users: {
     title: string;
@@ -395,6 +401,11 @@ export type AdminMessages = {
       noCover: string;
       sectionLabel: string;
       empty: string;
+      onHomeBadge: string;
+      onHomeFilter: string;
+      onHomeHint: string;
+      onHomeEditLink: string;
+      onHomeEmpty: string;
     };
     tags: {
       title: string;

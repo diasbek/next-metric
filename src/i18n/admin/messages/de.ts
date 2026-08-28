@@ -143,6 +143,7 @@ export const deAdmin: AdminMessages = {
     title: "Übersicht",
     works: "Projekte",
     draftWorks: "Entwürfe",
+    onHomeWorks: "Auf der Startseite",
     newLeads: "Neue Anfragen",
     services: "Leistungen",
     homePage: "Startseite",
@@ -151,6 +152,12 @@ export const deAdmin: AdminMessages = {
     quickLinks: "Schnellzugriff",
     recentAudit: "Letzte Aktivität",
     noAudit: "Noch keine Aktivität.",
+    homeCasesTitle: "Cases auf der Startseite",
+    homeCasesHint:
+      "Gesteuert unter Startseite → Case studies. Case öffnen zum Bearbeiten oder die Auswahl dort ändern.",
+    homeCasesEmpty: "Noch keine Cases auf der Startseite verknüpft.",
+    homeCasesEdit: "Auswahl bearbeiten",
+    homeCasesOrder: "Home #{n}",
   },
   users: {
     title: "Benutzer",
@@ -435,13 +442,18 @@ export const deAdmin: AdminMessages = {
     works: {
       title: "Works",
       description:
-        "Die /works/-Seite und Cases. Am Griff ziehen zum Sortieren. Klicken zum Bearbeiten.",
+        "Die /works/-Seite und Cases. Am Griff ziehen zum Sortieren. Klicken zum Bearbeiten. Blauer Badge = auf der Startseite.",
       newItem: "Neues Projekt",
       searchPlaceholder: "Suchen…",
       filterReorderOff: " (Sortieren bei Filter/Suche deaktiviert)",
       noCover: "Kein Cover",
       sectionLabel: "Projekte",
       empty: "Noch keine Projekte — ersten Case anlegen.",
+      onHomeBadge: "Auf Startseite",
+      onHomeFilter: "Auf Startseite",
+      onHomeHint: "Diese Slugs sind unter Startseite → Case studies ausgewählt.",
+      onHomeEditLink: "Startseiten-Auswahl bearbeiten →",
+      onHomeEmpty: "Noch keine Cases auf der Startseite verknüpft.",
     },
     tags: {
       title: "Tags",

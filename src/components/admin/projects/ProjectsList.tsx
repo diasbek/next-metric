@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { HardNavForm } from "@/components/admin/HardNavForm";
 import {
   ReorderStatus,
@@ -26,13 +27,19 @@ export type ProjectListItem = {
   status: string;
   cover_image: string;
   title: string;
+  /** True when this slug is listed under Home → Case studies. */
+  onHome?: boolean;
+  /** 1-based order on the homepage (null if not on home). */
+  homeOrder?: number | null;
 };
 
 type Props = { projects: ProjectListItem[]; embedded?: boolean };
-type StatusFilter = "all" | "published" | "draft";
+type StatusFilter = "all" | "published" | "draft" | "home";
 
 function parseWorksStatus(raw: string | null): StatusFilter {
-  if (raw === "published" || raw === "draft" || raw === "all") return raw;
+  if (raw === "published" || raw === "draft" || raw === "all" || raw === "home") {
+    return raw;
+  }
   return "all";
 }
 
@@ -46,7 +53,7 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
       style={{
         display: "flex",
         flexDirection: "column",
-        border: "1px solid #333",
+        border: project.onHome ? "1px solid #3a3a8a" : "1px solid #333",
         color: "#fff",
         background: "#0a0a0a",
         overflow: "hidden",
@@ -85,20 +92,63 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
             {t.pages.works.noCover}
           </div>
         )}
+        {project.onHome ? (
+          <span
+            style={{
+              position: "absolute",
+              top: 10,
+              left: 10,
+              zIndex: 1,
+              padding: "4px 8px",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.02em",
+              background: "#2600ff",
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            {project.homeOrder
+              ? `${t.pages.works.onHomeBadge} · #${project.homeOrder}`
+              : t.pages.works.onHomeBadge}
+          </span>
+        ) : null}
       </div>
       <div style={{ padding: 14, display: "grid", gap: 6, flex: 1 }}>
         <strong style={{ fontSize: 15 }}>{project.title || project.slug}</strong>
         <span style={{ fontSize: 12, color: "#777" }}>{project.slug}</span>
-        <span
+        <div
           style={{
             marginTop: "auto",
-            fontSize: 11,
-            fontWeight: 600,
-            color: project.status === "published" ? "#8c8" : "#a86",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            alignItems: "center",
           }}
         >
-          {statusLabel}
-        </span>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: project.status === "published" ? "#8c8" : "#a86",
+            }}
+          >
+            {statusLabel}
+          </span>
+          {project.onHome ? (
+            <Link
+              href="/admin/home/?section=case-studies"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                fontSize: 11,
+                color: "#9af",
+                textDecoration: "none",
+              }}
+            >
+              {t.pages.works.onHomeEditLink}
+            </Link>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -138,12 +188,21 @@ export function ProjectsList({ projects, embedded = false }: Props) {
 
   const filtered = useMemo(() => {
     return ordered.filter((p) => {
-      if (filter !== "all" && p.status !== filter) return false;
+      if (filter === "home") {
+        if (!p.onHome) return false;
+      } else if (filter !== "all" && p.status !== filter) {
+        return false;
+      }
       const hay = `${p.title} ${p.slug}`.toLowerCase();
       if (q.trim() && !hay.includes(q.trim().toLowerCase())) return false;
       return true;
     });
   }, [ordered, filter, q]);
+
+  const homeCount = useMemo(
+    () => projects.filter((p) => p.onHome).length,
+    [projects],
+  );
 
   const openProject = (id: string) => {
     router.push(`/admin/works/${id}/`);
@@ -198,7 +257,14 @@ export function ProjectsList({ projects, embedded = false }: Props) {
           alignItems: "center",
         }}
       >
-        {(["all", "published", "draft"] as const).map((item) => (
+        {(
+          [
+            ["all", t.common.all],
+            ["published", t.common.published],
+            ["draft", t.common.draft],
+            ["home", `${t.pages.works.onHomeFilter}${homeCount ? ` (${homeCount})` : ""}`],
+          ] as const
+        ).map(([item, label]) => (
           <button
             key={item}
             type="button"
@@ -207,13 +273,12 @@ export function ProjectsList({ projects, embedded = false }: Props) {
               ...adminBtn,
               background: filter === item ? "#fff" : "#1a1a1a",
               color: filter === item ? "#000" : "#fff",
+              ...(item === "home" && filter !== item
+                ? { borderColor: "#3a3a8a", color: "#bcb" }
+                : {}),
             }}
           >
-            {item === "all"
-              ? t.common.all
-              : item === "published"
-                ? t.common.published
-                : t.common.draft}
+            {label}
           </button>
         ))}
         <input
@@ -230,6 +295,15 @@ export function ProjectsList({ projects, embedded = false }: Props) {
           }}
         />
       </div>
+
+      {filter === "home" ? (
+        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#888", lineHeight: 1.4 }}>
+          {t.pages.works.onHomeHint}{" "}
+          <Link href="/admin/home/?section=case-studies" style={{ color: "#8af" }}>
+            {t.pages.works.onHomeEditLink}
+          </Link>
+        </p>
+      ) : null}
 
       <SortableCardGrid
         items={filtering ? filtered : ordered}
@@ -259,7 +333,11 @@ export function ProjectsList({ projects, embedded = false }: Props) {
       />
       {filtered.length === 0 ? (
         <p style={{ color: "#888", marginTop: 24 }}>
-          {projects.length === 0 ? t.pages.works.empty : t.common.emptyList}
+          {projects.length === 0
+            ? t.pages.works.empty
+            : filter === "home"
+              ? t.pages.works.onHomeEmpty
+              : t.common.emptyList}
         </p>
       ) : null}
     </div>
