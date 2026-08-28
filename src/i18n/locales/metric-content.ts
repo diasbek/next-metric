@@ -114,6 +114,7 @@ export const metricSiteContent: SiteContent = {
     howWeWork: "How we work",
     whyUsTitle: "Why Metric",
     otherWorks: "Other projects",
+    relatedInCategory: "More in {category}",
     reviewsTitle: "Reviews",
     listingDesignLabel: "Amazon listing design",
     beforeAfterLabel: "Before / After",

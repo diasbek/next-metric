@@ -36,6 +36,8 @@ export interface SiteContent {
       title: string;
       description: string;
       keywords?: string;
+      ogImage?: string;
+      noindex?: boolean;
     }
   >;
   ui: {
@@ -94,6 +96,7 @@ export interface SiteContent {
     howWeWork: string;
     whyUsTitle: string;
     otherWorks: string;
+    relatedInCategory: string;
     reviewsTitle: string;
     listingDesignLabel: string;
     beforeAfterLabel: string;

@@ -3,6 +3,7 @@ import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
+import { SiteBreadcrumbs } from "@/components/molecules/SiteBreadcrumbs";
 import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
 import type { Project } from "@/data/projects";
 import { youtubeEmbedUrl } from "@/data/projects";
@@ -13,10 +14,13 @@ import {
 } from "@/data/case-image-meta";
 import { caseStripFromBlocks } from "@/lib/cms/case-gallery";
 import { getNextProjects } from "@/i18n/get-content";
+import { getLocalizedBreadcrumbs } from "@/i18n/page-seo";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
+import { getActiveTags } from "@/lib/cms/tags";
+import { resolveTagDisplays } from "@/utils/tag-labels";
 
 interface WorkCaseSectionProps {
   locale: Locale;
@@ -40,9 +44,10 @@ export async function WorkCaseSection({
   project,
 }: WorkCaseSectionProps) {
   const { ui } = content;
-  const [home, nextProjects] = await Promise.all([
+  const [home, nextProjects, taxonomy] = await Promise.all([
     getMetricHomeResolved(locale),
     getNextProjects(locale, project.slug),
+    getActiveTags(locale),
   ]);
   const homeCaseBySlug = new Map<string, (typeof home.caseStudies.items)[number]>(
     home.caseStudies.items.map((item) => [item.slug, item]),
@@ -59,10 +64,21 @@ export async function WorkCaseSection({
 
   const authorName = project.author ?? project.title;
   let galleryIndex = 0;
+  const path = localePath(locale, `/works/${project.slug}/`);
+  const breadcrumbs = getLocalizedBreadcrumbs(locale, [
+    "home",
+    "works",
+    { name: project.title, path },
+  ]);
+  const displayTags = resolveTagDisplays(project.tags, taxonomy);
+  const relatedHeading = project.sphere
+    ? ui.relatedInCategory.replace("{category}", project.sphere)
+    : ui.otherWorks;
 
   return (
     <article className="metric-case">
       <PageContainer className="metric-case__shell">
+        <SiteBreadcrumbs items={breadcrumbs} className="mb-6" />
         <header className="metric-case__intro">
           <h1 className="metric-case__title font-display">{authorName}</h1>
 
@@ -82,12 +98,13 @@ export async function WorkCaseSection({
 
             <div className="metric-case__col metric-case__col--aside">
               <div className="metric-case__meta">
-                {project.tags.length ? (
+                {displayTags.length ? (
                   <div className="metric-case__tags">
-                    {project.tags.map((tag) => (
+                    {displayTags.map((tag) => (
                       <MetricTagPill
-                        key={tag}
-                        tag={tag}
+                        key={tag.slug}
+                        tag={tag.slug}
+                        label={tag.label}
                         locale={locale}
                         className="metric-case__tag"
                       />
@@ -158,6 +175,7 @@ export async function WorkCaseSection({
                               height={height}
                               className="metric-case__stack-img"
                               priority
+                              fetchPriority="high"
                             />
                           ) : (
                             <MediaImage
@@ -256,6 +274,7 @@ export async function WorkCaseSection({
                       height={height}
                       className="metric-case__stack-img"
                       priority
+                      fetchPriority="high"
                     />
                   ) : (
                     <MediaImage
@@ -318,7 +337,7 @@ export async function WorkCaseSection({
         <section className="mt-16 md:mt-20">
           <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
-              {ui.otherWorks}
+              {relatedHeading}
             </h2>
             <Button href={localePath(locale, "/works/")} variant="outline">
               {home.caseStudies.moreLabel}
@@ -327,12 +346,13 @@ export async function WorkCaseSection({
           <div className="metric-case-studies__list">
             {nextProjects.slice(0, 2).map((item) => {
               const fromHome = homeCaseBySlug.get(item.slug);
+              const rawTags = fromHome?.tags ?? item.tags;
               return (
                 <MetricCaseCard
                   key={item.slug}
                   locale={locale}
                   href={localePath(locale, `/works/${item.slug}/`)}
-                  tags={fromHome?.tags ?? item.tags}
+                  tags={resolveTagDisplays(rawTags, taxonomy)}
                   quote={fromHome?.quote ?? item.quote ?? item.title}
                   author={fromHome?.author ?? item.author ?? item.title}
                   role={fromHome?.role ?? item.role ?? item.description}

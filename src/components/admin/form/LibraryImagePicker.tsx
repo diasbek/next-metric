@@ -69,8 +69,10 @@ export function LibraryImagePicker({
     : items;
 
   const pick = (url: string) => {
-    setValue(url);
     onSelect?.(url);
+    // Parent often switches tab / unmounts this picker on select.
+    // Only keep local highlight when still mounted (e.g. gallery add flow).
+    setValue(url);
   };
 
   return (

@@ -1,34 +1,22 @@
-import {
-  directionFilters,
-  sphereFilters,
-} from "@/data/filters";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
+import type { ResolvedTag } from "@/lib/cms/tags";
+import { classifyTagSlug } from "@/lib/cms/tags";
+import type { TagKind } from "@/lib/cms/types";
+import {
+  WORKS_CATEGORY_VALUES,
+  WORKS_TYPE_VALUES,
+} from "./works-filters-fallback";
 
-/** Category / industry values (excludes localized "All"). */
-export const WORKS_CATEGORY_VALUES = sphereFilters.filter(
-  (value) => value !== "All",
-) as readonly string[];
+export type WorksFilterOption = {
+  value: string;
+  label: string;
+};
 
-/** Deliverable / type values (excludes localized "All"). */
-export const WORKS_TYPE_VALUES = directionFilters.filter(
-  (value) => value !== "All",
-) as readonly string[];
+export type WorksFilterKind = TagKind;
 
-const CATEGORY_SET = new Set(
-  WORKS_CATEGORY_VALUES.map((value) => value.toLowerCase()),
-);
-const TYPE_SET = new Set(WORKS_TYPE_VALUES.map((value) => value.toLowerCase()));
-
-export type WorksFilterKind = "category" | "type";
-
-export function classifyWorksTag(tag: string): WorksFilterKind | null {
-  const key = tag.trim().toLowerCase();
-  if (!key) return null;
-  if (CATEGORY_SET.has(key)) return "category";
-  if (TYPE_SET.has(key)) return "type";
-  return null;
-}
+/** @deprecated Prefer getActiveTags() — kept for fallbacks when CMS is empty. */
+export { WORKS_CATEGORY_VALUES, WORKS_TYPE_VALUES };
 
 export function worksListingHref(
   locale: Locale,
@@ -44,11 +32,14 @@ export function worksListingHref(
   return query ? `${base}?${query}` : base;
 }
 
-export function worksTagHref(locale: Locale, tag: string): string {
-  const kind = classifyWorksTag(tag);
+export function worksTagHref(
+  locale: Locale,
+  tag: string,
+  taxonomy: readonly Pick<ResolvedTag, "slug" | "kind">[] = [],
+): string {
+  const kind = classifyWorksTag(tag, taxonomy);
   if (kind === "category") return worksListingHref(locale, { category: tag });
   if (kind === "type") return worksListingHref(locale, { type: tag });
-  // Unknown tags still deep-link as type so the list can match on tags.
   return worksListingHref(locale, { type: tag });
 }
 
@@ -85,4 +76,36 @@ export function uniqueWorksFilterOptions(
     out.push(value);
   }
   return out.sort((a, b) => a.localeCompare(b));
+}
+
+/** Build filter dropdown options from taxonomy, only values present on projects. */
+export function worksFilterOptionsFromTaxonomy(
+  taxonomy: readonly ResolvedTag[],
+  kind: TagKind,
+  usedSlugs: readonly string[],
+): WorksFilterOption[] {
+  const used = new Set(
+    usedSlugs.map((s) => s.trim().toLowerCase()).filter(Boolean),
+  );
+  return taxonomy
+    .filter((tag) => tag.kind === kind && used.has(tag.slug.toLowerCase()))
+    .sort((a, b) => a.sort_order - b.sort_order || a.slug.localeCompare(b.slug))
+    .map((tag) => ({ value: tag.slug, label: tag.label }));
+}
+
+export function classifyWorksTag(
+  tag: string,
+  taxonomy: readonly Pick<ResolvedTag, "slug" | "kind">[] = [],
+): WorksFilterKind | null {
+  const fromTaxonomy = classifyTagSlug(tag, taxonomy);
+  if (fromTaxonomy) return fromTaxonomy;
+  const key = tag.trim().toLowerCase();
+  if (!key) return null;
+  if (WORKS_CATEGORY_VALUES.some((value) => value.toLowerCase() === key)) {
+    return "category";
+  }
+  if (WORKS_TYPE_VALUES.some((value) => value.toLowerCase() === key)) {
+    return "type";
+  }
+  return null;
 }

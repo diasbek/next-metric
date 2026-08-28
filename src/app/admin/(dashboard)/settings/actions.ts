@@ -77,13 +77,15 @@ export async function saveSettingsAction(formData: FormData) {
   }
 
   for (const locale of ["en", "de"] as const) {
-    for (const pageKey of ["home", "agency", "works", "services", "contacts"] as const) {
+    for (const pageKey of ["home", "works"] as const) {
       await supabase.from("metric_page_seo").upsert({
         locale,
         page_key: pageKey,
         title: String(formData.get(`${locale}_${pageKey}_title`) ?? ""),
         description: String(formData.get(`${locale}_${pageKey}_description`) ?? ""),
         keywords: String(formData.get(`${locale}_${pageKey}_keywords`) ?? ""),
+        og_image: String(formData.get(`${locale}_${pageKey}_og_image`) ?? "").trim(),
+        noindex: formData.get(`${locale}_${pageKey}_noindex`) === "on",
       });
     }
   }

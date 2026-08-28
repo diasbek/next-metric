@@ -4,11 +4,12 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 import type { SiteContent } from "@/i18n/types";
+import type { WorksFilterOption } from "@/utils/works-filters";
 
 interface WorksListingFiltersProps {
   ui: SiteContent["ui"];
-  categoryOptions: readonly string[];
-  typeOptions: readonly string[];
+  categoryOptions: readonly WorksFilterOption[];
+  typeOptions: readonly WorksFilterOption[];
   category: string;
   type: string;
   pathname: string;
@@ -25,6 +26,8 @@ export function WorksListingFilters({
   const router = useRouter();
   const categoryValue = category || ui.filterAll;
   const typeValue = type || ui.filterAll;
+  const categoryValues = categoryOptions.map((o) => o.value);
+  const typeValues = typeOptions.map((o) => o.value);
 
   const updateFilter = useCallback(
     (key: "category" | "type", next: string) => {
@@ -55,9 +58,12 @@ export function WorksListingFilters({
       <div className="works-filters__row">
         <FilterDropdown
           label={ui.filterSphere}
-          options={[ui.filterAll, ...categoryOptions]}
+          options={[
+            { value: ui.filterAll, label: ui.filterAll },
+            ...categoryOptions,
+          ]}
           value={
-            categoryOptions.includes(categoryValue) || categoryValue === ui.filterAll
+            categoryValues.includes(categoryValue) || categoryValue === ui.filterAll
               ? categoryValue
               : ui.filterAll
           }
@@ -66,9 +72,12 @@ export function WorksListingFilters({
         />
         <FilterDropdown
           label={ui.filterDirection}
-          options={[ui.filterAll, ...typeOptions]}
+          options={[
+            { value: ui.filterAll, label: ui.filterAll },
+            ...typeOptions,
+          ]}
           value={
-            typeOptions.includes(typeValue) || typeValue === ui.filterAll
+            typeValues.includes(typeValue) || typeValue === ui.filterAll
               ? typeValue
               : ui.filterAll
           }

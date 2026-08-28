@@ -16,7 +16,8 @@ type ReorderTable =
   | typeof T.testimonials
   | typeof T.services
   | typeof T.projects
-  | typeof T.teamMembers;
+  | typeof T.teamMembers
+  | typeof T.tags;
 
 /** Persist 0-based sort_order for a list of ids. Used by admin DnD grids. */
 export async function reorderCmsRows(options: {

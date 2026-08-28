@@ -11,12 +11,34 @@ import {
 import { createPortal } from "react-dom";
 import { useIsClient } from "@/hooks/use-is-client";
 
+export type FilterDropdownOption = {
+  value: string;
+  label: string;
+};
+
 interface FilterDropdownProps {
   label: string;
-  options: readonly string[];
+  options: readonly (string | FilterDropdownOption)[];
   value: string;
   onChange: (value: string) => void;
   allLabel: string;
+}
+
+function normalizeOption(
+  option: string | FilterDropdownOption,
+  allLabel: string,
+  groupLabel: string,
+): FilterDropdownOption {
+  if (typeof option === "string") {
+    return {
+      value: option,
+      label: option === allLabel ? groupLabel : option,
+    };
+  }
+  return {
+    value: option.value,
+    label: option.value === allLabel ? groupLabel : option.label,
+  };
 }
 
 export function FilterDropdown({
@@ -34,7 +56,11 @@ export function FilterDropdown({
   const mounted = useIsClient();
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
 
-  const displayValue = value === allLabel ? label : value;
+  const normalized = options.map((option) =>
+    normalizeOption(option, allLabel, label),
+  );
+  const selected = normalized.find((option) => option.value === value);
+  const displayValue = value === allLabel ? label : (selected?.label ?? value);
 
   const updatePosition = useCallback(() => {
     const anchor = rootRef.current;
@@ -66,15 +92,15 @@ export function FilterDropdown({
     updatePosition();
     const frame = requestAnimationFrame(() => updatePosition());
 
-    const handleLayoutChange = () => updatePosition();
+    const onLayout = () => updatePosition();
 
-    window.addEventListener("resize", handleLayoutChange);
-    window.addEventListener("scroll", handleLayoutChange, true);
+    window.addEventListener("resize", onLayout);
+    window.addEventListener("scroll", onLayout, true);
 
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("resize", handleLayoutChange);
-      window.removeEventListener("scroll", handleLayoutChange, true);
+      window.removeEventListener("resize", onLayout);
+      window.removeEventListener("scroll", onLayout, true);
     };
   }, [open, updatePosition, options.length]);
 
@@ -82,11 +108,11 @@ export function FilterDropdown({
     if (!open) return;
 
     const frame = requestAnimationFrame(() => {
-      const selected = menuRef.current?.querySelector<HTMLButtonElement>(
+      const selectedBtn = menuRef.current?.querySelector<HTMLButtonElement>(
         '[role="option"][aria-selected="true"]',
       );
       const first = menuRef.current?.querySelector<HTMLButtonElement>('[role="option"]');
-      (selected ?? first)?.focus();
+      (selectedBtn ?? first)?.focus();
     });
 
     const handlePointerDown = (event: MouseEvent) => {
@@ -155,12 +181,11 @@ export function FilterDropdown({
             aria-label={label}
             style={menuStyle}
           >
-            {options.map((option) => {
-              const isSelected = option === value;
-              const optionLabel = option === allLabel ? label : option;
+            {normalized.map((option) => {
+              const isSelected = option.value === value;
 
               return (
-                <li key={option} className="ui-select__menu-option" role="none">
+                <li key={option.value} className="ui-select__menu-option" role="none">
                   <button
                     type="button"
                     role="option"
@@ -169,11 +194,11 @@ export function FilterDropdown({
                       isSelected ? "is-active" : ""
                     }`}
                     onClick={() => {
-                      onChange(option);
+                      onChange(option.value);
                       setOpen(false);
                     }}
                   >
-                    {optionLabel}
+                    {option.label}
                   </button>
                 </li>
               );

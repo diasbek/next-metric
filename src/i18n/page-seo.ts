@@ -87,10 +87,14 @@ export async function getLocalizedProjectListSchema(locale: Locale) {
 export async function getLocalizedCreativeWorkSchema(
   locale: Locale,
   slug: string,
+  options?: {
+    datePublished?: string | null;
+    dateModified?: string | null;
+  },
 ) {
   const project = await getProjectBySlug(locale, slug);
   if (!project) return null;
-  return getCreativeWorkSchema(project, locale);
+  return getCreativeWorkSchema(project, locale, options);
 }
 
 export function getLocalizedServicesCatalogSchema(locale: Locale) {

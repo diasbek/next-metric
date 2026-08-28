@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { youtubeEmbedUrl } from "@/data/projects";
-import { getWorkOgImagePath } from "@/utils/og/paths";
+import { getWorkOgImagePath, ogEyebrows } from "@/utils/og/paths";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { adminBtn } from "@/components/admin/ui/styles";
 import { useAdminT } from "@/i18n/admin";
@@ -52,6 +52,162 @@ function copyDirty(draft: ProjectEditorData, saved: ProjectEditorData): boolean 
     }
   }
   return false;
+}
+
+function resolveOgCandidates(draft: ProjectEditorData, locale: AdminLocale): string[] {
+  const custom = draft.og_image.trim();
+  const cover = draft.cover_image.trim();
+  const out: string[] = [];
+  if (custom) out.push(custom);
+  if (cover && cover !== custom) out.push(cover);
+  // /og/.../works/[slug] only resolves published CMS cases — drafts 404.
+  if (draft.status === "published" && draft.slug.trim()) {
+    out.push(getWorkOgImagePath(locale, draft.slug));
+  }
+  return out;
+}
+
+function OgSharePreview({
+  draft,
+  locale,
+}: {
+  draft: ProjectEditorData;
+  locale: AdminLocale;
+}) {
+  const t = useAdminT();
+  const tr = draft.translations[locale];
+  const candidateKey = `${draft.og_image}|${draft.cover_image}|${draft.status}|${draft.slug}|${locale}`;
+  const candidates = useMemo(
+    () => resolveOgCandidates(draft, locale),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidateKey],
+  );
+  const [index, setIndex] = useState(0);
+  const [failedAll, setFailedAll] = useState(false);
+
+  useEffect(() => {
+    setIndex(0);
+    setFailedAll(false);
+  }, [candidateKey]);
+
+  const src = !failedAll && index < candidates.length ? candidates[index] : null;
+  const title =
+    (tr.meta_title || tr.title || "").replace(/\s*—\s*METRIC$/i, "").trim() ||
+    t.pages.project.titlePlaceholder;
+  const description =
+    (tr.meta_description || tr.description || "").trim() ||
+    t.pages.project.descriptionPlaceholder;
+  const eyebrow = ogEyebrows[locale].works;
+
+  return (
+    <div style={{ display: "grid", gap: 6 }}>
+      <span style={{ fontSize: 12, color: "#888" }}>{t.pages.project.ogImage}</span>
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          aspectRatio: "1200 / 630",
+          border: "1px solid #333",
+          background: "#111",
+          borderRadius: 8,
+          overflow: "hidden",
+        }}
+      >
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt=""
+            onError={() => {
+              setIndex((i) => {
+                const next = i + 1;
+                if (next >= candidates.length) setFailedAll(true);
+                return next;
+              });
+            }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1.1fr 0.9fr",
+              width: "100%",
+              height: "100%",
+              background: "#fff",
+              color: "#090909",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                padding: "14px 12px",
+                minWidth: 0,
+              }}
+            >
+              <strong
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  color: "#ff3c82",
+                  textTransform: "uppercase",
+                }}
+              >
+                {eyebrow}
+              </strong>
+              <div style={{ display: "grid", gap: 6, minWidth: 0 }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    lineHeight: 1.15,
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {title}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 11,
+                    lineHeight: 1.3,
+                    color: "#444",
+                    overflowWrap: "anywhere",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
+              <span style={{ fontSize: 10, color: "#888" }}>metric.graphics</span>
+            </div>
+            <div
+              style={{
+                background:
+                  "linear-gradient(145deg, #f3e0ef, #ead4e8 40%, rgba(38,0,255,0.12))",
+                borderLeft: "1px solid #eee",
+              }}
+            />
+          </div>
+        )}
+      </div>
+      <p style={{ margin: 0, fontSize: 11, color: "#666" }}>
+        {src ? t.settings.ogPreviewHint : t.pages.project.ogPreviewEmpty}
+      </p>
+    </div>
+  );
 }
 
 export function CaseSitePreview({ draft, saved, locale }: Props) {
@@ -362,25 +518,7 @@ export function CaseSitePreview({ draft, saved, locale }: Props) {
         <span style={{ fontSize: 11, color: "#777" }}>{t.pages.project.previewLiveHint}</span>
       </div>
 
-      <div style={{ display: "grid", gap: 6 }}>
-        <span style={{ fontSize: 12, color: "#888" }}>OG</span>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={
-            draft.og_image ||
-            getWorkOgImagePath(locale, draft.slug)
-          }
-          alt="OG preview"
-          style={{
-            width: "100%",
-            aspectRatio: "1200 / 630",
-            objectFit: "cover",
-            border: "1px solid #333",
-            background: "#111",
-            borderRadius: 8,
-          }}
-        />
-      </div>
+      <OgSharePreview draft={draft} locale={locale} />
     </aside>
   );
 }

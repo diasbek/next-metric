@@ -153,13 +153,21 @@ async function loadExtras(locale: Locale) {
 
     const pageSeo: Record<
       string,
-      { title: string; description: string; keywords: string }
+      {
+        title: string;
+        description: string;
+        keywords: string;
+        ogImage: string;
+        noindex: boolean;
+      }
     > = {};
     for (const row of seoRes.data ?? []) {
       pageSeo[row.page_key] = {
         title: row.title,
         description: row.description,
         keywords: row.keywords ?? "",
+        ogImage: (row.og_image ?? "").trim(),
+        noindex: Boolean(row.noindex),
       };
     }
 

@@ -13,6 +13,7 @@ import {
   uploadMediaFile,
 } from "@/lib/cms/storage";
 import { adminFail, adminOk, adminRedirect } from "@/lib/cms/admin-redirect";
+import { replaceProjectTags } from "@/lib/cms/tags";
 
 function projectEditPath(projectId: string, formData?: FormData, extraQs?: Record<string, string>) {
   const locale = String(formData?.get("return_locale") ?? "").trim();
@@ -100,12 +101,23 @@ export async function saveProjectAction(formData: FormData) {
     ogImage = uploaded.publicUrl;
   }
 
+  const categoryTagId = String(formData.get("category_tag_id") ?? "").trim();
+  const typeTagIds = formData
+    .getAll("type_tag_ids")
+    .map((v) => String(v).trim())
+    .filter(Boolean);
+  const tagSync = await replaceProjectTags(id, [
+    ...(categoryTagId ? [categoryTagId] : []),
+    ...typeTagIds,
+  ]);
+  if ("error" in tagSync) return adminFail(tagSync.error);
+
   const { error } = await supabase
     .from("metric_projects")
     .update({
       slug: String(formData.get("slug") ?? ""),
       status,
-      sphere: String(formData.get("sphere") ?? ""),
+      sphere: tagSync.sphere,
       featured: formData.get("featured") === "on",
       sort_order: Number(formData.get("sort_order") ?? 0),
       cover_image: coverImage,
@@ -123,10 +135,7 @@ export async function saveProjectAction(formData: FormData) {
       locale,
       title: String(formData.get(`${locale}_title`) ?? ""),
       description: String(formData.get(`${locale}_description`) ?? ""),
-      tags: String(formData.get(`${locale}_tags`) ?? "")
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
+      tags: tagSync.tags,
       case_year: String(formData.get(`${locale}_case_year`) ?? "") || null,
       case_task: String(formData.get(`${locale}_case_task`) ?? "") || null,
       case_solution: String(formData.get(`${locale}_case_solution`) ?? "") || null,
@@ -139,7 +148,7 @@ export async function saveProjectAction(formData: FormData) {
     });
   }
 
-  revalidateCms(["cms", "projects"]);
+  revalidateCms(["cms", "projects", "tags"]);
   return adminRedirect(projectEditPath(id, formData));
 }
 

@@ -4,7 +4,7 @@ import { HardNavForm } from "@/components/admin/HardNavForm";
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { SITE_CONFIG } from "@/utils/consts";
-import { getPageOgImagePath, type OgPageKey } from "@/utils/og/paths";
+import { getPageOgImagePath, isOgPageKey } from "@/utils/og/paths";
 import {
   deleteTelegramWebhookAction,
   pingTelegramChatAction,
@@ -29,6 +29,8 @@ type SeoRow = {
   title: string;
   description: string;
   keywords: string;
+  og_image: string;
+  noindex: boolean;
 };
 
 type SettingsData = {
@@ -67,11 +69,8 @@ type Props = {
 };
 
 const PAGE_KEYS = [
-  { key: "home", labelKey: "pageHome" },
-  { key: "agency", labelKey: "pageAgency" },
-  { key: "works", labelKey: "pageWorks" },
-  { key: "services", labelKey: "pageServices" },
-  { key: "contacts", labelKey: "pageContacts" },
+  { key: "home", labelKey: "pageHome" as const },
+  { key: "works", labelKey: "pageWorks" as const },
 ] as const;
 
 const fieldset: CSSProperties = {
@@ -89,7 +88,13 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
   const [seoDraft, setSeoDraft] = useState(() => {
     const map: Record<
       string,
-      { title: string; description: string; keywords: string }
+      {
+        title: string;
+        description: string;
+        keywords: string;
+        og_image: string;
+        noindex: boolean;
+      }
     > = {};
     for (const locale of ADMIN_LOCALES) {
       for (const page of PAGE_KEYS) {
@@ -100,6 +105,8 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
           title: row?.title ?? "",
           description: row?.description ?? "",
           keywords: row?.keywords ?? "",
+          og_image: row?.og_image ?? "",
+          noindex: Boolean(row?.noindex),
         };
       }
     }
@@ -110,6 +117,8 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
     title: "",
     description: "",
     keywords: "",
+    og_image: "",
+    noindex: false,
   };
 
   const webhookHint = settings.webhookSecretPresent
@@ -134,13 +143,20 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
     }
   }, []);
 
-  const ogPath = getPageOgImagePath(seoLocale, seoPage as OgPageKey);
-  const [ogPreviewSrc, setOgPreviewSrc] = useState(ogPath);
+  const ogPath = isOgPageKey(seoPage)
+    ? getPageOgImagePath(seoLocale, seoPage)
+    : getPageOgImagePath(seoLocale, "home");
+  const customOg = currentSeo.og_image.trim();
+  const [ogPreviewSrc, setOgPreviewSrc] = useState(customOg || ogPath);
   const [ogLoading, setOgLoading] = useState(true);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setOgLoading(true);
+      if (customOg) {
+        setOgPreviewSrc(customOg);
+        return;
+      }
       const params = new URLSearchParams();
       if (currentSeo.title.trim()) params.set("title", currentSeo.title.trim());
       if (currentSeo.description.trim()) {
@@ -150,7 +166,7 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
       setOgPreviewSrc(qs ? `${ogPath}?${qs}` : ogPath);
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [ogPath, currentSeo.title, currentSeo.description]);
+  }, [ogPath, customOg, currentSeo.title, currentSeo.description]);
 
   return (
     <div style={{ width: "100%", maxWidth: 720 }}>
@@ -347,6 +363,10 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
               <input type="hidden" name={`${key}_title`} value={value.title} />
               <input type="hidden" name={`${key}_description`} value={value.description} />
               <input type="hidden" name={`${key}_keywords`} value={value.keywords} />
+              <input type="hidden" name={`${key}_og_image`} value={value.og_image} />
+              {value.noindex ? (
+                <input type="hidden" name={`${key}_noindex`} value="on" />
+              ) : null}
             </div>
           ))}
 
@@ -578,6 +598,45 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
           </label>
           <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
             {t.settings.seoKeywordsHint}
+          </p>
+          <label>
+            {t.settings.seoOgImage}
+            <input
+              value={currentSeo.og_image}
+              onChange={(e) =>
+                setSeoDraft((prev) => ({
+                  ...prev,
+                  [`${seoLocale}_${seoPage}`]: {
+                    ...prev[`${seoLocale}_${seoPage}`],
+                    og_image: e.target.value,
+                  },
+                }))
+              }
+              placeholder={t.settings.seoOgImagePlaceholder}
+              style={adminInput}
+            />
+          </label>
+          <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
+            {t.settings.seoOgImageHint}
+          </p>
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="checkbox"
+              checked={currentSeo.noindex}
+              onChange={(e) =>
+                setSeoDraft((prev) => ({
+                  ...prev,
+                  [`${seoLocale}_${seoPage}`]: {
+                    ...prev[`${seoLocale}_${seoPage}`],
+                    noindex: e.target.checked,
+                  },
+                }))
+              }
+            />
+            {t.settings.seoNoindex}
+          </label>
+          <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
+            {t.settings.seoIndexableHint}
           </p>
         </div>
 

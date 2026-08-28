@@ -50,6 +50,8 @@ export interface Project {
   quote?: string;
   author?: string;
   role?: string;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export function youtubeEmbedUrl(url: string): string | null {

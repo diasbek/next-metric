@@ -20,6 +20,11 @@ import { getContentFreshnessDate } from "@/lib/cms/freshness";
 import { getAllPublishedSlugsFromCms } from "@/lib/cms/projects";
 import { canonicalPageUrl, createPageMetadata } from "@/utils/metadata";
 import { getWorkOgImagePath } from "@/utils/og/paths";
+import {
+  getFaqPageSchema,
+  getLocalBusinessSchema,
+  getServicesCatalogSchema,
+} from "@/utils/seo/json-ld";
 import { HomePageView } from "@/views/HomePageView";
 import { AgencyPageView } from "@/views/AgencyPageView";
 import { WorksPageView } from "@/views/WorksPageView";
@@ -88,9 +93,16 @@ export function createWorkCasePage(locale: Locale) {
       const description =
         project.seo?.metaDescription || project.description;
       const path = localePath(locale, `/works/${slug}/`);
-      const creativeWork = await getLocalizedCreativeWorkSchema(locale, slug);
+      const creativeWork = await getLocalizedCreativeWorkSchema(locale, slug, {
+        datePublished: project.publishedAt,
+        dateModified:
+          cmsSlugs.find((item) => item.slug === slug)?.updated_at ??
+          project.updatedAt ??
+          null,
+      });
       const dateModified =
         cmsSlugs.find((item) => item.slug === slug)?.updated_at ??
+        project.updatedAt ??
         (await getContentFreshnessDate()).toISOString();
 
       return (
@@ -143,16 +155,28 @@ async function withPageDateModified(
 }
 
 export function createHomePage(locale: Locale) {
-  const content = getContent(locale);
-  const meta = content.pageMeta.home;
   const path = localePath(locale, pagePaths.home);
 
   return {
     generateMetadata: () => getLocalizedPageMetadata(locale, "home"),
     Page: async function HomePage() {
+      const content = await getResolvedContent(locale);
+      const meta = content.pageMeta.home;
       return (
         <>
-          <JsonLd data={await withPageDateModified(locale, meta, path)} />
+          <JsonLd
+            data={await withPageDateModified(
+              locale,
+              meta,
+              path,
+              ["home"],
+              [
+                getFaqPageSchema(content.faq),
+                getServicesCatalogSchema(content.services, locale),
+                getLocalBusinessSchema(locale),
+              ],
+            )}
+          />
           <HomePageView locale={locale} />
         </>
       );

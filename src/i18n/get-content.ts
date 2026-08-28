@@ -48,13 +48,27 @@ export async function getProjectBySlug(locale: Locale, slug: string) {
 
 export async function getNextProjects(locale: Locale, slug: string, count = 2) {
   const projects = await getProjectsForLocale(locale);
-  const index = projects.findIndex((project) => project.slug === slug);
-  if (index === -1) return projects.slice(0, count);
-  const next = projects.slice(index + 1, index + 1 + count);
-  if (next.length < count) {
-    return [...next, ...projects.slice(0, count - next.length)];
-  }
-  return next;
+  const current = projects.find((project) => project.slug === slug);
+  if (!current) return projects.slice(0, count);
+
+  const others = projects.filter((project) => project.slug !== slug);
+  const scored = others
+    .map((project) => {
+      let score = 0;
+      if (current.sphere && project.sphere === current.sphere) score += 3;
+      for (const tag of current.tags) {
+        if (project.tags.includes(tag)) score += 1;
+      }
+      return { project, score };
+    })
+    .sort((a, b) => b.score - a.score || a.project.slug.localeCompare(b.project.slug));
+
+  const related = scored.filter((row) => row.score > 0).map((row) => row.project);
+  if (related.length >= count) return related.slice(0, count);
+
+  const relatedSlugs = new Set(related.map((p) => p.slug));
+  const fill = others.filter((p) => !relatedSlugs.has(p.slug));
+  return [...related, ...fill].slice(0, count);
 }
 
 export async function getAllProjectSlugs(): Promise<string[]> {
@@ -126,6 +140,8 @@ export async function getResolvedContent(locale: Locale): Promise<SiteContent> {
               title: value.title || fallback?.title || "",
               description: value.description || fallback?.description || "",
               keywords: value.keywords || fallback?.keywords || "",
+              ogImage: value.ogImage || fallback?.ogImage || "",
+              noindex: value.noindex ?? fallback?.noindex ?? false,
             },
           ];
         }),

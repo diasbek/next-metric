@@ -7,7 +7,7 @@ import type { Locale } from "@/i18n/config";
 export type MetricCaseCardProps = {
   locale: Locale;
   href: string;
-  tags: readonly string[];
+  tags: readonly string[] | readonly { slug: string; label: string }[];
   quote: string;
   author: string;
   role: string;
@@ -15,6 +15,14 @@ export type MetricCaseCardProps = {
   imageAlt?: string;
   viewLabel: string;
 };
+
+function normalizeTags(
+  tags: MetricCaseCardProps["tags"],
+): Array<{ slug: string; label: string }> {
+  return tags.map((tag) =>
+    typeof tag === "string" ? { slug: tag, label: tag } : tag,
+  );
+}
 
 export function MetricCaseCard({
   locale,
@@ -27,14 +35,16 @@ export function MetricCaseCard({
   imageAlt,
   viewLabel,
 }: MetricCaseCardProps) {
+  const resolvedTags = normalizeTags(tags);
   return (
     <article className="metric-case-card">
       <div className="metric-case-card__body">
         <div className="metric-case-card__tags">
-          {tags.map((tag) => (
+          {resolvedTags.map((tag) => (
             <MetricTagPill
-              key={tag}
-              tag={tag}
+              key={tag.slug}
+              tag={tag.slug}
+              label={tag.label}
               locale={locale}
               className="border-foreground text-foreground"
             />

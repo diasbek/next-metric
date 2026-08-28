@@ -164,6 +164,7 @@ const BY_KEY: Record<AdminNavLabelKey, (props: IconProps) => ReactNode> = {
   home: IconHome,
   agency: IconAgency,
   works: IconWorks,
+  tags: IconWorks,
   services: IconServices,
   contacts: IconContacts,
   leads: IconLeads,

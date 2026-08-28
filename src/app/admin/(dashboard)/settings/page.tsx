@@ -44,13 +44,17 @@ export default async function AdminSettingsPage({
         webhookSecretConfigured: Boolean(settings?.telegram_webhook_secret?.trim()),
         webhookSecretPresent: Boolean(settings?.telegram_webhook_secret),
       }}
-      seo={(seo ?? []).map((row) => ({
-        locale: row.locale,
-        page_key: row.page_key,
-        title: row.title ?? "",
-        description: row.description ?? "",
-        keywords: row.keywords ?? "",
-      }))}
+      seo={(seo ?? [])
+        .filter((row) => row.page_key === "home" || row.page_key === "works")
+        .map((row) => ({
+          locale: row.locale,
+          page_key: row.page_key,
+          title: row.title ?? "",
+          description: row.description ?? "",
+          keywords: row.keywords ?? "",
+          og_image: row.og_image ?? "",
+          noindex: Boolean(row.noindex),
+        }))}
       flash={{
         saved: Boolean(params.saved),
         webhook: params.webhook,

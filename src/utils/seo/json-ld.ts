@@ -143,19 +143,50 @@ export function getProjectListSchema(
   };
 }
 
-export function getCreativeWorkSchema(project: Project, locale: Locale = "en") {
+export function getCreativeWorkSchema(
+  project: Project,
+  locale: Locale = "en",
+  options?: {
+    datePublished?: string | null;
+    dateModified?: string | null;
+  },
+) {
   const path = localePath(locale, `/works/${project.slug}/`);
   const url = absoluteUrl(path);
+  const images = [
+    project.image,
+    ...(project.caseStudy?.blocks ?? []).flatMap((block) => {
+      if (block.type === "gallery") return block.images.map((img) => img.url);
+      if (block.type === "before_after") {
+        return [block.beforeImage, block.afterImage].filter(Boolean) as string[];
+      }
+      return [];
+    }),
+  ]
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((src) => absoluteUrl(src));
 
   return {
-    "@type": "CreativeWork",
+    "@type": ["CreativeWork", "ImageGallery"],
     "@id": `${url}#creativework`,
     name: project.title,
     description: project.description,
     url,
-    image: absoluteUrl(project.image),
+    image: images.length ? images : absoluteUrl(project.image),
     creator: { "@id": ORGANIZATION_ID },
+    publisher: { "@id": ORGANIZATION_ID },
     inLanguage: htmlLang[locale],
+    ...(project.author ? { author: { "@type": "Person", name: project.author } } : {}),
+    ...(project.sphere
+      ? { about: { "@type": "Thing", name: project.sphere } }
+      : {}),
+    ...(project.tags.length
+      ? { keywords: project.tags.join(", ") }
+      : {}),
+    ...(options?.datePublished ? { datePublished: options.datePublished } : {}),
+    ...(options?.dateModified ? { dateModified: options.dateModified } : {}),
+    isPartOf: { "@id": WEBSITE_ID },
   };
 }
 

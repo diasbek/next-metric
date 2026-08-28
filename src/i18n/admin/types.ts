@@ -7,6 +7,7 @@ export type AdminMessages = {
     home: string;
     agency: string;
     works: string;
+    tags: string;
     services: string;
     contacts: string;
     leads: string;
@@ -190,6 +191,11 @@ export type AdminMessages = {
     pageWorks: string;
     pageServices: string;
     pageContacts: string;
+    seoOgImage: string;
+    seoOgImagePlaceholder: string;
+    seoOgImageHint: string;
+    seoNoindex: string;
+    seoIndexableHint: string;
     telegramLegend: string;
     telegramEnabled: string;
     botToken: string;
@@ -376,6 +382,27 @@ export type AdminMessages = {
       noCover: string;
       sectionLabel: string;
     };
+    tags: {
+      title: string;
+      description: string;
+      sectionLabel: string;
+      sectionCategory: string;
+      sectionType: string;
+      newItem: string;
+      editTitle: string;
+      empty: string;
+      kind: string;
+      kindCategory: string;
+      kindType: string;
+      slug: string;
+      slugHint: string;
+      labelEn: string;
+      labelDe: string;
+      sortOrder: string;
+      active: string;
+      inactive: string;
+      deactivate: string;
+    };
     team: {
       title: string;
       description: string;
@@ -461,6 +488,9 @@ export type AdminMessages = {
       featured: string;
       slug: string;
       sphere: string;
+      category: string;
+      categoryNone: string;
+      types: string;
       tags: string;
       caseYear: string;
       caseTask: string;
@@ -508,6 +538,12 @@ export type AdminMessages = {
       youtubeUrl: string;
       seoSection: string;
       seoHint: string;
+      seoWarnTitleEmpty: string;
+      seoWarnTitleLong: string;
+      seoWarnDescEmpty: string;
+      seoWarnDescRange: string;
+      seoWarnOg: string;
+      seoWarnNoindexPublished: string;
       fillSeo: string;
       metaTitle: string;
       metaDescription: string;
@@ -515,6 +551,7 @@ export type AdminMessages = {
       seoIndexable: string;
       ogImage: string;
       ogImageUrl: string;
+      ogPreviewEmpty: string;
       heroImage: string;
     };
   };

@@ -33,6 +33,10 @@ type ImageFieldProps = {
   previewTitle?: string;
   previewSubtitle?: string;
   previewQuote?: string;
+  previewAuthor?: string;
+  previewRole?: string;
+  previewTags?: string[];
+  previewCta?: string;
 };
 
 const shell: CSSProperties = {
@@ -77,6 +81,10 @@ export function ImageField({
   previewTitle,
   previewSubtitle,
   previewQuote,
+  previewAuthor,
+  previewRole,
+  previewTags,
+  previewCta,
 }: ImageFieldProps) {
   const t = useAdminT();
   const isDesktop = useAdminDesktop();
@@ -311,10 +319,22 @@ export function ImageField({
                     title={previewTitle}
                     subtitle={previewSubtitle}
                     quote={previewQuote}
+                    author={previewAuthor}
+                    role={previewRole}
+                    tags={previewTags}
+                    ctaLabel={previewCta}
                   />
                 </div>
                 {preset === "projectCover" ? (
-                  <ProjectCardPeek imageUrl={displayPreview} title={previewTitle} />
+                  <ProjectCardPeek
+                    imageUrl={displayPreview}
+                    title={previewTitle}
+                    quote={previewQuote}
+                    author={previewAuthor}
+                    role={previewRole}
+                    tags={previewTags}
+                    ctaLabel={previewCta}
+                  />
                 ) : null}
               </div>
             ) : (
@@ -509,12 +529,21 @@ export function ImageField({
                 title={previewTitle}
                 subtitle={previewSubtitle}
                 quote={previewQuote}
+                author={previewAuthor}
+                role={previewRole}
+                tags={previewTags}
+                ctaLabel={previewCta}
                 interactive
               />
               {preset === "projectCover" ? (
                 <ProjectCardPeek
                   imageUrl={sourceUrl || previewUrl}
                   title={previewTitle}
+                  quote={previewQuote}
+                  author={previewAuthor}
+                  role={previewRole}
+                  tags={previewTags}
+                  ctaLabel={previewCta}
                 />
               ) : null}
             </div>

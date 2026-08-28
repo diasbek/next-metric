@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { degular, degularDisplay } from "@/assets/fonts";
@@ -86,6 +87,7 @@ export default async function RootLayout({
         </ConsentProvider>
         <PwaRegister />
         <LinkedInInsightTag />
+        <SpeedInsights />
       </body>
     </html>
   );

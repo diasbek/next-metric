@@ -25,6 +25,7 @@ import type {
   ProjectEditorData,
   ProjectMediaDraft,
   ProjectTranslationDraft,
+  TagOption,
 } from "@/components/admin/projects/project-editor-types";
 import {
   addProjectBlockAction,
@@ -43,13 +44,17 @@ import {
 } from "@/components/admin/ui/styles";
 import type { AdminLocale } from "@/components/admin/ui/locales";
 import { ADMIN_LOCALES } from "@/components/admin/ui/locales";
+import { ADMIN_TOPBAR_HEIGHT } from "@/components/admin/chrome/AdminTopBar";
+import { ADMIN_MD_BREAKPOINT } from "@/components/admin/chrome/nav";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
+import { useAdminDesktop } from "@/components/admin/ui/useAdminDesktop";
 
 export type { ProjectEditorData } from "./project-editor-types";
 
 type Props = {
   project: ProjectEditorData;
   library: LibraryItem[];
+  tagOptions: TagOption[];
 };
 
 const sectionBox: CSSProperties = {
@@ -66,10 +71,7 @@ const sectionTitle: CSSProperties = {
   letterSpacing: "0.02em",
 };
 
-const stickyBar: CSSProperties = {
-  position: "sticky",
-  top: 0,
-  zIndex: 20,
+const stickyBarBase: CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
   gap: 10,
@@ -78,8 +80,11 @@ const stickyBar: CSSProperties = {
   padding: "12px 14px",
   margin: "0 0 8px",
   border: "1px solid #333",
-  background: "rgba(10,10,10,0.94)",
-  backdropFilter: "blur(8px)",
+  background: "rgba(10,10,10,0.96)",
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  boxSizing: "border-box",
+  width: "100%",
 };
 
 function isLocaleFilled(tr: ProjectTranslationDraft): boolean {
@@ -107,6 +112,13 @@ function seoLenColor(length: number, soft: number, hard: number): string {
   return "#6a6";
 }
 
+function seoDescColor(length: number): string {
+  if (length === 0) return "#666";
+  if (length > 170) return "#f66";
+  if (length < 120 || length > 160) return "#da6";
+  return "#6a6";
+}
+
 function ReturnFields({
   locale,
   focus,
@@ -122,8 +134,9 @@ function ReturnFields({
   );
 }
 
-export function ProjectEditor({ project, library }: Props) {
+export function ProjectEditor({ project, library, tagOptions }: Props) {
   const t = useAdminT();
+  const isDesktop = useAdminDesktop();
   const searchParams = useSearchParams();
   const [locale, setLocale] = useState<AdminLocale>(() =>
     searchParams.get("locale") === "de" ? "de" : "en",
@@ -132,13 +145,19 @@ export function ProjectEditor({ project, library }: Props) {
   const [coverPreview, setCoverPreview] = useState(project.cover_image);
   const [coverBlobUrl, setCoverBlobUrl] = useState<string | null>(null);
   const [coverSource, setCoverSource] = useState<MediaSourceMode>("upload");
+  const [coverLibraryUrl, setCoverLibraryUrl] = useState("");
   const [ogSource, setOgSource] = useState<MediaSourceMode>("upload");
+  const [ogLibraryUrl, setOgLibraryUrl] = useState("");
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const tr = draft.translations[locale];
 
   useEffect(() => {
     setDraft(project);
     setCoverPreview(project.cover_image);
+    setCoverLibraryUrl("");
+    setOgLibraryUrl("");
+    setCoverSource("upload");
+    setOgSource("upload");
     setCoverBlobUrl((prev) => {
       if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
       return null;
@@ -222,7 +241,14 @@ export function ProjectEditor({ project, library }: Props) {
       meta_description: tr.meta_description.trim() || description.slice(0, 160),
       keywords:
         tr.keywords.trim() ||
-        [tr.tags, draft.sphere].filter(Boolean).join(", "),
+        [
+          draft.sphere,
+          ...tagOptions
+            .filter((tag) => draft.typeTagIds.includes(tag.id))
+            .map((tag) => tag.slug),
+        ]
+          .filter(Boolean)
+          .join(", "),
     });
     if (!draft.og_image && draft.cover_image) {
       setDraft((p) => ({ ...p, og_image: p.cover_image }));
@@ -239,10 +265,63 @@ export function ProjectEditor({ project, library }: Props) {
 
   const metaTitleLen = (tr.meta_title || (tr.title ? `${tr.title} — METRIC` : "")).length;
   const metaDescLen = (tr.meta_description || tr.description).length;
+  const seoWarnings = useMemo(() => {
+    const warnings: string[] = [];
+    if (!tr.meta_title.trim()) warnings.push(t.pages.project.seoWarnTitleEmpty);
+    else if (metaTitleLen > 60) warnings.push(t.pages.project.seoWarnTitleLong);
+    if (!tr.meta_description.trim() && !tr.description.trim()) {
+      warnings.push(t.pages.project.seoWarnDescEmpty);
+    } else if (metaDescLen < 120 || metaDescLen > 160) {
+      warnings.push(t.pages.project.seoWarnDescRange);
+    }
+    if (!draft.og_image.trim() && !draft.cover_image.trim()) {
+      warnings.push(t.pages.project.seoWarnOg);
+    }
+    if (draft.status === "published" && !draft.seo_indexable) {
+      warnings.push(t.pages.project.seoWarnNoindexPublished);
+    }
+    return warnings;
+  }, [
+    tr.meta_title,
+    tr.meta_description,
+    tr.description,
+    metaTitleLen,
+    metaDescLen,
+    draft.og_image,
+    draft.cover_image,
+    draft.status,
+    draft.seo_indexable,
+    t.pages.project,
+  ]);
   const publicPath =
     locale === "de"
       ? `metric.graphics/de/works/${draft.slug || "…"}/`
       : `metric.graphics/works/${draft.slug || "…"}/`;
+
+  const categoryOptions = useMemo(
+    () => tagOptions.filter((tag) => tag.kind === "category"),
+    [tagOptions],
+  );
+  const typeOptions = useMemo(
+    () => tagOptions.filter((tag) => tag.kind === "type"),
+    [tagOptions],
+  );
+
+  const coverPreviewTags = useMemo(() => {
+    const selected = [
+      ...categoryOptions.filter((tag) => tag.id === draft.categoryTagId),
+      ...typeOptions.filter((tag) => draft.typeTagIds.includes(tag.id)),
+    ];
+    return selected.map((tag) => tag.slug).slice(0, 4);
+  }, [categoryOptions, typeOptions, draft.categoryTagId, draft.typeTagIds]);
+  const coverCaseChrome = {
+    previewTitle: tr.title || t.pages.project.title,
+    previewQuote: tr.quote.trim() || tr.title || t.pages.project.title,
+    previewAuthor: tr.author.trim() || tr.title || t.pages.project.title,
+    previewRole: tr.role.trim() || tr.description || t.pages.project.descriptionLabel,
+    previewTags: coverPreviewTags,
+    previewCta: locale === "de" ? "Case ansehen" : "View case",
+  };
 
   return (
     <div
@@ -258,6 +337,13 @@ export function ProjectEditor({ project, library }: Props) {
         @media (max-width: 960px) {
           .admin-project-editor {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (min-width: ${ADMIN_MD_BREAKPOINT}px) {
+          .admin-project-sticky-island {
+            position: sticky;
+            top: ${ADMIN_TOPBAR_HEIGHT}px;
+            z-index: 40;
           }
         }
       `}</style>
@@ -285,7 +371,6 @@ export function ProjectEditor({ project, library }: Props) {
               <div key={l.code} style={{ display: "none" }} aria-hidden>
                 <input type="hidden" name={`${l.code}_title`} value={row.title} />
                 <input type="hidden" name={`${l.code}_description`} value={row.description} />
-                <input type="hidden" name={`${l.code}_tags`} value={row.tags} />
                 <input type="hidden" name={`${l.code}_case_year`} value={row.case_year} />
                 <input type="hidden" name={`${l.code}_case_task`} value={row.case_task} />
                 <input type="hidden" name={`${l.code}_case_solution`} value={row.case_solution} />
@@ -303,7 +388,19 @@ export function ProjectEditor({ project, library }: Props) {
             );
           })}
 
-          <div style={stickyBar}>
+          <div
+            className="admin-project-sticky-island"
+            style={{
+              ...stickyBarBase,
+              ...(isDesktop
+                ? {
+                    position: "sticky",
+                    top: ADMIN_TOPBAR_HEIGHT,
+                    zIndex: 40,
+                  }
+                : null),
+            }}
+          >
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
               {ADMIN_LOCALES.map((l) => {
                 const active = locale === l.code;
@@ -368,14 +465,29 @@ export function ProjectEditor({ project, library }: Props) {
                 </span>
               </label>
               <label style={{ fontSize: 13 }}>
-                {t.pages.project.sphere}
-                <input
-                  name="sphere"
-                  value={draft.sphere}
-                  onChange={(e) => setDraft((p) => ({ ...p, sphere: e.target.value }))}
+                {t.pages.project.category}
+                <select
+                  name="category_tag_id"
+                  value={draft.categoryTagId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    const slug =
+                      categoryOptions.find((tag) => tag.id === id)?.slug ?? "";
+                    setDraft((p) => ({
+                      ...p,
+                      categoryTagId: id,
+                      sphere: slug,
+                    }));
+                  }}
                   style={adminInput}
-                  placeholder="Home, Tools, …"
-                />
+                >
+                  <option value="">{t.pages.project.categoryNone}</option>
+                  {categoryOptions.map((tag) => (
+                    <option key={tag.id} value={tag.id}>
+                      {tag.label}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label style={{ fontSize: 13 }}>
                 {t.common.position}
@@ -409,13 +521,17 @@ export function ProjectEditor({ project, library }: Props) {
               tabs={sourceTabs}
               label={t.common.cover}
             >
+              {coverLibraryUrl ? (
+                <input type="hidden" name="cover_from_library" value={coverLibraryUrl} />
+              ) : null}
               {coverSource === "upload" ? (
                 <ImageField
+                  key={coverPreview || "cover-empty"}
                   name="cover_file"
                   preset="projectCover"
                   currentUrl={coverPreview || null}
                   label={t.common.cover}
-                  previewTitle={tr.title || t.pages.project.title}
+                  {...coverCaseChrome}
                   onReady={(file) => {
                     if (coverBlobUrl?.startsWith("blob:")) {
                       URL.revokeObjectURL(coverBlobUrl);
@@ -425,6 +541,7 @@ export function ProjectEditor({ project, library }: Props) {
                       setCoverPreview(draft.cover_image);
                       return;
                     }
+                    setCoverLibraryUrl("");
                     const blob = URL.createObjectURL(file);
                     setCoverBlobUrl(blob);
                     setCoverPreview(blob);
@@ -434,13 +551,22 @@ export function ProjectEditor({ project, library }: Props) {
               {coverSource === "library" ? (
                 library.length > 0 ? (
                   <LibraryImagePicker
-                    name="cover_from_library"
+                    name="_cover_library_pick"
                     items={library}
                     label={t.pages.project.fromLibrary}
                     noneLabel={t.pages.project.noneOption}
+                    hint={t.pages.project.libraryClickToAdd}
+                    showClear={false}
                     onSelect={(url) => {
+                      if (!url) return;
+                      setCoverLibraryUrl(url);
                       setDraft((p) => ({ ...p, cover_image: url }));
                       setCoverPreview(url);
+                      setCoverBlobUrl((prev) => {
+                        if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+                        return null;
+                      });
+                      setCoverSource("upload");
                     }}
                   />
                 ) : (
@@ -459,6 +585,7 @@ export function ProjectEditor({ project, library }: Props) {
                     name="cover_image"
                     value={draft.cover_image}
                     onChange={(e) => {
+                      setCoverLibraryUrl("");
                       setDraft((p) => ({ ...p, cover_image: e.target.value }));
                       setCoverPreview(e.target.value);
                     }}
@@ -525,15 +652,63 @@ export function ProjectEditor({ project, library }: Props) {
               />
             </label>
             <div className="admin-form-2col">
-              <label style={{ fontSize: 13 }}>
-                {t.pages.project.tags}
-                <input
-                  value={tr.tags}
-                  onChange={(e) => updateLocale({ tags: e.target.value })}
-                  style={adminInput}
-                  placeholder="Listing, Premium A+, Home"
-                />
-              </label>
+              <fieldset style={{ margin: 0, border: 0, padding: 0 }}>
+                <legend style={{ fontSize: 13, marginBottom: 6 }}>
+                  {t.pages.project.types}
+                </legend>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 10,
+                    marginTop: 4,
+                  }}
+                >
+                  {typeOptions.map((tag) => {
+                    const checked = draft.typeTagIds.includes(tag.id);
+                    return (
+                      <label
+                        key={tag.id}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          fontSize: 13,
+                          color: "#ddd",
+                          border: "1px solid #333",
+                          padding: "6px 10px",
+                          cursor: "pointer",
+                          background: checked ? "#1a1a2a" : "transparent",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          name="type_tag_ids"
+                          value={tag.id}
+                          checked={checked}
+                          onChange={(e) => {
+                            const on = e.target.checked;
+                            setDraft((p) => ({
+                              ...p,
+                              typeTagIds: on
+                                ? [...p.typeTagIds, tag.id]
+                                : p.typeTagIds.filter((id) => id !== tag.id),
+                            }));
+                          }}
+                        />
+                        {tag.label}
+                      </label>
+                    );
+                  })}
+                  {!typeOptions.length ? (
+                    <span style={{ fontSize: 12, color: "#888" }}>
+                      <Link href="/admin/tags/" style={{ color: "#8af" }}>
+                        {t.pages.tags.title}
+                      </Link>
+                    </span>
+                  ) : null}
+                </div>
+              </fieldset>
               <label style={{ fontSize: 13 }}>
                 {t.pages.project.caseYear}
                 <input
@@ -643,6 +818,23 @@ export function ProjectEditor({ project, library }: Props) {
             <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
               {t.pages.project.seoHint}
             </p>
+            {seoWarnings.length ? (
+              <ul
+                style={{
+                  margin: 0,
+                  padding: "10px 12px 10px 28px",
+                  background: "#1a1510",
+                  border: "1px solid #543",
+                  color: "#eca",
+                  fontSize: 12,
+                  lineHeight: 1.45,
+                }}
+              >
+                {seoWarnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            ) : null}
             <label style={{ fontSize: 13, display: "flex", gap: 8, alignItems: "center" }}>
               <input
                 type="checkbox"
@@ -678,7 +870,7 @@ export function ProjectEditor({ project, library }: Props) {
                 style={{ ...adminInput, minHeight: 72 }}
                 placeholder={tr.description}
               />
-              <span style={{ fontSize: 11, color: seoLenColor(metaDescLen, 155, 170) }}>
+              <span style={{ fontSize: 11, color: seoDescColor(metaDescLen) }}>
                 {metaDescLen}/160
               </span>
             </label>
@@ -715,23 +907,35 @@ export function ProjectEditor({ project, library }: Props) {
               tabs={sourceTabs}
               label={t.pages.project.ogImage}
             >
+              {ogLibraryUrl ? (
+                <input type="hidden" name="og_from_library" value={ogLibraryUrl} />
+              ) : null}
               {ogSource === "upload" ? (
                 <ImageField
+                  key={draft.og_image || draft.cover_image || "og-empty"}
                   name="og_file"
                   preset="ogSocial"
                   currentUrl={draft.og_image || draft.cover_image || null}
                   label={t.pages.project.ogImage}
+                  onReady={(file) => {
+                    if (file) setOgLibraryUrl("");
+                  }}
                 />
               ) : null}
               {ogSource === "library" ? (
                 library.length > 0 ? (
                   <LibraryImagePicker
-                    name="og_from_library"
+                    name="_og_library_pick"
                     items={library}
                     label={t.pages.project.fromLibrary}
                     noneLabel={t.pages.project.noneOption}
+                    hint={t.pages.project.libraryClickToAdd}
+                    showClear={false}
                     onSelect={(url) => {
+                      if (!url) return;
+                      setOgLibraryUrl(url);
                       setDraft((p) => ({ ...p, og_image: url }));
+                      setOgSource("upload");
                     }}
                   />
                 ) : (
@@ -749,9 +953,10 @@ export function ProjectEditor({ project, library }: Props) {
                   <input
                     name="og_image"
                     value={draft.og_image}
-                    onChange={(e) =>
-                      setDraft((p) => ({ ...p, og_image: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      setOgLibraryUrl("");
+                      setDraft((p) => ({ ...p, og_image: e.target.value }));
+                    }}
                     style={adminInput}
                     placeholder={t.pages.project.urlPlaceholder}
                   />

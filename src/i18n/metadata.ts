@@ -18,7 +18,11 @@ export async function getLocalizedPageMetadata(
   const alternates = getLocalizedAlternates(pagePaths[pageKey]);
   const image =
     options?.image ??
-    (isOgPageKey(pageKey) ? getPageOgImagePath(locale, pageKey) : undefined);
+    (meta.ogImage?.trim()
+      ? meta.ogImage.trim()
+      : isOgPageKey(pageKey)
+        ? getPageOgImagePath(locale, pageKey)
+        : undefined);
   const modifiedTime = (await getContentFreshnessDate()).toISOString();
 
   return createPageMetadata(meta.title, meta.description, path, {
@@ -33,6 +37,9 @@ export async function getLocalizedPageMetadata(
     modifiedTime,
     ...(meta.keywords?.trim() ? { keywords: meta.keywords } : {}),
     ...(image ? { image } : {}),
+    ...(meta.noindex
+      ? { robots: { index: false, follow: true } }
+      : {}),
   });
 }
 

@@ -148,6 +148,7 @@ export function MetricHeroSection({
                   alt="Amazon listing images and A+ Content product photography examples"
                   fill
                   priority
+                  fetchPriority="high"
                   unoptimized
                   className="object-contain"
                 />

@@ -1,0 +1,40 @@
+.site-breadcrumbs {
+  font-size: 13px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
+.site-breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-breadcrumbs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.site-breadcrumbs__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-breadcrumbs__link:hover {
+  color: var(--foreground);
+}
+
+.site-breadcrumbs__sep {
+  color: #bbb;
+  margin-right: 6px;
+}
+
+.site-breadcrumbs__current {
+  color: var(--foreground);
+}

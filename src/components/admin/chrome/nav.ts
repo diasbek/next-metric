@@ -14,6 +14,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/", labelKey: "overview", area: "content" },
   { href: "/admin/home/", labelKey: "home", area: "content" },
   { href: "/admin/works/", labelKey: "works", area: "content" },
+  { href: "/admin/tags/", labelKey: "tags", area: "content" },
   { href: "/admin/contacts/", labelKey: "contacts", area: "content" },
   { href: "/admin/leads/", labelKey: "leads", area: "leads" },
   { href: "/admin/media/", labelKey: "media", area: "media" },

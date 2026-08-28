@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 export const CMS_TAGS = [
   "cms",
   "projects",
+  "tags",
   "services",
   "faq",
   "home",
@@ -41,6 +42,11 @@ const TAG_PATHS: Record<CmsTag, PathEntry[]> = {
     ...localePaths("/works"),
     ...localePaths("/works/[slug]", "page"),
     ["/sitemap.xml", "page"],
+  ],
+  tags: [
+    ...localePaths("/"),
+    ...localePaths("/works"),
+    ...localePaths("/works/[slug]", "page"),
   ],
   services: [
     ...localePaths("/"),

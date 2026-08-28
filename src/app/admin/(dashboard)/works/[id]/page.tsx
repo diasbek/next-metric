@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/cms/auth";
 import { getAdminProjectById } from "@/lib/cms/projects";
+import { getAdminTags, getProjectTagIds } from "@/lib/cms/tags";
 import { getPublicMediaUrl, listRecentMediaFiles } from "@/lib/cms/storage";
 import {
   ProjectEditor,
@@ -17,9 +18,11 @@ export default async function AdminProjectEditPage({
 }) {
   await requirePermission("content");
   const { id } = await params;
-  const [project, libraryPaths] = await Promise.all([
+  const [project, libraryPaths, allTags, projectTagIds] = await Promise.all([
     getAdminProjectById(id),
     listRecentMediaFiles(120),
+    getAdminTags(),
+    getProjectTagIds(id),
   ]);
   if (!project) notFound();
 
@@ -27,6 +30,19 @@ export default async function AdminProjectEditPage({
     path,
     url: getPublicMediaUrl(path),
   }));
+
+  const activeTags = allTags.filter((tag) => tag.is_active);
+  const categoryTags = activeTags.filter((tag) => tag.kind === "category");
+  const typeTags = activeTags.filter((tag) => tag.kind === "type");
+  const tagIdSet = new Set(projectTagIds);
+  const categoryTagId =
+    categoryTags.find((tag) => tagIdSet.has(tag.id))?.id ??
+    allTags.find((tag) => tag.kind === "category" && tagIdSet.has(tag.id))
+      ?.id ??
+    "";
+  const typeTagIds = allTags
+    .filter((tag) => tag.kind === "type" && tagIdSet.has(tag.id))
+    .map((tag) => tag.id);
 
   const translations = Object.fromEntries(
     ADMIN_LOCALES.map((locale) => {
@@ -57,6 +73,8 @@ export default async function AdminProjectEditPage({
     slug: project.slug,
     status: project.status,
     sphere: project.sphere ?? "",
+    categoryTagId,
+    typeTagIds,
     sort_order: project.sort_order ?? 0,
     featured: Boolean(project.featured),
     cover_image: project.cover_image ?? "",
@@ -84,9 +102,31 @@ export default async function AdminProjectEditPage({
       })),
   };
 
+  const tagOptions = [
+    ...categoryTags,
+    ...typeTags,
+    // Keep assigned inactive tags selectable so save doesn't drop them silently
+    ...allTags.filter(
+      (tag) =>
+        !tag.is_active &&
+        tagIdSet.has(tag.id) &&
+        !categoryTags.some((c) => c.id === tag.id) &&
+        !typeTags.some((c) => c.id === tag.id),
+    ),
+  ].map((tag) => ({
+    id: tag.id,
+    slug: tag.slug,
+    label: tag.is_active ? tag.label : `${tag.label} (inactive)`,
+    kind: tag.kind,
+  }));
+
   return (
     <Suspense fallback={null}>
-      <ProjectEditor project={data} library={library} />
+      <ProjectEditor
+        project={data}
+        library={library}
+        tagOptions={tagOptions}
+      />
     </Suspense>
   );
 }

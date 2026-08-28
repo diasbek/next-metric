@@ -40,6 +40,8 @@ export type ProjectEditorData = {
   slug: string;
   status: string;
   sphere: string;
+  categoryTagId: string;
+  typeTagIds: string[];
   sort_order: number;
   featured: boolean;
   cover_image: string;
@@ -51,3 +53,10 @@ export type ProjectEditorData = {
 };
 
 export type LibraryItem = { path: string; url: string };
+
+export type TagOption = {
+  id: string;
+  slug: string;
+  label: string;
+  kind: "category" | "type";
+};

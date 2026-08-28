@@ -5,6 +5,27 @@ export type PublishStatus = "draft" | "published";
 export type LeadStatus = "new" | "read" | "archived";
 export type MediaKind = "hero" | "gallery" | "before" | "after" | "cover";
 export type ProjectBlockType = "gallery" | "before_after" | "youtube";
+export type TagKind = "category" | "type";
+
+export type DbTag = {
+  id: string;
+  kind: TagKind;
+  slug: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type DbTagTranslation = {
+  tag_id: string;
+  locale: CmsLocale;
+  label: string;
+};
+
+export type TagWithTranslations = DbTag & {
+  tag_translations: DbTagTranslation[];
+};
 
 export type DbProject = {
   id: string;
@@ -232,6 +253,8 @@ export function mapProjectRow(
     author: (tr.author ?? "").trim() || undefined,
     role: (tr.role ?? "").trim() || undefined,
     quote: (tr.quote ?? "").trim() || undefined,
+    publishedAt: row.published_at ?? null,
+    updatedAt: row.updated_at ?? null,
     seo: {
       metaTitle: (tr.meta_title ?? "").trim(),
       metaDescription: (tr.meta_description ?? "").trim(),

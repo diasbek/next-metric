@@ -11,6 +11,10 @@ type SurfacePreviewProps = {
   title?: string;
   subtitle?: string;
   quote?: string;
+  author?: string;
+  role?: string;
+  tags?: string[];
+  ctaLabel?: string;
   /** Highlight as live editing target */
   interactive?: boolean;
   children?: ReactNode;
@@ -28,6 +32,176 @@ const pageShell: CSSProperties = {
   boxSizing: "border-box",
   overflow: "hidden",
 };
+
+/** Mirrors public `.metric-case-card` (works / home) — light card on dark admin chrome. */
+function CaseCardChrome({
+  imageUrl,
+  quote,
+  author,
+  role,
+  tags,
+  ctaLabel,
+  layout,
+  interactive,
+  children,
+}: {
+  imageUrl: string | null;
+  quote: string;
+  author: string;
+  role: string;
+  tags: string[];
+  ctaLabel: string;
+  layout: "desktop" | "mobile";
+  interactive?: boolean;
+  children?: ReactNode;
+}) {
+  const ring = interactive
+    ? { outline: "1px solid #2600ff", outlineOffset: 2 }
+    : {};
+
+  const media = (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        aspectRatio: CASE_CARD_MEDIA_ASPECT_CSS,
+        overflow: "hidden",
+        borderRadius: layout === "desktop" ? 20 : 16,
+        background: "#111",
+        flexShrink: 0,
+      }}
+    >
+      {children ?? <CoverImage url={imageUrl} />}
+    </div>
+  );
+
+  const body = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        gap: layout === "desktop" ? 16 : 14,
+        minWidth: 0,
+        padding: layout === "desktop" ? "4px 4px 4px 0" : 0,
+      }}
+    >
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+        {(tags.length ? tags : ["Listing"]).map((tag) => (
+          <span
+            key={tag}
+            style={{
+              border: "1px solid #111",
+              padding: "6px 10px",
+              fontSize: 11,
+              color: "#111",
+              background: "transparent",
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: "grid", gap: 8, minWidth: 0 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: layout === "desktop" ? 22 : 18,
+            fontWeight: 600,
+            lineHeight: 0.95,
+            letterSpacing: "-0.02em",
+            color: "#111",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {quote}
+        </p>
+        <p
+          style={{
+            margin: 0,
+            fontSize: layout === "desktop" ? 14 : 13,
+            fontWeight: 500,
+            letterSpacing: "-0.02em",
+            color: "#111",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {author}
+        </p>
+        <p
+          style={{
+            margin: 0,
+            fontSize: layout === "desktop" ? 12 : 12,
+            letterSpacing: "-0.02em",
+            color: "#333",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {role}
+        </p>
+      </div>
+      <span
+        style={{
+          display: "inline-flex",
+          alignSelf: "flex-start",
+          padding: "10px 16px",
+          fontSize: 12,
+          fontWeight: 600,
+          color: "#fff",
+          background: "#111",
+          border: "1px solid #111",
+        }}
+      >
+        {ctaLabel}
+      </span>
+    </div>
+  );
+
+  return (
+    <div
+      className="admin-surface-preview"
+      style={{
+        ...pageShell,
+        ...ring,
+        background: "#f3f3f3",
+        border: "1px solid #ddd",
+        maxWidth: layout === "mobile" ? 240 : "100%",
+      }}
+    >
+      <p style={{ margin: "0 0 12px", fontSize: 12, color: "#666" }}>
+        {layout === "desktop"
+          ? "Works → case card (desktop)"
+          : "Works → case card (mobile)"}
+        {" · "}
+        3000 × 2347
+      </p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: layout === "desktop" ? "1fr 1.05fr" : "1fr",
+          gap: layout === "desktop" ? 16 : 12,
+          alignItems: "stretch",
+          background: "#fff",
+          borderRadius: layout === "desktop" ? 24 : 20,
+          padding: layout === "desktop" ? 20 : 14,
+          overflow: "hidden",
+        }}
+      >
+        {layout === "desktop" ? (
+          <>
+            {body}
+            {media}
+          </>
+        ) : (
+          <>
+            {media}
+            {body}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Frame({
   aspect,
@@ -109,7 +283,11 @@ export function SurfacePreview({
   imageUrl,
   title = "Project title",
   subtitle = "Short description as on the site",
-  quote = "Quote text appears here as on the Agency page",
+  quote,
+  author,
+  role,
+  tags,
+  ctaLabel = "View case",
   interactive = false,
   children,
 }: SurfacePreviewProps) {
@@ -119,50 +297,35 @@ export function SurfacePreview({
 
   if (surface === "worksHero") {
     return (
-      <div className="admin-surface-preview" style={{ ...pageShell, ...ring }}>
-        <p style={{ margin: "0 0 12px", fontSize: 12, color: "#888" }}>
-          Works → case card
-        </p>
-        <Frame aspect={CASE_CARD_MEDIA_ASPECT_CSS} label="3000 × 2347">
-          {children ?? <CoverImage url={imageUrl} />}
-        </Frame>
-        <div style={{ marginTop: 14, display: "grid", gap: 6, minWidth: 0 }}>
-          <strong style={{ fontSize: 18, overflowWrap: "anywhere" }}>{title}</strong>
-          <span style={{ fontSize: 13, color: "#bbb", overflowWrap: "anywhere" }}>{subtitle}</span>
-          <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-            {["Listing", "Premium A+"].map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  border: "1px solid #444",
-                  padding: "4px 8px",
-                  fontSize: 11,
-                  color: "#ccc",
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+      <CaseCardChrome
+        imageUrl={imageUrl}
+        quote={quote?.trim() || title}
+        author={author?.trim() || title}
+        role={role?.trim() || subtitle}
+        tags={tags?.filter(Boolean) ?? []}
+        ctaLabel={ctaLabel}
+        layout="desktop"
+        interactive={interactive}
+      >
+        {children}
+      </CaseCardChrome>
     );
   }
 
   if (surface === "projectCard") {
     return (
-      <div className="admin-surface-preview" style={{ ...pageShell, ...ring, maxWidth: 240 }}>
-        <p style={{ margin: "0 0 12px", fontSize: 12, color: "#888" }}>
-          Project card
-        </p>
-        <Frame aspect={CASE_CARD_MEDIA_ASPECT_CSS} label="3000 × 2347">
-          {children ?? <CoverImage url={imageUrl} />}
-        </Frame>
-        <div style={{ marginTop: 12, display: "grid", gap: 6, minWidth: 0 }}>
-          <strong style={{ fontSize: 16, overflowWrap: "anywhere" }}>{title}</strong>
-          <span style={{ fontSize: 13, color: "#bbb", overflowWrap: "anywhere" }}>{subtitle}</span>
-        </div>
-      </div>
+      <CaseCardChrome
+        imageUrl={imageUrl}
+        quote={quote?.trim() || title}
+        author={author?.trim() || title}
+        role={role?.trim() || subtitle}
+        tags={tags?.filter(Boolean) ?? []}
+        ctaLabel={ctaLabel}
+        layout="mobile"
+        interactive={interactive}
+      >
+        {children}
+      </CaseCardChrome>
     );
   }
 
@@ -254,7 +417,7 @@ export function SurfacePreview({
               className="admin-surface-preview__quote"
               style={{ margin: 0, fontWeight: 500, lineHeight: 1.25 }}
             >
-              «{quote}»
+              «{quote ?? "Quote text appears here as on the Agency page"}»
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
@@ -339,27 +502,40 @@ export function SurfacePreview({
   );
 }
 
-/** Secondary card preview for cover uploads (same image, card crop feel). */
+/** Mobile case-card peek (same public MetricCaseCard, stacked). */
 export function ProjectCardPeek({
   imageUrl,
   title,
+  quote,
+  author,
+  role,
+  tags,
+  ctaLabel,
 }: {
   imageUrl: string | null;
   title?: string;
+  quote?: string;
+  author?: string;
+  role?: string;
+  tags?: string[];
+  ctaLabel?: string;
 }) {
   return (
     <SurfacePreview
       surface="projectCard"
       imageUrl={imageUrl}
-      title={title ?? "In the grid"}
-      subtitle="How cover looks on /works/ case cards"
+      title={title ?? "Case"}
+      quote={quote}
+      author={author}
+      role={role}
+      tags={tags}
+      ctaLabel={ctaLabel}
     />
   );
 }
 
 export function surfaceAspectCss(preset: ImagePreset): string | undefined {
   if (!preset.aspect) return undefined;
-  // approximate CSS aspect-ratio string
   if (preset.surface === "worksHero" || preset.surface === "projectCard") {
     return CASE_CARD_MEDIA_ASPECT_CSS;
   }

@@ -99,7 +99,9 @@ export async function getAllPublishedSlugsFromCms(): Promise<
   Array<{ slug: string; updated_at: string }>
 > {
   const rows = await getCachedPublishedListingRows();
-  return rows.map((r) => ({ slug: r.slug, updated_at: r.updated_at }));
+  return rows
+    .filter((r) => r.seo_indexable !== false)
+    .map((r) => ({ slug: r.slug, updated_at: r.updated_at }));
 }
 
 export async function getAdminProjects(): Promise<
