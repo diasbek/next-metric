@@ -247,23 +247,21 @@ export function SurfacePreview({
         <p style={{ margin: "0 0 12px", fontSize: 12, color: "#888" }}>
           Case study → gallery
         </p>
-        <Frame label="Free aspect">
-          {children ?? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl ?? ""}
-              alt=""
-              style={{
-                width: "100%",
-                height: "auto",
-                display: "block",
-                maxHeight: 360,
-                objectFit: "contain",
-                background: "#000",
-              }}
-            />
-          )}
-        </Frame>
+        {children ?? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl ?? ""}
+            alt=""
+            style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
+              maxHeight: 360,
+              objectFit: "contain",
+              background: "#000",
+            }}
+          />
+        )}
       </div>
     );
   }

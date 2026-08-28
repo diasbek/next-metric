@@ -195,6 +195,7 @@ export function AdminProfileMenu({
             <Link
               role="menuitem"
               href="/admin/profile/"
+              prefetch={false}
               onClick={() => setOpen(false)}
               style={adminChromeMenuItem}
               onMouseEnter={(e) => {

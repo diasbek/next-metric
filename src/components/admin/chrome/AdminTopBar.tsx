@@ -40,10 +40,8 @@ export function AdminTopBar({
         gap: 12,
         padding: "0 12px 0 16px",
         boxSizing: "border-box",
-        background: "rgba(10,10,10,0.94)",
+        background: "#0a0a0a",
         borderBottom: "1px solid #222",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
       }}
     >
       <style>{`
@@ -87,6 +85,7 @@ export function AdminTopBar({
 
       <Link
         href="/admin/"
+        prefetch={false}
         className="admin-chrome__topbar-brand"
         aria-label={t.brand}
       >

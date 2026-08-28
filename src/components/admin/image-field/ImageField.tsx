@@ -28,6 +28,11 @@ type ImageFieldProps = {
   currentUrl?: string | null;
   label?: string;
   required?: boolean;
+  /**
+   * Interactive crop UI. Gallery / case frames (`projectCase`) never crop —
+   * the original file is sent as-is and the server only resizes.
+   */
+  crop?: boolean;
   onReady?: (file: File | null) => void;
   /** Chrome text in site mockups */
   previewTitle?: string;
@@ -77,6 +82,7 @@ export function ImageField({
   currentUrl,
   label,
   required = false,
+  crop: cropProp,
   onReady,
   previewTitle,
   previewSubtitle,
@@ -90,6 +96,7 @@ export function ImageField({
   const isDesktop = useAdminDesktop();
   const presetConfig = IMAGE_PRESETS[preset];
   const presetCopy = t.media.presets[preset];
+  const allowCrop = preset === "projectCase" ? false : (cropProp ?? true);
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
@@ -168,9 +175,18 @@ export function ImageField({
     setCrop({ x: 0, y: 0 });
     setZoom(1);
     setRotation(0);
+    setMeta(formatAdminMessage(t.media.originalSize, { size: formatBytes(file.size) }));
+
+    if (!allowCrop) {
+      // Upload the frame untouched; the server resizes and re-encodes it.
+      setEditing(false);
+      setPreviewUrl(url);
+      assignFile(file);
+      return;
+    }
+
     setEditing(true);
     setPreviewUrl(currentUrl ?? null);
-    setMeta(formatAdminMessage(t.media.originalSize, { size: formatBytes(file.size) }));
   };
 
   const onDrop = (event: DragEvent) => {
@@ -239,11 +255,13 @@ export function ImageField({
   const displayPreview = editing ? sourceUrl || previewUrl : previewUrl;
   const cropFrameAspect = surfaceAspectCss(presetConfig);
   const idleDensity =
-    preset === "team" || preset === "avatar"
-      ? "thumb"
-      : preset === "projectCover" || preset === "projectCase"
-        ? "cover"
-        : "media";
+    !allowCrop
+      ? "media"
+      : preset === "team" || preset === "avatar"
+        ? "thumb"
+        : preset === "projectCover"
+          ? "cover"
+          : "media";
   const openPicker = () => fileInputRef.current?.click();
 
   return (
@@ -296,14 +314,7 @@ export function ImageField({
             onDrop={onDrop}
           >
             {displayPreview ? (
-              <div
-                className={preset === "projectCover" ? "admin-preview-split" : undefined}
-                style={
-                  preset === "projectCover"
-                    ? undefined
-                    : { display: "grid", gridTemplateColumns: "1fr", gap: 12 }
-                }
-              >
+              !allowCrop ? (
                 <div
                   style={{ cursor: "pointer" }}
                   onClick={openPicker}
@@ -313,30 +324,63 @@ export function ImageField({
                     if (e.key === "Enter" || e.key === " ") openPicker();
                   }}
                 >
-                  <SurfacePreview
-                    surface={presetConfig.surface}
-                    imageUrl={displayPreview}
-                    title={previewTitle}
-                    subtitle={previewSubtitle}
-                    quote={previewQuote}
-                    author={previewAuthor}
-                    role={previewRole}
-                    tags={previewTags}
-                    ctaLabel={previewCta}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={displayPreview}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: 360,
+                      objectFit: "contain",
+                      display: "block",
+                      background: "#111",
+                    }}
                   />
                 </div>
-                {preset === "projectCover" ? (
-                  <ProjectCardPeek
-                    imageUrl={displayPreview}
-                    title={previewTitle}
-                    quote={previewQuote}
-                    author={previewAuthor}
-                    role={previewRole}
-                    tags={previewTags}
-                    ctaLabel={previewCta}
-                  />
-                ) : null}
-              </div>
+              ) : (
+                <div
+                  className={preset === "projectCover" ? "admin-preview-split" : undefined}
+                  style={
+                    preset === "projectCover"
+                      ? undefined
+                      : { display: "grid", gridTemplateColumns: "1fr", gap: 12 }
+                  }
+                >
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={openPicker}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") openPicker();
+                    }}
+                  >
+                    <SurfacePreview
+                      surface={presetConfig.surface}
+                      imageUrl={displayPreview}
+                      title={previewTitle}
+                      subtitle={previewSubtitle}
+                      quote={previewQuote}
+                      author={previewAuthor}
+                      role={previewRole}
+                      tags={previewTags}
+                      ctaLabel={previewCta}
+                    />
+                  </div>
+                  {preset === "projectCover" ? (
+                    <ProjectCardPeek
+                      imageUrl={displayPreview}
+                      title={previewTitle}
+                      quote={previewQuote}
+                      author={previewAuthor}
+                      role={previewRole}
+                      tags={previewTags}
+                      ctaLabel={previewCta}
+                    />
+                  ) : null}
+                </div>
+              )
             ) : (
               <button
                 type="button"
@@ -360,7 +404,13 @@ export function ImageField({
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <button type="button" style={btnPrimary} onClick={openPicker}>
-              {previewUrl ? t.media.replaceAndEdit : t.media.uploadAndEdit}
+              {allowCrop
+                ? previewUrl
+                  ? t.media.replaceAndEdit
+                  : t.media.uploadAndEdit
+                : previewUrl
+                  ? t.media.replace
+                  : t.media.upload}
             </button>
             {previewUrl && currentUrl && previewUrl !== currentUrl ? (
               <button type="button" style={btn} onClick={clear}>

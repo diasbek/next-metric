@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { HardNavForm } from "@/components/admin/HardNavForm";
 import { AdminPageShell } from "@/components/admin/page-shell/AdminPageShell";
 import { ADMIN_LOCALES, type AdminLocale } from "@/components/admin/ui/locales";
@@ -97,6 +97,7 @@ export function MetricHomeAdmin({
     : "hero";
 
   const current = drafts[locale];
+  const previewPayload = useDeferredValue(current);
 
   function updateLocalePayload(next: Record<string, unknown>) {
     setDrafts((prev) => ({ ...prev, [locale]: next }));
@@ -265,7 +266,7 @@ export function MetricHomeAdmin({
         </div>
 
         <HomeSitePreview
-          payload={current}
+          payload={previewPayload}
           locale={locale}
           section={active}
           dirty={dirty}

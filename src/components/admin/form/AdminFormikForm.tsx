@@ -69,6 +69,9 @@ export function AdminFormikForm<T extends Values>({
     >
       {(formik) => (
         <Form style={style} encType="multipart/form-data">
+          {formik.isSubmitting ? (
+            <input type="hidden" data-admin-form-pending="true" />
+          ) : null}
           {typeof children === "function"
             ? children({
                 ...formik,

@@ -301,6 +301,7 @@ export type AdminMessages = {
     cropFailed: string;
     uploadAndEdit: string;
     replaceAndEdit: string;
+    replace: string;
     revert: string;
     clear: string;
     viewport: string;
@@ -522,6 +523,12 @@ export type AdminMessages = {
       openMediaLibrary: string;
       addMedia: string;
       galleryHint: string;
+      galleryDropTitle: string;
+      galleryDropHint: string;
+      galleryAddCount: string;
+      galleryUploading: string;
+      galleryAdded: string;
+      galleryRemoveQueued: string;
       beforeAfter: string;
       beforeAfterHint: string;
       beforeAfterEmpty: string;

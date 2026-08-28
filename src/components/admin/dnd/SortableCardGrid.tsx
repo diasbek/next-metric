@@ -3,7 +3,6 @@
 import {
   DndContext,
   PointerSensor,
-  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
@@ -171,7 +170,7 @@ export function SortableCard({
   style,
 }: {
   id: string;
-  onActivate: () => void;
+  onActivate?: () => void;
   children: ReactNode;
   style?: CSSProperties;
 }) {
@@ -192,20 +191,24 @@ export function SortableCard({
       }}
     >
       <DragHandle attributes={attributes} listeners={listeners} />
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={onActivate}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onActivate();
-          }
-        }}
-        style={{ height: "100%", cursor: "pointer" }}
-      >
-        {children}
-      </div>
+      {onActivate ? (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={onActivate}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onActivate();
+            }
+          }}
+          style={{ height: "100%", cursor: "pointer" }}
+        >
+          {children}
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 }
@@ -225,10 +228,7 @@ export function SortableCardGrid<T extends Identifiable>({
   disabled?: boolean;
 }) {
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 200, tolerance: 8 },
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
   const gridStyle: CSSProperties = {

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { hardNavCreate } from "@/components/admin/HardNavForm";
+import { HardNavForm } from "@/components/admin/HardNavForm";
 import {
   ReorderStatus,
   SortableCard,
@@ -179,18 +179,14 @@ export function ProjectsList({ projects, embedded = false }: Props) {
             <ReorderStatus pending={pending} saved={saved} />
           </div>
         )}
-        <form
-          action={hardNavCreate(createProjectAction, {
-            successMessage: t.common.created,
-            fallbackError: t.common.actionFailed,
-            defaultSaved: t.common.saved,
-            defaultReady: t.common.ready,
-          })}
+        <HardNavForm
+          action={createProjectAction}
+          successMessage={t.common.created}
         >
           <button type="submit" style={adminBtnPrimary}>
             {t.pages.works.newItem}
           </button>
-        </form>
+        </HardNavForm>
       </div>
 
       <div

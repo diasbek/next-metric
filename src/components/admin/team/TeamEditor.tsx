@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  hardNavCreate,
+  HardNavForm,
   runAdminMutation,
 } from "@/components/admin/HardNavForm";
 import {
@@ -197,7 +197,7 @@ function SortableMember({
         opacity: isDragging ? 0.85 : 1,
         zIndex: isDragging ? 2 : 1,
         cursor: isDragging ? "grabbing" : "grab",
-        touchAction: "none",
+        touchAction: "manipulation",
       }}
       {...attributes}
       {...listeners}
@@ -319,18 +319,14 @@ export function TeamEditor({ items, initialEditId = null, embedded = false }: Pr
             </p>
           ) : null}
         </div>
-        <form
-          action={hardNavCreate(createTeamMemberAction, {
-            successMessage: t.common.created,
-            fallbackError: t.common.actionFailed,
-            defaultSaved: t.common.saved,
-            defaultReady: t.common.ready,
-          })}
+        <HardNavForm
+          action={createTeamMemberAction}
+          successMessage={t.common.created}
         >
           <button type="submit" style={btnPrimary}>
             + {t.pages.team.newItem}
           </button>
-        </form>
+        </HardNavForm>
       </div>
 
       <div

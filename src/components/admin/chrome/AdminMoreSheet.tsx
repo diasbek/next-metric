@@ -15,13 +15,10 @@ import { AdminNavList } from "@/components/admin/chrome/AdminDesktopSidebar";
 import type { AdminNavItem } from "@/components/admin/chrome/nav";
 import { adminChromeNavLink } from "@/components/admin/chrome/menuStyles";
 
-type Snap = "closed" | "peek" | "expanded";
-
-const PEEK_RATIO = 0.48;
-const EXPANDED_RATIO = 0.92;
-const CLOSE_RATIO = 0.18;
-const VELOCITY_CLOSE = 0.85;
-const VELOCITY_EXPAND = -0.55;
+const SHEET_RATIO = 0.92;
+const CLOSE_PX = 72;
+const VELOCITY_CLOSE = 0.7;
+const EXIT_MS = 140;
 
 type Props = {
   open: boolean;
@@ -34,12 +31,6 @@ function subscribeNever() {
   return () => undefined;
 }
 
-function sheetHeightPx(snap: Snap, viewportH: number) {
-  if (snap === "closed") return 0;
-  const ratio = snap === "expanded" ? EXPANDED_RATIO : PEEK_RATIO;
-  return Math.round(viewportH * ratio);
-}
-
 export function AdminMoreSheet({
   open,
   onClose,
@@ -47,35 +38,23 @@ export function AdminMoreSheet({
   pathname,
 }: Props) {
   const t = useAdminT();
-  const mounted = useSyncExternalStore(
+  const canPortal = useSyncExternalStore(
     subscribeNever,
     () => true,
     () => false,
   );
 
-  const [snap, setSnap] = useState<Snap>("closed");
-  const [dragHeight, setDragHeight] = useState<number | null>(null);
+  const [present, setPresent] = useState(open);
+  const [shown, setShown] = useState(false);
   const [viewportH, setViewportH] = useState(800);
   const [dragging, setDragging] = useState(false);
+  const [dragY, setDragY] = useState(0);
 
   const dragStartY = useRef(0);
-  const dragStartH = useRef(0);
   const lastY = useRef(0);
   const lastT = useRef(0);
   const velocity = useRef(0);
-
-  // Keep snap in sync with `open` during render (React-approved pattern).
-  const [openSynced, setOpenSynced] = useState(open);
-  if (open !== openSynced) {
-    setOpenSynced(open);
-    if (open) {
-      setSnap("peek");
-      setDragHeight(null);
-    } else {
-      setSnap("closed");
-      setDragHeight(null);
-    }
-  }
+  const showFrame = useRef(0);
 
   useEffect(() => {
     const apply = () => setViewportH(window.innerHeight);
@@ -85,45 +64,49 @@ export function AdminMoreSheet({
   }, []);
 
   useEffect(() => {
-    if (snap === "closed") return;
+    if (open) {
+      setPresent(true);
+      setDragY(0);
+      cancelAnimationFrame(showFrame.current);
+      showFrame.current = requestAnimationFrame(() => {
+        showFrame.current = requestAnimationFrame(() => setShown(true));
+      });
+      return () => cancelAnimationFrame(showFrame.current);
+    }
+    setShown(false);
+    setDragging(false);
+    setDragY(0);
+    const timer = window.setTimeout(() => setPresent(false), EXIT_MS);
+    return () => window.clearTimeout(timer);
+  }, [open]);
+
+  useEffect(() => {
+    if (!present) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [snap]);
+  }, [present]);
 
   useEffect(() => {
-    if (snap === "closed") return;
+    if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [snap, onClose]);
-
-  const baseHeight = sheetHeightPx(snap, viewportH);
-  const height = dragHeight ?? baseHeight;
-  const visible = snap !== "closed" || (dragHeight !== null && dragHeight > 0);
+  }, [open, onClose]);
 
   const settle = useCallback(
-    (h: number, v: number) => {
-      if (v > VELOCITY_CLOSE || h < viewportH * CLOSE_RATIO) {
-        setDragHeight(null);
-        setSnap("closed");
+    (y: number, v: number) => {
+      if (v > VELOCITY_CLOSE || y > CLOSE_PX) {
         onClose();
         return;
       }
-      const peek = sheetHeightPx("peek", viewportH);
-      const expanded = sheetHeightPx("expanded", viewportH);
-      if (v < VELOCITY_EXPAND || h > (peek + expanded) / 2) {
-        setSnap("expanded");
-      } else {
-        setSnap("peek");
-      }
-      setDragHeight(null);
+      setDragY(0);
     },
-    [onClose, viewportH],
+    [onClose],
   );
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -131,22 +114,15 @@ export function AdminMoreSheet({
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
     dragStartY.current = event.clientY;
-    dragStartH.current = height;
     lastY.current = event.clientY;
     lastT.current = performance.now();
     velocity.current = 0;
-    setDragHeight(height);
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!dragging) return;
-    const dy = dragStartY.current - event.clientY;
-    const next = Math.min(
-      viewportH * EXPANDED_RATIO,
-      Math.max(0, dragStartH.current + dy),
-    );
-    setDragHeight(next);
-
+    const dy = Math.max(0, event.clientY - dragStartY.current);
+    setDragY(dy);
     const now = performance.now();
     const dt = Math.max(1, now - lastT.current);
     velocity.current = (event.clientY - lastY.current) / dt;
@@ -162,21 +138,23 @@ export function AdminMoreSheet({
       /* already released */
     }
     setDragging(false);
-    settle(dragHeight ?? height, velocity.current);
+    settle(dragY, velocity.current);
   };
 
-  if (!mounted || (!visible && snap === "closed")) return null;
+  if (!canPortal || !present) return null;
 
-  const backdropOpacity = Math.min(0.55, (height / Math.max(viewportH, 1)) * 0.7);
+  const height = Math.round(viewportH * SHEET_RATIO);
+  const translate = shown && !dragging ? 0 : dragging ? dragY : height;
+  const backdrop = shown ? Math.max(0, 0.5 * (1 - dragY / height)) : 0;
 
   return createPortal(
     <div
-      aria-hidden={snap === "closed"}
+      aria-hidden={!open}
       style={{
         position: "fixed",
         inset: 0,
         zIndex: 80,
-        pointerEvents: visible ? "auto" : "none",
+        pointerEvents: open || shown ? "auto" : "none",
       }}
     >
       <button
@@ -189,8 +167,8 @@ export function AdminMoreSheet({
           border: 0,
           padding: 0,
           margin: 0,
-          background: `rgba(0,0,0,${backdropOpacity})`,
-          transition: dragging ? "none" : "background 180ms ease",
+          background: `rgba(0,0,0,${backdrop})`,
+          transition: dragging ? "none" : `background ${EXIT_MS}ms ease-out`,
           cursor: "pointer",
         }}
       />
@@ -214,9 +192,11 @@ export function AdminMoreSheet({
           display: "flex",
           flexDirection: "column",
           boxShadow: "0 -12px 40px rgba(0,0,0,0.45)",
+          transform: `translate3d(0, ${translate}px, 0)`,
           transition: dragging
             ? "none"
-            : "height 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+            : `transform ${EXIT_MS}ms cubic-bezier(0.32, 0.72, 0, 1)`,
+          willChange: "transform",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
           overflow: "hidden",
         }}
@@ -283,6 +263,7 @@ export function AdminMoreSheet({
           >
             <Link
               href="/"
+              prefetch={false}
               style={{
                 ...adminChromeNavLink,
                 padding: "12px 14px",

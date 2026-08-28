@@ -107,7 +107,7 @@ export function AdminDashboardHome({
 
       <div className="admin-dash-grid">
         {kpi.map((card) => (
-          <Link key={card.label} href={card.href} className="admin-dash-card">
+          <Link key={card.label} href={card.href} prefetch={false} className="admin-dash-card">
             <p className="admin-dash-card__label">{card.label}</p>
             <p className="admin-dash-card__value">{card.value}</p>
           </Link>
@@ -120,7 +120,7 @@ export function AdminDashboardHome({
         </h2>
         <div className="admin-dash-grid">
           {shortcuts.map((card) => (
-            <Link key={card.label} href={card.href} className="admin-dash-card">
+            <Link key={card.label} href={card.href} prefetch={false} className="admin-dash-card">
               <p className="admin-dash-card__label">{card.label}</p>
               <p className="admin-dash-card__go">→</p>
             </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import { HardNavForm } from "@/components/admin/HardNavForm";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useDeferredValue, useEffect, useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ImageField } from "@/components/admin/image-field";
@@ -148,6 +148,7 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
     searchParams.get("locale") === "de" ? "de" : "en",
   );
   const [draft, setDraft] = useState(project);
+  const previewDraft = useDeferredValue(draft);
   const [coverPreview, setCoverPreview] = useState(project.cover_image);
   const [coverBlobUrl, setCoverBlobUrl] = useState<string | null>(null);
   const [coverSource, setCoverSource] = useState<MediaSourceMode>("upload");
@@ -785,12 +786,8 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
               onDragEnd={onDragEnd}
               style={{ gridTemplateColumns: "1fr" }}
               renderItem={(block) => (
-                <SortableCard id={block.id} onActivate={() => undefined}>
-                  <div
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  >
-                    <BlockCard
+                <SortableCard id={block.id}>
+                  <BlockCard
                       block={block}
                       projectId={draft.id}
                       media={draft.media}
@@ -809,7 +806,6 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                         }));
                       }}
                     />
-                  </div>
                 </SortableCard>
               )}
             />
@@ -1066,7 +1062,7 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
       </div>
 
       <CaseSitePreview
-        draft={draft}
+        draft={previewDraft}
         saved={project}
         locale={locale}
         ogPreviewDataUrl={ogMode === "generate" ? ogPreviewDataUrl : null}
@@ -1240,6 +1236,17 @@ function BlockCard({
 
       {block.type === "gallery" ? (
         <div style={{ display: "grid", gap: 10 }}>
+          <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+            {t.pages.project.galleryHint}
+          </p>
+          <CaseMediaAdd
+            projectId={projectId}
+            blockId={block.id}
+            kind="gallery"
+            library={library}
+            locale={locale}
+            previewTitle={title}
+          />
           <ReorderStatus pending={galleryPending} saved={gallerySaved} />
           <SortableCardGrid
             items={orderedGallery}
@@ -1249,12 +1256,8 @@ function BlockCard({
               gap: 8,
             }}
             renderItem={(item) => (
-              <SortableCard id={item.id} onActivate={() => undefined}>
-                <div
-                  style={{ display: "grid", gap: 4 }}
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => e.stopPropagation()}
-                >
+              <SortableCard id={item.id}>
+                <div style={{ display: "grid", gap: 4 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.url}
@@ -1288,14 +1291,6 @@ function BlockCard({
                 </div>
               </SortableCard>
             )}
-          />
-          <CaseMediaAdd
-            projectId={projectId}
-            blockId={block.id}
-            kind="gallery"
-            library={library}
-            locale={locale}
-            previewTitle={title}
           />
         </div>
       ) : null}

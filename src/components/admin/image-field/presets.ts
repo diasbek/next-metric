@@ -74,7 +74,7 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     maxHeight: 2800,
     quality: 0.9,
     preferWebp: true,
-    hint: "Full gallery frame (up to ~2800px long edge, max 5 MB, no forced crop).",
+    hint: "Full gallery frame as-is (up to ~2800px long edge, max 5 MB). No crop UI.",
   },
   ogSocial: {
     key: "ogSocial",

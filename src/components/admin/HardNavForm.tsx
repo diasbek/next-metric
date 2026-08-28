@@ -5,6 +5,7 @@ import {
   type FormHTMLAttributes,
   type ReactNode,
 } from "react";
+import { useFormStatus } from "react-dom";
 import {
   isAdminFailure,
   isAdminRedirect,
@@ -104,6 +105,13 @@ export async function runAdminMutation(
   }
 }
 
+/** Marks the parent form pending so CSS can show instant wait feedback. */
+function AdminFormPendingMarker() {
+  const { pending } = useFormStatus();
+  if (!pending) return null;
+  return <input type="hidden" data-admin-form-pending="true" />;
+}
+
 /** Form that toasts + soft-navigates when the server action returns a result. */
 export const HardNavForm = forwardRef<HTMLFormElement, HardNavFormProps>(
   function HardNavForm(
@@ -126,6 +134,7 @@ export const HardNavForm = forwardRef<HTMLFormElement, HardNavFormProps>(
           });
         }}
       >
+        <AdminFormPendingMarker />
         {children}
       </form>
     );

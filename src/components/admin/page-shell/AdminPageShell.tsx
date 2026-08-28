@@ -76,6 +76,7 @@ export function AdminPageShell({
               <Link
                 key={section.id}
                 href={href}
+                prefetch={false}
                 style={{
                   ...adminBtn,
                   background: active ? "#fff" : "#1a1a1a",

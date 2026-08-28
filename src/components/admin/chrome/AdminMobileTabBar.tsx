@@ -43,8 +43,6 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
           padding: "6px 6px calc(6px + env(safe-area-inset-bottom, 0px))",
           background: "rgba(10,10,10,0.94)",
           borderTop: "1px solid #222",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
         }}
       >
         {primary.map((item) => {
@@ -53,6 +51,7 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               aria-current={active ? "page" : undefined}
               onClick={(e) => e.currentTarget.blur()}
               style={{
@@ -94,7 +93,7 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
 
         <button
           type="button"
-          onClick={() => setMoreOpen(true)}
+          onClick={() => setMoreOpen((v) => !v)}
           aria-expanded={moreOpen}
           style={{
             flex: "1 1 0",

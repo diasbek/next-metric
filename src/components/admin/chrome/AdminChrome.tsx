@@ -69,6 +69,29 @@ export function AdminChrome({
           width: 100%;
           padding: 20px 16px calc(var(--admin-tabbar) + 16px);
         }
+        .admin-chrome button,
+        .admin-chrome [role="button"],
+        .admin-chrome input[type="submit"],
+        .admin-chrome a.admin-nav-link {
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .admin-chrome button:active:not(:disabled),
+        .admin-chrome [role="button"]:active,
+        .admin-chrome input[type="submit"]:active:not(:disabled) {
+          filter: brightness(1.2);
+        }
+        .admin-chrome form:has([data-admin-form-pending]) {
+          opacity: 0.72;
+          cursor: wait;
+        }
+        .admin-chrome form:has([data-admin-form-pending]) button,
+        .admin-chrome form:has([data-admin-form-pending]) input,
+        .admin-chrome form:has([data-admin-form-pending]) select,
+        .admin-chrome form:has([data-admin-form-pending]) textarea {
+          cursor: wait;
+          pointer-events: none;
+        }
         /* Sidebar / sheet nav — route active only, no leftover focus boxes. */
         .admin-nav-link {
           color: #cfcfcf;

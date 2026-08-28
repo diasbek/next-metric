@@ -313,6 +313,7 @@ export const deAdmin: AdminMessages = {
     cropFailed: "Zuschnitt fehlgeschlagen",
     uploadAndEdit: "Hochladen & auf Seiten-Mockup bearbeiten",
     replaceAndEdit: "Ersetzen & bearbeiten",
+    replace: "Bild ersetzen",
     revert: "Zurücksetzen",
     clear: "Leeren",
     viewport: "Viewport",
@@ -333,7 +334,7 @@ export const deAdmin: AdminMessages = {
       projectCase: {
         label: "Case / Galerie",
         surfaceLabel: "Case-Galerie",
-        hint: "Galeriebild — freies Seitenverhältnis, bis ~2800px, max. 5 MB.",
+        hint: "Wird unverändert hochgeladen — kein Zuschnitt. Max. 5 MB; die Größe passt der Server an.",
       },
       ogSocial: {
         label: "OG / Social",
@@ -579,7 +580,14 @@ export const deAdmin: AdminMessages = {
       openMediaLibrary: "Mediathek öffnen",
       addMedia: "Bild hinzufügen",
       galleryHint:
-        "Frames per Hochladen (zuschneiden, dann Hinzufügen) oder aus der Bibliothek (Klick aufs Vorschaubild). Das sieht der Besucher.",
+        "Packe mehrere Fotos in die Fläche darunter — das wird die Serie auf der Case-Seite. Zum Sortieren die Vorschaubilder ziehen. Kein Zuschnitt.",
+      galleryDropTitle: "Bilderserie hier ablegen",
+      galleryDropHint:
+        "Mehrere Fotos auf einmal ablegen oder klicken zum Auswählen. JPEG, PNG, WebP · max. 5 MB pro Bild · kein Zuschnitt.",
+      galleryAddCount: "{count} Frames hinzufügen",
+      galleryUploading: "Lade {done} / {total} hoch…",
+      galleryAdded: "{count} Frames hinzugefügt",
+      galleryRemoveQueued: "Aus der Warteschlange entfernen",
       beforeAfter: "Vorher / Nachher",
       beforeAfterHint:
         "Ein Vergleichspaar für den Slider. Ersetzen aktualisiert diese Seite — ohne Duplikate.",

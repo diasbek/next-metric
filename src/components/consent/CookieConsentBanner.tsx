@@ -37,6 +37,7 @@ export function CookieConsentBanner() {
   const copy = locale === "de" ? COPY.de : COPY.en;
   const privacyHref = usePrivacyHref();
 
+  if (pathname?.startsWith("/admin")) return null;
   if (!isPanelOpen) return null;
 
   const alreadyDecided = status === "resolved";

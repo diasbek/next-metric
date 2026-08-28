@@ -541,6 +541,76 @@ export async function addProjectMediaAction(formData: FormData) {
   return adminRedirect(projectEditPath(projectId, formData));
 }
 
+/** One gallery frame. No redirect — the client refreshes after a batch. */
+export async function addProjectGalleryFrameAction(formData: FormData) {
+  await requirePermission("content");
+  const supabase = createSupabaseAdminClient();
+  const projectId = String(formData.get("project_id"));
+  const blockId = String(formData.get("block_id") ?? "").trim() || null;
+  const file = formData.get("file");
+
+  if (!isFileUpload(file)) {
+    const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+    const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+    const t = getAdminMessages(await getAdminUiLocale());
+    return adminFail(t.flash.errorMedia);
+  }
+
+  const uploaded = await uploadMediaFile(file, {
+    folder: `projects/${projectId}/gallery`,
+    filenameHint: `gallery-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    maxEdge: CASE_MEDIA_MAX_EDGE_PX,
+    quality: CASE_MEDIA_WEBP_QUALITY,
+    maxUploadBytes: CASE_MEDIA_MAX_UPLOAD_BYTES,
+  });
+
+  let maxQuery = supabase
+    .from("metric_project_media")
+    .select("sort_order")
+    .eq("project_id", projectId)
+    .eq("kind", "gallery")
+    .order("sort_order", { ascending: false })
+    .limit(1);
+  maxQuery = blockId
+    ? maxQuery.eq("block_id", blockId)
+    : maxQuery.is("block_id", null);
+  const { data: maxRow } = await maxQuery.maybeSingle();
+  const sortOrder = (maxRow?.sort_order ?? -1) + 1;
+
+  const dimensions =
+    uploaded.width != null && uploaded.height != null
+      ? { width: uploaded.width, height: uploaded.height }
+      : {};
+
+  const { error } = await supabase.from("metric_project_media").insert({
+    project_id: projectId,
+    block_id: blockId,
+    kind: "gallery",
+    url: uploaded.publicUrl,
+    sort_order: sortOrder,
+    alt: "",
+    ...dimensions,
+  });
+  if (error) return adminFail(error.message);
+  return adminOk();
+}
+
+export async function finishProjectGalleryBatchAction(formData: FormData) {
+  await requirePermission("content");
+  const projectId = String(formData.get("project_id"));
+  const count = Number(formData.get("added_count") ?? 0);
+  revalidateCms(["cms", "projects"]);
+  const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+  const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+  const { formatAdminMessage } = await import("@/i18n/admin/format");
+  const t = getAdminMessages(await getAdminUiLocale());
+  const message =
+    Number.isFinite(count) && count > 0
+      ? formatAdminMessage(t.pages.project.galleryAdded, { count })
+      : t.common.saved;
+  return adminRedirect(projectEditPath(projectId, formData), message);
+}
+
 export async function deleteProjectMediaAction(formData: FormData) {
   await requirePermission("content");
   const supabase = createSupabaseAdminClient();

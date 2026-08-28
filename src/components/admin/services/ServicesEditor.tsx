@@ -1,6 +1,6 @@
 "use client";
 
-import { HardNavForm, hardNavAction, hardNavCreate } from "@/components/admin/HardNavForm";
+import { HardNavForm, hardNavAction } from "@/components/admin/HardNavForm";
 import {
   ReorderStatus,
   SortableCard,
@@ -164,18 +164,14 @@ export function ServicesEditor({ items, initialEditId = null, embedded = false }
           <p style={{ color: "#888", margin: "8px 0 0" }}>{t.pages.services.description}</p>
           <ReorderStatus pending={pending} saved={saved} />
         </div>
-        <form
-          action={hardNavCreate(createServiceAction, {
-            successMessage: t.common.created,
-            fallbackError: t.common.actionFailed,
-            defaultSaved: t.common.saved,
-            defaultReady: t.common.ready,
-          })}
+        <HardNavForm
+          action={createServiceAction}
+          successMessage={t.common.created}
         >
           <button type="submit" style={adminBtnPrimary}>
             + {t.pages.services.newItem}
           </button>
-        </form>
+        </HardNavForm>
       </div>
 
       <div

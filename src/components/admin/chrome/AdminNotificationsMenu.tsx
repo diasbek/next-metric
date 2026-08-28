@@ -230,6 +230,7 @@ export function AdminNotificationsMenu() {
                       key={item.id}
                       role="menuitem"
                       href={item.href}
+                      prefetch={false}
                       onClick={() => setOpen(false)}
                       style={{
                         ...adminChromeMenuItem,
@@ -332,6 +333,7 @@ export function AdminNotificationsMenu() {
               <Link
                 role="menuitem"
                 href="/admin/leads/"
+                prefetch={false}
                 onClick={() => setOpen(false)}
                 style={{
                   ...adminChromeMenuItemMuted,

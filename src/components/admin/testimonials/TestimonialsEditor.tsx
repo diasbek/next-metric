@@ -3,7 +3,6 @@
 import {
   HardNavForm,
   hardNavAction,
-  hardNavCreate,
   runAdminMutation,
 } from "@/components/admin/HardNavForm";
 import {
@@ -318,18 +317,14 @@ export function TestimonialsEditor({ items, initialEditId = null, embedded = fal
           <p style={{ color: "#888", margin: "8px 0 0" }}>{t.pages.testimonials.description}</p>
           <ReorderStatus pending={pending} saved={saved} />
         </div>
-        <form
-          action={hardNavCreate(createTestimonialAction, {
-            successMessage: t.common.created,
-            fallbackError: t.common.actionFailed,
-            defaultSaved: t.common.saved,
-            defaultReady: t.common.ready,
-          })}
+        <HardNavForm
+          action={createTestimonialAction}
+          successMessage={t.common.created}
         >
           <button type="submit" style={btnPrimary}>
             + {t.pages.testimonials.newItem}
           </button>
-        </form>
+        </HardNavForm>
       </div>
 
       <div

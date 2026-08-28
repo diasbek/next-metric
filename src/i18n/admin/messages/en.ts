@@ -313,6 +313,7 @@ export const enAdmin: AdminMessages = {
     cropFailed: "Crop failed",
     uploadAndEdit: "Upload & edit on page mockup",
     replaceAndEdit: "Replace & edit",
+    replace: "Replace image",
     revert: "Revert",
     clear: "Clear",
     viewport: "Viewport",
@@ -333,7 +334,7 @@ export const enAdmin: AdminMessages = {
       projectCase: {
         label: "Case / gallery",
         surfaceLabel: "Case gallery",
-        hint: "Full gallery frame — free aspect, up to ~2800px, max 5 MB.",
+        hint: "Uploaded as is — no cropping. Max 5 MB; resizing happens on the server.",
       },
       ogSocial: {
         label: "OG / social",
@@ -577,7 +578,14 @@ export const enAdmin: AdminMessages = {
       openMediaLibrary: "Open media library",
       addMedia: "Add image",
       galleryHint:
-        "Add frames with Upload (crop, then Add) or From library (click a thumb). That strip is what visitors see.",
+        "Drop a pack of photos into the area below — they become the series on the case page. Drag thumbs to reorder. No cropping.",
+      galleryDropTitle: "Drop a series of images",
+      galleryDropHint:
+        "Drop several photos at once, or click to choose. JPEG, PNG, WebP · max 5 MB each · no crop.",
+      galleryAddCount: "Add {count} frames",
+      galleryUploading: "Uploading {done} / {total}…",
+      galleryAdded: "Added {count} frames",
+      galleryRemoveQueued: "Remove from queue",
       beforeAfter: "Before / After",
       beforeAfterHint:
         "One compare pair for the slider. Replacing an image updates that side — no duplicates.",

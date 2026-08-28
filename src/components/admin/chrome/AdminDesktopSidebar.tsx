@@ -64,6 +64,7 @@ export function AdminDesktopSidebar({ items, pathname }: Props) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               className={`admin-nav-link${active ? " is-active" : ""}`}
               aria-current={active ? "page" : undefined}
               onClick={blurNavTarget}
@@ -92,6 +93,7 @@ export function AdminDesktopSidebar({ items, pathname }: Props) {
           href="/"
           target="_blank"
           rel="noreferrer"
+          prefetch={false}
           className="admin-nav-link admin-nav-link--muted"
           onClick={blurNavTarget}
         >
@@ -121,6 +123,7 @@ export function AdminNavList({
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             className={`admin-nav-link admin-nav-link--sheet${active ? " is-active" : ""}`}
             aria-current={active ? "page" : undefined}
             onClick={(e) => {
