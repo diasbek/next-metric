@@ -2,7 +2,7 @@
 
 import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { Button, type ButtonSize, type ButtonVariant } from "@/components/atoms/Button";
-import { useProjectBrief } from "@/components/molecules/ProjectBriefProvider";
+import { useOptionalProjectBrief } from "@/components/molecules/ProjectBriefProvider";
 
 type ProjectBriefCtaProps = {
   href: string;
@@ -32,7 +32,7 @@ export function ProjectBriefCta({
   className,
   ...rest
 }: ProjectBriefCtaProps) {
-  const { open } = useProjectBrief();
+  const brief = useOptionalProjectBrief();
 
   return (
     <Button
@@ -47,9 +47,9 @@ export function ProjectBriefCta({
       // Capture phase: TransitionLink handles same-document hrefs in its own
       // click handler and would consume the event before the modal can open.
       onClickCapture={(event: MouseEvent<HTMLAnchorElement>) => {
-        if (opensInBrowser(event)) return;
+        if (!brief || opensInBrowser(event)) return;
         event.preventDefault();
-        open();
+        brief.open();
       }}
       onClick={onClick}
     >

@@ -1,5 +1,5 @@
-/* METRIC PWA shell — manifest/icons only; never cache HTML or /_next bundles. */
-const CACHE = "metric-shell-v11";
+/* METRIC PWA shell — manifest/icons only; never intercept HTML, CSS, or /_next. */
+const CACHE = "metric-shell-v12";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -23,27 +23,12 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-function isNextAsset(url) {
-  try {
-    return new URL(url).pathname.startsWith("/_next/");
-  } catch {
-    return false;
-  }
-}
-
-function isDocumentRequest(request) {
-  return request.mode === "navigate" || request.destination === "document";
-}
-
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
 
-  if (isNextAsset(request.url) || isDocumentRequest(request)) {
-    event.respondWith(fetch(request));
-    return;
-  }
-
+  // Only mediate shell assets. Pass everything else to the browser so a CDN
+  // 403/network blip cannot surface as an Uncaught SW promise rejection.
   if (
     request.destination === "manifest" ||
     request.url.includes("/icons/")
@@ -59,8 +44,5 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => caches.match(request)),
     );
-    return;
   }
-
-  event.respondWith(fetch(request));
 });

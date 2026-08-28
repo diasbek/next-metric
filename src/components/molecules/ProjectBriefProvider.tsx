@@ -30,6 +30,11 @@ export function useProjectBrief() {
   return ctx;
 }
 
+/** Returns null outside a provider — safe for admin previews and stray CTAs. */
+export function useOptionalProjectBrief() {
+  return useContext(ProjectBriefContext);
+}
+
 /** No-op brief context for admin site previews (no modal chrome). */
 export function ProjectBriefPreviewProvider({ children }: { children: ReactNode }) {
   const value = useMemo<ProjectBriefContextValue>(
