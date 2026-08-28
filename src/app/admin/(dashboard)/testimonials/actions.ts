@@ -1,6 +1,6 @@
 "use server";
 
-import { adminFail, adminRedirect } from "@/lib/cms/admin-redirect";
+import { adminFail, adminOk, adminRedirect } from "@/lib/cms/admin-redirect";
 import { revalidateCms } from "@/lib/cms/revalidate";
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -60,7 +60,7 @@ export async function saveTestimonialAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "testimonials"]);
-  return adminRedirect(`/admin/home/`);
+  return adminOk("Saved");
 }
 
 export async function createTestimonialAction() {

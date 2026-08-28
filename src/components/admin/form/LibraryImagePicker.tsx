@@ -16,6 +16,10 @@ type Props = {
   noneLabel: string;
   /** Called when selection changes (e.g. cover live preview). */
   onSelect?: (url: string) => void;
+  /** Optional hint under the label (e.g. click-to-add). */
+  hint?: string;
+  /** Show the clear / none control. Default true. */
+  showClear?: boolean;
 };
 
 const gridStyle: CSSProperties = {
@@ -48,6 +52,8 @@ export function LibraryImagePicker({
   label,
   noneLabel,
   onSelect,
+  hint,
+  showClear = true,
 }: Props) {
   const t = useAdminT();
   const listId = useId();
@@ -79,21 +85,28 @@ export function LibraryImagePicker({
           flexWrap: "wrap",
         }}
       >
-        <span style={{ fontSize: 13 }}>{label}</span>
-        <button
-          type="button"
-          onClick={() => pick("")}
-          style={{
-            padding: "4px 8px",
-            fontSize: 12,
-            cursor: "pointer",
-            background: "transparent",
-            border: "1px solid #333",
-            color: value ? "#ccc" : "#666",
-          }}
-        >
-          {noneLabel}
-        </button>
+        <div style={{ display: "grid", gap: 2, minWidth: 0 }}>
+          <span style={{ fontSize: 13 }}>{label}</span>
+          {hint ? (
+            <span style={{ fontSize: 12, color: "#888" }}>{hint}</span>
+          ) : null}
+        </div>
+        {showClear ? (
+          <button
+            type="button"
+            onClick={() => pick("")}
+            style={{
+              padding: "4px 8px",
+              fontSize: 12,
+              cursor: "pointer",
+              background: "transparent",
+              border: "1px solid #333",
+              color: value ? "#ccc" : "#666",
+            }}
+          >
+            {noneLabel}
+          </button>
+        ) : null}
       </div>
       <input
         value={q}

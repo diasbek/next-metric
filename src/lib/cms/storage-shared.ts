@@ -5,6 +5,11 @@
 
 export const MEDIA_BUCKET = "metric-media";
 
+/** Default max source file size for general media uploads (library, cover, avatars). */
+export const MEDIA_MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
+/** Case gallery / before-after / hero source file cap (per frame). */
+export const CASE_MEDIA_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
 /** Build a public object URL. Prefer passing the project URL at runtime. */
 export function getPublicMediaUrl(path: string, projectUrl?: string): string {
   const clean = path.replace(/^\/+/, "");

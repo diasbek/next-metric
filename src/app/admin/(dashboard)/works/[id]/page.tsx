@@ -19,7 +19,7 @@ export default async function AdminProjectEditPage({
   const { id } = await params;
   const [project, libraryPaths] = await Promise.all([
     getAdminProjectById(id),
-    listRecentMediaFiles(48),
+    listRecentMediaFiles(120),
   ]);
   if (!project) notFound();
 

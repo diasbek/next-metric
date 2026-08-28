@@ -6,6 +6,10 @@ import {
   uploadMediaViaApi,
 } from "@/lib/cms/browser-upload";
 import { adminBtn, adminInput } from "@/components/admin/ui/styles";
+import {
+  adminToastError,
+  adminToastSuccess,
+} from "@/components/admin/toast/AdminToaster";
 import { useAdminT } from "@/i18n/admin";
 
 type Props = {
@@ -46,13 +50,14 @@ export function PayloadImageInput({
         filenameHint: file.name.replace(/\.[^.]+$/, "") || "image",
       });
       onChange(uploaded.publicUrl);
+      adminToastSuccess(t.flash.uploaded);
     } catch (err) {
-      setError(
-        formatUploadError(
-          err instanceof Error ? err.message : t.common.actionFailed,
-          t.common.uploadNetworkError,
-        ),
+      const message = formatUploadError(
+        err instanceof Error ? err.message : t.common.actionFailed,
+        t.common.uploadNetworkError,
       );
+      setError(message);
+      adminToastError(message);
     } finally {
       setBusy(false);
     }
@@ -100,6 +105,9 @@ export function PayloadImageInput({
               </button>
             ) : null}
           </div>
+          <p style={{ margin: 0, fontSize: 11, color: "#666" }}>
+            {t.common.saveSectionToPublish}
+          </p>
           {error ? (
             <p style={{ margin: 0, color: "#f88", fontSize: 12 }}>{error}</p>
           ) : null}

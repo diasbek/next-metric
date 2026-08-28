@@ -6,7 +6,7 @@ import { HardNavForm } from "@/components/admin/HardNavForm";
 import { useMemo, useState } from "react";
 import { ImageField } from "@/components/admin/image-field";
 import { deleteMediaAction, uploadMediaAction } from "@/app/admin/(dashboard)/media/actions";
-import { adminBtn, adminInput } from "@/components/admin/ui/styles";
+import { adminBtn, adminBtnPrimary, adminInput } from "@/components/admin/ui/styles";
 import { useAdminT } from "@/i18n/admin";
 
 type Props = {
@@ -19,6 +19,7 @@ export function MediaLibrary({ files, flash, pager }: Props) {
   const t = useAdminT();
   const [q, setQ] = useState("");
   const [folder, setFolder] = useState<string>("all");
+  const [fileReady, setFileReady] = useState(false);
 
   const folders = useMemo(() => {
     const set = new Set<string>();
@@ -65,12 +66,27 @@ export function MediaLibrary({ files, flash, pager }: Props) {
           maxWidth: 420,
         }}
       >
-        <ImageField name="file" preset="free" label={t.common.uploadPhoto} required />
+        <ImageField
+          name="file"
+          preset="free"
+          label={t.common.uploadPhoto}
+          required
+          onReady={(file) => setFileReady(!!file)}
+        />
         <label style={{ fontSize: 13 }}>
           {t.common.folder}
           <input name="folder" placeholder={t.common.folderDefault} style={adminInput} />
         </label>
-        <button type="submit" style={{ ...adminBtn, justifySelf: "start" }}>
+        <button
+          type="submit"
+          disabled={!fileReady}
+          style={{
+            ...(fileReady ? adminBtnPrimary : adminBtn),
+            justifySelf: "start",
+            opacity: fileReady ? 1 : 0.45,
+            cursor: fileReady ? "pointer" : "not-allowed",
+          }}
+        >
           {t.media.upload}
         </button>
       </HardNavForm>
@@ -148,6 +164,9 @@ export function MediaLibrary({ files, flash, pager }: Props) {
               <button
                 type="submit"
                 style={{ padding: 6, cursor: "pointer", color: "#f66", fontSize: 12 }}
+                onClick={(e) => {
+                  if (!confirm(t.media.deleteWarn)) e.preventDefault();
+                }}
               >
                 {t.common.delete}
               </button>

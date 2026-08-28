@@ -21,7 +21,7 @@ import {
   uploadMediaViaApi,
 } from "@/lib/cms/browser-upload";
 
-import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { ImageField } from "@/components/admin/image-field";
 import {
   createTestimonialAction,
@@ -418,6 +418,8 @@ function TestimonialEditPanel({
   const [locale, setLocale] = useState<AdminLocale>("en");
   const [draft, setDraft] = useState(item);
   const [busy, setBusy] = useState(false);
+  const pendingPersonFile = useRef<File | null>(null);
+  const pendingLogoFile = useRef<File | null>(null);
 
   const tr = draft.translations[locale];
   const score = localizationScore(draft.translations);
@@ -455,14 +457,8 @@ function TestimonialEditPanel({
       const form = event.currentTarget;
       const fd = new FormData(form);
 
-      const personInput = form.querySelector<HTMLInputElement>(
-        'input[type="file"][name="person_image_file"]',
-      );
-      const logoInput = form.querySelector<HTMLInputElement>(
-        'input[type="file"][name="logo_image_file"]',
-      );
-      const personFile = personInput?.files?.[0];
-      const logoFile = logoInput?.files?.[0];
+      const personFile = pendingPersonFile.current;
+      const logoFile = pendingLogoFile.current;
 
       let personImage = draft.person_image.startsWith("blob:")
         ? item.person_image
@@ -477,6 +473,7 @@ function TestimonialEditPanel({
           filenameHint: "person",
         });
         personImage = uploaded.publicUrl;
+        pendingPersonFile.current = null;
       }
       if (logoFile) {
         const uploaded = await uploadMediaViaApi(logoFile, {
@@ -484,6 +481,7 @@ function TestimonialEditPanel({
           filenameHint: "logo",
         });
         logoImage = uploaded.publicUrl;
+        pendingLogoFile.current = null;
       }
 
       fd.set("person_image", personImage);
@@ -493,8 +491,10 @@ function TestimonialEditPanel({
 
       const ok = await runAdminMutation(saveTestimonialAction, fd, {
         successMessage: t.pages.testimonials.saved,
+        stayOnPage: true,
       });
       if (!ok) setBusy(false);
+      else setBusy(false);
     } catch (err) {
       adminToastError(
         formatUploadError(
@@ -710,7 +710,11 @@ function TestimonialEditPanel({
           previewSubtitle={tr.role || t.common.roleTitle}
           previewQuote={tr.quote || t.common.quote}
           onReady={(file) => {
-            if (!file) return;
+            pendingPersonFile.current = file;
+            if (!file) {
+              setDraft((p) => ({ ...p, person_image: item.person_image }));
+              return;
+            }
             const url = URL.createObjectURL(file);
             setDraft((p) => ({ ...p, person_image: url }));
           }}
@@ -723,7 +727,11 @@ function TestimonialEditPanel({
           label={t.common.logo}
           previewTitle={tr.role || t.common.name}
           onReady={(file) => {
-            if (!file) return;
+            pendingLogoFile.current = file;
+            if (!file) {
+              setDraft((p) => ({ ...p, logo_image: item.logo_image }));
+              return;
+            }
             const url = URL.createObjectURL(file);
             setDraft((p) => ({ ...p, logo_image: url }));
           }}

@@ -7,12 +7,17 @@ import { useSearchParams } from "next/navigation";
 import { ImageField } from "@/components/admin/image-field";
 import { LibraryImagePicker } from "@/components/admin/form/LibraryImagePicker";
 import {
+  MediaSourceTabs,
+  type MediaSourceMode,
+} from "@/components/admin/form/MediaSourceTabs";
+import {
   ReorderStatus,
   SortableCard,
   SortableCardGrid,
   useOrderedItems,
   usePersistReorder,
 } from "@/components/admin/dnd";
+import { CaseMediaAdd } from "@/components/admin/projects/CaseMediaAdd";
 import { CaseSitePreview } from "@/components/admin/projects/CaseSitePreview";
 import type {
   LibraryItem,
@@ -23,7 +28,6 @@ import type {
 } from "@/components/admin/projects/project-editor-types";
 import {
   addProjectBlockAction,
-  addProjectMediaAction,
   deleteProjectAction,
   deleteProjectBlockAction,
   deleteProjectMediaAction,
@@ -126,12 +130,19 @@ export function ProjectEditor({ project, library }: Props) {
   );
   const [draft, setDraft] = useState(project);
   const [coverPreview, setCoverPreview] = useState(project.cover_image);
+  const [coverBlobUrl, setCoverBlobUrl] = useState<string | null>(null);
+  const [coverSource, setCoverSource] = useState<MediaSourceMode>("upload");
+  const [ogSource, setOgSource] = useState<MediaSourceMode>("upload");
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const tr = draft.translations[locale];
 
   useEffect(() => {
     setDraft(project);
     setCoverPreview(project.cover_image);
+    setCoverBlobUrl((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return null;
+    });
   }, [project]);
 
   useEffect(() => {
@@ -141,12 +152,26 @@ export function ProjectEditor({ project, library }: Props) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const hash = window.location.hash.replace("#", "");
+    const focus = searchParams.get("focus");
+    const hash = window.location.hash.replace("#", "") || focus || "";
     if (!hash) return;
-    requestAnimationFrame(() => {
+    const timer = window.setTimeout(() => {
       document.getElementById(hash)?.scrollIntoView({ block: "start" });
-    });
-  }, [project.id]);
+    }, 50);
+    return () => window.clearTimeout(timer);
+  }, [project.id, searchParams, project.media.length, project.blocks.length]);
+
+  const sourceTabs = useMemo(
+    () => {
+      const tabs: { id: MediaSourceMode; label: string }[] = [
+        { id: "upload", label: t.pages.project.addFromUpload },
+        { id: "library", label: t.pages.project.addFromLibrary },
+        { id: "url", label: t.pages.project.addFromUrl },
+      ];
+      return tabs;
+    },
+    [t.pages.project.addFromUpload, t.pages.project.addFromLibrary, t.pages.project.addFromUrl],
+  );
 
   const filled = useMemo(
     () => ADMIN_LOCALES.filter((l) => isLocaleFilled(draft.translations[l.code])).length,
@@ -378,45 +403,73 @@ export function ProjectEditor({ project, library }: Props) {
               {t.pages.project.featured}
             </label>
 
-            <ImageField
-              name="cover_file"
-              preset="projectCover"
-              currentUrl={coverPreview || null}
+            <MediaSourceTabs
+              mode={coverSource}
+              onChange={setCoverSource}
+              tabs={sourceTabs}
               label={t.common.cover}
-              previewTitle={tr.title || t.pages.project.title}
-              onReady={(file) => {
-                if (!file) return;
-                setCoverPreview(URL.createObjectURL(file));
-              }}
-            />
-            {library.length > 0 ? (
-              <LibraryImagePicker
-                name="cover_from_library"
-                items={library}
-                label={t.pages.project.fromLibrary}
-                noneLabel={t.pages.project.noneOption}
-                onSelect={(url) => {
-                  if (!url) return;
-                  setDraft((p) => ({ ...p, cover_image: url }));
-                  setCoverPreview(url);
-                }}
-              />
-            ) : null}
-            <details>
-              <summary style={{ cursor: "pointer", fontSize: 13, color: "#888" }}>
-                {t.pages.project.coverUrl}
-              </summary>
-              <input
-                name="cover_image"
-                value={draft.cover_image}
-                onChange={(e) => {
-                  setDraft((p) => ({ ...p, cover_image: e.target.value }));
-                  setCoverPreview(e.target.value);
-                }}
-                style={adminInput}
-                placeholder={t.pages.project.urlPlaceholder}
-              />
-            </details>
+            >
+              {coverSource === "upload" ? (
+                <ImageField
+                  name="cover_file"
+                  preset="projectCover"
+                  currentUrl={coverPreview || null}
+                  label={t.common.cover}
+                  previewTitle={tr.title || t.pages.project.title}
+                  onReady={(file) => {
+                    if (coverBlobUrl?.startsWith("blob:")) {
+                      URL.revokeObjectURL(coverBlobUrl);
+                    }
+                    if (!file) {
+                      setCoverBlobUrl(null);
+                      setCoverPreview(draft.cover_image);
+                      return;
+                    }
+                    const blob = URL.createObjectURL(file);
+                    setCoverBlobUrl(blob);
+                    setCoverPreview(blob);
+                  }}
+                />
+              ) : null}
+              {coverSource === "library" ? (
+                library.length > 0 ? (
+                  <LibraryImagePicker
+                    name="cover_from_library"
+                    items={library}
+                    label={t.pages.project.fromLibrary}
+                    noneLabel={t.pages.project.noneOption}
+                    onSelect={(url) => {
+                      setDraft((p) => ({ ...p, cover_image: url }));
+                      setCoverPreview(url);
+                    }}
+                  />
+                ) : (
+                  <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+                    {t.pages.project.libraryEmpty}{" "}
+                    <Link href="/admin/media/" style={{ color: "#8af" }}>
+                      {t.pages.project.openMediaLibrary}
+                    </Link>
+                  </p>
+                )
+              ) : null}
+              {coverSource === "url" ? (
+                <label style={{ fontSize: 13 }}>
+                  {t.pages.project.coverUrl}
+                  <input
+                    name="cover_image"
+                    value={draft.cover_image}
+                    onChange={(e) => {
+                      setDraft((p) => ({ ...p, cover_image: e.target.value }));
+                      setCoverPreview(e.target.value);
+                    }}
+                    style={adminInput}
+                    placeholder={t.pages.project.urlPlaceholder}
+                  />
+                </label>
+              ) : (
+                <input type="hidden" name="cover_image" value={draft.cover_image} />
+              )}
+            </MediaSourceTabs>
           </section>
 
           <section style={sectionBox}>
@@ -656,36 +709,57 @@ export function ProjectEditor({ project, library }: Props) {
                 {tr.meta_description || tr.description || "…"}
               </p>
             </div>
-            <ImageField
-              name="og_file"
-              preset="ogSocial"
-              currentUrl={draft.og_image || draft.cover_image || null}
+            <MediaSourceTabs
+              mode={ogSource}
+              onChange={setOgSource}
+              tabs={sourceTabs}
               label={t.pages.project.ogImage}
-            />
-            <input type="hidden" name="og_image" value={draft.og_image} />
-            {library.length > 0 ? (
-              <LibraryImagePicker
-                name="og_from_library"
-                items={library}
-                label={t.pages.project.fromLibrary}
-                noneLabel={t.pages.project.noneOption}
-                onSelect={(url) => {
-                  if (!url) return;
-                  setDraft((p) => ({ ...p, og_image: url }));
-                }}
-              />
-            ) : null}
-            <details>
-              <summary style={{ cursor: "pointer", fontSize: 13, color: "#888" }}>
-                {t.pages.project.ogImageUrl}
-              </summary>
-              <input
-                value={draft.og_image}
-                onChange={(e) => setDraft((p) => ({ ...p, og_image: e.target.value }))}
-                style={adminInput}
-                placeholder={t.pages.project.urlPlaceholder}
-              />
-            </details>
+            >
+              {ogSource === "upload" ? (
+                <ImageField
+                  name="og_file"
+                  preset="ogSocial"
+                  currentUrl={draft.og_image || draft.cover_image || null}
+                  label={t.pages.project.ogImage}
+                />
+              ) : null}
+              {ogSource === "library" ? (
+                library.length > 0 ? (
+                  <LibraryImagePicker
+                    name="og_from_library"
+                    items={library}
+                    label={t.pages.project.fromLibrary}
+                    noneLabel={t.pages.project.noneOption}
+                    onSelect={(url) => {
+                      setDraft((p) => ({ ...p, og_image: url }));
+                    }}
+                  />
+                ) : (
+                  <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+                    {t.pages.project.libraryEmpty}{" "}
+                    <Link href="/admin/media/" style={{ color: "#8af" }}>
+                      {t.pages.project.openMediaLibrary}
+                    </Link>
+                  </p>
+                )
+              ) : null}
+              {ogSource === "url" ? (
+                <label style={{ fontSize: 13 }}>
+                  {t.pages.project.ogImageUrl}
+                  <input
+                    name="og_image"
+                    value={draft.og_image}
+                    onChange={(e) =>
+                      setDraft((p) => ({ ...p, og_image: e.target.value }))
+                    }
+                    style={adminInput}
+                    placeholder={t.pages.project.urlPlaceholder}
+                  />
+                </label>
+              ) : (
+                <input type="hidden" name="og_image" value={draft.og_image} />
+              )}
+            </MediaSourceTabs>
           </section>
 
           <button type="submit" style={{ ...adminBtnPrimary, padding: 14, fontSize: 14 }}>
@@ -859,34 +933,16 @@ function BlockCard({
                     </HardNavForm>
                   </>
                 ) : null}
-                <HardNavForm
-                  action={addProjectMediaAction}
-                  encType="multipart/form-data"
-                  style={{ display: "grid", gap: 8 }}
-                >
-                  <input type="hidden" name="project_id" value={projectId} />
-                  <input type="hidden" name="block_id" value={block.id} />
-                  <input type="hidden" name="kind" value={kind} />
-                  <ReturnFields locale={locale} focus="gallery" />
-                  <ImageField
-                    name="file"
-                    preset="projectCase"
-                    label={current ? t.pages.project.replaceImage : t.common.file}
-                    previewTitle={title}
-                    previewSubtitle={sideLabel}
-                  />
-                  {library.length > 0 ? (
-                    <LibraryImagePicker
-                      name="library_url"
-                      items={library}
-                      label={t.pages.project.fromLibrary}
-                      noneLabel={t.pages.project.noneOption}
-                    />
-                  ) : null}
-                  <button type="submit" style={adminBtn}>
-                    {current ? t.pages.project.replaceImage : t.pages.project.addMedia}
-                  </button>
-                </HardNavForm>
+                <CaseMediaAdd
+                  projectId={projectId}
+                  blockId={block.id}
+                  kind={kind}
+                  library={library}
+                  locale={locale}
+                  replacing={!!current}
+                  previewTitle={title}
+                  previewSubtitle={sideLabel}
+                />
               </div>
             );
           })}
@@ -944,33 +1000,14 @@ function BlockCard({
               </SortableCard>
             )}
           />
-          <HardNavForm
-            action={addProjectMediaAction}
-            encType="multipart/form-data"
-            style={{ display: "grid", gap: 8 }}
-          >
-            <input type="hidden" name="project_id" value={projectId} />
-            <input type="hidden" name="block_id" value={block.id} />
-            <input type="hidden" name="kind" value="gallery" />
-            <ReturnFields locale={locale} focus="gallery" />
-            <ImageField
-              name="file"
-              preset="projectCase"
-              label={t.pages.project.addMedia}
-              previewTitle={title}
-            />
-            {library.length > 0 ? (
-              <LibraryImagePicker
-                name="library_url"
-                items={library}
-                label={t.pages.project.fromLibrary}
-                noneLabel={t.pages.project.noneOption}
-              />
-            ) : null}
-            <button type="submit" style={adminBtn}>
-              {t.pages.project.addMedia}
-            </button>
-          </HardNavForm>
+          <CaseMediaAdd
+            projectId={projectId}
+            blockId={block.id}
+            kind="gallery"
+            library={library}
+            locale={locale}
+            previewTitle={title}
+          />
         </div>
       ) : null}
     </article>

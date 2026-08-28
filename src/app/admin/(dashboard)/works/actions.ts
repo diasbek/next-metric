@@ -304,7 +304,10 @@ export async function addProjectMediaAction(formData: FormData) {
   }
 
   if (!url) {
-    return adminRedirect(projectEditPath(projectId, formData, { error: "media" }));
+    const { getAdminMessages } = await import("@/i18n/admin/get-admin-messages");
+    const { getAdminUiLocale } = await import("@/i18n/admin/get-admin-locale");
+    const t = getAdminMessages(await getAdminUiLocale());
+    return adminFail(t.flash.errorMedia);
   }
 
   if (width == null || height == null) {

@@ -15,7 +15,7 @@ import { EasyCropper } from "./EasyCropper";
 import { cropAndCompress, formatBytes } from "./crop-image";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
 import { useAdminDesktop } from "@/components/admin/ui/useAdminDesktop";
-import { IMAGE_PRESETS, PROJECT_CASE_MAX_UPLOAD_BYTES, type ImagePresetKey } from "./presets";
+import { IMAGE_PRESETS, MEDIA_DEFAULT_MAX_UPLOAD_BYTES, PROJECT_CASE_MAX_UPLOAD_BYTES, type ImagePresetKey } from "./presets";
 import {
   ProjectCardPeek,
   SurfacePreview,
@@ -136,7 +136,9 @@ export function ImageField({
       return;
     }
     const maxBytes =
-      preset === "projectCase" ? PROJECT_CASE_MAX_UPLOAD_BYTES : 25 * 1024 * 1024;
+      preset === "projectCase"
+        ? PROJECT_CASE_MAX_UPLOAD_BYTES
+        : MEDIA_DEFAULT_MAX_UPLOAD_BYTES;
     if (file.size > maxBytes) {
       setError(
         formatAdminMessage(t.media.fileTooLarge, {
@@ -145,8 +147,13 @@ export function ImageField({
       );
       return;
     }
+    // Drop any previously assigned crop so mid-edit submit cannot send a stale file.
+    assignFile(null);
     setError("");
     if (sourceUrl?.startsWith("blob:")) URL.revokeObjectURL(sourceUrl);
+    if (previewUrl?.startsWith("blob:") && previewUrl !== sourceUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     const url = URL.createObjectURL(file);
     setSourceUrl(url);
     setSourceName(file.name);
@@ -154,6 +161,7 @@ export function ImageField({
     setZoom(1);
     setRotation(0);
     setEditing(true);
+    setPreviewUrl(currentUrl ?? null);
     setMeta(formatAdminMessage(t.media.originalSize, { size: formatBytes(file.size) }));
   };
 

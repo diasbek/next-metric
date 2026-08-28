@@ -1,7 +1,14 @@
 /** Site-aligned image presets + surface chrome for the interactive editor. */
 
+import {
+  CASE_MEDIA_MAX_UPLOAD_BYTES,
+  MEDIA_MAX_UPLOAD_BYTES,
+} from "@/lib/cms/storage-shared";
+
 /** Max source file size for case gallery / before-after frames. */
-export const PROJECT_CASE_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const PROJECT_CASE_MAX_UPLOAD_BYTES = CASE_MEDIA_MAX_UPLOAD_BYTES;
+/** Default max for non-case ImageField uploads (aligned with API / storage). */
+export const MEDIA_DEFAULT_MAX_UPLOAD_BYTES = MEDIA_MAX_UPLOAD_BYTES;
 
 /**
  * Public `/works/` + home MetricCaseCard media frame (case-*.jpg masters).

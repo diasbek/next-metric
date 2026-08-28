@@ -1,9 +1,19 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseUrl } from "@/lib/supabase/env";
 import sharp from "sharp";
-import { MEDIA_BUCKET, getPublicMediaUrl } from "@/lib/cms/storage-shared";
+import {
+  CASE_MEDIA_MAX_UPLOAD_BYTES,
+  MEDIA_BUCKET,
+  MEDIA_MAX_UPLOAD_BYTES,
+  getPublicMediaUrl,
+} from "@/lib/cms/storage-shared";
 
-export { MEDIA_BUCKET, getPublicMediaUrl } from "@/lib/cms/storage-shared";
+export {
+  CASE_MEDIA_MAX_UPLOAD_BYTES,
+  MEDIA_BUCKET,
+  MEDIA_MAX_UPLOAD_BYTES,
+  getPublicMediaUrl,
+} from "@/lib/cms/storage-shared";
 
 const ALLOWED_MIME = new Set([
   "image/jpeg",
@@ -14,9 +24,7 @@ const ALLOWED_MIME = new Set([
   "image/avif",
 ]);
 
-const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
-/** Case gallery / before-after / hero source file cap (per frame). */
-export const CASE_MEDIA_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = MEDIA_MAX_UPLOAD_BYTES;
 /** Default long-edge for general media (covers, avatars, library). */
 const MAX_EDGE_PX = 1920;
 /** Case gallery / hero masters — match static optimize-metric-images. */

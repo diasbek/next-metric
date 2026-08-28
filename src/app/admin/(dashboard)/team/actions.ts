@@ -2,6 +2,7 @@
 
 import {
   adminFail,
+  adminOk,
   adminRedirect,
   runAdminAction,
 } from "@/lib/cms/admin-redirect";
@@ -89,10 +90,7 @@ export async function saveTeamMemberAction(formData: FormData) {
     }
 
     revalidateCms(["cms", "team"]);
-    return adminRedirect(
-      `/admin/home/`,
-      t.common.saved,
-    );
+    return adminOk(t.common.saved);
   });
 }
 

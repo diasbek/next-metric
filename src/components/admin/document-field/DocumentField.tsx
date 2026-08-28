@@ -88,6 +88,10 @@ export function DocumentField({
   const onPick = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     setPending(file);
+    if (file) {
+      // File XOR URL — picking a file clears the pasted URL in the form value.
+      setUrlSynced("");
+    }
   };
 
   const clearPending = () => {

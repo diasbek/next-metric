@@ -477,7 +477,7 @@ function TeamEditPanel({
   const t = useAdminT();
   const [locale, setLocale] = useState<AdminLocale>("en");
   const [previewImage, setPreviewImage] = useState(item.image);
-  const fileRef = useRef<HTMLInputElement | null>(null);
+  const pendingFileRef = useRef<File | null>(null);
 
   const initialValues = {
     status: (item.status === "published" ? "published" : "draft") as
@@ -517,6 +517,7 @@ function TeamEditPanel({
         validationSchema={teamMemberSchema}
         action={saveTeamMemberAction}
         successMessage={t.common.saved}
+        stayOnPage
         style={{
           flex: 1,
           overflow: "auto",
@@ -541,7 +542,7 @@ function TeamEditPanel({
             ? item.image
             : previewImage;
 
-          const file = fileRef.current?.files?.[0];
+          const file = pendingFileRef.current;
           if (file) {
             try {
               const uploaded = await uploadMediaViaApi(file, {
@@ -549,6 +550,7 @@ function TeamEditPanel({
                 filenameHint: "photo",
               });
               imageUrl = uploaded.publicUrl;
+              pendingFileRef.current = null;
             } catch (err) {
               throw new Error(
                 formatUploadError(
@@ -699,11 +701,11 @@ function TeamEditPanel({
                 previewTitle={values[nameKey] || t.common.name}
                 previewSubtitle={values[roleKey] || t.common.roleTitle}
                 onReady={(file) => {
-                  const input = document.querySelector<HTMLInputElement>(
-                    `input[type="file"][name="image_file"]`,
-                  );
-                  fileRef.current = input;
-                  if (!file) return;
+                  pendingFileRef.current = file;
+                  if (!file) {
+                    setPreviewImage(item.image);
+                    return;
+                  }
                   const url = URL.createObjectURL(file);
                   setPreviewImage(url);
                 }}

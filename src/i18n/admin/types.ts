@@ -89,6 +89,7 @@ export type AdminMessages = {
     uploadFile: string;
     replaceFile: string;
     orPasteUrl: string;
+    saveSectionToPublish: string;
     cropExample: string;
     currentFile: string;
     noFileSelected: string;
@@ -279,6 +280,7 @@ export type AdminMessages = {
     allFolders: string;
     searchPlaceholder: string;
     upload: string;
+    deleteWarn: string;
     dragToPan: string;
     wheelZoom: string;
     livePreview: string;
@@ -335,6 +337,7 @@ export type AdminMessages = {
     attachment: string;
     openAttachment: string;
     attachmentLoading: string;
+    attachmentOpened: string;
     locale: string;
     consentAt: string;
     moveTo: string;
@@ -470,6 +473,12 @@ export type AdminMessages = {
       quotePlaceholder: string;
       coverUrl: string;
       fromLibrary: string;
+      addFromUpload: string;
+      addFromLibrary: string;
+      addFromUrl: string;
+      libraryClickToAdd: string;
+      libraryEmpty: string;
+      openMediaLibrary: string;
       addMedia: string;
       galleryHint: string;
       beforeAfter: string;

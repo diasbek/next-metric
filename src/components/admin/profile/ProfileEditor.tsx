@@ -56,7 +56,7 @@ function formatWhen(value: string | null): string {
 
 export function ProfileEditor({ profile, saved, passwordSaved }: Props) {
   const t = useAdminT();
-  const fileRef = useRef<HTMLInputElement | null>(null);
+  const pendingFileRef = useRef<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
   const [displayName, setDisplayName] = useState(profile.display_name);
   const [jobTitle, setJobTitle] = useState(profile.job_title);
@@ -81,7 +81,7 @@ export function ProfileEditor({ profile, saved, passwordSaved }: Props) {
 
       <HardNavForm
         action={async (formData) => {
-          const file = fileRef.current?.files?.[0];
+          const file = pendingFileRef.current;
           if (file) {
             try {
               const uploaded = await uploadMediaViaApi(file, {
@@ -90,6 +90,7 @@ export function ProfileEditor({ profile, saved, passwordSaved }: Props) {
               });
               formData.set("avatar_url", uploaded.publicUrl);
               formData.delete("avatar_file");
+              pendingFileRef.current = null;
             } catch (err) {
               throw new Error(
                 formatUploadError(
@@ -184,10 +185,7 @@ export function ProfileEditor({ profile, saved, passwordSaved }: Props) {
             previewTitle={displayName || profile.email}
             previewSubtitle={jobTitle || t.roles[profile.role]}
             onReady={(file) => {
-              const input = document.querySelector<HTMLInputElement>(
-                'input[type="file"][name="avatar_file"]',
-              );
-              fileRef.current = input;
+              pendingFileRef.current = file;
               if (!file) {
                 setAvatarUrl(profile.avatar_url);
                 return;

@@ -1,6 +1,10 @@
 "use client";
 
-import type { FormHTMLAttributes, ReactNode } from "react";
+import {
+  forwardRef,
+  type FormHTMLAttributes,
+  type ReactNode,
+} from "react";
 import {
   isAdminFailure,
   isAdminRedirect,
@@ -101,32 +105,32 @@ export async function runAdminMutation(
 }
 
 /** Form that toasts + soft-navigates when the server action returns a result. */
-export function HardNavForm({
-  action,
-  children,
-  successMessage,
-  stayOnPage,
-  ...props
-}: HardNavFormProps) {
-  const t = useAdminT();
+export const HardNavForm = forwardRef<HTMLFormElement, HardNavFormProps>(
+  function HardNavForm(
+    { action, children, successMessage, stayOnPage, ...props },
+    ref,
+  ) {
+    const t = useAdminT();
 
-  return (
-    <form
-      {...props}
-      action={async (formData) => {
-        await runAdminMutation(action, formData, {
-          successMessage,
-          stayOnPage,
-          fallbackError: t.common.actionFailed,
-          defaultSaved: t.common.saved,
-          defaultReady: t.common.ready,
-        });
-      }}
-    >
-      {children}
-    </form>
-  );
-}
+    return (
+      <form
+        ref={ref}
+        {...props}
+        action={async (formData) => {
+          await runAdminMutation(action, formData, {
+            successMessage,
+            stayOnPage,
+            fallbackError: t.common.actionFailed,
+            defaultSaved: t.common.saved,
+            defaultReady: t.common.ready,
+          });
+        }}
+      >
+        {children}
+      </form>
+    );
+  },
+);
 
 /** Bind `formAction` / button actions. */
 export function hardNavAction(

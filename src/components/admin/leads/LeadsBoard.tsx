@@ -925,8 +925,10 @@ function LeadAttachmentLink({ path }: { path: string }) {
       const result = await getLeadAttachmentUrlAction(path);
       if (!result.ok) {
         setError(result.error);
+        adminToastError(result.error);
         return;
       }
+      adminToastSuccess(t.leads.attachmentOpened);
       window.open(result.url, "_blank", "noopener,noreferrer");
     });
   };

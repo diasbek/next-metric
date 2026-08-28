@@ -1,5 +1,7 @@
 "use client";
 
+import { MEDIA_MAX_UPLOAD_BYTES } from "@/lib/cms/storage-shared";
+
 export type MediaUploadOptions = {
   folder?: string;
   filenameHint?: string;
@@ -16,8 +18,10 @@ export async function uploadMediaViaApi(
   if (!(file instanceof File) || file.size === 0) {
     throw new Error("Empty file");
   }
-  if (file.size > 12 * 1024 * 1024) {
-    throw new Error("File too large (max 12 MB)");
+  if (file.size > MEDIA_MAX_UPLOAD_BYTES) {
+    throw new Error(
+      `File too large (max ${Math.round(MEDIA_MAX_UPLOAD_BYTES / (1024 * 1024))} MB)`,
+    );
   }
 
   const body = new FormData();
