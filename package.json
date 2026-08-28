@@ -12,6 +12,7 @@
     "dev": "next dev",
     "postinstall": "node scripts/patch-brace-expansion.cjs",
     "prebuild": "node scripts/generate-manifest.js",
+    "generate:og": "tsx scripts/generate-og-statics.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",

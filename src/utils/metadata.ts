@@ -3,9 +3,9 @@ import { SITE_CONFIG } from "./consts";
 import type { Locale } from "@/i18n/config";
 import { withTrailingSlash } from "./seo/canonical-request";
 import { getRobotsMetadata } from "./seo/indexing";
-import { OG_IMAGE_DIMENSIONS } from "./og/paths";
+import { OG_IMAGE_DIMENSIONS, getDefaultOgImagePath } from "./og/paths";
 
-const DEFAULT_OG_IMAGE = "/og/en/home/";
+const DEFAULT_OG_IMAGE = getDefaultOgImagePath();
 
 function origin(): string {
   return SITE_CONFIG.url.replace(/\/$/, "");

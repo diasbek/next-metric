@@ -37,6 +37,27 @@ body {
   font-family: var(--font-degular), system-ui, sans-serif;
   font-weight: 400;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Telegram / Instagram / Facebook in-app browsers */
+html.restricted-webview {
+  overscroll-behavior-y: none;
+}
+
+html.restricted-webview body {
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+}
+
+html.restricted-webview .metric-hero,
+html.restricted-webview .metric-section,
+html.restricted-webview #site-content,
+html.restricted-webview #main-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+  content-visibility: visible !important;
 }
 
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {

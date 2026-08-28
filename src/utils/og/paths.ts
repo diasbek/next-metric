@@ -13,12 +13,36 @@ export function isOgPageKey(pageKey: PageKey): pageKey is OgPageKey {
   return PAGE_KEYS.includes(pageKey as OgPageKey);
 }
 
+/**
+ * Static PNG under /public — reliable for Telegram/Facebook on Hostinger.
+ * Dynamic `/og/...` routes still exist for admin preview + generate.
+ */
+export function getStaticPageOgImagePath(
+  locale: Locale,
+  pageKey: OgPageKey,
+): string {
+  return `/images/og/${locale}-${pageKey}.png`;
+}
+
+/** @deprecated Prefer getStaticPageOgImagePath for public metadata. */
 export function getPageOgImagePath(locale: Locale, pageKey: OgPageKey): string {
+  return getStaticPageOgImagePath(locale, pageKey);
+}
+
+/** Dynamic route used by admin Auto mode / live generate. */
+export function getDynamicPageOgImagePath(
+  locale: Locale,
+  pageKey: OgPageKey,
+): string {
   return `/og/${locale}/${pageKey}/`;
 }
 
 export function getWorkOgImagePath(locale: Locale, slug: string): string {
   return `/og/${locale}/works/${slug}/`;
+}
+
+export function getDefaultOgImagePath(): string {
+  return "/images/og/default.png";
 }
 
 /** Stable filename used by CMS “Generate & save”. */

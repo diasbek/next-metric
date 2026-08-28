@@ -1,33 +1,14 @@
-import { getResolvedContent } from "@/i18n/get-content";
-import { ogEyebrows } from "@/utils/og/paths";
-import { renderOgImageResponse } from "@/utils/og/render";
+import { readStaticOgPng, staticOgPngResponse } from "@/utils/og/render";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const dynamic = "force-static";
+export const revalidate = 86400;
 
-/** Legacy default OG image → EN home. */
+/** Legacy default OG image → static EN home card. */
 export async function GET() {
-  const content = await getResolvedContent("en");
-  const meta = content.pageMeta.home;
-
-  const image = await renderOgImageResponse({
-    title: meta.title.replace(/ — METRIC$/i, ""),
-    description: meta.description,
-    eyebrow: ogEyebrows.en.home,
-    siteUrl: (() => {
-      try {
-        return new URL(content.site.url).hostname;
-      } catch {
-        return "metric.graphics";
-      }
-    })(),
-  });
-
-  image.headers.set(
-    "Cache-Control",
-    "public, s-maxage=3600, stale-while-revalidate=86400",
-  );
-
-  return image;
+  const png = readStaticOgPng("en", "home");
+  if (!png) {
+    return new Response("OG unavailable", { status: 503 });
+  }
+  return staticOgPngResponse(png);
 }

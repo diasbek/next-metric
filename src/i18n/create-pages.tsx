@@ -21,7 +21,7 @@ import { WorkCaseSection } from "@/components/organisms";
 import { getContentFreshnessDate } from "@/lib/cms/freshness";
 import { getAllPublishedSlugsFromCms } from "@/lib/cms/projects";
 import { canonicalPageUrl, createPageMetadata } from "@/utils/metadata";
-import { getWorkOgImagePath } from "@/utils/og/paths";
+import { getPageOgImagePath } from "@/utils/og/paths";
 import {
   getFaqPageSchema,
   getLocalBusinessSchema,
@@ -59,7 +59,9 @@ export function createWorkCasePage(locale: Locale) {
         cmsSlugs.find((item) => item.slug === slug)?.updated_at ??
         (await getContentFreshnessDate()).toISOString();
       const ogImage =
-        project.seo?.ogImage || getWorkOgImagePath(locale, slug);
+        project.seo?.ogImage ||
+        project.image ||
+        getPageOgImagePath(locale, "works");
 
       return createPageMetadata(seoTitle, seoDescription, path, {
         image: ogImage,

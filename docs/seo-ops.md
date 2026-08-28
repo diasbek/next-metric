@@ -17,15 +17,16 @@ Technical SEO from the excellence plan is in the app. Use this list to keep rank
 
 ## OG / social images
 
-Priority for `og:image`:
+Priority for `og:image` (Telegram / Facebook / X):
 
-1. Stored `og_image` (custom upload / URL / CMS-generated PNG)
-2. Case cover (`cover_image`) when page is a work
-3. Dynamic `/og/{locale}/works/{slug}/` or `/og/{locale}/{page}/`
+1. Stored `og_image` (custom upload / CMS-generated PNG in storage)
+2. Case cover (`cover_image`) — used when no custom OG (reliable absolute image URL)
+3. Static card `/images/og/{locale}-{page}.png` for page-level SEO (committed PNGs)
+4. Dynamic `/og/{locale}/…` only as admin preview / generate helper (falls back to static on Hostinger)
 
-In Admin → Works / Settings SEO use **Custom | Generate | Auto**. Generate writes `og-generated.png` to media and sets `og_image` immediately (works for drafts). Auto clears stored OG so the live route is used after publish.
+Regenerate static cards locally: `npm run generate:og` (commit the PNGs; do not rely on Hostinger WASM/`@vercel/og`).
 
-After publish: spot-check OG URL `/og/en/works/{slug}/` and share preview (Facebook / Telegram debugger).
+After publish: spot-check `og:image` URL returns **200 image/png** (or JPEG for covers) with no redirect chain.
 
 ## Content cadence
 
