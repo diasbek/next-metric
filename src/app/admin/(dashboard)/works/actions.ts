@@ -13,10 +13,17 @@ import {
   isFileUpload,
   probeImageDimensions,
   uploadMediaFile,
+  uploadMediaFromUrl,
   uploadOgPngBuffer,
 } from "@/lib/cms/storage";
 import { adminFail, adminOk, adminRedirect } from "@/lib/cms/admin-redirect";
 import { replaceProjectTags } from "@/lib/cms/tags";
+import {
+  CASE_COVER_HEIGHT,
+  CASE_COVER_WIDTH,
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+} from "@/components/admin/image-field/presets";
 import { SITE_CONFIG } from "@/utils/consts";
 import { buildCaseOgProps } from "@/utils/og/build";
 import { OG_GENERATED_FILENAME } from "@/utils/og/paths";
@@ -93,15 +100,24 @@ export async function saveProjectAction(formData: FormData) {
   }
 
   const fromLibrary = String(formData.get("cover_from_library") ?? "").trim();
-  let coverImage = fromLibrary || String(formData.get("cover_image") ?? "");
+  let coverImage = String(formData.get("cover_image") ?? "").trim();
 
   const coverFile = formData.get("cover_file");
   if (isFileUpload(coverFile)) {
-    // Match optimized case-*.jpg masters (2800 long edge, high quality).
+    // Exact master size — same frame as public/images/metric/cases/case-*.jpg.
     const uploaded = await uploadMediaFile(coverFile, {
       folder: `projects/${id}/cover`,
       filenameHint: "cover",
-      maxEdge: CASE_MEDIA_MAX_EDGE_PX,
+      exactSize: { width: CASE_COVER_WIDTH, height: CASE_COVER_HEIGHT },
+      quality: CASE_MEDIA_WEBP_QUALITY,
+    });
+    coverImage = uploaded.publicUrl;
+  } else if (fromLibrary) {
+    // Library assets are arbitrary aspect — normalize into the case-card frame.
+    const uploaded = await uploadMediaFromUrl(fromLibrary, {
+      folder: `projects/${id}/cover`,
+      filenameHint: "cover",
+      exactSize: { width: CASE_COVER_WIDTH, height: CASE_COVER_HEIGHT },
       quality: CASE_MEDIA_WEBP_QUALITY,
     });
     coverImage = uploaded.publicUrl;
@@ -115,6 +131,8 @@ export async function saveProjectAction(formData: FormData) {
     const uploaded = await uploadMediaFile(ogFile, {
       folder: `projects/${id}/og`,
       filenameHint: "og",
+      exactSize: { width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
+      quality: 85,
     });
     ogImage = uploaded.publicUrl;
   }

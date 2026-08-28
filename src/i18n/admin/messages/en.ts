@@ -310,9 +310,11 @@ export const enAdmin: AdminMessages = {
     dropHint: "Drop a photo here or click",
     fileTooLarge: "File is larger than {max} MB",
     originalSize: "Original: {size}",
+    editExistingHint: "Frame to {width}×{height} — pan & zoom, then apply",
     cropFailed: "Crop failed",
     uploadAndEdit: "Upload & edit on page mockup",
     replaceAndEdit: "Replace & edit",
+    recropFrame: "Recrop to card frame",
     replace: "Replace image",
     revert: "Revert",
     clear: "Clear",
@@ -329,7 +331,7 @@ export const enAdmin: AdminMessages = {
       projectCover: {
         label: "Project cover",
         surfaceLabel: "Works / case card",
-        hint: "Same frame as case cards (2800×2191).",
+        hint: "Crop to the case-card master (exact 2800×2191), same as the old static covers.",
       },
       projectCase: {
         label: "Case / gallery",
@@ -339,7 +341,7 @@ export const enAdmin: AdminMessages = {
       ogSocial: {
         label: "OG / social",
         surfaceLabel: "Link preview",
-        hint: "Open Graph share image (~1200×630).",
+        hint: "Open Graph share image (exact 1200×630).",
       },
       team: {
         label: "Team photo",

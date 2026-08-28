@@ -59,6 +59,8 @@ export type UploadMediaOptions = {
   quality?: number;
   /** Override default 20 MB source-file cap (case gallery uses 5 MB). */
   maxUploadBytes?: number;
+  /** Force exact output size (cover-crop). Used for Open Graph 1200×630. */
+  exactSize?: { width: number; height: number };
 };
 
 export type UploadMediaResult = {
@@ -103,6 +105,7 @@ async function optimizeForWeb(
   mime: string,
   maxEdge = MAX_EDGE_PX,
   quality = DEFAULT_WEBP_QUALITY,
+  exactSize?: { width: number; height: number },
 ): Promise<{
   buffer: Buffer;
   contentType: string;
@@ -119,16 +122,25 @@ async function optimizeForWeb(
   const meta = await image.metadata();
   const width = meta.width ?? maxEdge;
   const height = meta.height ?? maxEdge;
-  const needsResize = width > maxEdge || height > maxEdge;
 
   let pipeline = image;
-  if (needsResize) {
+  if (exactSize) {
     pipeline = pipeline.resize({
-      width: maxEdge,
-      height: maxEdge,
-      fit: "inside",
-      withoutEnlargement: true,
+      width: exactSize.width,
+      height: exactSize.height,
+      fit: "cover",
+      position: "centre",
     });
+  } else {
+    const needsResize = width > maxEdge || height > maxEdge;
+    if (needsResize) {
+      pipeline = pipeline.resize({
+        width: maxEdge,
+        height: maxEdge,
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+    }
   }
 
   const webp = await pipeline
@@ -139,8 +151,8 @@ async function optimizeForWeb(
     buffer: webp,
     contentType: "image/webp",
     ext: "webp",
-    width: outMeta.width ?? (needsResize ? Math.min(width, maxEdge) : width),
-    height: outMeta.height ?? (needsResize ? Math.min(height, maxEdge) : height),
+    width: outMeta.width ?? (exactSize ? exactSize.width : width),
+    height: outMeta.height ?? (exactSize ? exactSize.height : height),
   };
 }
 
@@ -182,6 +194,7 @@ export async function uploadMediaFile(
       mime,
       options.maxEdge ?? MAX_EDGE_PX,
       options.quality ?? DEFAULT_WEBP_QUALITY,
+      options.exactSize,
     );
   } catch (err) {
     throw new Error(
@@ -201,6 +214,74 @@ export async function uploadMediaFile(
     cacheControl: "31536000",
   });
 
+  if (error) throw new Error(describeStorageError(error.message));
+
+  return {
+    path,
+    publicUrl: getPublicMediaUrl(path),
+    width: optimized.width,
+    height: optimized.height,
+  };
+}
+
+/**
+ * Fetch an existing image URL and re-upload through optimizeForWeb
+ * (e.g. library → case cover at exact 2800×2191).
+ */
+export async function uploadMediaFromUrl(
+  sourceUrl: string,
+  options: UploadMediaOptions = {},
+): Promise<UploadMediaResult> {
+  const url = sourceUrl.trim();
+  if (!url) throw new Error("Empty image URL");
+
+  let buffer: Buffer;
+  const storagePath = getStoragePathFromPublicUrl(url);
+  if (storagePath) {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.storage.from(MEDIA_BUCKET).download(storagePath);
+    if (error || !data) {
+      throw new Error(error?.message || "Failed to download media");
+    }
+    buffer = Buffer.from(await data.arrayBuffer());
+  } else if (url.startsWith("/")) {
+    const base =
+      (typeof process !== "undefined"
+        ? process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || ""
+        : ""
+      ).replace(/\/$/, "") || "http://127.0.0.1:3000";
+    const res = await fetch(`${base}${url}`);
+    if (!res.ok) throw new Error(`Failed to fetch image (${res.status})`);
+    buffer = Buffer.from(await res.arrayBuffer());
+  } else {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch image (${res.status})`);
+    buffer = Buffer.from(await res.arrayBuffer());
+  }
+
+  if (!buffer.length) throw new Error("Empty image");
+
+  const folder = (options.folder ?? "uploads").replace(/^\/+|\/+$/g, "");
+  const base = options.filenameHint
+    ? sanitizeFilename(options.filenameHint)
+    : "image";
+
+  const optimized = await optimizeForWeb(
+    buffer,
+    "image/jpeg",
+    options.maxEdge ?? MAX_EDGE_PX,
+    options.quality ?? DEFAULT_WEBP_QUALITY,
+    options.exactSize,
+  );
+
+  const path = `${folder}/${Date.now()}-${base}.${optimized.ext}`;
+  const supabase = createSupabaseAdminClient();
+  const body = new Uint8Array(optimized.buffer);
+  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, body, {
+    contentType: optimized.contentType,
+    upsert: false,
+    cacheControl: "31536000",
+  });
   if (error) throw new Error(describeStorageError(error.message));
 
   return {

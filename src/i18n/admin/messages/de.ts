@@ -310,9 +310,11 @@ export const deAdmin: AdminMessages = {
     dropHint: "Foto hier ablegen oder klicken",
     fileTooLarge: "Datei ist größer als {max} MB",
     originalSize: "Original: {size}",
+    editExistingHint: "Auf {width}×{height} einrahmen — schieben & zoomen, dann anwenden",
     cropFailed: "Zuschnitt fehlgeschlagen",
     uploadAndEdit: "Hochladen & auf Seiten-Mockup bearbeiten",
     replaceAndEdit: "Ersetzen & bearbeiten",
+    recropFrame: "Auf Kartenrahmen zuschneiden",
     replace: "Bild ersetzen",
     revert: "Zurücksetzen",
     clear: "Leeren",
@@ -329,7 +331,7 @@ export const deAdmin: AdminMessages = {
       projectCover: {
         label: "Projekt-Cover",
         surfaceLabel: "Works / Case-Card",
-        hint: "Gleicher Rahmen wie die Case-Cards (2800×2191).",
+        hint: "Auf Case-Card-Master zuschneiden (exakt 2800×2191), wie die alten statischen Cover.",
       },
       projectCase: {
         label: "Case / Galerie",
@@ -339,7 +341,7 @@ export const deAdmin: AdminMessages = {
       ogSocial: {
         label: "OG / Social",
         surfaceLabel: "Link-Vorschau",
-        hint: "Open-Graph-Bild (~1200×630).",
+        hint: "Open-Graph-Bild (exakt 1200×630).",
       },
       team: {
         label: "Teamfoto",

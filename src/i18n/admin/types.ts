@@ -298,9 +298,11 @@ export type AdminMessages = {
     dropHint: string;
     fileTooLarge: string;
     originalSize: string;
+    editExistingHint: string;
     cropFailed: string;
     uploadAndEdit: string;
     replaceAndEdit: string;
+    recropFrame: string;
     replace: string;
     revert: string;
     clear: string;

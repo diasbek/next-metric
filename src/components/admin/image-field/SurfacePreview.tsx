@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Button } from "@/components/atoms/Button";
 import { AdminSiteScaleFrame } from "@/components/admin/preview/AdminSiteScaleFrame";
 import type { ImagePreset, SurfaceKind } from "./presets";
-import { CASE_CARD_MEDIA_ASPECT_CSS } from "./presets";
+import { CASE_CARD_MEDIA_ASPECT_CSS, OG_IMAGE_ASPECT_CSS } from "./presets";
 
 type SurfacePreviewProps = {
   surface: SurfaceKind;
@@ -58,7 +58,8 @@ function CaseCardChrome({
   children?: ReactNode;
 }) {
   const designWidth = layout === "desktop" ? 1100 : 390;
-  const viewportWidth = layout === "desktop" ? 340 : 220;
+  /* Mobile peek a bit wider so type/CTA stay readable after scale. */
+  const viewportWidth = layout === "desktop" ? 340 : 260;
   const resolvedTags = tags.length ? tags : ["Listing"];
 
   return (
@@ -353,6 +354,16 @@ export function SurfacePreview({
     );
   }
 
+  if (surface === "ogShare") {
+    return (
+      <div className="admin-surface-preview" style={{ ...pageShell, ...ring }}>
+        <Frame aspect={OG_IMAGE_ASPECT_CSS} label="Open Graph · 1200 × 630">
+          {children ?? <CoverImage url={imageUrl} />}
+        </Frame>
+      </div>
+    );
+  }
+
   if (surface === "logoBadge") {
     return (
       <div className="admin-surface-preview" style={{ ...pageShell, ...ring }}>
@@ -450,6 +461,8 @@ export function surfaceAspectCss(preset: ImagePreset): string | undefined {
     return CASE_CARD_MEDIA_ASPECT_CSS;
   }
   if (preset.surface === "teamMember" || preset.surface === "testimonial") return "1 / 1";
-  if (preset.key === "ogSocial") return "1200 / 630";
+  if (preset.surface === "ogShare" || preset.key === "ogSocial") {
+    return OG_IMAGE_ASPECT_CSS;
+  }
   return `${Math.round(preset.aspect * 1000)} / 1000`;
 }

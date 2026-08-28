@@ -34,6 +34,11 @@ type ImageFieldProps = {
    */
   crop?: boolean;
   onReady?: (file: File | null) => void;
+  /**
+   * Open the crop editor on an existing URL (library pick / recrop).
+   * Bump `token` each time you want to re-trigger.
+   */
+  editRequest?: { url: string; fileName?: string; token: number } | null;
   /** Chrome text in site mockups */
   previewTitle?: string;
   previewSubtitle?: string;
@@ -84,6 +89,7 @@ export function ImageField({
   required = false,
   crop: cropProp,
   onReady,
+  editRequest,
   previewTitle,
   previewSubtitle,
   previewQuote,
@@ -100,6 +106,7 @@ export function ImageField({
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
+  const lastEditToken = useRef<number | null>(null);
 
   const [sourceUrl, setSourceUrl] = useState<string | null>(null);
   const [sourceName, setSourceName] = useState("image");
@@ -143,6 +150,44 @@ export function ImageField({
     },
     [onReady],
   );
+
+  const beginEditFromUrl = useCallback(
+    (url: string, fileName = "image") => {
+      if (!allowCrop || !url.trim()) return;
+      assignFile(null);
+      setError("");
+      setSourceUrl((prev) => {
+        if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+        return url;
+      });
+      setSourceName(fileName);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
+      setCroppedArea(null);
+      setEditing(true);
+      setMeta(
+        formatAdminMessage(t.media.editExistingHint, {
+          width: String(presetConfig.maxWidth),
+          height: String(presetConfig.maxHeight),
+        }),
+      );
+    },
+    [
+      allowCrop,
+      assignFile,
+      presetConfig.maxHeight,
+      presetConfig.maxWidth,
+      t.media.editExistingHint,
+    ],
+  );
+
+  useEffect(() => {
+    if (!editRequest?.url || !editRequest.token) return;
+    if (lastEditToken.current === editRequest.token) return;
+    lastEditToken.current = editRequest.token;
+    beginEditFromUrl(editRequest.url, editRequest.fileName ?? "library");
+  }, [editRequest, beginEditFromUrl]);
 
   const openFile = (file: File | null | undefined) => {
     if (!file) return;
@@ -259,7 +304,7 @@ export function ImageField({
       ? "media"
       : preset === "team" || preset === "avatar"
         ? "thumb"
-        : preset === "projectCover"
+        : preset === "projectCover" || preset === "ogSocial"
           ? "cover"
           : "media";
   const openPicker = () => fileInputRef.current?.click();
@@ -412,6 +457,15 @@ export function ImageField({
                   ? t.media.replace
                   : t.media.upload}
             </button>
+            {allowCrop && previewUrl ? (
+              <button
+                type="button"
+                style={btn}
+                onClick={() => beginEditFromUrl(previewUrl, sourceName || "cover")}
+              >
+                {t.media.recropFrame}
+              </button>
+            ) : null}
             {previewUrl && currentUrl && previewUrl !== currentUrl ? (
               <button type="button" style={btn} onClick={clear}>
                 {t.media.revert}
@@ -473,15 +527,26 @@ export function ImageField({
                 style={{
                   position: "relative",
                   width: "100%",
-                  maxWidth: stackEditLayout ? 360 : "100%",
+                  maxWidth: stackEditLayout
+                    ? preset === "ogSocial"
+                      ? 480
+                      : 360
+                    : preset === "ogSocial"
+                      ? 560
+                      : "100%",
                   aspectRatio: cropFrameAspect,
                   margin: stackEditLayout ? "0 auto" : undefined,
                   background: "#000",
                   border: "1px solid #2600ff",
                   boxShadow: "0 0 0 1px rgba(38,0,255,0.35)",
                   overflow: "hidden",
-                  minHeight: stackEditLayout ? 200 : 280,
-                  height: cropFrameAspect ? undefined : stackEditLayout ? 280 : 360,
+                  // minHeight would break fixed-aspect frames (e.g. OG 1200×630).
+                  ...(cropFrameAspect
+                    ? {}
+                    : {
+                        minHeight: stackEditLayout ? 200 : 280,
+                        height: stackEditLayout ? 280 : 360,
+                      }),
                 }}
               >
                 {sourceUrl ? (

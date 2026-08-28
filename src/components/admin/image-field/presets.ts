@@ -21,6 +21,12 @@ export const CASE_COVER_HEIGHT = 2191;
 export const CASE_CARD_MEDIA_ASPECT = CASE_COVER_WIDTH / CASE_COVER_HEIGHT;
 export const CASE_CARD_MEDIA_ASPECT_CSS = `${CASE_COVER_WIDTH} / ${CASE_COVER_HEIGHT}`;
 
+/** Open Graph / Twitter share card (Facebook recommended). */
+export const OG_IMAGE_WIDTH = 1200;
+export const OG_IMAGE_HEIGHT = 630;
+export const OG_IMAGE_ASPECT = OG_IMAGE_WIDTH / OG_IMAGE_HEIGHT;
+export const OG_IMAGE_ASPECT_CSS = `${OG_IMAGE_WIDTH} / ${OG_IMAGE_HEIGHT}`;
+
 export type ImagePresetKey =
   | "projectCover"
   | "projectCase"
@@ -37,6 +43,7 @@ export type SurfaceKind =
   | "teamMember"
   | "testimonial"
   | "logoBadge"
+  | "ogShare"
   | "free";
 
 export type ImagePreset = {
@@ -65,7 +72,7 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     maxHeight: CASE_COVER_HEIGHT,
     quality: 0.92,
     preferWebp: true,
-    hint: "Same frame as case cards (2800×2191).",
+    hint: "Crop to the case-card master (exact 2800×2191), same as the old static covers.",
   },
   projectCase: {
     key: "projectCase",
@@ -83,14 +90,14 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
   ogSocial: {
     key: "ogSocial",
     label: "OG / social",
-    surface: "free",
+    surface: "ogShare",
     surfaceLabel: "Link preview",
-    aspect: 1200 / 630,
-    maxWidth: 1200,
-    maxHeight: 630,
+    aspect: OG_IMAGE_ASPECT,
+    maxWidth: OG_IMAGE_WIDTH,
+    maxHeight: OG_IMAGE_HEIGHT,
     quality: 0.85,
     preferWebp: true,
-    hint: "Open Graph share image (~1200×630).",
+    hint: "Open Graph share image (exact 1200×630).",
   },
   team: {
     key: "team",

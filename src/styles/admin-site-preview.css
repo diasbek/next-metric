@@ -20,7 +20,6 @@
 }
 
 .admin-site-preview__frame {
-  width: 100%;
   max-width: 100%;
   overflow: hidden;
   border-radius: 8px;
@@ -29,8 +28,15 @@
   box-sizing: border-box;
 }
 
+.admin-site-preview__canvas {
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
 .admin-site-preview__scaler {
   transform-origin: top left;
+  line-height: normal;
 }
 
 /* —— Case card (Works / home) —— */
@@ -51,6 +57,7 @@
 .admin-site-preview--case-card-desktop .metric-case-card__media {
   width: calc(100% - 50px) !important;
   margin: 50px 50px 50px 0 !important;
+  aspect-ratio: 2800 / 2191 !important;
   align-self: center !important;
   border-radius: 30px !important;
 }
@@ -76,28 +83,37 @@
 }
 
 .admin-site-preview--case-card-desktop .metric-case-card__cta.metric-cta {
+  --cta-height: 48px;
   --cta-pad-x: 28px;
-  min-height: var(--cta-height);
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 48px);
+  min-height: 48px !important;
   font-size: var(--text-body-lg);
+  padding: 0 calc(28px + var(--cta-skew-overhang)) !important;
 }
 
 .admin-site-preview--case-card-mobile .metric-case-card {
-  grid-template-columns: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
   grid-template-areas:
     "media"
     "body" !important;
+  align-items: stretch !important;
   border-radius: var(--radius-xl) !important;
 }
 
 .admin-site-preview--case-card-mobile .metric-case-card__body {
   gap: 20px !important;
   padding: 20px !important;
+  min-height: 0 !important;
 }
 
 .admin-site-preview--case-card-mobile .metric-case-card__media {
   width: calc(100% - 32px) !important;
+  max-width: none !important;
   margin: 16px 16px 0 !important;
+  aspect-ratio: 2800 / 2191 !important;
   border-radius: 20px !important;
+  align-self: stretch !important;
 }
 
 .admin-site-preview--case-card-mobile .metric-case-card__quote {
@@ -121,9 +137,14 @@
 }
 
 .admin-site-preview--case-card-mobile .metric-case-card__cta.metric-cta {
+  /* Lock mobile CTA tokens — public clamps use 100vw (admin window), not 390. */
+  --cta-height: 44px;
+  --cta-height-sm: 44px;
   --cta-pad-x: 28px;
-  min-height: var(--cta-height-sm);
-  font-size: var(--text-nav);
+  --cta-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 44px);
+  min-height: 44px !important;
+  font-size: 16px !important;
+  padding: 0 calc(28px + var(--cta-skew-overhang)) !important;
 }
 
 .admin-site-preview .metric-case-card__media img {

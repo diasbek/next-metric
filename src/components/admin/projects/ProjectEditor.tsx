@@ -152,6 +152,11 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   const [coverBlobUrl, setCoverBlobUrl] = useState<string | null>(null);
   const [coverSource, setCoverSource] = useState<MediaSourceMode>("upload");
   const [coverLibraryUrl, setCoverLibraryUrl] = useState("");
+  const [coverEditRequest, setCoverEditRequest] = useState<{
+    url: string;
+    fileName?: string;
+    token: number;
+  } | null>(null);
   const [ogSource, setOgSource] = useState<MediaSourceMode>("upload");
   const [ogLibraryUrl, setOgLibraryUrl] = useState("");
   const [ogMode, setOgMode] = useState<OgMode>(() => inferOgMode(project.og_image));
@@ -547,11 +552,12 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
               ) : null}
               {coverSource === "upload" ? (
                 <ImageField
-                  key={coverPreview || "cover-empty"}
+                  key="project-cover"
                   name="cover_file"
                   preset="projectCover"
                   currentUrl={coverPreview || null}
                   label={t.common.cover}
+                  editRequest={coverEditRequest}
                   {...coverCaseChrome}
                   onReady={(file) => {
                     if (!file) {
@@ -577,10 +583,13 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                     showClear={false}
                     onSelect={(url) => {
                       if (!url) return;
-                      setCoverLibraryUrl(url);
-                      setDraft((p) => ({ ...p, cover_image: url }));
-                      setCoverPreview(url);
-                      setCoverBlobUrl(null);
+                      // Open crop to case-card master — don't use library URL as-is.
+                      setCoverLibraryUrl("");
+                      setCoverEditRequest({
+                        url,
+                        fileName: "cover-library",
+                        token: Date.now(),
+                      });
                       setCoverSource("upload");
                     }}
                   />
