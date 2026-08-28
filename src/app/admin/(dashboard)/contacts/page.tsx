@@ -5,10 +5,10 @@ import type { CmsLocale } from "@/lib/cms/types";
 
 const LOCALES: CmsLocale[] = ["en", "de"];
 
-const emptyLocale = {
-  address_lines: "",
-  presentation_url: "",
-  brief_url: "",
+type LocaleContacts = {
+  address_lines: string;
+  presentation_url: string;
+  brief_url: string;
 };
 
 export default async function AdminContactsPage({
@@ -46,7 +46,7 @@ export default async function AdminContactsPage({
         },
       ];
     }),
-  ) as Record<CmsLocale, typeof emptyLocale>;
+  ) as Record<CmsLocale, LocaleContacts>;
 
   return (
     <ContactsPageAdmin

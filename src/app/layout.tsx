@@ -67,6 +67,9 @@ export default async function RootLayout({
         {metrikaPixel ? (
           <noscript>
             <div>
+              {/* Tracking pixel inside <noscript>: next/image needs JS and
+                  would rewrite the URL Metrika expects. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={metrikaPixel}
                 style={{ position: "absolute", left: -9999 }}

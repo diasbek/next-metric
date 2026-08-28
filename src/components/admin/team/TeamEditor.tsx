@@ -60,7 +60,6 @@ import {
   localizationScore,
   type AdminLocale,
   type TeamMemberDraft,
-  type TeamTranslationDraft,
 } from "./types";
 import { adminPanel } from "@/components/admin/ui/styles";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
@@ -69,17 +68,6 @@ type Props = {
   items: TeamMemberDraft[];
   initialEditId?: string | null;
   embedded?: boolean;
-};
-
-
-const input: CSSProperties = {
-  width: "100%",
-  padding: 10,
-  background: "#111",
-  border: "1px solid #333",
-  color: "#fff",
-  marginTop: 6,
-  fontSize: 14,
 };
 
 const btn: CSSProperties = {

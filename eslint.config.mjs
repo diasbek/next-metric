@@ -13,6 +13,21 @@ const eslintConfig = defineConfig([
     "public/og/**",
     "scripts/**",
   ]),
+  {
+    rules: {
+      // `_name` marks bindings kept only to strip them from a rest spread or
+      // to satisfy a callback signature.
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

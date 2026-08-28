@@ -8,7 +8,7 @@ import {
 import { writeAuditLog } from "@/lib/cms/audit";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
-import { adminFail, adminRedirect } from "@/lib/cms/admin-redirect";
+import { adminRedirect } from "@/lib/cms/admin-redirect";
 
 function revalidateUsers() {
   revalidatePath("/admin/users/");

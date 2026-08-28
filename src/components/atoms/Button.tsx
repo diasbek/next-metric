@@ -77,8 +77,14 @@ export function Button(props: ButtonProps) {
   const label = <span className="metric-cta__label">{props.children}</span>;
 
   if ("href" in props && props.href != null) {
-    const { children, variant: _v, size: _s, className: _c, href, ...rest } =
-      props;
+    const {
+      children: _children,
+      variant: _v,
+      size: _s,
+      className: _c,
+      href,
+      ...rest
+    } = props;
     return (
       <TransitionLink href={href} className={classes} {...rest}>
         {label}
@@ -87,8 +93,14 @@ export function Button(props: ButtonProps) {
   }
 
   if (props.as === "span") {
-    const { children, variant: _v, size: _s, className: _c, as: _as, ...rest } =
-      props;
+    const {
+      children: _children,
+      variant: _v,
+      size: _s,
+      className: _c,
+      as: _as,
+      ...rest
+    } = props;
     return (
       <span className={classes} {...rest}>
         {label}
@@ -97,7 +109,7 @@ export function Button(props: ButtonProps) {
   }
 
   const {
-    children,
+    children: _children,
     variant: _v,
     size: _s,
     className: _c,

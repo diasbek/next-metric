@@ -2,7 +2,6 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseUrl } from "@/lib/supabase/env";
 import sharp from "sharp";
 import {
-  CASE_MEDIA_MAX_UPLOAD_BYTES,
   MEDIA_BUCKET,
   MEDIA_MAX_UPLOAD_BYTES,
   getPublicMediaUrl,
@@ -427,7 +426,6 @@ export async function uploadSiteDocument(
 /** Recursively list object paths in the public media bucket (early-exit aware). */
 export async function listMediaFiles(
   prefixOrOptions: string | { prefix?: string; maxFiles?: number } = "",
-  depth = 0,
 ): Promise<string[]> {
   const options =
     typeof prefixOrOptions === "string"

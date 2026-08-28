@@ -53,6 +53,9 @@ function ErrorFallback({
         </button>
         <button
           type="button"
+          // Full reload on purpose: the router tree already threw, so a soft
+          // navigation would re-render the same broken subtree.
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
           onClick={() => window.location.assign("/admin/")}
           style={{
             padding: "10px 14px",
