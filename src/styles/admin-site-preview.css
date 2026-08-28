@@ -139,6 +139,178 @@
   pointer-events: none;
 }
 
+/* —— Home page sections ——
+   The admin slot is always < 1024px, so the public desktop media queries never
+   fire. Desktop mode re-applies the ≥1024px layout at the scaled design width. */
+
+.admin-site-preview--home {
+  background: #fff;
+}
+
+/* Preview is read-only: never navigate away from the editor. */
+.admin-site-preview--home .admin-site-preview__scaler {
+  pointer-events: none;
+}
+
+.admin-site-preview--home-desktop .metric-hero {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding-block: 48px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__shell {
+  gap: 40px !important;
+  padding-top: 0 !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__main {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 40px !important;
+  align-items: center !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__copy,
+.admin-site-preview--home-desktop .metric-hero__visual {
+  width: 100% !important;
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  order: 0 !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__title {
+  font-size: 68px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__subtitle {
+  max-width: 70% !important;
+  font-size: 20px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__trust {
+  grid-template-columns: 1.55fr 1fr 1fr 1fr !important;
+  gap: 16px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__trust-card {
+  min-height: 240px !important;
+  border-radius: 32px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__trust-card:first-child,
+.admin-site-preview--home-desktop .metric-hero__trust-card:last-child {
+  grid-column: auto !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__trust-inner {
+  padding: 24px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__trust-kicker,
+.admin-site-preview--home-desktop .metric-hero__trust-copy {
+  font-size: 16px !important;
+}
+
+.admin-site-preview--home-desktop .metric-hero__trust-value,
+.admin-site-preview--home-desktop .metric-hero__trust-icon {
+  --hero-trust-mark: 64px;
+  font-size: 64px !important;
+}
+
+.admin-site-preview--home-desktop .metric-categories__title-line--with-icon {
+  white-space: nowrap !important;
+}
+
+.admin-site-preview--home-desktop .metric-case-studies__header {
+  display: grid !important;
+  grid-template-columns: 1.1fr 0.9fr !important;
+  align-items: end !important;
+  gap: 40px !important;
+}
+
+.admin-site-preview--home-desktop .metric-case-studies__subtitle {
+  justify-self: end !important;
+}
+
+.admin-site-preview--home-desktop .metric-services__layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr) !important;
+  gap: 40px !important;
+  align-items: start !important;
+}
+
+.admin-site-preview--home-desktop .metric-services-card {
+  display: grid !important;
+  grid-template-areas: "head" !important;
+  align-content: start !important;
+  height: 400px !important;
+  padding: 18px !important;
+  border-radius: 24px !important;
+  gap: 0 !important;
+  overflow: clip !important;
+  isolation: isolate !important;
+  background: rgb(245 245 245 / 0.3) !important;
+}
+
+.admin-site-preview--home-desktop .metric-services-card__head {
+  grid-area: head !important;
+  gap: 12px !important;
+}
+
+.admin-site-preview--home-desktop .metric-services-card__num {
+  width: 65px !important;
+  height: 65px !important;
+  font-size: 32px !important;
+}
+
+.admin-site-preview--home-desktop .metric-services-card__label.metric-cta {
+  min-height: 65px !important;
+  --cta-pad-x: 22px;
+  font-size: 32px !important;
+}
+
+.admin-site-preview--home-desktop .metric-services-card__media {
+  position: absolute !important;
+  inset: unset !important;
+  top: 34px !important;
+  right: -8px !important;
+  width: min(58%, 560px) !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  z-index: 1 !important;
+}
+
+.admin-site-preview--home-desktop .metric-workflow__header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 28rem) !important;
+  column-gap: 56px !important;
+  align-items: end !important;
+}
+
+.admin-site-preview--home-desktop .metric-workflow__subtitle {
+  justify-self: end !important;
+  text-align: left !important;
+}
+
+.admin-site-preview--home-desktop .metric-workflow__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.admin-site-preview--home-desktop .metric-workflow-card--offset {
+  margin-top: 64px !important;
+}
+
+.admin-site-preview--home-desktop .metric-faq__grid {
+  grid-template-columns: 0.85fr 1.15fr !important;
+  gap: 64px !important;
+  align-items: start !important;
+}
+
 /* —— Case study page —— */
 
 .admin-site-preview--case-page {

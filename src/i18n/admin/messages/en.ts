@@ -416,6 +416,14 @@ export const enAdmin: AdminMessages = {
       sectionFaq: "FAQ",
       sectionNavFooter: "Nav & footer",
       sectionAdvanced: "Advanced JSON",
+      sitePreview: "Site preview",
+      previewUnsaved: "Preview shows unsaved edits. Save to publish them.",
+      previewHint:
+        "Rendered with the real homepage components — images and fonts match the live site.",
+      previewSectionOnly: "Current section",
+      previewFullPage: "Full page",
+      previewNavLabel: "Header navigation",
+      previewFooterLabel: "Footer",
       contactsSettingsHint:
         "Phone, address, and social URLs are managed in Contacts / Settings — not duplicated in this payload.",
     },

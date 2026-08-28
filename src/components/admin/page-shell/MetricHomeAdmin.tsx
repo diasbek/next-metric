@@ -35,6 +35,14 @@ const FaqEditor = dynamic(
   { ssr: false },
 );
 
+const HomeSitePreview = dynamic(
+  () =>
+    import("@/components/admin/metric-home/HomeSitePreview").then(
+      (m) => m.HomeSitePreview,
+    ),
+  { ssr: false },
+);
+
 type Props = {
   section: string;
   status: "draft" | "published";
@@ -138,100 +146,132 @@ export function MetricHomeAdmin({
         </div>
       }
     >
-      <HardNavForm action={saveMetricHomeAction}>
-        <input type="hidden" name="status" value={publishStatus} />
-        <input type="hidden" name="section" value={active} />
-        <input
-          type="hidden"
-          name="en_payload"
-          value={JSON.stringify(drafts.en)}
-        />
-        <input
-          type="hidden"
-          name="de_payload"
-          value={JSON.stringify(drafts.de)}
-        />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(280px, 380px)",
+          gap: 24,
+          alignItems: "start",
+        }}
+        className="admin-home-editor"
+      >
+        <style>{`
+          @media (max-width: 1100px) {
+            .admin-home-editor {
+              grid-template-columns: minmax(0, 1fr) !important;
+            }
+            .admin-home-editor > aside {
+              position: static !important;
+              max-width: 100% !important;
+            }
+          }
+        `}</style>
 
-        <PublishBar status={publishStatus} onChange={setPublishStatus} />
+        <div style={{ display: "grid", gap: 16, minWidth: 0 }}>
+          <HardNavForm action={saveMetricHomeAction}>
+            <input type="hidden" name="status" value={publishStatus} />
+            <input type="hidden" name="section" value={active} />
+            <input
+              type="hidden"
+              name="en_payload"
+              value={JSON.stringify(drafts.en)}
+            />
+            <input
+              type="hidden"
+              name="de_payload"
+              value={JSON.stringify(drafts.de)}
+            />
 
-        {active === "hero" ? (
-          <HeroSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "trust" ? (
-          <TrustSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "categories" ? (
-          <CategoriesSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "case-studies" ? (
-          <CaseStudiesSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-            projects={projects}
-          />
-        ) : null}
-        {active === "services" ? (
-          <HomeServicesSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "workflow" ? (
-          <WorkflowSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "faq" ? (
-          <FaqChromeEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "nav-footer" ? (
-          <NavFooterSectionEditor
-            locale={locale}
-            current={current}
-            update={updateLocalePayload}
-          />
-        ) : null}
-        {active === "advanced" ? (
-          <AdvancedJsonEditor
-            locale={locale}
-            value={jsonDraft}
-            onChange={(text, parsed) => {
-              setJsonDraft(text);
-              if (parsed) {
-                setDrafts((prev) => ({ ...prev, [locale]: parsed }));
-              }
-            }}
-          />
-        ) : null}
+            <PublishBar status={publishStatus} onChange={setPublishStatus} />
 
-        <SaveButton />
-      </HardNavForm>
+            {active === "hero" ? (
+              <HeroSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "trust" ? (
+              <TrustSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "categories" ? (
+              <CategoriesSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "case-studies" ? (
+              <CaseStudiesSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+                projects={projects}
+              />
+            ) : null}
+            {active === "services" ? (
+              <HomeServicesSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "workflow" ? (
+              <WorkflowSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "faq" ? (
+              <FaqChromeEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "nav-footer" ? (
+              <NavFooterSectionEditor
+                locale={locale}
+                current={current}
+                update={updateLocalePayload}
+              />
+            ) : null}
+            {active === "advanced" ? (
+              <AdvancedJsonEditor
+                locale={locale}
+                value={jsonDraft}
+                onChange={(text, parsed) => {
+                  setJsonDraft(text);
+                  if (parsed) {
+                    setDrafts((prev) => ({ ...prev, [locale]: parsed }));
+                  }
+                }}
+              />
+            ) : null}
 
-      {active === "faq" ? (
-        <div style={{ marginTop: 24 }}>
-          <FaqEditor items={faq} initialEditId={faqEditId} embedded />
+            <SaveButton />
+          </HardNavForm>
+
+          {active === "faq" ? (
+            <div style={{ marginTop: 24 }}>
+              <FaqEditor items={faq} initialEditId={faqEditId} embedded />
+            </div>
+          ) : null}
         </div>
-      ) : null}
+
+        <HomeSitePreview
+          payload={current}
+          locale={locale}
+          section={active}
+          dirty={dirty}
+          faq={faq}
+        />
+      </div>
     </AdminPageShell>
   );
 }

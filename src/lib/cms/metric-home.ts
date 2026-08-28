@@ -5,34 +5,14 @@ import {
 } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { createSupabasePublicClient, hasSupabasePublicConfig } from "@/lib/supabase/public";
+import { mergeMetricHome } from "@/lib/cms/metric-home-merge";
 
 type ProjectEnrichment = {
   cover_image: string | null;
   title: string | null;
 };
 
-function isPresentSection(value: unknown): boolean {
-  if (value == null) return false;
-  if (typeof value === "string") return value.trim().length > 0;
-  if (Array.isArray(value)) return value.length > 0;
-  if (typeof value === "object") return Object.keys(value).length > 0;
-  return true;
-}
-
-/** Merge CMS payload over static defaults; empty arrays/objects/strings do not wipe. */
-export function mergeMetricHome(
-  base: MetricHomeContent,
-  payload: Partial<MetricHomeContent>,
-): MetricHomeContent {
-  const next = { ...base };
-  for (const key of Object.keys(base) as Array<keyof MetricHomeContent>) {
-    const candidate = payload[key];
-    if (isPresentSection(candidate)) {
-      (next as Record<string, unknown>)[key] = candidate;
-    }
-  }
-  return next;
-}
+export { mergeMetricHome };
 
 /**
  * Soft-enrich case study cards from published `metric_projects`.

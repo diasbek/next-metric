@@ -375,6 +375,13 @@ export type AdminMessages = {
       sectionNavFooter: string;
       sectionAdvanced: string;
       contactsSettingsHint: string;
+      sitePreview: string;
+      previewUnsaved: string;
+      previewHint: string;
+      previewSectionOnly: string;
+      previewFullPage: string;
+      previewNavLabel: string;
+      previewFooterLabel: string;
     };
     works: {
       title: string;

@@ -417,6 +417,15 @@ export const deAdmin: AdminMessages = {
       sectionFaq: "FAQ",
       sectionNavFooter: "Nav & Footer",
       sectionAdvanced: "Erweitertes JSON",
+      sitePreview: "Site-Vorschau",
+      previewUnsaved:
+        "Die Vorschau zeigt ungespeicherte Änderungen. Zum Veröffentlichen speichern.",
+      previewHint:
+        "Gerendert mit den echten Startseiten-Komponenten — Bilder und Schriften wie live.",
+      previewSectionOnly: "Aktueller Abschnitt",
+      previewFullPage: "Ganze Seite",
+      previewNavLabel: "Header-Navigation",
+      previewFooterLabel: "Footer",
       contactsSettingsHint:
         "Telefon, Adresse und Social-URLs werden unter Kontakt / Einstellungen verwaltet — nicht in diesem Payload dupliziert.",
     },
