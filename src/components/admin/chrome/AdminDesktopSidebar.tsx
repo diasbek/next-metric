@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import Link from "next/link";
 import { useAdminT } from "@/i18n/admin";
 import { AdminNavIcon } from "@/components/admin/chrome/AdminNavIcons";
@@ -8,11 +8,7 @@ import {
   ADMIN_TOPBAR_HEIGHT,
 } from "@/components/admin/chrome/AdminTopBar";
 import {
-  adminChromeNavLink,
-  adminChromeNavLinkActive,
-} from "@/components/admin/chrome/menuStyles";
-import {
-  isAdminNavActive,
+  getActiveAdminNavHref,
   type AdminNavItem,
 } from "@/components/admin/chrome/nav";
 
@@ -21,11 +17,19 @@ type Props = {
   pathname: string;
 };
 
+function blurNavTarget(event: MouseEvent<HTMLAnchorElement>) {
+  // Soft nav keeps :focus on the clicked link; clear mouse focus so only
+  // the route-based active style remains (not leftover outline boxes).
+  event.currentTarget.blur();
+}
+
 export function AdminDesktopSidebar({ items, pathname }: Props) {
   const t = useAdminT();
+  const activeHref = getActiveAdminNavHref(pathname, items);
 
   return (
     <aside
+      className="admin-sidebar"
       style={{
         position: "sticky",
         top: ADMIN_TOPBAR_HEIGHT,
@@ -43,6 +47,7 @@ export function AdminDesktopSidebar({ items, pathname }: Props) {
       }}
     >
       <nav
+        aria-label={t.chrome.adminNav}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -54,15 +59,14 @@ export function AdminDesktopSidebar({ items, pathname }: Props) {
         }}
       >
         {items.map((item) => {
-          const active = isAdminNavActive(pathname, item.href);
+          const active = item.href === activeHref;
           return (
             <Link
               key={item.href}
               href={item.href}
-              style={{
-                ...adminChromeNavLink,
-                ...(active ? adminChromeNavLinkActive : null),
-              }}
+              className={`admin-nav-link${active ? " is-active" : ""}`}
+              aria-current={active ? "page" : undefined}
+              onClick={blurNavTarget}
             >
               <AdminNavIcon
                 labelKey={item.labelKey}
@@ -88,10 +92,8 @@ export function AdminDesktopSidebar({ items, pathname }: Props) {
           href="/"
           target="_blank"
           rel="noreferrer"
-          style={{
-            ...adminChromeNavLink,
-            color: "#aaa",
-          }}
+          className="admin-nav-link admin-nav-link--muted"
+          onClick={blurNavTarget}
         >
           {t.chrome.site}
         </Link>
@@ -110,20 +112,20 @@ export function AdminNavList({
   onNavigate?: () => void;
 }): ReactNode {
   const t = useAdminT();
+  const activeHref = getActiveAdminNavHref(pathname, items);
   return (
-    <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <nav aria-label={t.chrome.adminNav} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {items.map((item) => {
-        const active = isAdminNavActive(pathname, item.href);
+        const active = item.href === activeHref;
         return (
           <Link
             key={item.href}
             href={item.href}
-            onClick={() => onNavigate?.()}
-            style={{
-              ...adminChromeNavLink,
-              padding: "12px 14px",
-              fontSize: 15,
-              ...(active ? adminChromeNavLinkActive : null),
+            className={`admin-nav-link admin-nav-link--sheet${active ? " is-active" : ""}`}
+            aria-current={active ? "page" : undefined}
+            onClick={(e) => {
+              blurNavTarget(e);
+              onNavigate?.();
             }}
           >
             <AdminNavIcon

@@ -73,15 +73,14 @@ export const adminChromeNavLink: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 10,
-  border: "1px solid transparent",
-  borderLeft: "2px solid transparent",
+  border: "none",
+  background: "transparent",
   boxSizing: "border-box",
 };
 
 export const adminChromeNavLinkActive: CSSProperties = {
   background: "#141414",
-  borderColor: "transparent",
-  borderLeftColor: "#fff",
+  boxShadow: "inset 2px 0 0 #fff",
   fontWeight: 600,
   color: "#fff",
 };

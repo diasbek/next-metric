@@ -69,6 +69,54 @@ export function AdminChrome({
           width: 100%;
           padding: 20px 16px calc(var(--admin-tabbar) + 16px);
         }
+        /* Sidebar / sheet nav — route active only, no leftover focus boxes. */
+        .admin-nav-link {
+          color: #cfcfcf;
+          text-decoration: none;
+          padding: 10px 12px;
+          border-radius: 0;
+          font-size: 13px;
+          line-height: 1.25;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border: none;
+          background: transparent;
+          box-shadow: none;
+          box-sizing: border-box;
+          font-weight: 400;
+          outline: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .admin-nav-link:hover {
+          background: #111;
+          color: #fff;
+        }
+        .admin-nav-link.is-active {
+          background: #141414;
+          color: #fff;
+          font-weight: 600;
+          box-shadow: inset 2px 0 0 #fff;
+        }
+        .admin-nav-link.is-active:hover {
+          background: #141414;
+          color: #fff;
+        }
+        .admin-nav-link:focus,
+        .admin-nav-link:focus-visible {
+          outline: none;
+        }
+        .admin-nav-link:focus-visible:not(.is-active) {
+          background: #111;
+          box-shadow: inset 0 0 0 1px #444;
+        }
+        .admin-nav-link--muted {
+          color: #aaa;
+        }
+        .admin-nav-link--sheet {
+          padding: 12px 14px;
+          font-size: 15px;
+        }
         .admin-form-2col {
           display: grid;
           grid-template-columns: minmax(0, 1fr);

@@ -40,6 +40,24 @@ export function isAdminNavActive(pathname: string, href: string): boolean {
   return path === target || path.startsWith(target);
 }
 
+/** Exactly one nav item — longest matching href wins (avoids false dual-active). */
+export function getActiveAdminNavHref(
+  pathname: string,
+  items: AdminNavItem[],
+): string | null {
+  let best: string | null = null;
+  let bestLen = -1;
+  for (const item of items) {
+    if (!isAdminNavActive(pathname, item.href)) continue;
+    const len = item.href.length;
+    if (len > bestLen) {
+      best = item.href;
+      bestLen = len;
+    }
+  }
+  return best;
+}
+
 type SoftNavFn = (href: string) => void;
 
 let softNavImpl: SoftNavFn | null = null;

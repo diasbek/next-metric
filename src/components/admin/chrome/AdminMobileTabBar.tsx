@@ -6,7 +6,7 @@ import { useAdminT } from "@/i18n/admin";
 import { AdminMoreSheet } from "@/components/admin/chrome/AdminMoreSheet";
 import { AdminNavIcon, IconMore } from "@/components/admin/chrome/AdminNavIcons";
 import {
-  isAdminNavActive,
+  getActiveAdminNavHref,
   pickMobilePrimaryTabs,
   type AdminNavItem,
 } from "@/components/admin/chrome/nav";
@@ -21,9 +21,9 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
   const [moreOpen, setMoreOpen] = useState(false);
   const primary = pickMobilePrimaryTabs(items, 4);
   const primaryHrefSet = new Set(primary.map((item) => item.href));
-  const onSecondaryRoute = items.some(
-    (item) =>
-      !primaryHrefSet.has(item.href) && isAdminNavActive(pathname, item.href),
+  const activeHref = getActiveAdminNavHref(pathname, items);
+  const onSecondaryRoute = Boolean(
+    activeHref && !primaryHrefSet.has(activeHref),
   );
   const moreActive = moreOpen || onSecondaryRoute;
 
@@ -48,11 +48,13 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
         }}
       >
         {primary.map((item) => {
-          const active = isAdminNavActive(pathname, item.href);
+          const active = item.href === activeHref;
           return (
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
+              onClick={(e) => e.currentTarget.blur()}
               style={{
                 flex: "1 1 0",
                 minWidth: 0,
@@ -63,7 +65,7 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
                 gap: 4,
                 padding: "8px 4px",
                 borderRadius: 0,
-                border: `1px solid ${active ? "#333" : "transparent"}`,
+                border: "none",
                 textDecoration: "none",
                 color: active ? "#fff" : "#888",
                 background: active ? "#1a1a1a" : "transparent",
@@ -72,6 +74,7 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
                 lineHeight: 1.15,
                 textAlign: "center",
                 boxSizing: "border-box",
+                outline: "none",
               }}
             >
               <AdminNavIcon labelKey={item.labelKey} size={20} />
@@ -103,7 +106,7 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
             gap: 4,
             padding: "8px 4px",
             borderRadius: 0,
-            border: `1px solid ${moreActive ? "#333" : "transparent"}`,
+            border: "none",
             cursor: "pointer",
             color: moreActive ? "#fff" : "#888",
             background: moreActive ? "#1a1a1a" : "transparent",
@@ -111,6 +114,7 @@ export function AdminMobileTabBar({ items, pathname }: Props) {
             fontWeight: moreActive ? 600 : 400,
             lineHeight: 1.15,
             boxSizing: "border-box",
+            outline: "none",
           }}
         >
           <IconMore size={20} />
