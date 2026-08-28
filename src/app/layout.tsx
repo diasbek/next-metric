@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { degular, degularDisplay } from "@/assets/fonts";
 import "./globals.css";
 import { NavigationScrollReset } from "@/components/NavigationScrollReset";
-import { SiteAnalytics } from "@/components/analytics";
+import { SiteAnalytics, LinkedInInsightTag } from "@/components/analytics";
 import { ConsentProvider, CookieConsentBanner } from "@/components/consent";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -85,6 +85,7 @@ export default async function RootLayout({
           <CookieConsentBanner />
         </ConsentProvider>
         <PwaRegister />
+        <LinkedInInsightTag />
       </body>
     </html>
   );

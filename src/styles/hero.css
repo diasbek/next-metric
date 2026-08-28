@@ -194,7 +194,8 @@
   overflow: visible;
 }
 
-/* Large screens: keep plaques/shadows inside the page shell. */
+/* Large screens: keep ambient wash inside the page shell without clipping
+   rotated / skewed plaques on the cluster's right edge. */
 @media (min-width: 1800px) {
   .metric-hero__shell,
   .metric-hero__main {
@@ -202,7 +203,12 @@
   }
 
   .metric-hero__visual {
-    overflow: hidden;
+    overflow: visible;
+  }
+
+  .metric-hero__cluster {
+    /* Small right inset so rotate(-8°) tag stays inside the clip rect. */
+    margin-right: 1.5cqw;
   }
 }
 
@@ -226,11 +232,37 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  /* Never paint a decode skeleton over the composition — it reads as a
+     solid crop over product frames (fill + priority already skips it). */
+  overflow: visible;
+}
+
+.metric-hero__cluster-shot .media-image__skeleton {
+  display: none;
 }
 
 .metric-hero__cluster-shot img {
   object-fit: contain;
   pointer-events: none;
+}
+
+/* White rounded card inside cluster.png (transparent PNG margins excluded).
+   Figma plaque % are authored against this stage, not the full canvas.
+   container-type so cqw/cqh fonts scale with the card, not the PNG margins. */
+.metric-hero__cluster-stage {
+  position: absolute;
+  left: 8.2%;
+  right: 10.2%;
+  top: 4.8%;
+  bottom: 3.5%;
+  z-index: 2;
+  container-type: size;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.metric-hero__cluster-stage > * {
+  pointer-events: auto;
 }
 
 .metric-hero__badge {
@@ -282,6 +314,8 @@
 }
 
 .metric-hero__redesign-tag {
+  /* Skew overhang like CTAs so the parallelogram isn't cropped mid-label. */
+  --hero-tag-skew-overhang: calc(0.5 * var(--cta-skew-tan) * 6.9cqw);
   position: absolute;
   left: 79.098%;
   top: 54.669%;
@@ -289,28 +323,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: 20.901%;
   height: 9.5%;
+  padding-inline: max(0.8cqw, var(--hero-tag-skew-overhang));
   font-size: 1.99cqw;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--foreground);
   white-space: nowrap;
   transform: rotate(var(--hero-tilt-tag));
+  transform-origin: center center;
+  overflow: visible;
 }
 
 .metric-hero__redesign-tag-glass {
   position: absolute;
-  inset: 12% 0;
+  /* Match CTA skew containment: inset by overhang so tips stay inside the box. */
+  inset: 12% var(--hero-tag-skew-overhang);
   z-index: 0;
   transform: skewX(var(--cta-skew));
   pointer-events: none;
+  overflow: visible;
 }
 
 .metric-hero__redesign-tag > span {
   position: relative;
   z-index: 1;
   display: inline-block;
+  max-width: 100%;
+  overflow: visible;
 }
 
 .metric-hero__redesign-card {
@@ -321,12 +363,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.6cqw;
+  box-sizing: border-box;
   width: 19.545%;
   height: 30.98%;
   padding: 2.12cqw 2.12cqw 1.67cqw;
   border-radius: var(--hero-r-plaque);
   background: var(--accent);
   color: #fff;
+  overflow: visible;
 }
 
 .metric-hero__redesign-value {
@@ -347,9 +391,9 @@
 
 .metric-hero__redesign-caption {
   margin: 1.21cqw 0 0;
-  max-width: 13.5cqw;
+  max-width: 100%;
   font-size: 2.42cqw;
-  line-height: 1;
+  line-height: 1.15;
   letter-spacing: -0.02em;
 }
 
@@ -393,29 +437,49 @@
 }
 
 .metric-hero__trust-value {
+  --hero-trust-mark: clamp(48px, 5vw, 80px);
+  /* Cap-height of the display numeral — icons should match this, not em box. */
+  --hero-trust-mark-cap: calc(var(--hero-trust-mark) * 0.68);
   margin: 0;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 0.12em;
   font-family: var(--font-display-stack);
   font-weight: 600;
-  font-size: clamp(48px, 5vw, 80px);
+  font-size: var(--hero-trust-mark);
   line-height: 0.9;
   letter-spacing: -0.02em;
 }
 
+/* Match the “5” glyph, not the full em box (star was reading oversized). */
 .metric-hero__trust-star {
-  margin-top: 8px;
-  width: 41px;
-  height: 39px;
+  margin: 0;
+  width: calc(var(--hero-trust-mark-cap) * 1.05);
+  height: var(--hero-trust-mark-cap);
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .metric-hero__trust-spn {
   margin-block: 18px auto;
 }
 
+/* Same cap height as “5” / “800+”. */
 .metric-hero__trust-icon {
+  --hero-trust-mark: clamp(48px, 5vw, 80px);
+  --hero-trust-mark-cap: calc(var(--hero-trust-mark) * 0.68);
   margin-bottom: auto;
+  display: flex;
+  align-items: flex-start;
+  height: var(--hero-trust-mark-cap);
+  line-height: 0;
+}
+
+.metric-hero__trust-icon img {
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
 }
 
 @media (max-width: 1023px) {
@@ -442,6 +506,9 @@
     order: -1;
     justify-content: stretch;
     align-items: stretch;
+    /* Keep rotated redesign tag inside the viewport (body overflow-x). */
+    padding-inline: max(16px, var(--page-padding));
+    box-sizing: border-box;
   }
 
   .metric-hero__cluster {
@@ -491,7 +558,12 @@
   }
 
   .metric-hero__trust-value {
-    font-size: 40px;
+    --hero-trust-mark: 40px;
+    font-size: var(--hero-trust-mark);
+  }
+
+  .metric-hero__trust-icon {
+    --hero-trust-mark: 40px;
   }
 }
 
@@ -575,7 +647,12 @@
   }
 
   .metric-hero__trust-value {
-    font-size: clamp(48px, 5cqw, 80px);
+    --hero-trust-mark: clamp(48px, 5cqw, 80px);
+    font-size: var(--hero-trust-mark);
+  }
+
+  .metric-hero__trust-icon {
+    --hero-trust-mark: clamp(48px, 5cqw, 80px);
   }
 }
 
@@ -608,12 +685,12 @@
   }
 
   .metric-hero__trust-value {
-    font-size: clamp(64px, 4.2cqw, 104px);
+    --hero-trust-mark: clamp(64px, 4.2cqw, 104px);
+    font-size: var(--hero-trust-mark);
   }
 
-  .metric-hero__trust-star {
-    width: clamp(41px, 2.4cqw, 56px);
-    height: clamp(39px, 2.3cqw, 54px);
+  .metric-hero__trust-icon {
+    --hero-trust-mark: clamp(64px, 4.2cqw, 104px);
   }
 
   .metric-hero__trust-spn img {
@@ -640,6 +717,11 @@
   }
 
   .metric-hero__trust-value {
-    font-size: clamp(80px, 3.8cqw, 128px);
+    --hero-trust-mark: clamp(80px, 3.8cqw, 128px);
+    font-size: var(--hero-trust-mark);
+  }
+
+  .metric-hero__trust-icon {
+    --hero-trust-mark: clamp(80px, 3.8cqw, 128px);
   }
 }
