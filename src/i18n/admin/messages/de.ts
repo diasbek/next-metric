@@ -295,7 +295,7 @@ export const deAdmin: AdminMessages = {
     editFrame: "Edit frame = real site ratio ({surface})",
     chooseImage: "Choose an image (JPEG, PNG, WebP…)",
     dropHint: "Drop a photo here or click",
-    fileTooLarge: "File is larger than 25 MB",
+    fileTooLarge: "Datei ist größer als {max} MB",
     originalSize: "Original: {size}",
     cropFailed: "Crop failed",
     uploadAndEdit: "Upload & edit on page mockup",
@@ -320,7 +320,7 @@ export const deAdmin: AdminMessages = {
       projectCase: {
         label: "Case / Galerie",
         surfaceLabel: "Case-Galerie",
-        hint: "Galeriebild — freies Seitenverhältnis, bis ~2800px.",
+        hint: "Galeriebild — freies Seitenverhältnis, bis ~2800px, max. 5 MB.",
       },
       ogSocial: {
         label: "OG / Social",

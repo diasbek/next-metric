@@ -15,6 +15,8 @@ const ALLOWED_MIME = new Set([
 ]);
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+/** Case gallery / before-after / hero source file cap (per frame). */
+export const CASE_MEDIA_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 /** Default long-edge for general media (covers, avatars, library). */
 const MAX_EDGE_PX = 1920;
 /** Case gallery / hero masters — match static optimize-metric-images. */
@@ -48,6 +50,8 @@ export type UploadMediaOptions = {
   maxEdge?: number;
   /** WebP quality 1–100 (default 82; case galleries use 90) */
   quality?: number;
+  /** Override default 20 MB source-file cap (case gallery uses 5 MB). */
+  maxUploadBytes?: number;
 };
 
 export type UploadMediaResult = {
@@ -140,8 +144,10 @@ export async function uploadMediaFile(
   if (!(file instanceof File) || file.size === 0) {
     throw new Error("Empty file");
   }
-  if (file.size > MAX_UPLOAD_BYTES) {
-    throw new Error("File too large (max 20 MB)");
+  const maxBytes = options.maxUploadBytes ?? MAX_UPLOAD_BYTES;
+  if (file.size > maxBytes) {
+    const mb = Math.round(maxBytes / (1024 * 1024));
+    throw new Error(`File too large (max ${mb} MB)`);
   }
 
   const mime = file.type || "application/octet-stream";

@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   CASE_MEDIA_MAX_EDGE_PX,
+  CASE_MEDIA_MAX_UPLOAD_BYTES,
   CASE_MEDIA_WEBP_QUALITY,
   deleteMediaByPublicUrl,
   isFileUpload,
@@ -293,6 +294,7 @@ export async function addProjectMediaAction(formData: FormData) {
         ? {
             maxEdge: CASE_MEDIA_MAX_EDGE_PX,
             quality: CASE_MEDIA_WEBP_QUALITY,
+            maxUploadBytes: CASE_MEDIA_MAX_UPLOAD_BYTES,
           }
         : {}),
     });

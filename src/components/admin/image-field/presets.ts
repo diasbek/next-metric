@@ -1,5 +1,8 @@
 /** Site-aligned image presets + surface chrome for the interactive editor. */
 
+/** Max source file size for case gallery / before-after frames. */
+export const PROJECT_CASE_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
 export type ImagePresetKey =
   | "projectCover"
   | "projectCase"
@@ -57,7 +60,7 @@ export const IMAGE_PRESETS: Record<ImagePresetKey, ImagePreset> = {
     maxHeight: 2800,
     quality: 0.9,
     preferWebp: true,
-    hint: "Full gallery frame (up to ~2800px long edge, no forced crop).",
+    hint: "Full gallery frame (up to ~2800px long edge, max 5 MB, no forced crop).",
   },
   ogSocial: {
     key: "ogSocial",

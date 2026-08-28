@@ -15,7 +15,7 @@ import { EasyCropper } from "./EasyCropper";
 import { cropAndCompress, formatBytes } from "./crop-image";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
 import { useAdminDesktop } from "@/components/admin/ui/useAdminDesktop";
-import { IMAGE_PRESETS, type ImagePresetKey } from "./presets";
+import { IMAGE_PRESETS, PROJECT_CASE_MAX_UPLOAD_BYTES, type ImagePresetKey } from "./presets";
 import {
   ProjectCardPeek,
   SurfacePreview,
@@ -135,8 +135,14 @@ export function ImageField({
       setError(t.media.chooseImage);
       return;
     }
-    if (file.size > 25 * 1024 * 1024) {
-      setError(t.media.fileTooLarge);
+    const maxBytes =
+      preset === "projectCase" ? PROJECT_CASE_MAX_UPLOAD_BYTES : 25 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setError(
+        formatAdminMessage(t.media.fileTooLarge, {
+          max: String(Math.round(maxBytes / (1024 * 1024))),
+        }),
+      );
       return;
     }
     setError("");
@@ -177,6 +183,18 @@ export function ImageField({
         rotation,
       });
       if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+      if (
+        preset === "projectCase" &&
+        result.file.size > PROJECT_CASE_MAX_UPLOAD_BYTES
+      ) {
+        URL.revokeObjectURL(result.previewUrl);
+        setError(
+          formatAdminMessage(t.media.fileTooLarge, {
+            max: String(Math.round(PROJECT_CASE_MAX_UPLOAD_BYTES / (1024 * 1024))),
+          }),
+        );
+        return;
+      }
       setPreviewUrl(result.previewUrl);
       assignFile(result.file);
       setEditing(false);

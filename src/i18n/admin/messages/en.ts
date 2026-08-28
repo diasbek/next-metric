@@ -295,7 +295,7 @@ export const enAdmin: AdminMessages = {
     editFrame: "Edit frame = real site ratio ({surface})",
     chooseImage: "Choose an image (JPEG, PNG, WebP…)",
     dropHint: "Drop a photo here or click",
-    fileTooLarge: "File is larger than 25 MB",
+    fileTooLarge: "File is larger than {max} MB",
     originalSize: "Original: {size}",
     cropFailed: "Crop failed",
     uploadAndEdit: "Upload & edit on page mockup",
@@ -320,7 +320,7 @@ export const enAdmin: AdminMessages = {
       projectCase: {
         label: "Case / gallery",
         surfaceLabel: "Case gallery",
-        hint: "Full gallery frame — free aspect, up to ~2800px.",
+        hint: "Full gallery frame — free aspect, up to ~2800px, max 5 MB.",
       },
       ogSocial: {
         label: "OG / social",
