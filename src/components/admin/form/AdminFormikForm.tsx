@@ -61,7 +61,7 @@ export function AdminFormikForm<T extends Values>({
           const message =
             err instanceof Error && err.message.trim()
               ? err.message
-              : "Не удалось подготовить форму";
+              : "Could not prepare the form";
           adminToastError(message);
           helpers.setSubmitting(false);
         }

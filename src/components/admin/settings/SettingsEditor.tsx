@@ -452,7 +452,7 @@ export function SettingsEditor({ settings, seo, flash }: Props) {
               }}
             >
               <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-                Превью сниппета в поиске
+                {t.settings.snippetPreview}
               </p>
               <p style={{ margin: 0, fontSize: 13, color: "#8ab4f8" }}>
                 {snippetHost}

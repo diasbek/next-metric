@@ -83,7 +83,7 @@ export async function createTestimonialAction() {
   );
 
   revalidateCms(["cms", "testimonials"]);
-  return adminRedirect(`/admin/home/`);
+  return adminRedirect(`/admin/testimonials/?edit=${data.id}`);
 }
 
 export async function deleteTestimonialAction(formData: FormData) {
@@ -91,7 +91,7 @@ export async function deleteTestimonialAction(formData: FormData) {
   const supabase = createSupabaseAdminClient();
   await supabase.from("metric_testimonials").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "testimonials"]);
-  return adminRedirect("/admin/home/");
+  return adminRedirect("/admin/testimonials/");
 }
 
 export async function reorderTestimonialsAction(orderedIds: string[]) {

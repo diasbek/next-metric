@@ -8,6 +8,8 @@ export type AdminMessages = {
     agency: string;
     works: string;
     tags: string;
+    team: string;
+    testimonials: string;
     services: string;
     contacts: string;
     leads: string;
@@ -241,6 +243,7 @@ export type AdminMessages = {
     ogLabel: string;
     ogLoading: string;
     ogPreviewHint: string;
+    snippetPreview: string;
   };
   profile: {
     title: string;
@@ -381,6 +384,7 @@ export type AdminMessages = {
       filterReorderOff: string;
       noCover: string;
       sectionLabel: string;
+      empty: string;
     };
     tags: {
       title: string;

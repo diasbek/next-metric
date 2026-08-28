@@ -30,7 +30,7 @@ export async function setLeadStatusAction(
   return runAdminAction(async () => {
     const actor = await requirePermission("leads");
     const next = parseStatus(status);
-    if (!id.trim() || !next) return adminFail("Некорректные данные заявки");
+    if (!id.trim() || !next) return adminFail("Invalid lead data");
 
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase
@@ -47,7 +47,7 @@ export async function setLeadStatusAction(
       meta: { status: next },
     });
     revalidateCms(["cms", "leads"]);
-    return adminOk("Статус обновлён");
+    return adminOk("Status updated");
   });
 }
 
@@ -55,7 +55,7 @@ export async function setLeadStatusAction(
 export async function updateLeadStatusAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const status = parseStatus(String(formData.get("status") ?? ""));
-  if (!status) return adminFail("Некорректный статус");
+  if (!status) return adminFail("Invalid status");
   return setLeadStatusAction(id, status);
 }
 
@@ -80,7 +80,7 @@ export async function getLeadAttachmentUrlAction(
 export async function deleteLeadAction(id: string): Promise<AdminActionResult> {
   return runAdminAction(async () => {
     const actor = await requirePermission("leads");
-    if (!id.trim()) return adminFail("Некорректные данные заявки");
+    if (!id.trim()) return adminFail("Invalid lead data");
 
     const supabase = createSupabaseAdminClient();
     const { data: lead } = await supabase
@@ -105,7 +105,7 @@ export async function deleteLeadAction(id: string): Promise<AdminActionResult> {
       entityId: id,
     });
     revalidateCms(["cms", "leads"]);
-    return adminOk("Заявка удалена");
+    return adminOk("Lead deleted");
   });
 }
 
@@ -116,7 +116,7 @@ export async function purgeStaleLeadsAction(
   return runAdminAction(async () => {
     const actor = await requirePermission("leads");
     const days = Math.max(1, Math.floor(retentionDays) || 0);
-    if (!days) return adminFail("Некорректный срок хранения");
+    if (!days) return adminFail("Invalid retention period");
 
     const cutoff = new Date(Date.now() - days * 86_400_000).toISOString();
     const supabase = createSupabaseAdminClient();
@@ -127,7 +127,7 @@ export async function purgeStaleLeadsAction(
 
     if (selectError) return adminFail(selectError.message);
     if (!stale || stale.length === 0) {
-      return adminOk("Нет заявок для удаления");
+      return adminOk("No leads to delete");
     }
 
     const paths = stale
@@ -151,6 +151,6 @@ export async function purgeStaleLeadsAction(
       meta: { count: ids.length, retentionDays: days },
     });
     revalidateCms(["cms", "leads"]);
-    return adminOk(`Удалено заявок: ${ids.length}`);
+    return adminOk(`Deleted leads: ${ids.length}`);
   });
 }

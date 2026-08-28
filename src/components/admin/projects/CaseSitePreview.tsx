@@ -20,7 +20,10 @@ type Props = {
   ogPreviewDataUrl?: string | null;
 };
 
-function copyDirty(draft: ProjectEditorData, saved: ProjectEditorData): boolean {
+export function isProjectEditorDirty(
+  draft: ProjectEditorData,
+  saved: ProjectEditorData,
+): boolean {
   if (
     draft.slug !== saved.slug ||
     draft.status !== saved.status ||
@@ -55,6 +58,10 @@ function copyDirty(draft: ProjectEditorData, saved: ProjectEditorData): boolean 
     }
   }
   return false;
+}
+
+function copyDirty(draft: ProjectEditorData, saved: ProjectEditorData): boolean {
+  return isProjectEditorDirty(draft, saved);
 }
 
 function resolveOgCandidates(draft: ProjectEditorData, locale: AdminLocale): string[] {

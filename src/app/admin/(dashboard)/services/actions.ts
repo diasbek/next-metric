@@ -32,7 +32,7 @@ export async function saveServiceAction(formData: FormData) {
   }
 
   revalidateCms(["cms", "services"]);
-  return adminRedirect(`/admin/home/?section=services`);
+  return adminRedirect(`/admin/services/?edit=${id}`);
 }
 
 export async function createServiceAction() {
@@ -62,7 +62,7 @@ export async function createServiceAction() {
   );
 
   revalidateCms(["cms", "services"]);
-  return adminRedirect(`/admin/home/?section=services`);
+  return adminRedirect(`/admin/services/?edit=${data.id}`);
 }
 
 export async function deleteServiceAction(formData: FormData) {
@@ -70,7 +70,7 @@ export async function deleteServiceAction(formData: FormData) {
   const supabase = createSupabaseAdminClient();
   await supabase.from("metric_services").delete().eq("id", String(formData.get("id")));
   revalidateCms(["cms", "services"]);
-  return adminRedirect("/admin/home/?section=services");
+  return adminRedirect("/admin/services/");
 }
 
 export async function reorderServicesAction(orderedIds: string[]) {

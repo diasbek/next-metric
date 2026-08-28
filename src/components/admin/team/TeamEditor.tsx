@@ -668,7 +668,7 @@ function TeamEditPanel({
                 </button>
               ) : (
                 <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
-                  Заполни RU первым — потом можно копировать в UZ/EN.
+                  {t.common.fillEnFirst}
                 </p>
               )}
 

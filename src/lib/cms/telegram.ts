@@ -94,15 +94,15 @@ export async function notifyLeadViaTelegram(lead: LeadNotifyPayload) {
   if (!token || chats.length === 0) return;
 
   const text = [
-    "🆕 Новая заявка METRIC",
-    `Имя: ${lead.name}`,
+    "🆕 New METRIC lead",
+    `Name: ${lead.name}`,
     lead.email ? `Email: ${lead.email}` : null,
     lead.phone && lead.phone !== PROJECT_BRIEF_PHONE_PLACEHOLDER
-      ? `Телефон: ${lead.phone}`
+      ? `Phone: ${lead.phone}`
       : null,
-    lead.locale ? `Язык: ${lead.locale}` : null,
-    lead.message ? `Сообщение:\n${lead.message}` : null,
-    lead.hasAttachment ? "📎 Есть вложение — откройте в админ-панели" : null,
+    lead.locale ? `Locale: ${lead.locale}` : null,
+    lead.message ? `Message:\n${lead.message}` : null,
+    lead.hasAttachment ? "📎 Attachment — open in admin" : null,
   ]
     .filter(Boolean)
     .join("\n");

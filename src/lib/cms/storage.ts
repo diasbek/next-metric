@@ -248,7 +248,7 @@ export async function uploadOgPngBuffer(
 function describeStorageError(message: string): string {
   const trimmed = message.trim() || "Storage upload failed";
   if (/fetch failed/i.test(trimmed)) {
-    return "Не удалось загрузить файл в Supabase Storage (fetch failed). Обычно это сеть между сервером и Supabase — файл лучше грузить из браузера.";
+    return "Could not upload to Supabase Storage (fetch failed). Usually a network issue between the server and Supabase — prefer uploading from the browser.";
   }
   return trimmed;
 }

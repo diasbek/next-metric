@@ -75,6 +75,37 @@ export function IconWorks(props: IconProps) {
   );
 }
 
+export function IconTags(props: IconProps) {
+  return (
+    <IconShell {...props}>
+      <path d="M20.6 13.4 12.7 21.3a2 2 0 0 1-2.8 0L2.7 14.1a2 2 0 0 1 0-2.8l7.9-7.9A2 2 0 0 1 12 3h6.5A2.5 2.5 0 0 1 21 5.5V12a2 2 0 0 1-.4 1.4Z" />
+      <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
+    </IconShell>
+  );
+}
+
+export function IconTeam(props: IconProps) {
+  return (
+    <IconShell {...props}>
+      <circle cx="12" cy="7" r="2.6" />
+      <path d="M7 18.5a5 5 0 0 1 10 0" />
+      <circle cx="5.5" cy="9.5" r="2" />
+      <path d="M2 18.5a3.8 3.8 0 0 1 5.2-3.5" />
+      <circle cx="18.5" cy="9.5" r="2" />
+      <path d="M16.8 15a3.8 3.8 0 0 1 5.2 3.5" />
+    </IconShell>
+  );
+}
+
+export function IconTestimonials(props: IconProps) {
+  return (
+    <IconShell {...props}>
+      <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H10v6.5A2.5 2.5 0 0 1 7.5 13H6v3l-2-2.5V6.5Z" />
+      <path d="M14 6.5A2.5 2.5 0 0 1 16.5 4H20v6.5A2.5 2.5 0 0 1 17.5 13H16v3l-2-2.5V6.5Z" />
+    </IconShell>
+  );
+}
+
 export function IconServices(props: IconProps) {
   return (
     <IconShell {...props}>
@@ -164,7 +195,9 @@ const BY_KEY: Record<AdminNavLabelKey, (props: IconProps) => ReactNode> = {
   home: IconHome,
   agency: IconAgency,
   works: IconWorks,
-  tags: IconWorks,
+  tags: IconTags,
+  team: IconTeam,
+  testimonials: IconTestimonials,
   services: IconServices,
   contacts: IconContacts,
   leads: IconLeads,

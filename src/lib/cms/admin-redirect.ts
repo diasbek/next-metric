@@ -25,12 +25,12 @@ export type AdminActionResult = AdminRedirect | AdminSuccess | AdminFailure;
 
 export function adminRedirect(
   path: string,
-  message = "Сохранено",
+  message = "Saved",
 ): AdminRedirect {
   return { ok: true, redirectTo: path, message };
 }
 
-export function adminOk(message = "Готово"): AdminSuccess {
+export function adminOk(message = "Done"): AdminSuccess {
   return { ok: true, message };
 }
 
@@ -79,7 +79,7 @@ export async function runAdminAction(
     const message =
       err instanceof Error && err.message.trim()
         ? err.message
-        : "Не удалось выполнить действие. Попробуйте ещё раз.";
+        : "Action failed. Please try again.";
     console.error("[admin action]", err);
     return adminFail(message);
   }

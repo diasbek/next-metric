@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { HardNavForm } from "@/components/admin/HardNavForm";
 import { AdminPageShell } from "@/components/admin/page-shell/AdminPageShell";
 import { ADMIN_LOCALES, type AdminLocale } from "@/components/admin/ui/locales";
@@ -27,6 +27,7 @@ import {
   type ProjectOption,
 } from "@/components/admin/metric-home/MetricHomeSectionEditors";
 import { useAdminT } from "@/i18n/admin";
+import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 
 const FaqEditor = dynamic(
   () =>
@@ -60,6 +61,16 @@ export function MetricHomeAdmin({
   const [jsonDraft, setJsonDraft] = useState(() =>
     JSON.stringify(payloads.en, null, 2),
   );
+
+  const dirty = useMemo(() => {
+    if (publishStatus !== status) return true;
+    return (
+      JSON.stringify(drafts.en) !== JSON.stringify(payloads.en) ||
+      JSON.stringify(drafts.de) !== JSON.stringify(payloads.de)
+    );
+  }, [drafts, payloads, publishStatus, status]);
+
+  useUnsavedChangesGuard(dirty);
 
   const sections = [
     { id: "hero", label: t.pages.home.sectionHero },

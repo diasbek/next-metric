@@ -8,6 +8,8 @@ export const enAdmin: AdminMessages = {
     agency: "Agency",
     works: "Works",
     tags: "Tags",
+    team: "Team",
+    testimonials: "Testimonials",
     services: "Services catalog",
     contacts: "Contacts",
     leads: "Leads",
@@ -174,8 +176,8 @@ export const enAdmin: AdminMessages = {
   },
   contacts: {
     title: "Contacts page",
-    description:
-      "Global contacts are shared across languages. Address and files are per locale (RU / UZ / EN).",
+      description:
+      "Global contacts are shared across languages. Address and files are per locale (EN / DE).",
     save: "Save contacts",
     address: "Address (one line = one line on the site)",
     presentationUrl: "Presentation",
@@ -249,6 +251,7 @@ export const enAdmin: AdminMessages = {
     ogLoading: "Loading preview…",
     ogPreviewHint:
       "Preview updates as you edit the text. After save, the same image is used for social sharing.",
+    snippetPreview: "Search snippet preview",
   },
   profile: {
     title: "Profile",
@@ -425,6 +428,7 @@ export const enAdmin: AdminMessages = {
       filterReorderOff: " (reorder disabled while filtering/searching)",
       noCover: "No cover",
       sectionLabel: "Projects",
+      empty: "No projects yet — create the first case.",
     },
     tags: {
       title: "Tags",
@@ -538,7 +542,8 @@ export const enAdmin: AdminMessages = {
       gallery: "Gallery",
       general: "Listing & cover",
       save: "Save case",
-      featured: "Show on home page",
+      featured:
+        "Featured flag (does not auto-show on home — pick cases under Home → Case studies)",
       slug: "URL slug",
       sphere: "Category / sphere",
       category: "Category",

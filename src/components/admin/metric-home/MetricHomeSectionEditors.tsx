@@ -808,8 +808,8 @@ export function FaqChromeEditor({ locale, current, update }: LocalePayloadProps)
         />
       </Field>
       <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
-        Questions and answers are edited in the list below (same FAQ used on the
-        homepage).
+        Chrome is title and subtitle only. Questions and answers are edited in
+        the FAQ list below.
       </p>
     </fieldset>
   );

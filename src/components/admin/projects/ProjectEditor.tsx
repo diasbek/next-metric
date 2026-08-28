@@ -18,7 +18,7 @@ import {
   usePersistReorder,
 } from "@/components/admin/dnd";
 import { CaseMediaAdd } from "@/components/admin/projects/CaseMediaAdd";
-import { CaseSitePreview } from "@/components/admin/projects/CaseSitePreview";
+import { CaseSitePreview, isProjectEditorDirty } from "@/components/admin/projects/CaseSitePreview";
 import type {
   LibraryItem,
   ProjectBlockDraft,
@@ -53,6 +53,7 @@ import { ADMIN_TOPBAR_HEIGHT } from "@/components/admin/chrome/AdminTopBar";
 import { ADMIN_MD_BREAKPOINT } from "@/components/admin/chrome/nav";
 import { formatAdminMessage, useAdminT } from "@/i18n/admin";
 import { useAdminDesktop } from "@/components/admin/ui/useAdminDesktop";
+import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 
 export type { ProjectEditorData } from "./project-editor-types";
 
@@ -157,6 +158,8 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   const [ogPreviewDataUrl, setOgPreviewDataUrl] = useState<string | null>(null);
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const tr = draft.translations[locale];
+
+  useUnsavedChangesGuard(isProjectEditorDirty(draft, project));
 
   useEffect(() => {
     setDraft(project);
@@ -1044,10 +1047,6 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
               ) : null}
             </div>
           </section>
-
-          <button type="submit" style={{ ...adminBtnPrimary, padding: 14, fontSize: 14 }}>
-            {t.pages.project.save}
-          </button>
         </HardNavForm>
 
         <HardNavForm action={deleteProjectAction}>

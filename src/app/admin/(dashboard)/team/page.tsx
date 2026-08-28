@@ -1,56 +1,56 @@
 import { requirePermission } from "@/lib/cms/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { EMBED } from "@/lib/cms/embeds";
-import { ServicesEditor } from "@/components/admin/services/ServicesEditor";
+import { TeamEditor } from "@/components/admin/team/TeamEditor";
 import {
   ADMIN_LOCALES,
-  type ServiceDraft,
-} from "@/components/admin/services/types";
+  type TeamMemberDraft,
+} from "@/components/admin/team/types";
 import { AdminPageShell } from "@/components/admin/page-shell/AdminPageShell";
 import { getAdminMessages } from "@/i18n/admin/get-admin-messages";
 import { getAdminUiLocale } from "@/i18n/admin/get-admin-locale";
 
-function toDraft(row: {
+function toTeamDraft(row: {
   id: string;
-  service_key: string;
   sort_order: number;
   status: string;
-  service_translations?: Array<{
+  image: string | null;
+  image_object_position: string | null;
+  is_director: boolean | null;
+  team_member_translations?: Array<{
     locale: string;
-    title: string;
-    short_description: string;
-    full_description: string;
-    price: string;
-    duration: string;
+    name: string;
+    role: string;
   }>;
-}): ServiceDraft {
+}): TeamMemberDraft {
   const translations = Object.fromEntries(
     ADMIN_LOCALES.map((locale) => {
-      const tr = row.service_translations?.find((t) => t.locale === locale.code);
+      const tr = row.team_member_translations?.find(
+        (t) => t.locale === locale.code,
+      );
       return [
         locale.code,
         {
           locale: locale.code,
-          title: tr?.title ?? "",
-          short: tr?.short_description ?? "",
-          full: tr?.full_description ?? "",
-          price: tr?.price ?? "",
-          duration: tr?.duration ?? "",
+          name: tr?.name ?? "",
+          role: tr?.role ?? "",
         },
       ];
     }),
-  ) as ServiceDraft["translations"];
+  ) as TeamMemberDraft["translations"];
 
   return {
     id: row.id,
-    service_key: row.service_key,
     sort_order: row.sort_order,
     status: row.status,
+    image: row.image ?? "",
+    image_object_position: row.image_object_position ?? "",
+    is_director: Boolean(row.is_director),
     translations,
   };
 }
 
-export default async function AdminServicesPage({
+export default async function AdminTeamPage({
   searchParams,
 }: {
   searchParams: Promise<{ edit?: string }>;
@@ -60,11 +60,11 @@ export default async function AdminServicesPage({
   const params = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase
-    .from("metric_services")
-    .select(`*, ${EMBED.serviceTranslations}`)
+    .from("metric_team_members")
+    .select(`*, ${EMBED.teamMemberTranslations}`)
     .order("sort_order");
 
-  const items = (data ?? []).map(toDraft);
+  const items = (data ?? []).map(toTeamDraft);
   const initialEditId =
     params.edit && items.some((item) => item.id === params.edit)
       ? params.edit
@@ -72,14 +72,14 @@ export default async function AdminServicesPage({
 
   return (
     <AdminPageShell
-      title={t.pages.services.title}
-      publicPath="/services/"
-      description={t.pages.services.description}
-      sections={[{ id: "content", label: t.pages.services.sectionLabel }]}
+      title={t.pages.team.title}
+      publicPath="/agency/"
+      description={t.pages.team.description}
+      sections={[{ id: "content", label: t.pages.team.title }]}
       activeSection="content"
-      basePath="/admin/services/"
+      basePath="/admin/team/"
     >
-      <ServicesEditor items={items} initialEditId={initialEditId} embedded />
+      <TeamEditor items={items} initialEditId={initialEditId} embedded />
     </AdminPageShell>
   );
 }

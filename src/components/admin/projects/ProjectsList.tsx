@@ -262,7 +262,9 @@ export function ProjectsList({ projects, embedded = false }: Props) {
         }
       />
       {filtered.length === 0 ? (
-        <p style={{ color: "#888", marginTop: 24 }}>{t.common.emptyList}</p>
+        <p style={{ color: "#888", marginTop: 24 }}>
+          {projects.length === 0 ? t.pages.works.empty : t.common.emptyList}
+        </p>
       ) : null}
     </div>
   );
