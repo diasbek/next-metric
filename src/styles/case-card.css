@@ -145,12 +145,24 @@
   color: var(--foreground);
 }
 
+.metric-case-card__description {
+  margin-top: 12px;
+  font-size: clamp(14px, 1.5vw, 20px);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
 @media (min-width: 1024px) {
   .metric-case-card__author {
     margin-top: 32px;
   }
 
   .metric-case-card__role {
+    margin-top: 20px;
+  }
+
+  .metric-case-card__description {
     margin-top: 20px;
   }
 }
@@ -173,6 +185,10 @@
     font-size: clamp(24px, 1.25vw, 28px);
   }
 
+  .metric-case-card__description {
+    font-size: clamp(20px, 1.1vw, 24px);
+  }
+
   .metric-case-card__tags .metric-pill {
     padding: clamp(16px, 0.9vw, 22px) clamp(20px, 1.2vw, 28px);
     font-size: clamp(20px, 1.1vw, 24px);
@@ -190,6 +206,10 @@
 
   .metric-case-card__role {
     font-size: clamp(28px, 1.05vw, 32px);
+  }
+
+  .metric-case-card__description {
+    font-size: clamp(24px, 0.9vw, 28px);
   }
 }
 

@@ -21,6 +21,7 @@ export type HomeCaseCardFields = {
   quote: string;
   author: string;
   role: string;
+  description: string;
   image: string;
   title?: string;
 };
@@ -147,7 +148,12 @@ export async function enrichCaseStudiesFromProjects(
 
       const quote = project.quote || project.title || item.quote;
       const author = project.author || project.title || item.author;
-      const role = project.role || project.description || item.role;
+      const role = project.role || item.role;
+      const itemDescription =
+        typeof (item as { description?: unknown }).description === "string"
+          ? (item as { description: string }).description.trim()
+          : "";
+      const description = project.description || itemDescription;
       const image = project.cover_image || item.image;
       const tags = project.tags.length ? project.tags : [...item.tags];
 
@@ -157,6 +163,7 @@ export async function enrichCaseStudiesFromProjects(
         quote,
         author,
         role,
+        description,
         image,
         ...(project.title ? { title: project.title } : {}),
       };
@@ -191,6 +198,7 @@ export function applyProjectFieldsToCaseItems(
         quote: String(item.quote ?? ""),
         author: String(item.author ?? ""),
         role: String(item.role ?? ""),
+        description: String(item.description ?? ""),
         image: String(item.image ?? ""),
       };
     })

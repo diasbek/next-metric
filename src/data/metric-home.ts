@@ -75,6 +75,8 @@ const metricHomeEn = {
         quote: "Conversion grew from 9.5% to 22% in three days",
         author: "VJM-STORE",
         role: "VJM-STORE, Amazon DE",
+        description:
+          "Visual identity and Amazon listing system for a drill brush attachment set — listing images, A+ Content, and EBC modules.",
         image: "/images/metric/case-detail/vjm-store/1.jpg",
       },
       {
@@ -83,6 +85,7 @@ const metricHomeEn = {
         quote: "Your ideas really do make all the difference",
         author: "Markus Pfister",
         role: "MATOLUX, Mitgründer & Geschäftsführer",
+        description: "Amazon listing redesign with Premium A+ Content",
         image: "/images/metric/cases/case-1.jpg",
       },
       {
@@ -91,6 +94,7 @@ const metricHomeEn = {
         quote: "All performance figures have risen significantly",
         author: "Louis Bierbaum",
         role: "CRAFTUS, Mitgründer & Geschäftsführer",
+        description: "Listing and A+ system for a growing Amazon brand",
         image: "/images/metric/cases/case-2.jpg",
       },
       {
@@ -99,6 +103,7 @@ const metricHomeEn = {
         quote: "The conversion rate has increased by one and a half times",
         author: "Tobias Fraikin",
         role: "CRAFTUS, Mitgründer & Geschäftsführer",
+        description: "Conversion-led Amazon visuals",
         image: "/images/metric/cases/case-3.jpg",
       },
     ],
@@ -254,6 +259,8 @@ const metricHomeDe = {
         quote: "Conversion stieg in drei Tagen von 9,5 % auf 22 %",
         author: "VJM-STORE",
         role: "VJM-STORE, Amazon DE",
+        description:
+          "Visuelle Identität und Amazon-Listing-System für ein Bohrbürsten-Set — Listing-Bilder, A+ Content und EBC-Module.",
         image: "/images/metric/case-detail/vjm-store/1.jpg",
       },
       {
@@ -262,6 +269,7 @@ const metricHomeDe = {
         quote: "Eure Ideen machen wirklich den Unterschied",
         author: "Markus Pfister",
         role: "MATOLUX, Mitgründer & Geschäftsführer",
+        description: "Amazon-Listing-Redesign mit Premium A+ Content",
         image: "/images/metric/cases/case-1.jpg",
       },
       {
@@ -270,6 +278,7 @@ const metricHomeDe = {
         quote: "Alle Performance-Kennzahlen sind deutlich gestiegen",
         author: "Louis Bierbaum",
         role: "CRAFTUS, Mitgründer & Geschäftsführer",
+        description: "Listing- und A+-System für eine wachsende Amazon-Marke",
         image: "/images/metric/cases/case-2.jpg",
       },
       {
@@ -278,6 +287,7 @@ const metricHomeDe = {
         quote: "Die Conversion-Rate hat sich um das Eineinhalbfache erhöht",
         author: "Tobias Fraikin",
         role: "CRAFTUS, Mitgründer & Geschäftsführer",
+        description: "Conversion-orientierte Amazon-Visuals",
         image: "/images/metric/cases/case-3.jpg",
       },
     ],

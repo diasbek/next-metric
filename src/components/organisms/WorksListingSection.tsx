@@ -37,7 +37,8 @@ export async function WorksListingSection({
       tags: resolveTagDisplays(rawTags, taxonomy),
       quote: project.quote ?? project.title,
       author: project.author ?? project.title,
-      role: project.role ?? project.description,
+      role: project.role ?? "",
+      description: project.description ?? "",
       image: project.image,
       imageAlt: project.title,
       sphere: project.sphere,
@@ -114,6 +115,7 @@ export async function WorksListingSection({
                 quote={item.quote}
                 author={item.author}
                 role={item.role}
+                description={item.description}
                 image={item.image}
                 imageAlt={item.imageAlt}
                 viewLabel={home.caseStudies.viewLabel}

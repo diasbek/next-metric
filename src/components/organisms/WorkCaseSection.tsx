@@ -60,7 +60,6 @@ export async function WorkCaseSection({
         coverImage: project.image,
       });
 
-  const authorName = project.author ?? project.title;
   const reviews =
     project.reviews && project.reviews.length > 0
       ? project.reviews
@@ -91,14 +90,12 @@ export async function WorkCaseSection({
       <PageContainer className="metric-case__shell">
         <SiteBreadcrumbs items={breadcrumbs} className="mb-6" />
         <header className="metric-case__intro">
-          <h1 className="metric-case__title font-display">{authorName}</h1>
+          <h1 className="metric-case__title font-display">
+            {project.title.trim() || project.slug}
+          </h1>
 
           <div className="metric-case__grid">
             <div className="metric-case__col metric-case__col--main">
-              {project.role ? (
-                <p className="metric-case__role">{project.role}</p>
-              ) : null}
-
               {caseStudy?.task ? (
                 <div className="metric-case__brief">
                   <p className="metric-case__brief-label">{ui.task}</p>
@@ -314,6 +311,7 @@ export async function WorkCaseSection({
             </div>
             <CaseReviewsCarousel
               reviews={reviews}
+              caseTitle={project.title}
               fallbackImage={project.image}
               fallbackAuthor={project.title}
             />
@@ -342,7 +340,8 @@ export async function WorkCaseSection({
                   tags={resolveTagDisplays(rawTags, taxonomy)}
                   quote={item.quote ?? item.title}
                   author={item.author ?? item.title}
-                  role={item.role ?? item.description}
+                  role={item.role ?? ""}
+                  description={item.description}
                   image={item.image}
                   imageAlt={item.title}
                   viewLabel={home.caseStudies.viewLabel}

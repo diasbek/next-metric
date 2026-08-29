@@ -267,7 +267,7 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
       ? `/works/${draft.slug}/`
       : `/${locale}/works/${draft.slug}/`;
 
-  const authorName = (tr.author || tr.title || "").trim() || t.pages.project.titlePlaceholder;
+  const pageTitle = tr.title.trim() || t.pages.project.titlePlaceholder;
   const tags = tr.tags
     .split(",")
     .map((s) => s.trim())
@@ -360,11 +360,10 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
           <article className="metric-case" style={{ paddingBlock: "40px 48px" }}>
             <div className="page-container metric-case__shell" style={{ paddingInline: 40 }}>
               <header className="metric-case__intro">
-                <h1 className="metric-case__title font-display">{authorName}</h1>
+                <h1 className="metric-case__title font-display">{pageTitle}</h1>
 
                 <div className="metric-case__grid">
                   <div className="metric-case__col metric-case__col--main">
-                    {tr.role ? <p className="metric-case__role">{tr.role}</p> : null}
                     {tr.case_task ? (
                       <div className="metric-case__brief">
                         <p className="metric-case__brief-label">{taskLabel}</p>
@@ -487,17 +486,20 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
                       t.pages.project.titlePlaceholder;
                     return (
                       <blockquote key={`${index}-${name}`} className="metric-case__review">
-                        {review.quote ? (
-                          <p className="metric-case__review-quote" style={{ fontSize: 22 }}>
-                            {review.quote}
-                          </p>
+                        {pageTitle ? (
+                          <p className="metric-case__review-case">{pageTitle}</p>
                         ) : null}
-                        <footer style={{ marginTop: 16 }}>
+                        <footer style={{ marginTop: 0, marginBottom: review.quote ? 16 : 0 }}>
                           <strong className="metric-case__review-name">{name}</strong>
                           {review.role ? (
                             <p className="metric-case__review-role">{review.role}</p>
                           ) : null}
                         </footer>
+                        {review.quote ? (
+                          <p className="metric-case__review-quote" style={{ fontSize: 22 }}>
+                            {review.quote}
+                          </p>
+                        ) : null}
                       </blockquote>
                     );
                   })}

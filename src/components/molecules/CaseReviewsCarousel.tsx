@@ -7,6 +7,8 @@ import "swiper/css";
 
 type Props = {
   reviews: ProjectReview[];
+  /** Case / project title shown on each review card. */
+  caseTitle: string;
   /** Fallback when a review has no personImage (usually project cover). */
   fallbackImage: string;
   fallbackAuthor: string;
@@ -14,9 +16,12 @@ type Props = {
 
 export function CaseReviewsCarousel({
   reviews,
+  caseTitle,
   fallbackImage,
   fallbackAuthor,
 }: Props) {
+  const title = caseTitle.trim();
+
   return (
     <Swiper
       className="metric-case__reviews"
@@ -42,8 +47,8 @@ export function CaseReviewsCarousel({
             className="metric-case__review-slide"
           >
             <article className="metric-case__review">
-              {review.quote ? (
-                <p className="metric-case__review-quote">{review.quote}</p>
+              {title ? (
+                <p className="metric-case__review-case">{title}</p>
               ) : null}
               <div className="metric-case__review-author">
                 <div className="metric-case__review-avatar">
@@ -64,6 +69,9 @@ export function CaseReviewsCarousel({
                   ) : null}
                 </div>
               </div>
+              {review.quote ? (
+                <p className="metric-case__review-quote">{review.quote}</p>
+              ) : null}
             </article>
           </SwiperSlide>
         );

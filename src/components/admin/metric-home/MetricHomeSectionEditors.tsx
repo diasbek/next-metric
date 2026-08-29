@@ -77,6 +77,7 @@ function projectCardForLocale(
   quote: string;
   author: string;
   role: string;
+  description: string;
   image: string;
 } | null {
   if (!project) return null;
@@ -90,7 +91,8 @@ function projectCardForLocale(
     tags: (tr?.tags?.length ? tr.tags : en?.tags) ?? [],
     quote: (tr?.quote || en?.quote || title).trim(),
     author: (tr?.author || en?.author || title).trim(),
-    role: (tr?.role || en?.role || tr?.description || en?.description || "").trim(),
+    role: (tr?.role || en?.role || "").trim(),
+    description: (tr?.description || en?.description || "").trim(),
     image: project.cover_image,
   };
 }
@@ -576,7 +578,12 @@ export function CaseStudiesSectionEditor({
                       «{card.quote}»
                     </strong>
                     <span style={{ fontSize: 12, color: "#aaa" }}>{card.author}</span>
-                    <span style={{ fontSize: 12, color: "#777" }}>{card.role}</span>
+                    {card.role ? (
+                      <span style={{ fontSize: 12, color: "#777" }}>{card.role}</span>
+                    ) : null}
+                    {card.description ? (
+                      <span style={{ fontSize: 12, color: "#888" }}>{card.description}</span>
+                    ) : null}
                     {card.tags.length ? (
                       <span style={{ fontSize: 11, color: "#666" }}>
                         {card.tags.join(" · ")}

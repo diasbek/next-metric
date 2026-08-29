@@ -280,6 +280,7 @@ export function MetricCaseStudiesSection({
               quote={item.quote}
               author={item.author}
               role={item.role}
+              description={item.description}
               image={item.image}
               imageAlt={`${item.author} — ${item.tags.slice(0, 2).join(", ") || "Amazon case study"}`}
               viewLabel={caseStudies.viewLabel}

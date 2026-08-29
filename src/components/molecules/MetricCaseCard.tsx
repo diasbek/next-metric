@@ -11,6 +11,8 @@ export type MetricCaseCardProps = {
   quote: string;
   author: string;
   role: string;
+  /** Short listing blurb from the case (`description` in CMS). */
+  description?: string;
   image: string;
   imageAlt?: string;
   viewLabel: string;
@@ -31,11 +33,13 @@ export function MetricCaseCard({
   quote,
   author,
   role,
+  description,
   image,
   imageAlt,
   viewLabel,
 }: MetricCaseCardProps) {
   const resolvedTags = normalizeTags(tags);
+  const blurb = description?.trim() ?? "";
   return (
     <article className="metric-case-card">
       <div className="metric-case-card__body">
@@ -53,7 +57,8 @@ export function MetricCaseCard({
         <div className="metric-case-card__copy">
           <h3 className="metric-case-card__quote font-display">{quote}</h3>
           <p className="metric-case-card__author">{author}</p>
-          <p className="metric-case-card__role">{role}</p>
+          {role ? <p className="metric-case-card__role">{role}</p> : null}
+          {blurb ? <p className="metric-case-card__description">{blurb}</p> : null}
         </div>
         <Button href={href} variant="dark" className="metric-case-card__cta">
           {viewLabel}
