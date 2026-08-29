@@ -17,8 +17,6 @@ export function CaseReviewsCarousel({
   fallbackImage,
   fallbackAuthor,
 }: Props) {
-  const desktopSlides = Math.min(3, Math.max(1, reviews.length));
-
   return (
     <Swiper
       className="metric-case__reviews"
@@ -27,8 +25,10 @@ export function CaseReviewsCarousel({
       grabCursor
       watchOverflow
       breakpoints={{
+        // Match admin preview: always 3 columns on desktop so a single
+        // card stays one-third width instead of stretching full-bleed.
         768: {
-          slidesPerView: desktopSlides,
+          slidesPerView: 3,
           spaceBetween: 20,
         },
       }}

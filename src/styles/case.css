@@ -334,6 +334,10 @@
   overflow: hidden;
 }
 
+.metric-case__reviews .swiper-wrapper {
+  align-items: stretch;
+}
+
 .metric-case__reviews--preview {
   display: grid;
   gap: 16px;
@@ -349,6 +353,12 @@
 }
 
 .metric-case__review-slide {
+  height: auto;
+  box-sizing: border-box;
+}
+
+.metric-case__review-slide.swiper-slide {
+  width: 100%;
   height: auto;
   box-sizing: border-box;
 }
