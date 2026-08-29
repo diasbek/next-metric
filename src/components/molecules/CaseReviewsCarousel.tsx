@@ -10,6 +10,10 @@ type Props = {
   fallbackAuthor: string;
 };
 
+function norm(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
 export function CaseReviewsCarousel({
   reviews,
   caseTitle,
@@ -17,18 +21,29 @@ export function CaseReviewsCarousel({
   fallbackAuthor,
 }: Props) {
   const title = caseTitle.trim();
+  const titleKey = title ? norm(title) : "";
 
   return (
     <div className="metric-case__reviews">
       {reviews.map((review, index) => {
-        const name = review.author?.trim() || fallbackAuthor;
+        const name = (review.author?.trim() || fallbackAuthor).trim();
+        const role = review.role?.trim() ?? "";
         const avatar = review.personImage?.trim() || fallbackImage;
+        const nameKey = name ? norm(name) : "";
+        const roleKey = role ? norm(role) : "";
+
+        // Case title once at top; skip it when it only repeats the author.
+        const showCase = Boolean(titleKey) && titleKey !== nameKey;
+        // Role only when it adds something beyond case title / author.
+        const showRole =
+          Boolean(roleKey) && roleKey !== titleKey && roleKey !== nameKey;
+
         return (
           <article
             key={review.id || `${index}-${name}`}
             className="metric-case__review"
           >
-            {title ? (
+            {showCase ? (
               <p className="metric-case__review-case">{title}</p>
             ) : null}
             <div className="metric-case__review-author">
@@ -44,9 +59,11 @@ export function CaseReviewsCarousel({
                 ) : null}
               </div>
               <div>
-                <p className="metric-case__review-name">{name}</p>
-                {review.role ? (
-                  <p className="metric-case__review-role">{review.role}</p>
+                {name ? (
+                  <p className="metric-case__review-name">{name}</p>
+                ) : null}
+                {showRole ? (
+                  <p className="metric-case__review-role">{role}</p>
                 ) : null}
               </div>
             </div>

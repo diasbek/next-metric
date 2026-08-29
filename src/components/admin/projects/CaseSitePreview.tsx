@@ -484,15 +484,26 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
                     const name =
                       (review.author || tr.title || "").trim() ||
                       t.pages.project.titlePlaceholder;
+                    const role = review.role.trim();
+                    const titleKey = pageTitle.trim().toLowerCase();
+                    const nameKey = name.toLowerCase();
+                    const roleKey = role.toLowerCase();
+                    const showCase = Boolean(titleKey) && titleKey !== nameKey;
+                    const showRole =
+                      Boolean(roleKey) &&
+                      roleKey !== titleKey &&
+                      roleKey !== nameKey;
                     return (
                       <blockquote key={`${index}-${name}`} className="metric-case__review">
-                        {pageTitle ? (
+                        {showCase ? (
                           <p className="metric-case__review-case">{pageTitle}</p>
                         ) : null}
                         <footer style={{ marginTop: 0, marginBottom: review.quote ? 16 : 0 }}>
-                          <strong className="metric-case__review-name">{name}</strong>
-                          {review.role ? (
-                            <p className="metric-case__review-role">{review.role}</p>
+                          {name ? (
+                            <strong className="metric-case__review-name">{name}</strong>
+                          ) : null}
+                          {showRole ? (
+                            <p className="metric-case__review-role">{role}</p>
                           ) : null}
                         </footer>
                         {review.quote ? (
