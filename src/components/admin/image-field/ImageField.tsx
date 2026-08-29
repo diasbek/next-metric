@@ -406,9 +406,6 @@ export function ImageField({
                       imageUrl={displayPreview}
                       title={previewTitle}
                       subtitle={previewSubtitle}
-                      quote={previewQuote}
-                      author={previewAuthor}
-                      role={previewRole}
                       tags={previewTags}
                       ctaLabel={previewCta}
                     />
@@ -417,9 +414,7 @@ export function ImageField({
                     <ProjectCardPeek
                       imageUrl={displayPreview}
                       title={previewTitle}
-                      quote={previewQuote}
-                      author={previewAuthor}
-                      role={previewRole}
+                      subtitle={previewSubtitle}
                       tags={previewTags}
                       ctaLabel={previewCta}
                     />
@@ -643,9 +638,6 @@ export function ImageField({
                 imageUrl={sourceUrl || previewUrl}
                 title={previewTitle}
                 subtitle={previewSubtitle}
-                quote={previewQuote}
-                author={previewAuthor}
-                role={previewRole}
                 tags={previewTags}
                 ctaLabel={previewCta}
                 interactive
@@ -654,9 +646,7 @@ export function ImageField({
                 <ProjectCardPeek
                   imageUrl={sourceUrl || previewUrl}
                   title={previewTitle}
-                  quote={previewQuote}
-                  author={previewAuthor}
-                  role={previewRole}
+                  subtitle={previewSubtitle}
                   tags={previewTags}
                   ctaLabel={previewCta}
                 />

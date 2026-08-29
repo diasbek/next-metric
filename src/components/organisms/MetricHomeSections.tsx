@@ -277,12 +277,10 @@ export function MetricCaseStudiesSection({
               locale={locale}
               href={localePath(locale, `/works/${item.slug}/`)}
               tags={item.tags}
-              quote={item.quote}
-              author={item.author}
-              role={item.role}
+              title={item.title?.trim() || item.author || item.slug}
               description={item.description}
               image={item.image}
-              imageAlt={`${item.author} — ${item.tags.slice(0, 2).join(", ") || "Amazon case study"}`}
+              imageAlt={`${item.title?.trim() || item.author || item.slug} — ${item.tags.slice(0, 2).join(", ") || "Amazon case study"}`}
               viewLabel={caseStudies.viewLabel}
             />
           ))}

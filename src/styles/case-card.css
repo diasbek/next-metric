@@ -123,30 +123,15 @@
   }
 }
 
-.metric-case-card__quote {
+.metric-case-card__title {
   font-size: clamp(24px, 6vw, 60px);
   line-height: 0.95;
   letter-spacing: -0.02em;
   color: var(--foreground);
 }
 
-.metric-case-card__author {
-  margin-top: 16px;
-  font-size: clamp(18px, 2.4vw, 32px);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--foreground);
-}
-
-.metric-case-card__role {
-  margin-top: 8px;
-  font-size: clamp(14px, 1.8vw, 24px);
-  letter-spacing: -0.02em;
-  color: var(--foreground);
-}
-
 .metric-case-card__description {
-  margin-top: 12px;
+  margin-top: 16px;
   font-size: clamp(14px, 1.5vw, 20px);
   line-height: 1.35;
   letter-spacing: -0.02em;
@@ -154,16 +139,8 @@
 }
 
 @media (min-width: 1024px) {
-  .metric-case-card__author {
-    margin-top: 32px;
-  }
-
-  .metric-case-card__role {
-    margin-top: 20px;
-  }
-
   .metric-case-card__description {
-    margin-top: 20px;
+    margin-top: 24px;
   }
 }
 
@@ -173,16 +150,8 @@
     padding: 50px;
   }
 
-  .metric-case-card__quote {
+  .metric-case-card__title {
     font-size: clamp(60px, 3.2vw, 84px);
-  }
-
-  .metric-case-card__author {
-    font-size: clamp(32px, 1.7vw, 40px);
-  }
-
-  .metric-case-card__role {
-    font-size: clamp(24px, 1.25vw, 28px);
   }
 
   .metric-case-card__description {
@@ -196,16 +165,8 @@
 }
 
 @media (min-width: 2560px) {
-  .metric-case-card__quote {
+  .metric-case-card__title {
     font-size: clamp(84px, 2.8vw, 104px);
-  }
-
-  .metric-case-card__author {
-    font-size: clamp(40px, 1.4vw, 48px);
-  }
-
-  .metric-case-card__role {
-    font-size: clamp(28px, 1.05vw, 32px);
   }
 
   .metric-case-card__description {

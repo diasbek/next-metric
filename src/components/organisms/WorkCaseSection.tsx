@@ -338,9 +338,7 @@ export async function WorkCaseSection({
                   locale={locale}
                   href={localePath(locale, `/works/${item.slug}/`)}
                   tags={resolveTagDisplays(rawTags, taxonomy)}
-                  quote={item.quote ?? item.title}
-                  author={item.author ?? item.title}
-                  role={item.role ?? ""}
+                  title={item.title}
                   description={item.description}
                   image={item.image}
                   imageAlt={item.title}

@@ -61,18 +61,13 @@
   border-radius: 30px !important;
 }
 
-.admin-site-preview--case-card-desktop .metric-case-card__quote {
+.admin-site-preview--case-card-desktop .metric-case-card__title {
   font-size: 48px !important;
   line-height: 0.95 !important;
 }
 
-.admin-site-preview--case-card-desktop .metric-case-card__author {
-  margin-top: 32px !important;
-  font-size: 28px !important;
-}
-
-.admin-site-preview--case-card-desktop .metric-case-card__role {
-  margin-top: 20px !important;
+.admin-site-preview--case-card-desktop .metric-case-card__description {
+  margin-top: 24px !important;
   font-size: 20px !important;
 }
 
@@ -115,18 +110,13 @@
   align-self: stretch !important;
 }
 
-.admin-site-preview--case-card-mobile .metric-case-card__quote {
+.admin-site-preview--case-card-mobile .metric-case-card__title {
   font-size: 28px !important;
   line-height: 0.95 !important;
 }
 
-.admin-site-preview--case-card-mobile .metric-case-card__author {
+.admin-site-preview--case-card-mobile .metric-case-card__description {
   margin-top: 16px !important;
-  font-size: 18px !important;
-}
-
-.admin-site-preview--case-card-mobile .metric-case-card__role {
-  margin-top: 8px !important;
   font-size: 14px !important;
 }
 
@@ -650,18 +640,13 @@
   align-self: stretch !important;
 }
 
-.admin-site-preview--home-mobile .metric-case-card__quote {
+.admin-site-preview--home-mobile .metric-case-card__title {
   font-size: 28px !important;
   line-height: 0.95 !important;
 }
 
-.admin-site-preview--home-mobile .metric-case-card__author {
+.admin-site-preview--home-mobile .metric-case-card__description {
   margin-top: 16px !important;
-  font-size: 18px !important;
-}
-
-.admin-site-preview--home-mobile .metric-case-card__role {
-  margin-top: 8px !important;
   font-size: 14px !important;
 }
 

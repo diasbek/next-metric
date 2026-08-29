@@ -8,9 +8,8 @@ export type MetricCaseCardProps = {
   locale: Locale;
   href: string;
   tags: readonly string[] | readonly { slug: string; label: string }[];
-  quote: string;
-  author: string;
-  role: string;
+  /** Case / project name. */
+  title: string;
   /** Short listing blurb from the case (`description` in CMS). */
   description?: string;
   image: string;
@@ -30,15 +29,14 @@ export function MetricCaseCard({
   locale,
   href,
   tags,
-  quote,
-  author,
-  role,
+  title,
   description,
   image,
   imageAlt,
   viewLabel,
 }: MetricCaseCardProps) {
   const resolvedTags = normalizeTags(tags);
+  const name = title.trim();
   const blurb = description?.trim() ?? "";
   return (
     <article className="metric-case-card">
@@ -55,10 +53,12 @@ export function MetricCaseCard({
           ))}
         </div>
         <div className="metric-case-card__copy">
-          <h3 className="metric-case-card__quote font-display">{quote}</h3>
-          <p className="metric-case-card__author">{author}</p>
-          {role ? <p className="metric-case-card__role">{role}</p> : null}
-          {blurb ? <p className="metric-case-card__description">{blurb}</p> : null}
+          {name ? (
+            <h3 className="metric-case-card__title font-display">{name}</h3>
+          ) : null}
+          {blurb ? (
+            <p className="metric-case-card__description">{blurb}</p>
+          ) : null}
         </div>
         <Button href={href} variant="dark" className="metric-case-card__cta">
           {viewLabel}
@@ -67,7 +67,7 @@ export function MetricCaseCard({
       <div className="metric-case-card__media">
         <MediaImage
           src={image}
-          alt={imageAlt || author}
+          alt={imageAlt || name}
           fill
           className="object-cover"
           sizes="(max-width: 1023px) 92vw, (max-width: 1799px) 42vw, 1200px"

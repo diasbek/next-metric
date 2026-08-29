@@ -35,9 +35,7 @@ export async function WorksListingSection({
       slug: project.slug,
       href: localePath(locale, `/works/${project.slug}/`),
       tags: resolveTagDisplays(rawTags, taxonomy),
-      quote: project.quote ?? project.title,
-      author: project.author ?? project.title,
-      role: project.role ?? "",
+      title: project.title,
       description: project.description ?? "",
       image: project.image,
       imageAlt: project.title,
@@ -112,9 +110,7 @@ export async function WorksListingSection({
                 locale={locale}
                 href={item.href}
                 tags={item.tags}
-                quote={item.quote}
-                author={item.author}
-                role={item.role}
+                title={item.title}
                 description={item.description}
                 image={item.image}
                 imageAlt={item.imageAlt}

@@ -12,8 +12,11 @@ type SurfacePreviewProps = {
   /** Optional text chrome from the entity being edited */
   title?: string;
   subtitle?: string;
+  /** @deprecated Case cards no longer show review quote/author/role. */
   quote?: string;
+  /** @deprecated */
   author?: string;
+  /** @deprecated */
   role?: string;
   tags?: string[];
   ctaLabel?: string;
@@ -38,9 +41,8 @@ const pageShell: CSSProperties = {
 /** Public `.metric-case-card` markup, scaled — not a hand-rolled mock. */
 function CaseCardChrome({
   imageUrl,
-  quote,
-  author,
-  role,
+  title,
+  description,
   tags,
   ctaLabel,
   layout,
@@ -48,9 +50,8 @@ function CaseCardChrome({
   children,
 }: {
   imageUrl: string | null;
-  quote: string;
-  author: string;
-  role: string;
+  title: string;
+  description: string;
   tags: string[];
   ctaLabel: string;
   layout: "desktop" | "mobile";
@@ -98,9 +99,10 @@ function CaseCardChrome({
               ))}
             </div>
             <div className="metric-case-card__copy">
-              <h3 className="metric-case-card__quote font-display">{quote}</h3>
-              <p className="metric-case-card__author">{author}</p>
-              <p className="metric-case-card__role">{role}</p>
+              <h3 className="metric-case-card__title font-display">{title}</h3>
+              {description ? (
+                <p className="metric-case-card__description">{description}</p>
+              ) : null}
             </div>
             <Button as="span" variant="dark" className="metric-case-card__cta">
               {ctaLabel}
@@ -212,9 +214,10 @@ export function SurfacePreview({
     return (
       <CaseCardChrome
         imageUrl={imageUrl}
-        quote={quote?.trim() || title}
-        author={author?.trim() || title}
-        role={role?.trim() || subtitle}
+        title={title?.trim() || "Project title"}
+        description={
+          subtitle?.trim() || "Short description as on the site"
+        }
         tags={tags?.filter(Boolean) ?? []}
         ctaLabel={ctaLabel}
         layout="desktop"
@@ -229,9 +232,10 @@ export function SurfacePreview({
     return (
       <CaseCardChrome
         imageUrl={imageUrl}
-        quote={quote?.trim() || title}
-        author={author?.trim() || title}
-        role={role?.trim() || subtitle}
+        title={title?.trim() || "Project title"}
+        description={
+          subtitle?.trim() || "Short description as on the site"
+        }
         tags={tags?.filter(Boolean) ?? []}
         ctaLabel={ctaLabel}
         layout="mobile"
@@ -427,17 +431,13 @@ export function SurfacePreview({
 export function ProjectCardPeek({
   imageUrl,
   title,
-  quote,
-  author,
-  role,
+  subtitle,
   tags,
   ctaLabel,
 }: {
   imageUrl: string | null;
   title?: string;
-  quote?: string;
-  author?: string;
-  role?: string;
+  subtitle?: string;
   tags?: string[];
   ctaLabel?: string;
 }) {
@@ -446,9 +446,7 @@ export function ProjectCardPeek({
       surface="projectCard"
       imageUrl={imageUrl}
       title={title ?? "Case"}
-      quote={quote}
-      author={author}
-      role={role}
+      subtitle={subtitle}
       tags={tags}
       ctaLabel={ctaLabel}
     />

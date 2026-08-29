@@ -203,7 +203,6 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
     () => draft.reviews.slice().sort((a, b) => a.sort_order - b.sort_order),
     [draft.reviews],
   );
-  const firstReviewLocale = orderedReviews[0]?.translations[locale];
 
   const [renderedProject, setRenderedProject] = useState(project);
   const urlLocale = searchParams.get("locale");
@@ -446,21 +445,8 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   }, [categoryOptions, typeOptions, draft.categoryTagId, draft.typeTagIds]);
   const coverCaseChrome = {
     previewTitle: tr.title || t.pages.project.title,
-    previewQuote:
-      firstReviewLocale?.quote.trim() ||
-      tr.quote.trim() ||
-      tr.title ||
-      t.pages.project.title,
-    previewAuthor:
-      firstReviewLocale?.author.trim() ||
-      tr.author.trim() ||
-      tr.title ||
-      t.pages.project.title,
-    previewRole:
-      firstReviewLocale?.role.trim() ||
-      tr.role.trim() ||
-      tr.description ||
-      t.pages.project.descriptionLabel,
+    previewSubtitle:
+      tr.description.trim() || t.pages.project.descriptionPlaceholder,
     previewTags: coverPreviewTags,
     previewCta: locale === "de" ? "Case ansehen" : "View case",
   };
