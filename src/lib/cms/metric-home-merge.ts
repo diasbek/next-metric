@@ -87,5 +87,5 @@ export function caseStudyItemsFromPayload(
   }
   const items = (caseStudies as { items?: unknown }).items;
   if (!Array.isArray(items)) return null;
-  return items as MetricHomeContent["caseStudies"]["items"];
+  return items as unknown as MetricHomeContent["caseStudies"]["items"];
 }

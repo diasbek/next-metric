@@ -355,13 +355,33 @@ const metricHomeDe = {
   ],
 } as const;
 
-export type MetricHomeContent = typeof metricHomeEn;
+/** One homepage case card — length varies (CMS may clear the lineup). */
+export type MetricHomeCaseStudyItem = {
+  slug: string;
+  tags: string[];
+  quote: string;
+  author: string;
+  role: string;
+  description: string;
+  image: string;
+  title?: string;
+};
+
+type MetricHomeBase = typeof metricHomeEn;
+
+export type MetricHomeContent = {
+  [K in keyof MetricHomeBase]: K extends "caseStudies"
+    ? Omit<MetricHomeBase["caseStudies"], "items"> & {
+        items: MetricHomeCaseStudyItem[];
+      }
+    : MetricHomeBase[K];
+};
 
 /** @deprecated Prefer getMetricHome(locale) */
 export const metricHome = metricHomeEn;
 
 export function getMetricHome(locale: Locale): MetricHomeContent {
-  return (locale === "de" ? metricHomeDe : metricHomeEn) as MetricHomeContent;
+  return (locale === "de" ? metricHomeDe : metricHomeEn) as unknown as MetricHomeContent;
 }
 
 /** Plain JSON-serializable clone for CMS payload storage. */
