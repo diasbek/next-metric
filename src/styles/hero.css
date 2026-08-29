@@ -190,21 +190,9 @@
 .metric-hero,
 .metric-hero__shell,
 .metric-hero__main,
+.metric-hero__visual,
 .metric-hero__cluster {
   overflow: visible;
-}
-
-/* Large screens: don't clip rotated / skewed plaques on the cluster edge.
-   (Was overflow:hidden on .metric-hero__visual — that cut the redesign tag tip.) */
-@media (min-width: 1800px) {
-  .metric-hero__shell,
-  .metric-hero__main {
-    overflow-x: clip;
-  }
-
-  .metric-hero__visual {
-    overflow: visible;
-  }
 }
 
 .metric-hero__cluster,
@@ -295,14 +283,24 @@
 }
 
 .metric-hero__redesign-tag {
+  /* Tag height 9.5% of cluster; cluster aspect 660/478 → cqw for skew math. */
+  --hero-tag-h: calc(0.095 * (478 / 660) * 100cqw);
+  /* Glass is inset 8% top/bottom, so skew uses 84% of tag height. */
+  --hero-tag-skew-overhang: calc(
+    0.5 * var(--cta-skew-tan) * 0.84 * var(--hero-tag-h)
+  );
+  /* Label inset from the skewed glass edges. */
+  --hero-tag-pad-x: 2.6cqw;
+  --hero-tag-pad-y: 0.5cqw;
   position: absolute;
-  left: 79.098%;
+  /* Slightly wider + nudged left so pad-x fits without crowding the label. */
+  left: 77.4%;
   top: 54.669%;
   z-index: 6;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20.901%;
+  width: 22.6%;
   height: 9.5%;
   font-size: 1.99cqw;
   font-weight: 500;
@@ -315,7 +313,9 @@
 
 .metric-hero__redesign-tag-glass {
   position: absolute;
-  inset: 12% 0;
+  /* Same skew containment as .metric-cta::before — tips land on the tag
+     edges instead of painting past the cluster into body overflow-x. */
+  inset: 8% var(--hero-tag-skew-overhang);
   z-index: 0;
   transform: skewX(var(--cta-skew));
   pointer-events: none;
@@ -326,6 +326,9 @@
   position: relative;
   z-index: 1;
   display: inline-block;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: var(--hero-tag-pad-y) var(--hero-tag-pad-x);
 }
 
 .metric-hero__redesign-card {
@@ -581,6 +584,10 @@
     justify-content: center;
     align-items: center;
     min-height: 0;
+    /* Rotate(-8°) still nudges the tag corner past the cluster; keep it
+       inside the page gutter so body overflow-x:hidden can't clip it. */
+    padding-inline-end: clamp(12px, 2.2cqw, 28px);
+    box-sizing: border-box;
   }
 
   .metric-hero__cluster {
