@@ -339,8 +339,8 @@
 
 @media (min-width: 768px) {
   .metric-case__reviews {
-    /* Always 3 tracks so one card stays one-third width on desktop. */
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* Two columns on desktop so cards stay readable with longer quotes. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
   }
 }
@@ -354,7 +354,7 @@
 
 @media (min-width: 768px) {
   .metric-case__reviews--preview {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
   }
 }
