@@ -13,17 +13,26 @@ import {
   type ProjectWithRelations,
 } from "@/lib/cms/types";
 
+const PROJECT_REVIEW_EMBED = `
+  project_reviews:metric_project_reviews (
+    id, project_id, sort_order, person_image,
+    project_review_translations:metric_project_review_translations (*)
+  )
+`;
+
 const PROJECT_SELECT = `
   *,
   project_translations:metric_project_translations (*),
   project_media:metric_project_media (*),
-  project_blocks:metric_project_blocks (*)
+  project_blocks:metric_project_blocks (*),
+  ${PROJECT_REVIEW_EMBED}
 `;
 
-/** Listing/home cards — no gallery blocks or media. */
+/** Listing/home cards — translations + reviews (first review feeds cards). */
 const PROJECT_LISTING_SELECT = `
   *,
-  project_translations:metric_project_translations (*)
+  project_translations:metric_project_translations (*),
+  ${PROJECT_REVIEW_EMBED}
 `;
 
 async function fetchPublishedListingRows(): Promise<ProjectWithRelations[]> {

@@ -592,7 +592,17 @@ export const enAdmin: AdminMessages = {
       preview: "Case preview",
       caseText: "Case page copy",
       caseTextHint:
-        "Author, role and quote appear on the live case page. Task / solution sit under the intro.",
+        "Task / solution sit under the intro. Reviews below appear on the live case page; the first review also fills home and works cards.",
+      reviews: "Reviews",
+      reviewsHint:
+        "First review is used on home / works cards and as the case H1. All reviews show on the case page.",
+      addReview: "+ Add review",
+      reviewLabel: "Review {n}",
+      deleteReview: "Delete review",
+      deleteReviewConfirm: "Delete this review?",
+      moveReviewUp: "Move up",
+      moveReviewDown: "Move down",
+      primaryReviewHint: "Shown on cards",
       gallery: "Gallery",
       general: "Listing & cover",
       save: "Save case",

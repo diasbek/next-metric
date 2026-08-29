@@ -535,6 +535,15 @@ export type AdminMessages = {
       preview: string;
       caseText: string;
       caseTextHint: string;
+      reviews: string;
+      reviewsHint: string;
+      addReview: string;
+      reviewLabel: string;
+      deleteReview: string;
+      deleteReviewConfirm: string;
+      moveReviewUp: string;
+      moveReviewDown: string;
+      primaryReviewHint: string;
       gallery: string;
       general: string;
       save: string;

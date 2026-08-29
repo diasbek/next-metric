@@ -168,7 +168,114 @@ export async function saveProjectAction(formData: FormData) {
 
   if (error) return adminFail(error.message);
 
+  const reviewsRaw = String(formData.get("reviews_json") ?? "").trim();
+  type ReviewPayload = {
+    id?: string;
+    sort_order?: number;
+    person_image?: string;
+    translations?: Record<
+      string,
+      { author?: string; role?: string; quote?: string }
+    >;
+  };
+  let reviewsPayload: ReviewPayload[] = [];
+  if (reviewsRaw) {
+    try {
+      const parsed = JSON.parse(reviewsRaw) as unknown;
+      if (!Array.isArray(parsed)) {
+        return adminFail("Invalid reviews payload");
+      }
+      reviewsPayload = parsed as ReviewPayload[];
+    } catch {
+      return adminFail("Invalid reviews payload");
+    }
+  }
+
+  const { data: existingReviews, error: existingReviewsError } = await supabase
+    .from("metric_project_reviews")
+    .select("id")
+    .eq("project_id", id);
+  if (existingReviewsError) return adminFail(existingReviewsError.message);
+
+  const keepIds = new Set<string>();
+  const uuidRe =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  for (let index = 0; index < reviewsPayload.length; index += 1) {
+    const item = reviewsPayload[index];
+    const incomingId = String(item.id ?? "").trim();
+    const isPersisted = uuidRe.test(incomingId);
+    let reviewId = isPersisted ? incomingId : "";
+
+    let personImage = String(item.person_image ?? "").trim();
+    if (personImage.startsWith("blob:")) personImage = "";
+    const personFile = formData.get(`review_${index}_person_file`);
+    if (isFileUpload(personFile)) {
+      const uploaded = await uploadMediaFile(personFile, {
+        folder: `projects/${id}/reviews`,
+        filenameHint: "avatar",
+        maxEdge: 480,
+      });
+      personImage = uploaded.publicUrl;
+    }
+
+    if (isPersisted) {
+      const { error: updateError } = await supabase
+        .from("metric_project_reviews")
+        .update({ sort_order: index, person_image: personImage })
+        .eq("id", reviewId)
+        .eq("project_id", id);
+      if (updateError) return adminFail(updateError.message);
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from("metric_project_reviews")
+        .insert({
+          project_id: id,
+          sort_order: index,
+          person_image: personImage,
+        })
+        .select("id")
+        .single();
+      if (insertError || !inserted) {
+        return adminFail(insertError?.message ?? "Could not create review");
+      }
+      reviewId = inserted.id;
+    }
+    keepIds.add(reviewId);
+
+    for (const locale of ["en", "de"] as const) {
+      const tr = item.translations?.[locale] ?? {};
+      const { error: trError } = await supabase
+        .from("metric_project_review_translations")
+        .upsert({
+          review_id: reviewId,
+          locale,
+          author: String(tr.author ?? ""),
+          role: String(tr.role ?? ""),
+          quote: String(tr.quote ?? ""),
+        });
+      if (trError) return adminFail(`review ${locale}: ${trError.message}`);
+    }
+  }
+
+  const staleIds = (existingReviews ?? [])
+    .map((row) => String(row.id))
+    .filter((reviewId) => !keepIds.has(reviewId));
+  if (staleIds.length > 0) {
+    const { error: deleteError } = await supabase
+      .from("metric_project_reviews")
+      .delete()
+      .in("id", staleIds)
+      .eq("project_id", id);
+    if (deleteError) return adminFail(deleteError.message);
+  }
+
+  const first = reviewsPayload[0];
+  const firstEn = first?.translations?.en ?? {};
+  const firstDe = first?.translations?.de ?? {};
+
   for (const locale of ["en", "de"] as const) {
+    const firstTr = locale === "en" ? firstEn : firstDe;
     const { error: trError } = await supabase.from("metric_project_translations").upsert({
       project_id: id,
       locale,
@@ -178,9 +285,10 @@ export async function saveProjectAction(formData: FormData) {
       case_year: String(formData.get(`${locale}_case_year`) ?? "") || null,
       case_task: String(formData.get(`${locale}_case_task`) ?? "") || null,
       case_solution: String(formData.get(`${locale}_case_solution`) ?? "") || null,
-      author: String(formData.get(`${locale}_author`) ?? ""),
-      role: String(formData.get(`${locale}_role`) ?? ""),
-      quote: String(formData.get(`${locale}_quote`) ?? ""),
+      // Keep legacy columns in sync with the first review for cards/caches.
+      author: String(firstTr.author ?? formData.get(`${locale}_author`) ?? ""),
+      role: String(firstTr.role ?? formData.get(`${locale}_role`) ?? ""),
+      quote: String(firstTr.quote ?? formData.get(`${locale}_quote`) ?? ""),
       meta_title: String(formData.get(`${locale}_meta_title`) ?? ""),
       meta_description: String(formData.get(`${locale}_meta_description`) ?? ""),
       keywords: String(formData.get(`${locale}_keywords`) ?? ""),

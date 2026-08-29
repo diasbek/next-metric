@@ -37,6 +37,15 @@ export interface ProjectSeo {
   indexable: boolean;
 }
 
+export interface ProjectReview {
+  id: string;
+  author: string;
+  role: string;
+  quote: string;
+  /** Author avatar; falls back to project cover on the site. */
+  personImage?: string;
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -47,9 +56,12 @@ export interface Project {
   featured?: boolean;
   caseStudy?: CaseStudy;
   seo?: ProjectSeo;
+  /** First review fields — home/works cards and case H1 fallbacks. */
   quote?: string;
   author?: string;
   role?: string;
+  /** Ordered client reviews for the case page. */
+  reviews?: ProjectReview[];
   publishedAt?: string | null;
   updatedAt?: string | null;
 }

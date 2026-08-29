@@ -66,7 +66,12 @@ export async function enrichCaseStudiesFromProjects(
     const { data, error } = await supabase
       .from("metric_projects")
       .select(
-        "slug, cover_image, metric_project_translations ( locale, title, description, tags, author, role, quote )",
+        `slug, cover_image,
+         metric_project_translations ( locale, title, description, tags, author, role, quote ),
+         metric_project_reviews (
+           id, sort_order,
+           metric_project_review_translations ( locale, author, role, quote )
+         )`,
       )
       .eq("status", "published")
       .in("slug", slugs);
@@ -82,6 +87,28 @@ export async function enrichCaseStudiesFromProjects(
         : [];
       const { primary, en } = pickTranslationRow(translations, locale);
       const match = primary ?? en;
+
+      const reviewRows = Array.isArray(row.metric_project_reviews)
+        ? [...row.metric_project_reviews].sort(
+            (a: { sort_order?: number }, b: { sort_order?: number }) =>
+              (a.sort_order ?? 0) - (b.sort_order ?? 0),
+          )
+        : [];
+      const firstReview = reviewRows[0] as
+        | {
+            metric_project_review_translations?: Array<{
+              locale: string;
+              author?: string;
+              role?: string;
+              quote?: string;
+            }>;
+          }
+        | undefined;
+      const reviewTr = pickTranslationRow(
+        firstReview?.metric_project_review_translations ?? [],
+        locale,
+      );
+
       bySlug.set(slug, {
         cover_image:
           typeof row.cover_image === "string" && row.cover_image.trim()
@@ -93,9 +120,18 @@ export async function enrichCaseStudiesFromProjects(
         tags: asStringArray(
           primary?.tags?.length ? primary.tags : en?.tags?.length ? en.tags : match?.tags,
         ),
-        author: coalesceLocalized(primary?.author, en?.author) || null,
-        role: coalesceLocalized(primary?.role, en?.role) || null,
-        quote: coalesceLocalized(primary?.quote, en?.quote) || null,
+        author:
+          coalesceLocalized(reviewTr.primary?.author, reviewTr.en?.author) ||
+          coalesceLocalized(primary?.author, en?.author) ||
+          null,
+        role:
+          coalesceLocalized(reviewTr.primary?.role, reviewTr.en?.role) ||
+          coalesceLocalized(primary?.role, en?.role) ||
+          null,
+        quote:
+          coalesceLocalized(reviewTr.primary?.quote, reviewTr.en?.quote) ||
+          coalesceLocalized(primary?.quote, en?.quote) ||
+          null,
       });
     }
 

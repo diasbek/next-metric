@@ -24,6 +24,7 @@ import type {
   ProjectBlockDraft,
   ProjectEditorData,
   ProjectMediaDraft,
+  ProjectReviewDraft,
   ProjectTranslationDraft,
   TagOption,
 } from "@/components/admin/projects/project-editor-types";
@@ -97,6 +98,34 @@ function isLocaleFilled(tr: ProjectTranslationDraft): boolean {
   return Boolean(tr.title.trim());
 }
 
+function emptyReviewTranslations(): ProjectReviewDraft["translations"] {
+  return {
+    en: { author: "", role: "", quote: "" },
+    de: { author: "", role: "", quote: "" },
+  };
+}
+
+function syncLegacyQuoteFields(
+  translations: ProjectEditorData["translations"],
+  reviews: ProjectReviewDraft[],
+): ProjectEditorData["translations"] {
+  const first = reviews
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)[0];
+  const next = { ...translations };
+  for (const loc of ADMIN_LOCALES) {
+    const code = loc.code;
+    const row = first?.translations[code];
+    next[code] = {
+      ...next[code],
+      author: row?.author ?? "",
+      role: row?.role ?? "",
+      quote: row?.quote ?? "",
+    };
+  }
+  return next;
+}
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -165,9 +194,16 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   const [slugLocked, setSlugLocked] = useState(!isAutoSlug(project.slug));
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBusy, startDelete] = useTransition();
+  const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null);
   const tr = draft.translations[locale];
 
   useUnsavedChangesGuard(isProjectEditorDirty(draft, project));
+
+  const orderedReviews = useMemo(
+    () => draft.reviews.slice().sort((a, b) => a.sort_order - b.sort_order),
+    [draft.reviews],
+  );
+  const firstReviewLocale = orderedReviews[0]?.translations[locale];
 
   const [renderedProject, setRenderedProject] = useState(project);
   const urlLocale = searchParams.get("locale");
@@ -251,6 +287,71 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
         [locale]: { ...prev.translations[locale], ...patch },
       },
     }));
+  };
+
+  const setReviews = (nextReviews: ProjectReviewDraft[]) => {
+    const normalized = nextReviews.map((review, index) => ({
+      ...review,
+      sort_order: index,
+    }));
+    setDraft((prev) => ({
+      ...prev,
+      reviews: normalized,
+      translations: syncLegacyQuoteFields(prev.translations, normalized),
+    }));
+  };
+
+  const addReview = () => {
+    setReviews([
+      ...orderedReviews,
+      {
+        id: `temp-${crypto.randomUUID()}`,
+        sort_order: orderedReviews.length,
+        person_image: "",
+        translations: emptyReviewTranslations(),
+      },
+    ]);
+  };
+
+  const updateReviewLocale = (
+    reviewId: string,
+    patch: Partial<ProjectReviewDraft["translations"][AdminLocale]>,
+  ) => {
+    setReviews(
+      orderedReviews.map((review) =>
+        review.id === reviewId
+          ? {
+              ...review,
+              translations: {
+                ...review.translations,
+                [locale]: { ...review.translations[locale], ...patch },
+              },
+            }
+          : review,
+      ),
+    );
+  };
+
+  const updateReviewPersonImage = (reviewId: string, person_image: string) => {
+    setReviews(
+      orderedReviews.map((review) =>
+        review.id === reviewId ? { ...review, person_image } : review,
+      ),
+    );
+  };
+
+  const moveReview = (index: number, dir: -1 | 1) => {
+    const nextIndex = index + dir;
+    if (nextIndex < 0 || nextIndex >= orderedReviews.length) return;
+    const next = orderedReviews.slice();
+    const [item] = next.splice(index, 1);
+    next.splice(nextIndex, 0, item);
+    setReviews(next);
+  };
+
+  const removeReview = (reviewId: string) => {
+    setReviews(orderedReviews.filter((review) => review.id !== reviewId));
+    setDeleteReviewId(null);
   };
 
   const onTitleChange = (title: string) => {
@@ -345,9 +446,21 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
   }, [categoryOptions, typeOptions, draft.categoryTagId, draft.typeTagIds]);
   const coverCaseChrome = {
     previewTitle: tr.title || t.pages.project.title,
-    previewQuote: tr.quote.trim() || tr.title || t.pages.project.title,
-    previewAuthor: tr.author.trim() || tr.title || t.pages.project.title,
-    previewRole: tr.role.trim() || tr.description || t.pages.project.descriptionLabel,
+    previewQuote:
+      firstReviewLocale?.quote.trim() ||
+      tr.quote.trim() ||
+      tr.title ||
+      t.pages.project.title,
+    previewAuthor:
+      firstReviewLocale?.author.trim() ||
+      tr.author.trim() ||
+      tr.title ||
+      t.pages.project.title,
+    previewRole:
+      firstReviewLocale?.role.trim() ||
+      tr.role.trim() ||
+      tr.description ||
+      t.pages.project.descriptionLabel,
     previewTags: coverPreviewTags,
     previewCta: locale === "de" ? "Case ansehen" : "View case",
   };
@@ -393,9 +506,25 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
           style={{ display: "grid", gap: 16 }}
         >
           <input type="hidden" name="id" value={draft.id} />
+          <input
+            type="hidden"
+            name="reviews_json"
+            value={JSON.stringify(
+              orderedReviews.map((review, index) => ({
+                id: review.id,
+                sort_order: index,
+                person_image: review.person_image.startsWith("blob:")
+                  ? (project.reviews.find((r) => r.id === review.id)
+                      ?.person_image ?? "")
+                  : review.person_image,
+                translations: review.translations,
+              })),
+            )}
+          />
           <ReturnFields locale={locale} />
           {ADMIN_LOCALES.map((l) => {
             const row = draft.translations[l.code];
+            const first = orderedReviews[0]?.translations[l.code];
             return (
               <div key={l.code} style={{ display: "none" }} aria-hidden>
                 <input type="hidden" name={`${l.code}_title`} value={row.title} />
@@ -403,9 +532,21 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                 <input type="hidden" name={`${l.code}_case_year`} value={row.case_year} />
                 <input type="hidden" name={`${l.code}_case_task`} value={row.case_task} />
                 <input type="hidden" name={`${l.code}_case_solution`} value={row.case_solution} />
-                <input type="hidden" name={`${l.code}_author`} value={row.author} />
-                <input type="hidden" name={`${l.code}_role`} value={row.role} />
-                <input type="hidden" name={`${l.code}_quote`} value={row.quote} />
+                <input
+                  type="hidden"
+                  name={`${l.code}_author`}
+                  value={first?.author ?? row.author}
+                />
+                <input
+                  type="hidden"
+                  name={`${l.code}_role`}
+                  value={first?.role ?? row.role}
+                />
+                <input
+                  type="hidden"
+                  name={`${l.code}_quote`}
+                  value={first?.quote ?? row.quote}
+                />
                 <input type="hidden" name={`${l.code}_meta_title`} value={row.meta_title} />
                 <input
                   type="hidden"
@@ -641,26 +782,6 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                 placeholder={t.pages.project.titlePlaceholder}
               />
             </label>
-            <div className="admin-form-2col">
-              <label style={{ fontSize: 13 }}>
-                {t.pages.project.author}
-                <input
-                  value={tr.author}
-                  onChange={(e) => updateLocale({ author: e.target.value })}
-                  style={adminInput}
-                  placeholder={t.pages.project.authorPlaceholder}
-                />
-              </label>
-              <label style={{ fontSize: 13 }}>
-                {t.pages.project.role}
-                <input
-                  value={tr.role}
-                  onChange={(e) => updateLocale({ role: e.target.value })}
-                  style={adminInput}
-                  placeholder={t.pages.project.rolePlaceholder}
-                />
-              </label>
-            </div>
             <label style={{ fontSize: 13 }}>
               {t.pages.project.descriptionLabel}
               <textarea
@@ -670,15 +791,140 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
                 placeholder={t.pages.project.descriptionPlaceholder}
               />
             </label>
-            <label style={{ fontSize: 13 }}>
-              {t.pages.project.quote}
-              <textarea
-                value={tr.quote}
-                onChange={(e) => updateLocale({ quote: e.target.value })}
-                style={{ ...adminInput, minHeight: 64 }}
-                placeholder={t.pages.project.quotePlaceholder}
-              />
-            </label>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div>
+                <h3 style={{ ...sectionTitle, fontSize: 14 }}>
+                  {t.pages.project.reviews}
+                </h3>
+                <p style={{ margin: "6px 0 0", fontSize: 12, color: "#888" }}>
+                  {t.pages.project.reviewsHint}
+                </p>
+              </div>
+              {orderedReviews.map((review, index) => {
+                const row = review.translations[locale];
+                return (
+                  <div
+                    key={review.id}
+                    style={{
+                      border: "1px solid #333",
+                      padding: 12,
+                      display: "grid",
+                      gap: 10,
+                      background: "#111",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <strong style={{ fontSize: 13 }}>
+                          {formatAdminMessage(t.pages.project.reviewLabel, {
+                            n: String(index + 1),
+                          })}
+                        </strong>
+                        {index === 0 ? (
+                          <span style={{ fontSize: 11, color: "#8af" }}>
+                            {t.pages.project.primaryReviewHint}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          style={adminBtn}
+                          disabled={index === 0}
+                          onClick={() => moveReview(index, -1)}
+                        >
+                          {t.pages.project.moveReviewUp}
+                        </button>
+                        <button
+                          type="button"
+                          style={adminBtn}
+                          disabled={index === orderedReviews.length - 1}
+                          onClick={() => moveReview(index, 1)}
+                        >
+                          {t.pages.project.moveReviewDown}
+                        </button>
+                        <button
+                          type="button"
+                          style={{ ...adminBtn, color: "#f66", borderColor: "#633" }}
+                          onClick={() => setDeleteReviewId(review.id)}
+                        >
+                          {t.pages.project.deleteReview}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="admin-form-2col">
+                      <label style={{ fontSize: 13 }}>
+                        {t.pages.project.author}
+                        <input
+                          value={row.author}
+                          onChange={(e) =>
+                            updateReviewLocale(review.id, { author: e.target.value })
+                          }
+                          style={adminInput}
+                          placeholder={t.pages.project.authorPlaceholder}
+                        />
+                      </label>
+                      <label style={{ fontSize: 13 }}>
+                        {t.pages.project.role}
+                        <input
+                          value={row.role}
+                          onChange={(e) =>
+                            updateReviewLocale(review.id, { role: e.target.value })
+                          }
+                          style={adminInput}
+                          placeholder={t.pages.project.rolePlaceholder}
+                        />
+                      </label>
+                    </div>
+                    <label style={{ fontSize: 13 }}>
+                      {t.pages.project.quote}
+                      <textarea
+                        value={row.quote}
+                        onChange={(e) =>
+                          updateReviewLocale(review.id, { quote: e.target.value })
+                        }
+                        style={{ ...adminInput, minHeight: 64 }}
+                        placeholder={t.pages.project.quotePlaceholder}
+                      />
+                    </label>
+                    <ImageField
+                      key={`${review.id}-avatar`}
+                      name={`review_${index}_person_file`}
+                      preset="avatar"
+                      currentUrl={
+                        review.person_image.startsWith("blob:")
+                          ? project.reviews.find((r) => r.id === review.id)
+                              ?.person_image || null
+                          : review.person_image || null
+                      }
+                      label={t.common.photo}
+                      previewTitle={row.author || t.pages.project.authorPlaceholder}
+                      previewSubtitle={row.role || t.pages.project.rolePlaceholder}
+                      previewQuote={row.quote || t.pages.project.quotePlaceholder}
+                      onReady={(file) => {
+                        if (!file) {
+                          updateReviewPersonImage(review.id, "");
+                          return;
+                        }
+                        const blob = URL.createObjectURL(file);
+                        updateReviewPersonImage(review.id, blob);
+                      }}
+                    />
+                  </div>
+                );
+              })}
+              <button type="button" style={adminBtn} onClick={addReview}>
+                {t.pages.project.addReview}
+              </button>
+            </div>
             <div className="admin-form-2col">
               <fieldset style={{ margin: 0, border: 0, padding: 0 }}>
                 <legend style={{ fontSize: 13, marginBottom: 6 }}>
@@ -1072,6 +1318,18 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
               fallbackError: t.common.actionFailed,
             });
           });
+        }}
+      />
+
+      <AdminConfirmModal
+        open={Boolean(deleteReviewId)}
+        title={t.pages.project.deleteReview}
+        body={t.pages.project.deleteReviewConfirm}
+        confirmLabel={t.common.delete}
+        tone="danger"
+        onCancel={() => setDeleteReviewId(null)}
+        onConfirm={() => {
+          if (deleteReviewId) removeReview(deleteReviewId);
         }}
       />
 

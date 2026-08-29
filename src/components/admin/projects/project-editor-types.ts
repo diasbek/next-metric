@@ -35,6 +35,20 @@ export type ProjectBlockDraft = {
   youtube_url: string;
 };
 
+export type ProjectReviewLocaleDraft = {
+  author: string;
+  role: string;
+  quote: string;
+};
+
+export type ProjectReviewDraft = {
+  /** Client temp id (temp-…) or persisted uuid. */
+  id: string;
+  sort_order: number;
+  person_image: string;
+  translations: Record<AdminLocale, ProjectReviewLocaleDraft>;
+};
+
 export type ProjectEditorData = {
   id: string;
   slug: string;
@@ -50,6 +64,7 @@ export type ProjectEditorData = {
   translations: Record<AdminLocale, ProjectTranslationDraft>;
   media: ProjectMediaDraft[];
   blocks: ProjectBlockDraft[];
+  reviews: ProjectReviewDraft[];
 };
 
 export type LibraryItem = { path: string; url: string };

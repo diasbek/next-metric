@@ -3,6 +3,7 @@ import { MediaImage } from "@/components/atoms/MediaImage";
 import { PageContainer } from "@/components/atoms/PageContainer";
 import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
 import { MetricTagPill } from "@/components/molecules/MetricTagPill";
+import { CaseReviewsCarousel } from "@/components/molecules/CaseReviewsCarousel";
 import { SiteBreadcrumbs } from "@/components/molecules/SiteBreadcrumbs";
 import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
 import type { Project } from "@/data/projects";
@@ -60,6 +61,19 @@ export async function WorkCaseSection({
       });
 
   const authorName = project.author ?? project.title;
+  const reviews =
+    project.reviews && project.reviews.length > 0
+      ? project.reviews
+      : project.quote
+        ? [
+            {
+              id: "legacy",
+              author: project.author ?? "",
+              role: project.role ?? "",
+              quote: project.quote,
+            },
+          ]
+        : [];
   let galleryIndex = 0;
   const path = localePath(locale, `/works/${project.slug}/`);
   const breadcrumbs = getLocalizedBreadcrumbs(locale, [
@@ -291,41 +305,18 @@ export async function WorkCaseSection({
           </section>
         ) : null}
 
-        {project.quote ? (
+        {reviews.length ? (
           <section className="mt-16 md:mt-20">
             <div className="mb-8 flex items-end justify-between gap-4">
               <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
                 {ui.reviewsTitle}
               </h2>
             </div>
-            <div className="metric-case__reviews">
-              <article className="metric-case__review">
-                <p className="text-[clamp(16px,1.4vw,20px)] leading-[1.3] tracking-[-0.02em]">
-                  {project.quote}
-                </p>
-                <div className="mt-8 flex items-center gap-3">
-                  <div className="relative size-12 overflow-hidden rounded-full bg-[color:var(--surface)]">
-                    <MediaImage
-                      src={project.image}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-[18px] font-medium tracking-[-0.02em]">
-                      {authorName}
-                    </p>
-                    {project.role ? (
-                      <p className="text-[14px] text-[color:var(--muted)]">
-                        {project.role}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-              </article>
-            </div>
+            <CaseReviewsCarousel
+              reviews={reviews}
+              fallbackImage={project.image}
+              fallbackAuthor={project.title}
+            />
           </section>
         ) : null}
       </PageContainer>

@@ -6,6 +6,7 @@ import Image from "next/image";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
 import type { PublicCaptchaConfig } from "@/lib/cms/settings";
+import { trackLinkedInLeadConversion } from "@/components/analytics";
 import { ProjectBriefForm } from "@/components/molecules/ProjectBriefForm";
 
 function subscribeNever() {
@@ -51,6 +52,11 @@ export function ProjectBriefModal({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  useEffect(() => {
+    if (!submitted) return;
+    trackLinkedInLeadConversion();
+  }, [submitted]);
 
   if (!mounted) return null;
 

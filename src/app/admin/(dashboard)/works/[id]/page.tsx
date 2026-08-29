@@ -100,6 +100,32 @@ export default async function AdminProjectEditPage({
         sort_order: b.sort_order ?? 0,
         youtube_url: b.youtube_url ?? "",
       })),
+    reviews: (project.project_reviews ?? [])
+      .slice()
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((review) => {
+        const byLocale = Object.fromEntries(
+          (review.project_review_translations ?? []).map((tr) => [
+            tr.locale,
+            {
+              author: tr.author ?? "",
+              role: tr.role ?? "",
+              quote: tr.quote ?? "",
+            },
+          ]),
+        ) as Partial<Record<AdminLocale, { author: string; role: string; quote: string }>>;
+        return {
+          id: review.id,
+          sort_order: review.sort_order ?? 0,
+          person_image: review.person_image ?? "",
+          translations: Object.fromEntries(
+            ADMIN_LOCALES.map((locale) => [
+              locale.code,
+              byLocale[locale.code] ?? { author: "", role: "", quote: "" },
+            ]),
+          ) as ProjectEditorData["reviews"][number]["translations"],
+        };
+      }),
   };
 
   const tagOptions = [

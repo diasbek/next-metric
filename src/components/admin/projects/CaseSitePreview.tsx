@@ -57,6 +57,31 @@ export function isProjectEditorDirty(
       return true;
     }
   }
+  const draftReviews = draft.reviews
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order);
+  const savedReviews = saved.reviews
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order);
+  if (draftReviews.length !== savedReviews.length) return true;
+  for (let i = 0; i < draftReviews.length; i += 1) {
+    const a = draftReviews[i];
+    const b = savedReviews[i];
+    if (a.id !== b.id || a.sort_order !== b.sort_order) return true;
+    if (a.person_image !== b.person_image) return true;
+    for (const locale of Object.keys(a.translations) as AdminLocale[]) {
+      const at = a.translations[locale];
+      const bt = b.translations[locale];
+      if (!at || !bt) return true;
+      if (
+        at.author !== bt.author ||
+        at.role !== bt.role ||
+        at.quote !== bt.quote
+      ) {
+        return true;
+      }
+    }
+  }
   return false;
 }
 
@@ -249,6 +274,15 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
     .filter(Boolean);
   const taskLabel = locale === "de" ? "Aufgabe:" : "Task:";
   const solutionLabel = locale === "de" ? "Lösung:" : "Solution:";
+  const previewReviews = useMemo(
+    () =>
+      draft.reviews
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((review) => review.translations[locale])
+        .filter((row) => Boolean(row.quote.trim() || row.author.trim() || row.role.trim())),
+    [draft.reviews, locale],
+  );
 
   return (
     <aside
@@ -442,17 +476,31 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
                 </div>
               </div>
 
-              {tr.quote ? (
-                <div className="metric-case__reviews" style={{ marginTop: 40 }}>
-                  <blockquote className="metric-case__review">
-                    <p style={{ margin: 0, fontSize: 28, lineHeight: 1.2 }}>{tr.quote}</p>
-                    <footer style={{ marginTop: 16 }}>
-                      <strong>{authorName}</strong>
-                      {tr.role ? (
-                        <p style={{ margin: "4px 0 0", color: "var(--muted)" }}>{tr.role}</p>
-                      ) : null}
-                    </footer>
-                  </blockquote>
+              {previewReviews.length ? (
+                <div
+                  className="metric-case__reviews metric-case__reviews--preview"
+                  style={{ marginTop: 40 }}
+                >
+                  {previewReviews.map((review, index) => {
+                    const name =
+                      (review.author || tr.title || "").trim() ||
+                      t.pages.project.titlePlaceholder;
+                    return (
+                      <blockquote key={`${index}-${name}`} className="metric-case__review">
+                        {review.quote ? (
+                          <p className="metric-case__review-quote" style={{ fontSize: 22 }}>
+                            {review.quote}
+                          </p>
+                        ) : null}
+                        <footer style={{ marginTop: 16 }}>
+                          <strong className="metric-case__review-name">{name}</strong>
+                          {review.role ? (
+                            <p className="metric-case__review-role">{review.role}</p>
+                          ) : null}
+                        </footer>
+                      </blockquote>
+                    );
+                  })}
                 </div>
               ) : null}
             </div>

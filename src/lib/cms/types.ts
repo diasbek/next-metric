@@ -1,4 +1,4 @@
-import type { CaseBlock, CaseStudy, Project } from "@/data/projects";
+import type { CaseBlock, CaseStudy, Project, ProjectReview } from "@/data/projects";
 import { coalesceLocalized, pickTranslationRow } from "@/lib/cms/locale-fallback";
 
 export type CmsLocale = "en" | "de";
@@ -81,6 +81,27 @@ export type DbProjectBlock = {
   youtube_url: string | null;
 };
 
+export type DbProjectReview = {
+  id: string;
+  project_id: string;
+  sort_order: number;
+  person_image?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type DbProjectReviewTranslation = {
+  review_id: string;
+  locale: CmsLocale;
+  author: string;
+  role: string;
+  quote: string;
+};
+
+export type ProjectReviewWithTranslations = DbProjectReview & {
+  project_review_translations?: DbProjectReviewTranslation[];
+};
+
 export type DbLead = {
   id: string;
   name: string;
@@ -141,6 +162,7 @@ export type ProjectWithRelations = DbProject & {
   project_translations: DbProjectTranslation[];
   project_media?: DbProjectMedia[];
   project_blocks?: DbProjectBlock[];
+  project_reviews?: ProjectReviewWithTranslations[];
 };
 
 function buildBlocks(
@@ -214,6 +236,34 @@ function buildBlocks(
   return legacy;
 }
 
+function mapProjectReviews(
+  rows: ProjectReviewWithTranslations[] | undefined,
+  locale: CmsLocale,
+): ProjectReview[] {
+  return (rows ?? [])
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((row) => {
+      const { primary, en } = pickTranslationRow(
+        row.project_review_translations ?? [],
+        locale,
+      );
+      const author = coalesceLocalized(primary?.author, en?.author);
+      const role = coalesceLocalized(primary?.role, en?.role);
+      const quote = coalesceLocalized(primary?.quote, en?.quote);
+      if (!author && !role && !quote) return null;
+      const personImage = row.person_image?.trim();
+      return {
+        id: row.id,
+        author,
+        role,
+        quote,
+        ...(personImage ? { personImage } : {}),
+      };
+    })
+    .filter((item): item is ProjectReview => Boolean(item));
+}
+
 export function mapProjectRow(
   row: ProjectWithRelations,
   locale: CmsLocale,
@@ -228,15 +278,26 @@ export function mapProjectRow(
     .sort((a, b) => a.sort_order - b.sort_order)[0];
 
   const blocks = buildBlocks(row.project_blocks, media);
+  const reviews = mapProjectReviews(row.project_reviews, locale);
+  const firstReview = reviews[0];
 
   const title = coalesceLocalized(primary?.title, en?.title);
   const description = coalesceLocalized(primary?.description, en?.description);
   const caseYear = coalesceLocalized(primary?.case_year, en?.case_year);
   const caseTask = coalesceLocalized(primary?.case_task, en?.case_task);
   const caseSolution = coalesceLocalized(primary?.case_solution, en?.case_solution);
-  const author = coalesceLocalized(primary?.author, en?.author) || undefined;
-  const role = coalesceLocalized(primary?.role, en?.role) || undefined;
-  const quote = coalesceLocalized(primary?.quote, en?.quote) || undefined;
+  const author =
+    firstReview?.author ||
+    coalesceLocalized(primary?.author, en?.author) ||
+    undefined;
+  const role =
+    firstReview?.role ||
+    coalesceLocalized(primary?.role, en?.role) ||
+    undefined;
+  const quote =
+    firstReview?.quote ||
+    coalesceLocalized(primary?.quote, en?.quote) ||
+    undefined;
   const tags =
     (primary?.tags?.length ? primary.tags : null) ??
     (en?.tags?.length ? en.tags : null) ??
@@ -267,6 +328,7 @@ export function mapProjectRow(
     author,
     role,
     quote,
+    reviews,
     publishedAt: row.published_at ?? null,
     updatedAt: row.updated_at ?? null,
     seo: {

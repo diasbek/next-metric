@@ -596,7 +596,17 @@ export const deAdmin: AdminMessages = {
       preview: "Case-Vorschau",
       caseText: "Case-Texte",
       caseTextHint:
-        "Autor, Rolle und Zitat erscheinen auf der Live-Case-Seite. Aufgabe / Lösung stehen darunter.",
+        "Aufgabe / Lösung stehen unter dem Intro. Reviews erscheinen auf der Case-Seite; das erste Review füllt auch Home- und Works-Karten.",
+      reviews: "Reviews",
+      reviewsHint:
+        "Das erste Review erscheint auf Home-/Works-Karten und als Case-H1. Alle Reviews werden auf der Case-Seite gezeigt.",
+      addReview: "+ Review hinzufügen",
+      reviewLabel: "Review {n}",
+      deleteReview: "Review löschen",
+      deleteReviewConfirm: "Dieses Review löschen?",
+      moveReviewUp: "Nach oben",
+      moveReviewDown: "Nach unten",
+      primaryReviewHint: "Auf Karten sichtbar",
       gallery: "Galerie",
       general: "Listing & Cover",
       save: "Case speichern",
