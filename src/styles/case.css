@@ -331,12 +331,18 @@
 }
 
 .metric-case__reviews {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
   width: 100%;
-  overflow: hidden;
 }
 
-.metric-case__reviews .swiper-wrapper {
-  align-items: stretch;
+@media (min-width: 768px) {
+  .metric-case__reviews {
+    /* Always 3 tracks so one card stays one-third width on desktop. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
 }
 
 .metric-case__reviews--preview {
@@ -353,20 +359,10 @@
   }
 }
 
-.metric-case__review-slide {
-  height: auto;
-  box-sizing: border-box;
-}
-
-.metric-case__review-slide.swiper-slide {
-  width: 100%;
-  height: auto;
-  box-sizing: border-box;
-}
-
 .metric-case__review {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   height: 100%;
   border-radius: var(--radius-xl);
   background: var(--surface);
