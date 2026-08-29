@@ -484,31 +484,42 @@ export function CaseSitePreview({ draft, saved, locale, ogPreviewDataUrl }: Prop
                     const name =
                       (review.author || tr.title || "").trim() ||
                       t.pages.project.titlePlaceholder;
-                    const role = review.role.trim();
+                    let quote = review.quote.trim();
+                    let role = review.role.trim();
                     const titleKey = pageTitle.trim().toLowerCase();
                     const nameKey = name.toLowerCase();
-                    const roleKey = role.toLowerCase();
-                    const showCase = Boolean(titleKey) && titleKey !== nameKey;
-                    const showRole =
-                      Boolean(roleKey) &&
-                      roleKey !== titleKey &&
-                      roleKey !== nameKey;
+                    // Misplaced CMS: title in quote, review text in role.
+                    if (
+                      titleKey &&
+                      quote.toLowerCase() === titleKey &&
+                      (role.length > 80 || /[.!?]/.test(role))
+                    ) {
+                      quote = role;
+                      role = "";
+                    }
+                    if (titleKey && quote.toLowerCase() === titleKey) quote = "";
+                    if (titleKey && role.toLowerCase() === titleKey) role = "";
+                    if (nameKey && role.toLowerCase() === nameKey) role = "";
+                    const showCase =
+                      Boolean(titleKey) &&
+                      titleKey !== nameKey &&
+                      (!quote || quote.toLowerCase() !== titleKey);
                     return (
                       <blockquote key={`${index}-${name}`} className="metric-case__review">
                         {showCase ? (
                           <p className="metric-case__review-case">{pageTitle}</p>
                         ) : null}
-                        <footer style={{ marginTop: 0, marginBottom: review.quote ? 16 : 0 }}>
+                        <footer style={{ marginTop: 0, marginBottom: quote ? 16 : 0 }}>
                           {name ? (
                             <strong className="metric-case__review-name">{name}</strong>
                           ) : null}
-                          {showRole ? (
+                          {role ? (
                             <p className="metric-case__review-role">{role}</p>
                           ) : null}
                         </footer>
-                        {review.quote ? (
+                        {quote ? (
                           <p className="metric-case__review-quote" style={{ fontSize: 22 }}>
-                            {review.quote}
+                            {quote}
                           </p>
                         ) : null}
                       </blockquote>

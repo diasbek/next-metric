@@ -14,29 +14,65 @@ function norm(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+/** Long role text is almost certainly a misplaced quote. */
+function looksLikeQuoteBody(text: string): boolean {
+  const t = text.trim();
+  return t.length > 80 || /[.!?]/.test(t);
+}
+
+function resolveReviewCopy(
+  review: ProjectReview,
+  caseTitle: string,
+  fallbackAuthor: string,
+): { name: string; role: string; quote: string; showCase: boolean } {
+  const title = caseTitle.trim();
+  const titleKey = title ? norm(title) : "";
+  const name = (review.author?.trim() || fallbackAuthor).trim();
+  const nameKey = name ? norm(name) : "";
+
+  let quote = review.quote?.trim() ?? "";
+  let role = review.role?.trim() ?? "";
+
+  // CMS sometimes stores the case title in `quote` and the review in `role`.
+  if (titleKey && norm(quote) === titleKey && looksLikeQuoteBody(role)) {
+    quote = role;
+    role = "";
+  } else if (!quote && looksLikeQuoteBody(role)) {
+    quote = role;
+    role = "";
+  }
+
+  if (titleKey && norm(quote) === titleKey) quote = "";
+  if (nameKey && norm(quote) === nameKey) quote = "";
+
+  if (titleKey && norm(role) === titleKey) role = "";
+  if (nameKey && norm(role) === nameKey) role = "";
+  if (quote && norm(role) === norm(quote)) role = "";
+
+  const showCase =
+    Boolean(titleKey) &&
+    titleKey !== nameKey &&
+    (!quote || titleKey !== norm(quote));
+
+  return { name, role, quote, showCase };
+}
+
 export function CaseReviewsCarousel({
   reviews,
   caseTitle,
   fallbackImage,
   fallbackAuthor,
 }: Props) {
-  const title = caseTitle.trim();
-  const titleKey = title ? norm(title) : "";
-
   return (
     <div className="metric-case__reviews">
       {reviews.map((review, index) => {
-        const name = (review.author?.trim() || fallbackAuthor).trim();
-        const role = review.role?.trim() ?? "";
+        const { name, role, quote, showCase } = resolveReviewCopy(
+          review,
+          caseTitle,
+          fallbackAuthor,
+        );
         const avatar = review.personImage?.trim() || fallbackImage;
-        const nameKey = name ? norm(name) : "";
-        const roleKey = role ? norm(role) : "";
-
-        // Case title once at top; skip it when it only repeats the author.
-        const showCase = Boolean(titleKey) && titleKey !== nameKey;
-        // Role only when it adds something beyond case title / author.
-        const showRole =
-          Boolean(roleKey) && roleKey !== titleKey && roleKey !== nameKey;
+        const title = caseTitle.trim();
 
         return (
           <article
@@ -62,13 +98,13 @@ export function CaseReviewsCarousel({
                 {name ? (
                   <p className="metric-case__review-name">{name}</p>
                 ) : null}
-                {showRole ? (
+                {role ? (
                   <p className="metric-case__review-role">{role}</p>
                 ) : null}
               </div>
             </div>
-            {review.quote ? (
-              <p className="metric-case__review-quote">{review.quote}</p>
+            {quote ? (
+              <p className="metric-case__review-quote">{quote}</p>
             ) : null}
           </article>
         );
