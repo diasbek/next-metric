@@ -252,6 +252,8 @@ export function MetricCaseStudiesSection({
   home: MetricHomeContent;
 }) {
   const { caseStudies } = home;
+  if (!caseStudies.items.length) return null;
+
   const titleParts = caseStudies.title.split(caseStudies.titleAccent);
 
   return (

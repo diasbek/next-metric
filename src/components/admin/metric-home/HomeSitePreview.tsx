@@ -24,6 +24,7 @@ import type { FAQItem } from "@/data/faq";
 import { useAdminT } from "@/i18n/admin";
 import { getContent } from "@/i18n/get-content";
 import { applyProjectFieldsToCaseItems, mergeMetricHome } from "@/lib/cms/metric-home";
+import { caseStudyItemsFromPayload } from "@/lib/cms/metric-home-merge";
 import { deepFallbackEmpty } from "@/lib/cms/locale-fallback";
 
 type Props = {
@@ -91,6 +92,13 @@ export function HomeSitePreview({
         (fallbackPayload ?? {}) as Partial<MetricHomeContent>,
       );
       merged = deepFallbackEmpty(merged, enMerged);
+    }
+    const cmsItems = caseStudyItemsFromPayload(payload);
+    if (cmsItems) {
+      merged = {
+        ...merged,
+        caseStudies: { ...merged.caseStudies, items: cmsItems },
+      };
     }
     const bySlug = new Map(
       projects.map((project) => {

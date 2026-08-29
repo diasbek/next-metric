@@ -5,7 +5,10 @@ import {
 } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import { createSupabasePublicClient, hasSupabasePublicConfig } from "@/lib/supabase/public";
-import { mergeMetricHome } from "@/lib/cms/metric-home-merge";
+import {
+  caseStudyItemsFromPayload,
+  mergeMetricHome,
+} from "@/lib/cms/metric-home-merge";
 import {
   coalesceLocalized,
   deepFallbackEmpty,
@@ -237,6 +240,19 @@ async function resolveMetricHome(locale: Locale): Promise<MetricHomeContent> {
     const enPayload = await loadMetricHomePayload("en");
     const enMerged = enPayload ? mergeMetricHome(enBase, enPayload) : enBase;
     merged = deepFallbackEmpty(merged, enMerged);
+  }
+
+  // Intentional empty lineup must survive DE string fallback (which would
+  // otherwise refill `items: []` from EN/static defaults).
+  const cmsItems = caseStudyItemsFromPayload(payload);
+  if (cmsItems) {
+    merged = {
+      ...merged,
+      caseStudies: {
+        ...merged.caseStudies,
+        items: cmsItems,
+      },
+    };
   }
 
   return enrichCaseStudiesFromProjects(merged, locale);
