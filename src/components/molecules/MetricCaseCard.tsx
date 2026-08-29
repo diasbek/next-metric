@@ -41,24 +41,26 @@ export function MetricCaseCard({
   return (
     <article className="metric-case-card">
       <div className="metric-case-card__body">
-        <div className="metric-case-card__tags">
-          {resolvedTags.map((tag) => (
-            <MetricTagPill
-              key={tag.slug}
-              tag={tag.slug}
-              label={tag.label}
-              locale={locale}
-              className="border-foreground text-foreground"
-            />
-          ))}
-        </div>
-        <div className="metric-case-card__copy">
-          {name ? (
-            <h3 className="metric-case-card__title font-display">{name}</h3>
-          ) : null}
-          {blurb ? (
-            <p className="metric-case-card__description">{blurb}</p>
-          ) : null}
+        <div className="metric-case-card__top">
+          <div className="metric-case-card__tags">
+            {resolvedTags.map((tag) => (
+              <MetricTagPill
+                key={tag.slug}
+                tag={tag.slug}
+                label={tag.label}
+                locale={locale}
+                className="border-foreground text-foreground"
+              />
+            ))}
+          </div>
+          <div className="metric-case-card__copy">
+            {name ? (
+              <h3 className="metric-case-card__title font-display">{name}</h3>
+            ) : null}
+            {blurb ? (
+              <p className="metric-case-card__description">{blurb}</p>
+            ) : null}
+          </div>
         </div>
         <Button href={href} variant="dark" className="metric-case-card__cta">
           {viewLabel}

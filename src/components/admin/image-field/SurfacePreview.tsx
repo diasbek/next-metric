@@ -88,21 +88,23 @@ function CaseCardChrome({
       >
         <article className="metric-case-card">
           <div className="metric-case-card__body">
-            <div className="metric-case-card__tags">
-              {resolvedTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="metric-pill border-foreground text-foreground"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className="metric-case-card__copy">
-              <h3 className="metric-case-card__title font-display">{title}</h3>
-              {description ? (
-                <p className="metric-case-card__description">{description}</p>
-              ) : null}
+            <div className="metric-case-card__top">
+              <div className="metric-case-card__tags">
+                {resolvedTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="metric-pill border-foreground text-foreground"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="metric-case-card__copy">
+                <h3 className="metric-case-card__title font-display">{title}</h3>
+                {description ? (
+                  <p className="metric-case-card__description">{description}</p>
+                ) : null}
+              </div>
             </div>
             <Button as="span" variant="dark" className="metric-case-card__cta">
               {ctaLabel}

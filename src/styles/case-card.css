@@ -62,19 +62,34 @@
   padding: 20px;
 }
 
+.metric-case-card__top {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
 @media (min-width: 768px) {
   .metric-case-card__body {
     gap: 28px;
     padding: 32px;
   }
+
+  .metric-case-card__top {
+    gap: 28px;
+  }
 }
 
 @media (min-width: 1024px) {
   .metric-case-card__body {
-    /* Figma: 50px inset; space-between pins tags top / CTA bottom. */
+    /* Figma: 50px inset; space-between pins top stack / CTA bottom. */
     gap: 24px;
     padding: 50px;
     min-height: 0;
+  }
+
+  .metric-case-card__top {
+    gap: 24px;
   }
 }
 
