@@ -1,17 +1,23 @@
-import { HeroLogoSvg } from "@/components/molecules/HeroLogoSvg";
+import Image from "next/image";
 
 interface SiteLogoMarkProps {
   idPrefix?: string;
   className?: string;
 }
 
+/** White Metric brand mark (pink M + light wordmark) for dark chrome. */
 export function SiteLogoMark({
-  idPrefix = "site-logo",
   className = "",
 }: SiteLogoMarkProps) {
   return (
     <span data-header-logo-mark className={`header-logo-mark ${className}`.trim()}>
-      <HeroLogoSvg color="#FAFAFA" idPrefix={idPrefix} showBlur={false} />
+      <Image
+        src="/images/metric/logo/metric-logo-white.svg"
+        alt=""
+        fill
+        className="object-contain object-left"
+        priority
+      />
     </span>
   );
 }

@@ -52,9 +52,11 @@ export function AdminTopBar({
           flex-shrink: 0;
         }
         .admin-chrome__topbar-brand .header-logo-mark {
+          position: relative;
+          display: block;
           height: 22px;
           max-height: 22px;
-          width: calc(22px * 1200 / 280);
+          width: calc(22px * 185.364 / 42);
         }
         .admin-chrome__topbar-actions {
           display: flex;
@@ -73,7 +75,7 @@ export function AdminTopBar({
           .admin-chrome__topbar-brand .header-logo-mark {
             height: 26px;
             max-height: 26px;
-            width: calc(26px * 1200 / 280);
+            width: calc(26px * 185.364 / 42);
           }
           .admin-chrome__topbar-actions {
             gap: 10px;
@@ -89,7 +91,7 @@ export function AdminTopBar({
         className="admin-chrome__topbar-brand"
         aria-label={t.brand}
       >
-        <SiteLogoMark idPrefix="admin-topbar" />
+        <SiteLogoMark />
       </Link>
 
       <div className="admin-chrome__topbar-actions">
