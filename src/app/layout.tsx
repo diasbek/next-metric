@@ -7,6 +7,11 @@ import { SiteAnalytics, LinkedInInsightTag, FacebookPixel } from "@/components/a
 import { ConsentProvider, CookieConsentBanner } from "@/components/consent";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  FACEBOOK_PIXEL_ID,
+  getFacebookPixelInitScript,
+  getFacebookPixelNoscriptUrl,
+} from "@/lib/analytics/facebook-pixel-snippet";
 import { getYandexMetrikaNoscriptUrl } from "@/lib/analytics/yandex-metrika-snippet";
 import { getResolvedAnalytics } from "@/lib/cms/settings";
 import { rootMetadata } from "@/utils/metadata";
@@ -52,6 +57,8 @@ export default async function RootLayout({
   const metrikaPixel = getYandexMetrikaNoscriptUrl(analytics.yandexMetrikaId);
   const htmlLangHeader = (await headers()).get("x-html-lang");
   const lang = htmlLangHeader === "de" ? "de" : "en";
+  const facebookPixelScript = getFacebookPixelInitScript(FACEBOOK_PIXEL_ID);
+  const facebookNoscript = getFacebookPixelNoscriptUrl(FACEBOOK_PIXEL_ID);
 
   return (
     <html
@@ -61,6 +68,12 @@ export default async function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: WEBVIEW_BOOT_SCRIPT }} />
+        {facebookPixelScript ? (
+          <script
+            id="facebook-pixel"
+            dangerouslySetInnerHTML={{ __html: facebookPixelScript }}
+          />
+        ) : null}
       </head>
       <body className="antialiased">
         {metrikaPixel ? (
@@ -75,6 +88,18 @@ export default async function RootLayout({
                 alt=""
               />
             </div>
+          </noscript>
+        ) : null}
+        {facebookNoscript ? (
+          <noscript>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              height={1}
+              width={1}
+              style={{ display: "none" }}
+              alt=""
+              src={facebookNoscript}
+            />
           </noscript>
         ) : null}
         <JsonLd data={getGlobalJsonLdGraph()} />

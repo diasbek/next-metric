@@ -39,7 +39,6 @@ function supabaseStorageHosts() {
 
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
-  { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
@@ -53,6 +52,22 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
 ];
+
+/** Clickjacking lock — admin / API never need to be framed.
+ *  CSP is ANDed with the public frame-ancestors policy when both match. */
+const denyFramingHeader = { key: "X-Frame-Options", value: "DENY" };
+const denyFramingCspHeader = {
+  key: "Content-Security-Policy",
+  value: "frame-ancestors 'none'",
+};
+
+/** Public pages: allow Meta Event Manager to iframe the site to detect the pixel.
+ *  CSP frame-ancestors replaces X-Frame-Options here (XFO cannot allow Facebook). */
+const publicFramingHeader = {
+  key: "Content-Security-Policy",
+  value:
+    "frame-ancestors 'self' https://www.facebook.com https://web.facebook.com https://business.facebook.com https://*.facebook.com",
+};
 
 const noindexRobotsHeader = {
   key: "X-Robots-Tag",
@@ -165,12 +180,12 @@ const nextConfig = {
       {
         source: "/:path*",
         has: [{ type: "host", value: "metric.nocode.uz" }],
-        headers: [...securityHeaders, noindexRobotsHeader],
+        headers: [...securityHeaders, publicFramingHeader, noindexRobotsHeader],
       },
       {
         source: "/:path*",
         has: [{ type: "host", value: "www.metric.nocode.uz" }],
-        headers: [...securityHeaders, noindexRobotsHeader],
+        headers: [...securityHeaders, publicFramingHeader, noindexRobotsHeader],
       },
     ];
 
@@ -199,6 +214,8 @@ const nextConfig = {
         source: "/admin/:path*",
         headers: [
           ...securityHeaders,
+          denyFramingHeader,
+          denyFramingCspHeader,
           {
             key: "Cache-Control",
             value: "private, no-store, max-age=0, must-revalidate",
@@ -213,6 +230,8 @@ const nextConfig = {
         source: "/api/:path*",
         headers: [
           ...securityHeaders,
+          denyFramingHeader,
+          denyFramingCspHeader,
           {
             key: "Cache-Control",
             value: "private, no-store, max-age=0, must-revalidate",
@@ -226,6 +245,7 @@ const nextConfig = {
         source: "/:path*",
         headers: [
           ...securityHeaders,
+          publicFramingHeader,
           {
             key: "Cache-Control",
             value: "public, max-age=0, s-maxage=0, must-revalidate",
