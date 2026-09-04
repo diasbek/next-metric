@@ -49,9 +49,15 @@ const securityHeaders = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
 ];
+
+/** Admin / API only — COOP same-origin blocks Meta Event Setup Tool
+ *  from scanning public pages (their iframe / window handshake fails). */
+const coopSameOriginHeader = {
+  key: "Cross-Origin-Opener-Policy",
+  value: "same-origin",
+};
 
 /** Clickjacking lock — admin / API never need to be framed.
  *  CSP is ANDed with the public frame-ancestors policy when both match. */
@@ -214,6 +220,7 @@ const nextConfig = {
         source: "/admin/:path*",
         headers: [
           ...securityHeaders,
+          coopSameOriginHeader,
           denyFramingHeader,
           denyFramingCspHeader,
           {
@@ -230,6 +237,7 @@ const nextConfig = {
         source: "/api/:path*",
         headers: [
           ...securityHeaders,
+          coopSameOriginHeader,
           denyFramingHeader,
           denyFramingCspHeader,
           {
