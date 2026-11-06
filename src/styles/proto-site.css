@@ -528,7 +528,17 @@ fieldset.fld{border:0;padding:0;margin:0;min-width:0}
 /* slanted plates: left corner flush with the text edge */
 .ctr-hd .btn,.svc-hd .btn,.talk-r .btn{margin-left:13px}
 /* Let's talk: Archivo variable (width + weight react to the cursor) */
-.talk-h{font-family:'Archivo',system-ui,sans-serif;font-weight:800;font-stretch:78%;letter-spacing:-.05em;word-spacing:0;line-height:.82}
+.talk-h,.talk-h span{
+  font-family:var(--font-archivo),system-ui,sans-serif;
+  font-synthesis:none;
+  font-weight:800;
+  font-stretch:78%;
+  font-variation-settings:"wdth" 78,"wght" 800;
+  letter-spacing:-.05em;
+  word-spacing:0;
+  line-height:.82;
+}
+.talk-h span{display:inline-block}
 /* proof strip: slightly larger, SPN logo */
 .pf b{font-size:clamp(38px,3.8vw,60px)}
 .pf b .spn-lg{height:clamp(50px,4.2vw,66px);width:auto;max-width:100%;display:block;overflow:visible;margin-left:-4px}

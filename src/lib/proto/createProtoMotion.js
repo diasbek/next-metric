@@ -503,82 +503,9 @@ const Band = {
     this.el.style.transform = 'translate3d(' + this.x.toFixed(1) + 'px,0,0) skewX(' + (-v * 7).toFixed(2) + 'deg)';
   }
 };
-/* ---- i18n: EN / DE ---- */
-let LANG = ''; try { LANG = localStorage.getItem('mlang') || ''; } catch (x) {}
-if (!LANG && /lang=de/.test(window.name)) LANG = 'de';
-LANG = LANG === 'de' ? 'de' : 'en';
-const DEU = {
-'Projects':'Projekte','Case studies':'Fallstudien','Services':'Leistungen','Workflow':'Ablauf','Home':'Start','Start your project':'Projekt starten','Start a project':'Projekt starten','Skip to content':'Zum Inhalt springen','Open menu':'Menü öffnen','Close menu':'Menü schließen','Previous review':'Vorherige Bewertung','Next review':'Nächste Bewertung','← Back':'← Zurück',
-'Move the cursor: your gaze leaves heat':'Cursor bewegen: Ihr Blick hinterlässt Wärme','Touch the results to steer the gaze':'Ergebnisse berühren, um den Blick zu lenken',
-'On Amazon, customers buy with their <em>eyes first.</em>':'Auf Amazon kaufen Kunden <em>zuerst mit den Augen.</em>',
-'Strategic Amazon listing images and A+ Content designed to communicate value, inspire confidence, and turn attention into sales.':'Strategische Amazon-Listing-Bilder und A+ Content, die Mehrwert vermitteln, Vertrauen schaffen und Aufmerksamkeit in Umsatz verwandeln.',
-'Build a stronger listing':'Stärkeres Listing aufbauen',
-'Official service partner':'Offizieller Servicepartner','An official partner in the Amazon Service Provider Network.':'Offizieller Partner im Amazon Service Provider Network.','Verified client reviews':'Verifizierte Kundenbewertungen','Excellent: 5.0 out of 5 on Trustpilot.':'Ausgezeichnet: 5,0 von 5 bei Trustpilot.','Sellers served':'Betreute Seller','Amazon sellers and brands we have worked with.':'Amazon-Seller und Marken, mit denen wir gearbeitet haben.','Click-through rate':'Klickrate','9.5% → 22% CTR after a Metric redesign.':'9,5 % → 22 % CTR nach einem Metric-Redesign.',
-'Better images. <em>More clicks.</em>':'Bessere Bilder. <em>Mehr Klicks.</em>','The same listing before and after a Metric redesign: the click-through rate went from 9.5% to 22%. Shoppers decide in the search results, long before they read a bullet point.':'Dasselbe Listing vor und nach einem Metric-Redesign: Die Klickrate stieg von 9,5 % auf 22 %. Käufer entscheiden in den Suchergebnissen, lange bevor sie einen Bullet Point lesen.','Before':'Vorher','Metric redesign':'Metric-Redesign',
-'Listing images':'Listing-Bilder','Main images':'Hauptbilder','Infographics':'Infografiken','Lifestyle scenes':'Lifestyle-Szenen','A+ modules':'A+-Module','Ad creatives':'Werbe-Creatives','3D renders':'3D-Renderings','Ready for Seller Central':'Bereit für Seller Central','Ad banners':'Anzeigenbanner','3D modeling':'3D-Modellierung',
-'We help turn products into ':'Wir machen Produkte zu ','<em>Amazon bestsellers</em> across categories.':'<em>Amazon-Bestsellern</em> in allen Kategorien.','Main images from Metric projects in home, beauty, automotive, apparel, sports and more. Drag the ring, or just scroll.':'Hauptbilder aus Metric-Projekten in Haushalt, Beauty, Auto, Mode, Sport und mehr. Ziehen Sie den Ring oder scrollen Sie einfach.',
-'See how better visuals drive real <em>Amazon results.</em>':'So sorgen bessere Visuals für echte <em>Amazon-Ergebnisse.</em>','Explore how strategic Amazon listing images and A+ Content helped brands attract more attention, communicate value more clearly, and improve conversion.':'Entdecken Sie, wie strategische Amazon-Listing-Bilder und A+ Content Marken geholfen haben, mehr Aufmerksamkeit zu gewinnen, Mehrwert klarer zu vermitteln und die Conversion zu steigern.','View case study':'Fallstudie ansehen','More projects':'Weitere Projekte',
-'Everything your Amazon brand needs to convert ':'Alles, was Ihre Amazon-Marke zum Verkaufen braucht ','in one place':'an einem Ort','Amazon listing images, A+ Content, Brand Stores, and advertising creatives built as one consistent visual system.':'Amazon-Listing-Bilder, A+ Content, Brand Stores und Werbe-Creatives als ein konsistentes visuelles System.','Book a free concept call':'Kostenloses Konzeptgespräch buchen','Also on request':'Auf Anfrage','Tell us about your product':'Erzählen Sie uns von Ihrem Produkt',
-'That’s how ':'So entstehen ','Metric are made':'Metric-Visuals','Unique visual worlds — hand-drawn. Every listing gets its own composition, built around what the shopper needs to see first.':'Einzigartige visuelle Welten — von Hand gezeichnet. Jedes Listing erhält eine eigene Komposition, aufgebaut um das, was der Käufer zuerst sehen muss.',
-'From brief to final files in <em>7 business days</em>':'Vom Briefing bis zu den fertigen Dateien in <em>7 Werktagen</em>','Most projects · 3D, Premium A+ and Brand Store work can take longer':'Die meisten Projekte · 3D-, Premium-A+- und Brand-Store-Arbeiten können länger dauern',
-'Sellers come back for the <em>next listing.</em>':'Seller kommen für das <em>nächste Listing</em> zurück.','5.0 · Excellent':'5,0 · Ausgezeichnet','>Case <span':'>Fall <span',
-'The most important answers about our Amazon product images, videos, and services.':'Die wichtigsten Antworten zu unseren Amazon-Produktbildern, Videos und Leistungen.',
-'We’d be happy to present more projects in a personal call.':'Gerne stellen wir Ihnen weitere Projekte in einem persönlichen Gespräch vor.','Let’s talk':'Sprechen wir','Hire us on Upwork ↗':'Auf Upwork beauftragen ↗','Amazon listing images, A+ Content, Brand Stores and advertising creatives. Official Amazon SPN partner, based in ':'Amazon-Listing-Bilder, A+ Content, Brand Stores und Werbe-Creatives. Offizieller Amazon-SPN-Partner mit Sitz in ','>Cases<':'>Fallstudien<','Concept redesign · forms send nothing':'Konzept-Redesign · Formulare senden nichts',
-'Selected <em>projects</em>':'Ausgewählte <em>Projekte</em>','Amazon listing images · Premium A+ · 3D':'Amazon-Listing-Bilder · Premium A+ · 3D','Filter by category':'Nach Kategorie filtern','Filter by type':'Nach Typ filtern','>Category<':'>Kategorie<','>Type<':'>Typ<','>All<':'>Alle<',
-'Deliverables':'Leistungen','In this case':'In diesem Projekt',' slides · listing + A+':' Slides · Listing + A+','>Task<':'>Aufgabe<','>Solution<':'>Lösung<','Next case · ':'Nächster Fall · ',
-'Tell us about your <em>project</em>':'Erzählen Sie uns von Ihrem <em>Projekt</em>','Answer a few quick questions so we can understand your goals and recommend the right solution. We usually respond within one business day.':'Beantworten Sie ein paar kurze Fragen, damit wir Ihre Ziele verstehen und die passende Lösung empfehlen können. Wir antworten in der Regel innerhalb eines Werktages.','Your name *':'Ihr Name *','Enter your full name':'Vollständigen Namen eingeben','Work email *':'Geschäftliche E-Mail *','Company or brand':'Unternehmen oder Marke','Your company or brand name':'Name Ihres Unternehmens oder Ihrer Marke','Product or store link':'Produkt- oder Store-Link','Amazon listing or brand website':'Amazon-Listing oder Marken-Website','What can we help you with? *':'Wobei können wir helfen? *','Tell us about your project *':'Erzählen Sie uns von Ihrem Projekt *','Briefly describe your product, current challenge, and the result you would like to achieve.':'Beschreiben Sie kurz Ihr Produkt, die aktuelle Herausforderung und das gewünschte Ergebnis.','I agree to the processing of my personal data as described in the ':'Ich stimme der Verarbeitung meiner personenbezogenen Daten gemäß der ','Privacy Policy ↗':'Datenschutzerklärung ↗','Submit your project':'Projekt absenden','Concept page: the form checks your answers but sends nothing anywhere.':'Konzeptseite: Das Formular prüft Ihre Eingaben, sendet aber nichts.','On the live site this brief would go to the METRIC team. This concept keeps it in your browser and sends nothing.':'Auf der Live-Seite ginge dieses Briefing an das METRIC-Team. Dieses Konzept behält es in Ihrem Browser und sendet nichts.',
-'Selected projects':'Ausgewählte Projekte','Eyes first.':'Zuerst die Augen.','Free concept call':'Kostenloses Konzeptgespräch','Amazon listing design':'Amazon-Listing-Design',' case studies':' Fallstudien',' · case study':' · Fallstudie',
-'>3D Product Modeling<':'>3D-Produktmodellierung<'
-};
-const DEC = [
-{ d: 'Amazon-Listing-Design für den IMPACT Pro Mount 360° mit Produktvisualisierung, Infografiken und einer conversion-orientierten visuellen Strategie für den deutschen Markt.', t: 'Die Kategorie der Fahrrad-Handyhalterungen ist hart umkämpft und visuell austauschbar: Viele Produkte setzen auf ähnliche schwarze Designs, generische Lifestyle-Bilder und eine einfache Kommunikation der Merkmale. Die Aufgabe bestand darin, den IMPACT Pro Mount 360° von günstigeren Kunststoff-Alternativen abzuheben und seine Aluminiumkonstruktion, Stabilität, Kompatibilität und Vielseitigkeit klar zu vermitteln.', s: 'Wir entwickelten ein kraftvolles, leistungsorientiertes visuelles System für Amazon, das technische Merkmale in klare Kundenvorteile übersetzt. Dynamische Radsport-Umgebungen, starke redaktionelle Typografie, technische Grafiken und markante Limettenakzente wurden zu einer strukturierten Galerie zusammengeführt, die Stabilität, Materialqualität, Kompatibilität, Montage, 360°-Verstellung und zusätzliche Sicherheit abdeckt. So wird der IMPACT Pro Mount 360° nicht als generisches Zubehör positioniert, sondern als hochwertige Performance-Ausrüstung für anspruchsvolle Fahrer.', q: 'Tolle Zusammenarbeit mit Metric. Das Team hat unsere Briefings und Vorlagen präzise umgesetzt und zugleich eine starke kreative Perspektive eingebracht, die die Listings spürbar verbessert hat. Die Kommunikation war reibungslos, die Bearbeitung schnell und es gab keine unnötigen Schleifen. Wir würden jederzeit wieder mit Metric arbeiten.' },
-{ d: 'Amazon-Listing-Design für ein hochsicheres Faltschloss für Fahrräder – mit technischer Klarheit, hochwertigen Visuals und realitätsnahem Produkt-Storytelling.', t: 'Ein klares, conversion-orientiertes Amazon-Listing erstellen, das die wichtigsten Vorteile des Schlosses – Sicherheit, Langlebigkeit, Portabilität, Rahmenschutz und einfache Montage – in Sekunden vermittelt.', s: 'Wir entwickelten ein konsistentes visuelles System aus kräftiger Typografie, technischen Produktdetails, Lifestyle-Szenarien und nutzenorientierten Infografiken. Jedes Bild beantwortet eine konkrete Kundenfrage und macht aus Produktspezifikationen klare, leicht verständliche visuelle Verkaufsargumente.', q: 'Wir haben nun unser zweites Projekt mit METRIC abgeschlossen, und wieder war die Erfahrung hervorragend. Das Team hat das Produkt schnell verstanden, die wichtigsten Merkmale in starke Visuals übersetzt und ein klares, professionelles Amazon-Listing geliefert. Die Kommunikation war reibungslos, Feedback wurde sorgfältig umgesetzt und das Ergebnis hat unsere Erwartungen voll erfüllt.' },
-{ d: 'Conversion-orientiertes Amazon-Listing und Premium A+ Content für NURADA – aus einem praktischen Garagen-Eckenschutz wird ein klares, glaubwürdiges und wiedererkennbares Produkterlebnis.', t: 'Die bestehenden Amazon-Visuals von NURADA kommunizierten einzelne Merkmale, ließen aber Realismus, eine einheitliche Identität und eine klare visuelle Hierarchie vermissen. Die Aufgabe bestand darin, den 40 cm langen Garagen-Eckenschutz in Listing und Premium A+ Content sofort verständlich, glaubwürdig und wertvoll wirken zu lassen.', s: 'Wir schufen ein stimmiges, conversion-orientiertes visuelles System rund um realistische Garagenszenarien, klare Produktbeweise und eine wiedererkennbare rot-weiße Identität. Strukturierte Layouts und verfeinerte Produktvisualisierung verbinden jedes Bild zu einem einheitlichen Amazon-Markenerlebnis.', q: 'Die Zusammenarbeit mit Metric war eine Freude. Ich möchte betonen, dass die Projekte, die ich mit ihrem Team umgesetzt habe, stets hervorragende Ergebnisse geliefert haben. Hervorheben möchte ich auch die Schnelligkeit in Kommunikation und Lieferung. Künftig arbeite ich mit Metric an allen Bildern für meine Amazon-Produkte.' },
-{ d: 'Eine stimmige Produktgeschichte für KLIPPs zweiteiliges Nagelknipser-Set, die Zweck und Details schon auf den ersten Blick verständlich macht.', t: 'Das zweiteilige Nagelknipser-Set von KLIPP als klares, stimmiges Produkt auf Amazon präsentieren. Die Herausforderung bestand darin, den Knipser für Fingernägel von dem für Fußnägel zu unterscheiden, Designdetails und praktische Vorteile beider zu erklären und den Wert des kompletten Sets auf einen Blick verständlich zu machen. Die Visuals sollten zudem die markante Identität von KLIPP in Listing und Premium A+ Content bewahren.', s: 'Wir verbanden detaillierte 3D-Produktmodelle, klare Texte, Listing-Visuals und Premium A+ Content zu einer einheitlichen visuellen Erzählung.' },
-{ d: 'Eine frische visuelle Geschichte für QORUX, die die Weichheit von Bambussocken in haptische Bilder, sonnige Szenen und klares Produkt-Storytelling auf Amazon übersetzt.', t: 'Eine stimmige Amazon-Präsentation für QORUX-Bambussocken erstellen, die die Weichheit des Materials vermittelt, wichtige Designmerkmale erklärt und Käufern ein klares Verständnis von Produkt und Passform gibt.', s: 'Wir entwickelten Listing-Bilder und Premium A+ Content rund um eine frische grüne Palette, Bambus-Motive und sonnige Lifestyle-Szenen. Detaillierte Produktansichten und prägnante Infografiken heben Strickstruktur, Fersenlasche und Passform hervor und schaffen eine konsistente visuelle Geschichte auf Desktop und Mobilgeräten.' }
-];
-const DEF = [
-['Was kostet ein Amazon-Designprojekt?', 'Der Preis hängt von Leistungsumfang und Komplexität ab. Nach einem kurzen Briefing erhalten Sie eine klare Kalkulation für Listing-Bilder, A+ Content, Brand Store oder ein Komplettpaket.'],
-['Wie lange dauert ein Projekt?', 'Die meisten Projekte werden innerhalb von 7 Werktagen geliefert – abhängig von der Anzahl der Leistungen, der Komplexität und der Geschwindigkeit des Feedbacks. Größere Projekte mit 3D-Produktion, Premium A+ Content oder Brand-Store-Design können mehr Zeit erfordern.'],
-['Können Sie ohne professionelle Produktfotos arbeiten?', 'Ja. Wir arbeiten mit vorhandenen Packshots, Referenzboards oder erstellen ein Briefing für ein Shooting. Viele Projekte starten mit wenigen Materialien und führen dennoch zu einem hochwertigen Listing-Set.'],
-['Welche Leistungen bieten Sie an?', 'Produktbilder, A+ Content, Anzeigenbanner und Brand-Store-Design – als ein konsistentes visuelles System für Amazon.'],
-['Wie läuft der Designprozess ab?', 'Briefing → Konzept → Produktion → Korrekturen → finale Lieferung. Sie erhalten klare Meilensteine, strukturierte Feedbackrunden und Dateien, die bereit für Seller Central sind.']
-];
-const DES = [['Produktbilder', 'Hauptbild, Infografiken und Lifestyle-Szenen: die Galerie, die verkaufen muss, bevor jemand ein Wort liest.'], ['A+ Content', 'Standard- und Premium-A+-Module, die unter der Buy Box die Markengeschichte erzählen und die letzten Fragen beantworten.'], ['Anzeigen-Banner', 'Sponsored-Brands- und Display-Creatives in derselben visuellen Sprache wie das Listing, auf das sie Traffic lenken.'], ['BrandStore', 'Ein Brand Store, der den Katalog zusammenführt und Käufer in Ihrer Marke hält.']];
-const DEA = ['3D-Produktvisualisierung', 'Redesign bestehender Listings', 'Komplettes Amazon-Markendesign', 'Laufende Design-Betreuung'];
-const DEW = [['Der Start war noch nie so einfach!', 'Das Produkt erreichte bereits innerhalb einer Woche den Bestseller-Status – dank seiner markanten Komposition und hochwertigen Bildsprache.', '1 Woche', 'bis zum Bestseller'], ['Dauerhafter Bestseller und Amazon’s Choice', 'Eine konstante Conversion-Rate von 41 % durch zielgruppengerechte Bildinhalte, die für Kunden relevant sind.', '41%', 'Conversion-Rate'], ['Starten Sie Ihr erstes Produkt mit Zuversicht', 'Strategische Visuals, die Ihr Produkt leicht verständlich machen – und leichter wählbar.']];
-const DEP = [['Briefing', 'Ein kurzes Briefing zu Produkt, Zielgruppe und gewünschtem Ergebnis.'], ['Konzept', 'Eine visuelle Richtung für das gesamte Listing, bevor die Produktion beginnt.'], ['Produktion', '3D, Fotoarbeit, Infografiken und Texte als ein System umgesetzt.'], ['Korrekturen', 'Strukturierte Feedbackrunden entlang klarer Meilensteine.'], ['Finale Lieferung', 'Dateien bereit für Seller Central.']];
-const DEB = ['Amazon-Listing-Bilder', 'Standard A+ Content', 'Premium A+ Content', 'Amazon Brand Store', '3D-Produktvisualisierung', 'Redesign bestehender Listings', 'Komplettes Amazon-Markendesign', 'Laufende Design-Betreuung', 'Sonstiges'];
-const DECAT = { 'Bike Accessories': 'Fahrradzubehör', 'Automotive & Garage': 'Auto & Garage', 'Beauty & Personal Care': 'Beauty & Körperpflege', 'Apparel & Accessories': 'Bekleidung & Accessoires' };
-let TM = null, TR = null;
-function tInit() {
-  TM = new Map(Object.entries(DEU));
-  const add = (a, b) => { if (a && b) TM.set(a, b); };
-  CASES.forEach((c, i) => { const x = DEC[i]; if (!x) return; add(c.desc, x.d); add(c.task, x.t); add(c.sol, x.s); if (c.rev) add(c.rev.q, x.q); });
-  FAQ.forEach((f, i) => { add(f[0], DEF[i][0]); add(f[1], DEF[i][1]); });
-  SERVICES.forEach((s, i) => { add('>' + s.n + '<', '>' + DES[i][0] + '<'); add(s.p, DES[i][1]); });
-  ALSO.forEach((x, i) => add('>' + x + '<', '>' + DEA[i] + '<'));
-  WORK.forEach((w, i) => { add(w.h, DEW[i][0]); add(w.p, DEW[i][1]); add(w.k, DEW[i][2]); add(w.kl, DEW[i][3]); });
-  PROC.forEach((p, i) => { add('>' + p.h + '<', '>' + DEP[i][0] + '<'); add('</b>' + p.h + '</li>', '</b>' + DEP[i][0] + '</li>'); add(p.p, DEP[i][1]); });
-  BRIEF_OPTS.forEach((o, i) => add('>' + o + '<', '>' + DEB[i] + '<'));
-  Object.keys(DECAT).forEach(k => { add('>' + k + '<', '>' + DECAT[k] + '<'); add('Next case · ' + k, 'Nächster Fall · ' + DECAT[k]); });
-  Array.from(TM.entries()).forEach(e => { if (e[0].indexOf('&') > -1) TM.set(e[0].replace(/&/g, '&amp;'), e[1].replace(/&/g, '&amp;')); });
-  const BS = String.fromCharCode(92), SP = '.*+?^${}()|[]' + BS;
-  const rx = k => k.split('').map(ch => SP.indexOf(ch) > -1 ? BS + ch : ch).join('');
-  TR = new RegExp(Array.from(TM.keys()).sort((a, b) => b.length - a.length).map(rx).join('|'), 'g');
-}
-const T = s => { if (LANG !== 'de') return s; if (!TR) tInit(); return String(s).replace(TR, m => TM.get(m)); };
-const TN = root => {
-  if (!root || LANG !== 'de') return; if (!TR) tInit();
-  const w = D.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
-  while ((n = w.nextNode())) { const t = n.nodeValue.trim(); if (t && TM.has(t)) n.nodeValue = n.nodeValue.replace(t, TM.get(t)); }
-  root.querySelectorAll('[aria-label]').forEach(e => { const a = e.getAttribute('aria-label'); if (TM.has(a)) e.setAttribute('aria-label', TM.get(a)); });
-};
-if (LANG === 'de') { H.lang = 'de'; TN($('#nav')); TN($('#menu')); TN($('.skip')); }
-{ const nr = $('.nav-r'); if (nr) nr.insertAdjacentHTML('afterbegin', '<div class="lang" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="' + (LANG === 'en') + '">EN</button><button type="button" data-lang="de" aria-pressed="' + (LANG === 'de') + '">DE</button></div>'); }
+/* Locale comes from Next.js routes / <html lang> — never mutate React DOM for i18n. */
+const LANG = (H.lang || '').toLowerCase().startsWith('de') ? 'de' : 'en';
 document.addEventListener('click', e => {
-  const lg = e.target.closest('[data-lang]');
-  if (lg) { const v = lg.dataset.lang === 'de' ? 'de' : 'en'; if (v !== LANG) { try { localStorage.setItem('mlang', v); } catch (x) {} window.name = 'lang=' + v; location.reload(); } return; }
   const bk = e.target.closest('[data-back]');
   if (bk) { e.preventDefault(); if (history.length > 1) history.back(); else location.hash = '#work'; return; }
   const c = e.target.closest('.sc, .wk'); if (!c || e.target.closest('a:not(.sc-m), button')) return;
@@ -600,11 +527,51 @@ const Proc = {
   }
 };
 const Talk = {
-  init() { this.ls = Array.from(D.querySelectorAll('#ft .talk-h span')); this.on = false; },
+  init() {
+    this.ls = Array.from(D.querySelectorAll('#ft .talk-h span'));
+    this.on = false;
+    this._measured = false;
+    this._measure();
+  },
+  _measure() {
+    if (!this.ls || !this.ls.length) return;
+    // Reset to rest metrics before sampling — live stretched rects feedback into k.
+    this.ls.forEach((l) => {
+      l.style.fontVariationSettings = '"wdth" 78, "wght" 800';
+      l.style.fontStretch = '78%';
+      l.style.fontWeight = '800';
+      l.__st = 78;
+      l.__wg = 800;
+    });
+    if (this.ls[0]) void this.ls[0].offsetWidth;
+    const sy = window.scrollY || 0;
+    this.ls.forEach((l) => {
+      const r = l.getBoundingClientRect();
+      l.__cx0 = r.left + r.width / 2;
+      l.__cy0 = r.top + r.height / 2 + sy;
+    });
+    this._measured = true;
+  },
   frame() {
     if (!fine || reduce || !this.ls || !this.ls.length) return;
-    const r0 = this.ls[0].getBoundingClientRect(); if (r0.top > VH || r0.bottom < 0) return;
-    this.ls.forEach(l => { const r = l.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, k = PX < -1e3 ? 0 : ss(320, 30, Math.hypot(PX - cx, (PY - cy) * 1.4)); const st = Math.round(78 + 47 * k), wg = Math.round(560 + 340 * k); if (l.__st !== st) { l.__st = st; l.style.fontStretch = st + '%'; l.style.fontWeight = wg; } });
+    const r0 = this.ls[0].getBoundingClientRect();
+    if (r0.top > VH || r0.bottom < 0) return;
+    if (!this._measured) this._measure();
+    const sy = window.scrollY || 0;
+    this.ls.forEach((l) => {
+      if (l.__cx0 == null) return;
+      const cx = l.__cx0;
+      const cy = l.__cy0 - sy;
+      const k = PX < -1e3 ? 0 : ss(320, 30, Math.hypot(PX - cx, (PY - cy) * 1.4));
+      const st = Math.round(78 + 47 * k);
+      const wg = Math.round(560 + 340 * k);
+      if (l.__st === st && l.__wg === wg) return;
+      l.__st = st;
+      l.__wg = wg;
+      l.style.fontVariationSettings = '"wdth" ' + st + ', "wght" ' + wg;
+      l.style.fontStretch = st + '%';
+      l.style.fontWeight = String(wg);
+    });
   }
 };
 const Gal = {
@@ -664,6 +631,7 @@ const Peek = {
   Gal.init(root);
   Mag.scan(root);
   Talk.init();
+  if (D.fonts && D.fonts.ready) D.fonts.ready.then(() => Talk._measure()).catch(() => {});
   Peek.bind(root);
 
   Heat.load().then(() => Heat.size(true)).catch(() => {});
@@ -728,6 +696,7 @@ const Peek = {
       Ring.layout();
       Pin.measure();
       Band.init(root);
+      Talk._measure();
     }, 180);
   };
   window.addEventListener('resize', onResize);
