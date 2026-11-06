@@ -1,21 +1,16 @@
-import { Button } from "@/components/atoms/Button";
 import { MediaImage } from "@/components/atoms/MediaImage";
-import { PageContainer } from "@/components/atoms/PageContainer";
-import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
-import { MetricTagPill } from "@/components/molecules/MetricTagPill";
-import { CaseReviewsCarousel } from "@/components/molecules/CaseReviewsCarousel";
-import { SiteBreadcrumbs } from "@/components/molecules/SiteBreadcrumbs";
+import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
+import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { BeforeAfterSlider } from "@/components/molecules/BeforeAfterSlider";
 import type { Project } from "@/data/projects";
 import { youtubeEmbedUrl } from "@/data/projects";
-import { ProgressiveCaseImage } from "@/components/atoms/ProgressiveCaseImage";
 import {
   CASE_GALLERY_SIZES,
   getCaseImageMeta,
 } from "@/data/case-image-meta";
 import { caseStripFromBlocks } from "@/lib/cms/case-gallery";
+import { caseAccent } from "@/lib/case-accent";
 import { getNextProjects } from "@/i18n/get-content";
-import { getLocalizedBreadcrumbs } from "@/i18n/page-seo";
 import type { Locale } from "@/i18n/config";
 import { localePath } from "@/i18n/paths";
 import type { SiteContent } from "@/i18n/types";
@@ -39,12 +34,20 @@ function frameAlt(
   return `${projectTitle} — ${index + 1}`;
 }
 
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "M";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+}
+
 export async function WorkCaseSection({
   locale,
   content,
   project,
 }: WorkCaseSectionProps) {
   const { ui } = content;
+  const de = locale === "de";
   const [home, nextProjects, taxonomy] = await Promise.all([
     getMetricHomeResolved(locale),
     getNextProjects(locale, project.slug),
@@ -73,143 +76,197 @@ export async function WorkCaseSection({
             },
           ]
         : [];
-  let galleryIndex = 0;
-  const path = localePath(locale, `/works/${project.slug}/`);
-  const breadcrumbs = getLocalizedBreadcrumbs(locale, [
-    "home",
-    "works",
-    { name: project.title, path },
-  ]);
+  const firstReview = reviews[0];
   const displayTags = resolveTagDisplays(project.tags, taxonomy);
-  const relatedHeading = project.sphere
-    ? ui.relatedInCategory.replace("{category}", project.sphere)
-    : ui.otherWorks;
+  const worksHref = localePath(locale, "/works/");
+  const homeHref = localePath(locale, "/");
+
+  const galleryImages: Array<{
+    url: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  }> = [];
+  if (hasStructuredBlocks) {
+    for (const block of blocks) {
+      if (block.type === "gallery") {
+        for (const image of block.images) {
+          galleryImages.push({
+            url: image.url,
+            alt: image.alt,
+            width: image.width ?? undefined,
+            height: image.height ?? undefined,
+          });
+        }
+      }
+    }
+  } else {
+    for (const item of legacyStrip) {
+      galleryImages.push({
+        url: item.src,
+        alt: item.alt,
+        width: item.width ?? undefined,
+        height: item.height ?? undefined,
+      });
+    }
+  }
+
+  const cover = project.image || galleryImages[0]?.url || "";
+  const slideCount = Math.max(galleryImages.length, 1);
+  const deliverables = displayTags.map((t) => t.label).join(" · ") || "Listing · A+";
+  const category = project.sphere || displayTags[0]?.label || "Amazon";
+  const accent = caseAccent(
+    project.sphere || category,
+    project.slug.length,
+    project.slug,
+    project.caseAccent,
+  );
+  const next = nextProjects[0];
+  const nextAccent = next
+    ? caseAccent(
+        next.sphere || next.tags?.[0],
+        next.slug.length,
+        next.slug,
+        next.caseAccent,
+      )
+    : accent;
 
   return (
-    <article className="metric-case">
-      <PageContainer className="metric-case__shell">
-        <SiteBreadcrumbs items={breadcrumbs} className="mb-6" />
-        <header className="metric-case__intro">
-          <h1 className="metric-case__title font-display">
-            {project.title.trim() || project.slug}
-          </h1>
+    <div className="metric-case" style={{ ["--acc" as string]: accent }}>
+      <article className="ch wrap">
+        <TransitionLink className="bk" href={worksHref} data-in="fade">
+          ← {de ? "Zurück" : "Back"}
+        </TransitionLink>
+        <nav className="bc cap" aria-label="Breadcrumb" data-in="fade">
+          <TransitionLink href={homeHref}>
+            {de ? "Start" : "Home"}
+          </TransitionLink>
+          <span aria-hidden="true">/</span>
+          <TransitionLink href={worksHref}>
+            {de ? "Projekte" : "Projects"}
+          </TransitionLink>
+          <span aria-hidden="true">/</span>
+          <span>{project.title.trim() || project.slug}</span>
+        </nav>
 
-          <div className="metric-case__grid">
-            <div className="metric-case__col metric-case__col--main">
-              {caseStudy?.task ? (
-                <div className="metric-case__brief">
-                  <p className="metric-case__brief-label">{ui.task}</p>
-                  <p className="metric-case__brief-text">{caseStudy.task}</p>
-                </div>
-              ) : null}
+        <h1 className="d1" data-in="chars">
+          {project.title.trim() || project.slug}
+        </h1>
+
+        <div className="ch-r" data-in="fade">
+          {displayTags.length ? (
+            <div className="tags">
+              {displayTags.map((tag) => (
+                <span className="tag" key={tag.slug}>
+                  {tag.label}
+                </span>
+              ))}
             </div>
+          ) : null}
+          {project.description ? (
+            <p className="lead">{project.description}</p>
+          ) : null}
+        </div>
 
-            <div className="metric-case__col metric-case__col--aside">
-              <div className="metric-case__meta">
-                {displayTags.length ? (
-                  <div className="metric-case__tags">
-                    {displayTags.map((tag) => (
-                      <MetricTagPill
-                        key={tag.slug}
-                        tag={tag.slug}
-                        label={tag.label}
-                        locale={locale}
-                        className="metric-case__tag"
-                      />
-                    ))}
-                  </div>
-                ) : null}
-                {project.description ? (
-                  <p className="metric-case__lede">{project.description}</p>
-                ) : null}
+        {cover ? (
+          <figure className="ch-cv" id="ch-cv">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={cover}
+              alt={`${project.title} — cover`}
+              decoding="async"
+            />
+          </figure>
+        ) : null}
+
+        <div className="meta" data-reveal="stagger">
+          <div>
+            <span className="cap">{de ? "Kategorie" : "Category"}</span>
+            <b>{category}</b>
+          </div>
+          <div>
+            <span className="cap">{de ? "Leistungen" : "Deliverables"}</span>
+            <b>{deliverables}</b>
+          </div>
+          <div>
+            <span className="cap">{de ? "In diesem Projekt" : "In this case"}</span>
+            <b>
+              {slideCount}{" "}
+              {de ? "Slides · Listing + A+" : "slides · listing + A+"}
+            </b>
+          </div>
+        </div>
+
+        {(caseStudy?.task || caseStudy?.solution) && (
+          <div className="ts">
+            {caseStudy.task ? (
+              <div>
+                <p className="cap">{ui.task}</p>
+                <p data-reveal="lines">{caseStudy.task}</p>
               </div>
+            ) : null}
+            {caseStudy.solution ? (
+              <div>
+                <p className="cap">{ui.solution}</p>
+                <p data-reveal="lines">{caseStudy.solution}</p>
+              </div>
+            ) : null}
+          </div>
+        )}
 
-              {caseStudy?.solution ? (
-                <div className="metric-case__brief">
-                  <p className="metric-case__brief-label">{ui.solution}</p>
-                  <p className="metric-case__brief-text">{caseStudy.solution}</p>
-                </div>
-              ) : null}
+        {galleryImages.length ? (
+          <div className="gal">
+            <div className="gal-l">
+              {galleryImages.map((image, index) => {
+                const fromCms =
+                  image.width != null &&
+                  image.height != null &&
+                  image.width > 0 &&
+                  image.height > 0
+                    ? { width: image.width, height: image.height }
+                    : null;
+                const { width, height } =
+                  fromCms ?? getCaseImageMeta(image.url);
+                const alt = frameAlt(project.title, index, image.alt);
+                const isHero = index === 0;
+                return (
+                  <figure className="gs" data-reveal="pic" key={`${image.url}-${index}`}>
+                    {isHero ? (
+                      <ProgressiveCaseImage
+                        src={image.url}
+                        alt={alt}
+                        width={width}
+                        height={height}
+                        priority
+                        fetchPriority="high"
+                      />
+                    ) : (
+                      <MediaImage
+                        src={image.url}
+                        alt={alt}
+                        width={width}
+                        height={height}
+                        quality={85}
+                        sizes={CASE_GALLERY_SIZES}
+                        loading="lazy"
+                      />
+                    )}
+                  </figure>
+                );
+              })}
             </div>
           </div>
-        </header>
+        ) : null}
 
-        {hasStructuredBlocks ? (
-          <div className="metric-case__content mt-12 md:mt-16">
-            {blocks.map((block) => {
-              if (block.type === "gallery") {
-                if (!block.images.length) return null;
-                return (
-                  <section key={block.id} className="metric-case__stack">
-                    {block.images.map((image) => {
-                      const index = galleryIndex++;
-                      const fromCms =
-                        image.width != null &&
-                        image.height != null &&
-                        image.width > 0 &&
-                        image.height > 0
-                          ? { width: image.width, height: image.height }
-                          : null;
-                      const { width, height } =
-                        fromCms ?? getCaseImageMeta(image.url);
-                      const alt = frameAlt(project.title, index, image.alt);
-                      const isHero = index === 0;
-                      const intrinsicH =
-                        width > 0 && height > 0
-                          ? Math.round((height / width) * 1200)
-                          : 800;
-
-                      return (
-                        <div
-                          key={`${block.id}-${image.url}-${index}`}
-                          className={
-                            isHero
-                              ? "metric-case__stack-item"
-                              : "metric-case__stack-item metric-case__stack-item--lazy"
-                          }
-                          style={
-                            isHero
-                              ? undefined
-                              : {
-                                  containIntrinsicSize: `auto ${intrinsicH}px`,
-                                }
-                          }
-                        >
-                          {isHero ? (
-                            <ProgressiveCaseImage
-                              src={image.url}
-                              alt={alt}
-                              width={width}
-                              height={height}
-                              className="metric-case__stack-img"
-                              priority
-                              fetchPriority="high"
-                            />
-                          ) : (
-                            <MediaImage
-                              src={image.url}
-                              alt={alt}
-                              width={width}
-                              height={height}
-                              className="metric-case__stack-img"
-                              quality={85}
-                              sizes={CASE_GALLERY_SIZES}
-                              loading="lazy"
-                            />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </section>
-                );
-              }
-
+        {hasStructuredBlocks
+          ? blocks.map((block) => {
               if (block.type === "before_after") {
                 if (!block.beforeImage || !block.afterImage) return null;
                 return (
                   <section
                     key={block.id}
-                    className="metric-case__block metric-case__block--ba mt-4"
+                    className="metric-case__block metric-case__block--ba"
+                    style={{ marginTop: 40 }}
                   >
                     <BeforeAfterSlider
                       beforeImage={block.beforeImage}
@@ -221,134 +278,102 @@ export async function WorkCaseSection({
                   </section>
                 );
               }
+              if (block.type === "youtube") {
+                const embed = youtubeEmbedUrl(block.youtubeUrl);
+                if (!embed) return null;
+                return (
+                  <section
+                    key={block.id}
+                    className="metric-case__block metric-case__block--youtube"
+                    style={{ marginTop: 40 }}
+                  >
+                    <div className="metric-case__youtube">
+                      <iframe
+                        src={embed}
+                        title={`${project.title} — YouTube`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        loading="lazy"
+                      />
+                    </div>
+                  </section>
+                );
+              }
+              return null;
+            })
+          : null}
+      </article>
 
-              const embed = youtubeEmbedUrl(block.youtubeUrl);
-              if (!embed) return null;
-              return (
-                <section
-                  key={block.id}
-                  className="metric-case__block metric-case__block--youtube mt-4"
-                >
-                  <div className="metric-case__youtube">
-                    <iframe
-                      src={embed}
-                      title={`${project.title} — YouTube`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      loading="lazy"
-                    />
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        ) : legacyStrip.length ? (
-          <section className="metric-case__stack mt-12 md:mt-16">
-            {legacyStrip.map((item, index) => {
-              const fromCms =
-                item.width != null &&
-                item.height != null &&
-                item.width > 0 &&
-                item.height > 0
-                  ? { width: item.width, height: item.height }
-                  : null;
-              const { width, height } = fromCms ?? getCaseImageMeta(item.src);
-              const alt = frameAlt(project.title, index, item.alt);
-              const isHero = index === 0;
-              const intrinsicH =
-                width > 0 && height > 0
-                  ? Math.round((height / width) * 1200)
-                  : 800;
-
-              return (
-                <div
-                  key={`${item.src}-${index}`}
-                  className={
-                    isHero
-                      ? "metric-case__stack-item"
-                      : "metric-case__stack-item metric-case__stack-item--lazy"
-                  }
-                  style={
-                    isHero
-                      ? undefined
-                      : { containIntrinsicSize: `auto ${intrinsicH}px` }
-                  }
-                >
-                  {isHero ? (
-                    <ProgressiveCaseImage
-                      src={item.src}
-                      alt={alt}
-                      width={width}
-                      height={height}
-                      className="metric-case__stack-img"
-                      priority
-                      fetchPriority="high"
+      {firstReview?.quote ? (
+        <section className="crv dk" data-dark aria-label="Client review">
+          <div className="wrap">
+            <figure className="rq">
+              <blockquote>{firstReview.quote}</blockquote>
+              <figcaption>
+                <footer>
+                  {firstReview.personImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      className="av"
+                      src={firstReview.personImage}
+                      alt=""
+                      width={48}
+                      height={48}
                     />
                   ) : (
-                    <MediaImage
-                      src={item.src}
-                      alt={alt}
-                      width={width}
-                      height={height}
-                      className="metric-case__stack-img"
-                      quality={85}
-                      sizes={CASE_GALLERY_SIZES}
-                      loading="lazy"
-                    />
+                    <span className="av" aria-hidden="true">
+                      {initials(firstReview.author || project.title)}
+                    </span>
                   )}
-                </div>
-              );
-            })}
-          </section>
-        ) : null}
-
-        {reviews.length ? (
-          <section className="mt-16 md:mt-20">
-            <div className="mb-8 flex items-end justify-between gap-4">
-              <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
-                {ui.reviewsTitle}
-              </h2>
-            </div>
-            <CaseReviewsCarousel
-              reviews={reviews}
-              caseTitle={project.title}
-              fallbackImage={project.image}
-              fallbackAuthor={project.title}
-            />
-          </section>
-        ) : null}
-      </PageContainer>
-
-      <PageContainer>
-        <section className="mt-16 md:mt-20">
-          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-            <h2 className="font-display text-[clamp(36px,5vw,72px)] text-foreground">
-              {relatedHeading}
-            </h2>
-            <Button href={localePath(locale, "/works/")} variant="outline">
-              {home.caseStudies.moreLabel}
-            </Button>
-          </div>
-          <div className="metric-case-studies__list">
-            {nextProjects.slice(0, 2).map((item) => {
-              const rawTags = item.tags;
-              return (
-                <MetricCaseCard
-                  key={item.slug}
-                  locale={locale}
-                  href={localePath(locale, `/works/${item.slug}/`)}
-                  tags={resolveTagDisplays(rawTags, taxonomy)}
-                  title={item.title}
-                  description={item.description}
-                  image={item.image}
-                  imageAlt={item.title}
-                  viewLabel={home.caseStudies.viewLabel}
-                />
-              );
-            })}
+                  <span>
+                    <b>{firstReview.author || project.title}</b>
+                    {firstReview.role ? (
+                      <span className="cap">{firstReview.role}</span>
+                    ) : null}
+                  </span>
+                </footer>
+              </figcaption>
+            </figure>
           </div>
         </section>
-      </PageContainer>
-    </article>
+      ) : null}
+
+      {next ? (
+        <TransitionLink
+          className="nx wrap"
+          href={localePath(locale, `/works/${next.slug}/`)}
+          data-cur={de ? "Nächster Fall" : "Next case"}
+          style={{ ["--acc" as string]: nextAccent }}
+        >
+          <div className="nx-g">
+            <div>
+              <p className="cap">
+                {de ? "Nächster Fall · " : "Next case · "}
+                {next.sphere || next.tags?.[0] || ""}
+              </p>
+              <p className="d1">{next.title}</p>
+            </div>
+            <div className="nx-m">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={next.image}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </TransitionLink>
+      ) : (
+        <div className="wrap" style={{ paddingBottom: 80 }}>
+          <TransitionLink className="btn mag ghost" href={worksHref}>
+            {home.caseStudies.moreLabel}{" "}
+            <span className="ar" aria-hidden="true">
+              →
+            </span>
+          </TransitionLink>
+        </div>
+      )}
+    </div>
   );
 }

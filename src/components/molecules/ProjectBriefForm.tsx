@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  FormEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Script from "next/script";
-import { Button } from "@/components/atoms/Button";
+import { ProtoBtn } from "@/components/proto/ProtoBtn";
 import { ProjectBriefMultiSelect } from "@/components/molecules/ProjectBriefMultiSelect";
 import {
   PROJECT_BRIEF_SERVICE_IDS,
@@ -112,19 +107,15 @@ export function ProjectBriefForm({
     };
 
     render();
-    const timer = window.setInterval(render, 400);
-    return () => window.clearInterval(timer);
+    const id = window.setInterval(render, 400);
+    return () => window.clearInterval(id);
   }, [captcha.provider, captcha.siteKey]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError("");
 
-    const name = values.name.trim();
-    const email = values.email.trim();
-    const about = values.about.trim();
-
-    if (!EMAIL_RE.test(email)) {
+    if (!EMAIL_RE.test(values.email.trim())) {
       setError(brief.emailInvalid);
       return;
     }
@@ -132,50 +123,44 @@ export function ProjectBriefForm({
       setError(brief.helpRequired);
       return;
     }
+    if (!consent) {
+      setError(ui.consentPrefix);
+      return;
+    }
     if (
       (captcha.provider === "turnstile" || captcha.provider === "hcaptcha") &&
+      captcha.siteKey &&
       !captchaToken
     ) {
       setError(ui.captchaRequired);
       return;
     }
-    if (!consent) {
-      setError(ui.consentRequired);
-      return;
-    }
 
     setLoading(true);
     try {
-      const form = event.currentTarget;
-      const response = await fetch("/api/leads/", {
+      const res = await fetch("/api/leads/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           source: "brief",
-          name,
-          email,
+          locale,
+          name: values.name.trim(),
+          email: values.email.trim(),
           company: values.company.trim(),
           productUrl: values.productUrl.trim(),
+          message: values.about.trim(),
           services,
-          message: about,
-          locale,
           consent: true,
           captchaToken,
-          website: String(new FormData(form).get("website") || ""),
+          website: "",
         }),
       });
-
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-          | { error?: string }
-          | null;
-        throw new Error(payload?.error || "Request failed");
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(data?.error || "Request failed");
       }
-
-      setValues({ name: "", email: "", company: "", productUrl: "", about: "" });
-      setServices([]);
-      setConsent(false);
-      setCaptchaToken("");
       if (widgetIdRef.current) {
         window.turnstile?.reset(widgetIdRef.current);
         window.hcaptcha?.reset(widgetIdRef.current);
@@ -189,7 +174,7 @@ export function ProjectBriefForm({
   };
 
   return (
-    <form className="project-brief__form" onSubmit={handleSubmit}>
+    <form className="fm" onSubmit={handleSubmit} noValidate>
       {captcha.provider === "turnstile" ? (
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
@@ -208,73 +193,71 @@ export function ProjectBriefForm({
         <input type="text" name="website" tabIndex={-1} autoComplete="off" />
       </label>
 
-      <label className="project-brief__field">
-        <span className="project-brief__label">
-          {brief.nameLabel} <span aria-hidden>*</span>
-        </span>
-        <input
-          ref={nameRef}
-          type="text"
-          name="name"
-          autoComplete="name"
-          required
-          placeholder={brief.namePlaceholder}
-          value={values.name}
-          onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
-          className="project-brief__input ui-input"
-        />
-      </label>
+      <div className="fm-2">
+        <label className="fld">
+          <span>
+            {brief.nameLabel} *
+          </span>
+          <input
+            ref={nameRef}
+            type="text"
+            name="name"
+            autoComplete="name"
+            required
+            placeholder={brief.namePlaceholder}
+            value={values.name}
+            onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
+          />
+        </label>
+        <label className="fld">
+          <span>
+            {brief.emailLabel} *
+          </span>
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            inputMode="email"
+            required
+            placeholder={brief.emailPlaceholder}
+            value={values.email}
+            onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
+          />
+        </label>
+      </div>
 
-      <label className="project-brief__field">
-        <span className="project-brief__label">
-          {brief.emailLabel} <span aria-hidden>*</span>
-        </span>
-        <input
-          type="email"
-          name="email"
-          autoComplete="email"
-          inputMode="email"
-          required
-          placeholder={brief.emailPlaceholder}
-          value={values.email}
-          onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
-          className="project-brief__input ui-input"
-        />
-      </label>
+      <div className="fm-2">
+        <label className="fld">
+          <span>{brief.companyLabel}</span>
+          <input
+            type="text"
+            name="company"
+            autoComplete="organization"
+            placeholder={brief.companyPlaceholder}
+            value={values.company}
+            onChange={(e) => setValues((v) => ({ ...v, company: e.target.value }))}
+          />
+        </label>
+        <label className="fld">
+          <span>{brief.linkLabel}</span>
+          <input
+            type="text"
+            name="productUrl"
+            inputMode="url"
+            autoComplete="url"
+            placeholder={brief.linkPlaceholder}
+            value={values.productUrl}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, productUrl: e.target.value }))
+            }
+          />
+        </label>
+      </div>
 
-      <label className="project-brief__field">
-        <span className="project-brief__label">{brief.companyLabel}</span>
-        <input
-          type="text"
-          name="company"
-          autoComplete="organization"
-          placeholder={brief.companyPlaceholder}
-          value={values.company}
-          onChange={(e) => setValues((v) => ({ ...v, company: e.target.value }))}
-          className="project-brief__input ui-input"
-        />
-      </label>
-
-      <label className="project-brief__field">
-        <span className="project-brief__label">{brief.linkLabel}</span>
-        <input
-          type="text"
-          name="productUrl"
-          inputMode="url"
-          autoComplete="url"
-          placeholder={brief.linkPlaceholder}
-          value={values.productUrl}
-          onChange={(e) =>
-            setValues((v) => ({ ...v, productUrl: e.target.value }))
-          }
-          className="project-brief__input ui-input"
-        />
-      </label>
-
-      <div className="project-brief__field">
-        <span className="project-brief__label">
-          {brief.helpLabel} <span aria-hidden>*</span>
-        </span>
+      <fieldset className="fld">
+        <legend>
+          {brief.helpLabel} *
+        </legend>
         <ProjectBriefMultiSelect
           label={brief.helpLabel}
           hint={brief.helpHint}
@@ -285,20 +268,19 @@ export function ProjectBriefForm({
           value={services}
           onChange={setServices}
         />
-      </div>
+      </fieldset>
 
-      <label className="project-brief__field">
-        <span className="project-brief__label">
-          {brief.aboutLabel} <span aria-hidden>*</span>
+      <label className="fld">
+        <span>
+          {brief.aboutLabel} *
         </span>
         <textarea
           name="message"
           required
-          rows={2}
+          rows={4}
           placeholder={brief.aboutPlaceholder}
           value={values.about}
           onChange={(e) => setValues((v) => ({ ...v, about: e.target.value }))}
-          className="project-brief__input project-brief__input--area ui-input"
         />
       </label>
 
@@ -307,7 +289,7 @@ export function ProjectBriefForm({
         <div ref={widgetHostRef} className="project-brief__captcha" />
       ) : null}
 
-      <label className="contact-form__consent project-brief__consent">
+      <label className="cns">
         <input
           type="checkbox"
           name="consent"
@@ -321,29 +303,27 @@ export function ProjectBriefForm({
             href={locale === "de" ? "/de/privacy/" : "/privacy/"}
             target="_blank"
             rel="noreferrer"
-            className="contact-form__consent-link"
+            className="lnk"
           >
-            {ui.consentLinkLabel}
+            {ui.consentLinkLabel} ↗
           </a>
           {ui.consentSuffix ? ` ${ui.consentSuffix}` : ""}.
         </span>
       </label>
 
       {error ? (
-        <p className="contact-form__error" role="alert">
+        <p className="fm-err" role="alert">
           {error}
         </p>
-      ) : null}
+      ) : (
+        <p className="fm-err" role="alert" />
+      )}
 
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        disabled={loading}
-        className="project-brief__submit metric-cta--full"
-      >
-        {loading ? brief.submitting : brief.submit}
-      </Button>
+      <div>
+        <ProtoBtn type="submit" className={loading ? "is-loading" : ""}>
+          {loading ? brief.submitting : brief.submit}
+        </ProtoBtn>
+      </div>
     </form>
   );
 }

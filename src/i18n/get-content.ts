@@ -9,6 +9,7 @@ import {
   getPublishedProjects,
 } from "@/lib/cms/projects";
 import { getCmsExtras } from "@/lib/cms/content";
+import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 
 const contentByLocale: Record<Locale, SiteContent> = {
   en: enContent,
@@ -46,29 +47,27 @@ export async function getProjectBySlug(locale: Locale, slug: string) {
   return getProjectBySlugFromCms(locale, slug);
 }
 
-export async function getNextProjects(locale: Locale, slug: string, count = 2) {
-  const projects = await getProjectsForLocale(locale);
-  const current = projects.find((project) => project.slug === slug);
-  if (!current) return projects.slice(0, count);
+/** Next case(s) in home lineup order (fallback: published list), with wrap. */
+export async function getNextProjects(locale: Locale, slug: string, count = 1) {
+  const [projects, home] = await Promise.all([
+    getProjectsForLocale(locale),
+    getMetricHomeResolved(locale),
+  ]);
+  if (!projects.length) return [];
 
-  const others = projects.filter((project) => project.slug !== slug);
-  const scored = others
-    .map((project) => {
-      let score = 0;
-      if (current.sphere && project.sphere === current.sphere) score += 3;
-      for (const tag of current.tags) {
-        if (project.tags.includes(tag)) score += 1;
-      }
-      return { project, score };
-    })
-    .sort((a, b) => b.score - a.score || a.project.slug.localeCompare(b.project.slug));
+  const bySlug = new Map(projects.map((project) => [project.slug, project]));
+  const lineup = home.caseStudies.items
+    .map((item) => bySlug.get(item.slug))
+    .filter((project): project is (typeof projects)[number] => Boolean(project));
+  const ordered = lineup.length ? lineup : projects;
 
-  const related = scored.filter((row) => row.score > 0).map((row) => row.project);
-  if (related.length >= count) return related.slice(0, count);
-
-  const relatedSlugs = new Set(related.map((p) => p.slug));
-  const fill = others.filter((p) => !relatedSlugs.has(p.slug));
-  return [...related, ...fill].slice(0, count);
+  const index = ordered.findIndex((project) => project.slug === slug);
+  if (index < 0) return ordered.slice(0, count);
+  const result: typeof projects = [];
+  for (let offset = 1; offset <= ordered.length && result.length < count; offset++) {
+    result.push(ordered[(index + offset) % ordered.length]!);
+  }
+  return result;
 }
 
 export async function getAllProjectSlugs(): Promise<string[]> {

@@ -27,7 +27,7 @@ export const SITE_CONFIG = {
   },
   nav: [
     { label: "Projects", href: "/#projects" },
-    { label: "Case Studies", href: "/#case-studies" },
+    { label: "Case studies", href: "/#cases" },
     { label: "Services", href: "/#services" },
     { label: "Workflow", href: "/#workflow" },
     { label: "FAQ", href: "/#faq" },

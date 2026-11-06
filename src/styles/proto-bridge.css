@@ -1,0 +1,223 @@
+/* Bridge Next shell ↔ concept (proto-site) classes without fighting SSR. */
+
+html {
+  scroll-padding-top: calc(76px + env(safe-area-inset-top, 0px));
+}
+
+body {
+  font-family: var(--font-ui-stack);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.font-display,
+.d1,
+.d2,
+.d3,
+h1.d1,
+h2.d2 {
+  font-family: var(--font-display-stack);
+}
+
+em,
+.d1 em,
+.d2 em,
+.hero-h em {
+  font-family: var(--font-italic-stack);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.cap,
+.btn,
+.nav,
+.flt,
+.fld,
+.fq-q,
+.fb {
+  font-family: var(--font-ui-stack);
+}
+
+/* Keep Next page shell gutters aligned with concept --gut */
+.page-container.wrap,
+.wrap.page-container {
+  max-width: none;
+  padding-inline: var(--gut);
+}
+
+/* Hide legacy skewed CTA chrome when proto .btn is used */
+.btn.metric-cta::before,
+.btn .metric-cta__label {
+  display: contents;
+}
+.btn.metric-cta {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  height: auto;
+  transform: none;
+}
+
+/* Concept nav sits fixed */
+.site-header.proto-nav,
+header.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 80;
+  height: auto;
+  background: transparent;
+}
+
+/* Language switcher → concept .lang buttons */
+.lang.language-switcher,
+.nav-r .language-switcher {
+  display: flex;
+  gap: 2px;
+  margin-right: 6px;
+  align-items: center;
+}
+.lang .language-switcher__sep,
+.nav-r .language-switcher__sep {
+  display: none;
+}
+.lang .language-switcher__link,
+.lang .language-switcher__active,
+.nav-r .language-switcher__link,
+.nav-r .language-switcher__active {
+  padding: 6px 8px;
+  font: 600 13px/1 var(--f-s);
+  letter-spacing: 0.04em;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  text-transform: uppercase;
+}
+.lang .language-switcher__active,
+.nav-r .language-switcher__active,
+.lang .language-switcher__link:hover,
+.nav-r .language-switcher__link:hover {
+  opacity: 1;
+}
+
+/* Custom cursor only on fine pointers */
+html:not(.fine) .cur,
+html:not(.fine) .curl {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cur,
+  .curl {
+    display: none !important;
+  }
+}
+
+/* Boot wipe — simple paper→ink flash, no leftover title chrome */
+.proto-boot.tr {
+  pointer-events: none;
+  z-index: 300;
+  transition: opacity 0.45s var(--eo);
+  background: var(--night);
+}
+.proto-boot__wash {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, var(--pink) 0%, var(--night) 55%);
+  opacity: 0.92;
+}
+.proto-boot.tr.is-done {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Brief overlay as full-viewport concept `.bf` */
+.project-brief.bf-overlay {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  background: var(--paper);
+}
+.project-brief.bf-overlay .project-brief__backdrop {
+  background: transparent;
+  pointer-events: none;
+}
+.project-brief.bf-overlay .bf-shell {
+  width: 100%;
+  max-width: none;
+  max-height: 100%;
+  overflow: auto;
+  background: var(--paper);
+  border-radius: 0;
+  box-shadow: none;
+}
+.project-brief.bf-overlay .bf-x {
+  position: fixed;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  right: max(18px, env(safe-area-inset-right, 0px));
+  z-index: 5;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+.project-brief.bf-overlay .bf {
+  padding-top: calc(clamp(100px, 18vh, 180px) + env(safe-area-inset-top, 0px));
+}
+.ch-o[aria-pressed="true"] {
+  color: #fff;
+}
+.ch-o[aria-pressed="true"]::before {
+  background: var(--pink);
+  box-shadow: none;
+}
+
+/* Case youtube embed in new grid */
+.metric-case__youtube {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--night);
+}
+.metric-case__youtube iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Admin preview: don't run full-viewport fixed chrome */
+.admin-site-preview .site-header.proto-nav,
+.admin-site-preview header.nav {
+  position: sticky;
+  top: 0;
+}
+.admin-site-preview .proto-boot {
+  display: none !important;
+}
+
+/* Offset first section under fixed nav when not a night hero */
+#main-content > .metric-works,
+#main-content > .metric-case {
+  min-height: 40vh;
+}
+
+/* Logo mark fill */
+.nav .lg .lm,
+.ft .lg .lm,
+.logo .lm {
+  fill: var(--pink);
+}
+.nav.dkn .lg text,
+.nav.dkn .logo {
+  color: var(--on-n);
+}
+html.menu-open .nav .lg text {
+  fill: #fff;
+  color: #fff;
+}

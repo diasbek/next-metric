@@ -12,7 +12,7 @@ export const faqItems: FAQItem[] = [
   {
     question: "How long does a project take?",
     answer:
-      "Most projects take between 7 and 14 business days, depending on the number of deliverables, project complexity, and the speed of feedback. Larger projects involving 3D production, Premium A+ Content, or Brand Store design may require additional time.",
+      "Most projects are delivered within 7 business days, depending on the number of deliverables, project complexity, and the speed of feedback. Larger projects involving 3D production, Premium A+ Content, or Brand Store design may require additional time.",
   },
   {
     question: "Can you work without professional product photos?",

@@ -28,10 +28,11 @@ const PROJECT_SELECT = `
   ${PROJECT_REVIEW_EMBED}
 `;
 
-/** Listing/home cards — translations + reviews (first review feeds cards). */
+/** Listing/home cards — translations + reviews + media (peek slideshow). */
 const PROJECT_LISTING_SELECT = `
   *,
   project_translations:metric_project_translations (*),
+  project_media:metric_project_media ( url, kind, sort_order ),
   ${PROJECT_REVIEW_EMBED}
 `;
 

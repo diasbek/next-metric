@@ -1,13 +1,39 @@
 /* Base document styles, theme bridge, and shared utilities */
 
 :root {
-  --background: #ffffff;
-  --foreground: #090909;
-  --accent: #ff3c82;
-  --surface: #f5f5f5;
-  --muted: rgba(9, 9, 9, 0.6);
-  --dark: #090909;
-  --font-display-stack: var(--font-degular-display), var(--font-degular), system-ui, sans-serif;
+  /* Concept site palette (metric-site.zip) */
+  --pink: #ff3c82;
+  --pink-d: #e2246b;
+  --pink-l: #ffd9e7;
+  --pink-ll: #fff0f5;
+  --ink: #0b0b0d;
+  --ink-2: #45454d;
+  --mute: #85858f;
+  --paper: #f4f3f1;
+  --paper-2: #e8e6e2;
+  --white: #ffffff;
+  --night: #0d0c10;
+  --night-2: #17151c;
+  --on-n: #f4f3f1;
+  --on-n2: rgba(244, 243, 241, 0.62);
+  --line: rgba(11, 11, 13, 0.12);
+  --line-2: rgba(11, 11, 13, 0.24);
+  --line-n: rgba(244, 243, 241, 0.14);
+  --eo: cubic-bezier(0.16, 1, 0.3, 1);
+  --eio: cubic-bezier(0.76, 0, 0.24, 1);
+  --gut: clamp(20px, 6vw, 104px);
+  --acc: var(--pink);
+
+  --background: var(--white);
+  --foreground: var(--ink);
+  --accent: var(--pink);
+  --surface: var(--paper);
+  --muted: var(--mute);
+  --dark: var(--ink);
+  --font-display-stack: var(--font-degular-display), var(--font-archivo), system-ui,
+    sans-serif;
+  --font-italic-stack: var(--font-scotch), Georgia, "Times New Roman", serif;
+  --font-ui-stack: var(--font-archivo), system-ui, sans-serif;
 }
 
 @theme inline {

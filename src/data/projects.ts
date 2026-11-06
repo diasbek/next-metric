@@ -53,6 +53,10 @@ export interface Project {
   image: string;
   tags: ProjectTag[];
   sphere: string;
+  /** Optional hex accent for case page chrome (proto per-case `acc`). */
+  caseAccent?: string;
+  /** Gallery / cover URLs for works-card hover peek. */
+  peekImages?: string[];
   featured?: boolean;
   caseStudy?: CaseStudy;
   seo?: ProjectSeo;

@@ -2,7 +2,6 @@
 
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 import type { SiteContent } from "@/i18n/types";
 import type { WorksFilterOption } from "@/utils/works-filters";
 
@@ -13,6 +12,33 @@ interface WorksListingFiltersProps {
   category: string;
   type: string;
   pathname: string;
+  categoryCounts?: Record<string, number>;
+  typeCounts?: Record<string, number>;
+  totalCount: number;
+}
+
+function Chip({
+  active,
+  label,
+  count,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  count?: number | null;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="fb"
+      aria-pressed={active}
+      onClick={onClick}
+    >
+      {label}
+      {count != null ? <sup>{count}</sup> : null}
+    </button>
+  );
 }
 
 export function WorksListingFilters({
@@ -22,77 +48,64 @@ export function WorksListingFilters({
   category,
   type,
   pathname,
+  categoryCounts = {},
+  typeCounts = {},
+  totalCount,
 }: WorksListingFiltersProps) {
   const router = useRouter();
-  const categoryValue = category || ui.filterAll;
-  const typeValue = type || ui.filterAll;
-  const categoryValues = categoryOptions.map((o) => o.value);
-  const typeValues = typeOptions.map((o) => o.value);
+  const categoryValue = category || "";
+  const typeValue = type || "";
 
   const updateFilter = useCallback(
     (key: "category" | "type", next: string) => {
       const nextCategory = key === "category" ? next : categoryValue;
       const nextType = key === "type" ? next : typeValue;
       const params = new URLSearchParams();
-      if (nextCategory && nextCategory !== ui.filterAll) {
-        params.set("category", nextCategory);
-      }
-      if (nextType && nextType !== ui.filterAll) {
-        params.set("type", nextType);
-      }
+      if (nextCategory) params.set("category", nextCategory);
+      if (nextType) params.set("type", nextType);
       const query = params.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
-    [categoryValue, pathname, router, typeValue, ui.filterAll],
+    [categoryValue, pathname, router, typeValue],
   );
 
-  const clearFilters = useCallback(() => {
-    router.replace(pathname, { scroll: false });
-  }, [pathname, router]);
-
-  const hasActive =
-    (category && category !== ui.filterAll) || (type && type !== ui.filterAll);
-
   return (
-    <div className="works-filters">
-      <div className="works-filters__row">
-        <FilterDropdown
-          label={ui.filterSphere}
-          options={[
-            { value: ui.filterAll, label: ui.filterAll },
-            ...categoryOptions,
-          ]}
-          value={
-            categoryValues.includes(categoryValue) || categoryValue === ui.filterAll
-              ? categoryValue
-              : ui.filterAll
-          }
-          onChange={(value) => updateFilter("category", value)}
-          allLabel={ui.filterAll}
+    <div className="flt" data-in="up">
+      <div className="flt-r" role="group" aria-label={ui.filterSphere}>
+        <span className="cap">{ui.filterSphere}</span>
+        <Chip
+          active={!categoryValue}
+          label={ui.filterAll}
+          count={totalCount}
+          onClick={() => updateFilter("category", "")}
         />
-        <FilterDropdown
-          label={ui.filterDirection}
-          options={[
-            { value: ui.filterAll, label: ui.filterAll },
-            ...typeOptions,
-          ]}
-          value={
-            typeValues.includes(typeValue) || typeValue === ui.filterAll
-              ? typeValue
-              : ui.filterAll
-          }
-          onChange={(value) => updateFilter("type", value)}
-          allLabel={ui.filterAll}
+        {categoryOptions.map((opt) => (
+          <Chip
+            key={opt.value}
+            active={categoryValue === opt.value}
+            label={opt.label}
+            count={categoryCounts[opt.value] ?? 0}
+            onClick={() => updateFilter("category", opt.value)}
+          />
+        ))}
+      </div>
+      <div className="flt-r" role="group" aria-label={ui.filterDirection}>
+        <span className="cap">{ui.filterDirection}</span>
+        <Chip
+          active={!typeValue}
+          label={ui.filterAll}
+          count={null}
+          onClick={() => updateFilter("type", "")}
         />
-        {hasActive ? (
-          <button
-            type="button"
-            className="works-filters__clear"
-            onClick={clearFilters}
-          >
-            {ui.filterClear}
-          </button>
-        ) : null}
+        {typeOptions.map((opt) => (
+          <Chip
+            key={opt.value}
+            active={typeValue === opt.value}
+            label={opt.label}
+            count={typeCounts[opt.value] ?? 0}
+            onClick={() => updateFilter("type", opt.value)}
+          />
+        ))}
       </div>
     </div>
   );

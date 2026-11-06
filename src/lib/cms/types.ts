@@ -36,6 +36,7 @@ export type DbProject = {
   sphere: string;
   featured: boolean;
   cover_image: string;
+  case_accent?: string;
   og_image?: string;
   seo_indexable?: boolean;
   published_at: string | null;
@@ -316,6 +317,20 @@ export function mapProjectRow(
     };
   }
 
+  const peekImages = [
+    ...new Set(
+      [
+        row.cover_image,
+        ...media
+          .slice()
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((m) => m.url),
+      ]
+        .map((url) => (typeof url === "string" ? url.trim() : ""))
+        .filter(Boolean),
+    ),
+  ].slice(0, 8);
+
   return {
     slug: row.slug,
     title,
@@ -323,6 +338,8 @@ export function mapProjectRow(
     image: row.cover_image || hero?.url || "",
     tags,
     sphere: row.sphere,
+    caseAccent: row.case_accent?.trim() || undefined,
+    peekImages: peekImages.length > 1 ? peekImages : undefined,
     featured: row.featured,
     caseStudy,
     author,

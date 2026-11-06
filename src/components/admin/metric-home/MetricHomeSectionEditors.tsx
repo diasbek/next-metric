@@ -99,8 +99,11 @@ function projectCardForLocale(
 
 export function HeroSectionEditor({ locale, current, update }: LocalePayloadProps) {
   const hero = asRecord(current.hero);
+  const ctr = asRecord(current.ctr);
   const patch = (partial: Record<string, unknown>) =>
     update(patchSection(current, "hero", partial));
+  const patchCtr = (partial: Record<string, unknown>) =>
+    update(patchSection(current, "ctr", partial));
 
   return (
     <fieldset style={fieldset}>
@@ -131,6 +134,13 @@ export function HeroSectionEditor({ locale, current, update }: LocalePayloadProp
           style={adminInput}
           value={readString(hero, "cta")}
           onChange={(e) => patch({ cta: e.target.value })}
+        />
+      </Field>
+      <Field title="Pointer hint">
+        <input
+          style={adminInput}
+          value={readString(hero, "hint")}
+          onChange={(e) => patch({ hint: e.target.value })}
         />
       </Field>
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
@@ -191,6 +201,53 @@ export function HeroSectionEditor({ locale, current, update }: LocalePayloadProp
         folder="metric-home/hero"
         onChange={(url) => patch({ product2: url })}
       />
+      <div style={cardBox}>
+        <strong style={{ color: "#fff", fontSize: 13 }}>CTR chart</strong>
+        <Field title="CTR kicker">
+          <input
+            style={adminInput}
+            value={readString(ctr, "kicker")}
+            onChange={(e) => patchCtr({ kicker: e.target.value })}
+          />
+        </Field>
+        <Field title="CTR title">
+          <input
+            style={adminInput}
+            value={readString(ctr, "title")}
+            onChange={(e) => patchCtr({ title: e.target.value })}
+          />
+        </Field>
+        <Field title="CTR title accent (italic substring)">
+          <input
+            style={adminInput}
+            value={readString(ctr, "titleAccent")}
+            onChange={(e) => patchCtr({ titleAccent: e.target.value })}
+          />
+        </Field>
+        <Field title="CTR body">
+          <textarea
+            style={{ ...adminInput, minHeight: 80 }}
+            value={readString(ctr, "body")}
+            onChange={(e) => patchCtr({ body: e.target.value })}
+          />
+        </Field>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
+          <Field title="Before label">
+            <input
+              style={adminInput}
+              value={readString(ctr, "beforeLabel")}
+              onChange={(e) => patchCtr({ beforeLabel: e.target.value })}
+            />
+          </Field>
+          <Field title="After label">
+            <input
+              style={adminInput}
+              value={readString(ctr, "afterLabel")}
+              onChange={(e) => patchCtr({ afterLabel: e.target.value })}
+            />
+          </Field>
+        </div>
+      </div>
     </fieldset>
   );
 }
@@ -252,6 +309,20 @@ export function TrustSectionEditor({ locale, current, update }: LocalePayloadPro
                     onChange={(e) => patchCard(index, { label: e.target.value })}
                   />
                 </Field>
+                <Field title="Value">
+                  <input
+                    style={adminInput}
+                    value={readString(card, "value")}
+                    onChange={(e) => patchCard(index, { value: e.target.value })}
+                  />
+                </Field>
+                <Field title="Text">
+                  <textarea
+                    style={{ ...adminInput, minHeight: 64 }}
+                    value={readString(card, "text")}
+                    onChange={(e) => patchCard(index, { text: e.target.value })}
+                  />
+                </Field>
                 <PayloadImageInput
                   label="Icon"
                   value={readString(card, "icon")}
@@ -262,6 +333,18 @@ export function TrustSectionEditor({ locale, current, update }: LocalePayloadPro
             ) : null}
             {kind === "rating" || kind === "stat" ? (
               <>
+                <Field title="Label">
+                  <input
+                    style={adminInput}
+                    value={
+                      readString(card, "label") ||
+                      [readString(card, "labelLine1"), readString(card, "labelLine2")]
+                        .filter(Boolean)
+                        .join(" ")
+                    }
+                    onChange={(e) => patchCard(index, { label: e.target.value })}
+                  />
+                </Field>
                 <Field title="Value">
                   <input
                     style={adminInput}
@@ -269,22 +352,45 @@ export function TrustSectionEditor({ locale, current, update }: LocalePayloadPro
                     onChange={(e) => patchCard(index, { value: e.target.value })}
                   />
                 </Field>
-                <Field title="Label line 1">
-                  <input
-                    style={adminInput}
-                    value={readString(card, "labelLine1")}
-                    onChange={(e) =>
-                      patchCard(index, { labelLine1: e.target.value })
-                    }
-                  />
-                </Field>
-                <Field title="Label line 2">
-                  <input
-                    style={adminInput}
-                    value={readString(card, "labelLine2")}
-                    onChange={(e) =>
-                      patchCard(index, { labelLine2: e.target.value })
-                    }
+                <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr 1fr" }}>
+                  <Field title="Prefix">
+                    <input
+                      style={adminInput}
+                      value={readString(card, "prefix")}
+                      onChange={(e) =>
+                        patchCard(index, { prefix: e.target.value })
+                      }
+                    />
+                  </Field>
+                  <Field title="Suffix">
+                    <input
+                      style={adminInput}
+                      value={readString(card, "suffix")}
+                      onChange={(e) =>
+                        patchCard(index, { suffix: e.target.value })
+                      }
+                    />
+                  </Field>
+                  <Field title="Count num">
+                    <input
+                      style={adminInput}
+                      value={
+                        typeof card.num === "number" ? String(card.num) : ""
+                      }
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        patchCard(index, {
+                          num: Number.isFinite(n) ? n : undefined,
+                        });
+                      }}
+                    />
+                  </Field>
+                </div>
+                <Field title="Text">
+                  <textarea
+                    style={{ ...adminInput, minHeight: 64 }}
+                    value={readString(card, "text")}
+                    onChange={(e) => patchCard(index, { text: e.target.value })}
                   />
                 </Field>
                 {kind === "rating" ? (
@@ -383,6 +489,13 @@ export function CategoriesSectionEditor({
           </div>
         );
       })}
+      <Field title="Lead">
+        <textarea
+          style={{ ...adminInput, minHeight: 72 }}
+          value={readString(categories, "lead")}
+          onChange={(e) => patch({ lead: e.target.value })}
+        />
+      </Field>
       {images.map((src, index) => (
         <PayloadImageInput
           key={`img-${index}`}
@@ -733,6 +846,13 @@ export function HomeServicesSectionEditor({
               />
             </Field>
           </div>
+          <Field title="Body">
+            <textarea
+              style={{ ...adminInput, minHeight: 72 }}
+              value={readString(item, "body")}
+              onChange={(e) => patchItem(index, { body: e.target.value })}
+            />
+          </Field>
           <PayloadImageInput
             label="Image"
             value={readString(item, "image")}
@@ -741,6 +861,34 @@ export function HomeServicesSectionEditor({
           />
         </div>
       ))}
+      <Field title="Also-on-request label">
+        <input
+          style={adminInput}
+          value={readString(services, "alsoLabel")}
+          onChange={(e) => patch({ alsoLabel: e.target.value })}
+        />
+      </Field>
+      <Field title="Also list (one per line)">
+        <textarea
+          style={{ ...adminInput, minHeight: 88 }}
+          value={readStringArray(services, "also").join("\n")}
+          onChange={(e) =>
+            patch({
+              also: e.target.value
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean),
+            })
+          }
+        />
+      </Field>
+      <Field title="Tell-us CTA">
+        <input
+          style={adminInput}
+          value={readString(services, "tellUs")}
+          onChange={(e) => patch({ tellUs: e.target.value })}
+        />
+      </Field>
       <button
         type="button"
         style={adminBtn}
@@ -748,7 +896,7 @@ export function HomeServicesSectionEditor({
           patch({
             items: [
               ...items,
-              { n: String(items.length + 1), title: "", image: "" },
+              { n: String(items.length + 1), title: "", body: "", image: "" },
             ],
           })
         }
@@ -765,15 +913,28 @@ export function WorkflowSectionEditor({
   update,
 }: LocalePayloadProps) {
   const workflow = asRecord(current.workflow);
+  const process = asRecord(current.process);
+  const processSteps = asArray(process.steps).map((item) => asRecord(item));
   const cards = asArray(workflow.cards).map((item) => asRecord(item));
 
   function patch(partial: Record<string, unknown>) {
     update(patchSection(current, "workflow", partial));
   }
 
+  function patchProcess(partial: Record<string, unknown>) {
+    update(patchSection(current, "process", partial));
+  }
+
   function patchCard(index: number, partial: Record<string, unknown>) {
     const next = cards.map((card, i) => (i === index ? { ...card, ...partial } : card));
     patch({ cards: next });
+  }
+
+  function patchStep(index: number, partial: Record<string, unknown>) {
+    const next = processSteps.map((step, i) =>
+      i === index ? { ...step, ...partial } : step,
+    );
+    patchProcess({ steps: next });
   }
 
   return (
@@ -814,6 +975,48 @@ export function WorkflowSectionEditor({
           onChange={(e) => patch({ note: e.target.value })}
         />
       </Field>
+      <div style={cardBox}>
+        <strong style={{ color: "#fff", fontSize: 13 }}>Process rail</strong>
+        <Field title="Process title">
+          <input
+            style={adminInput}
+            value={readString(process, "title")}
+            onChange={(e) => patchProcess({ title: e.target.value })}
+          />
+        </Field>
+        <Field title="Process title accent (italic substring)">
+          <input
+            style={adminInput}
+            value={readString(process, "titleAccent")}
+            onChange={(e) => patchProcess({ titleAccent: e.target.value })}
+          />
+        </Field>
+        <Field title="Process note">
+          <input
+            style={adminInput}
+            value={readString(process, "note")}
+            onChange={(e) => patchProcess({ note: e.target.value })}
+          />
+        </Field>
+        {processSteps.map((step, index) => (
+          <div key={`ps-${index}`} style={{ marginTop: 10 }}>
+            <Field title={`Step ${index + 1} heading`}>
+              <input
+                style={adminInput}
+                value={readString(step, "h")}
+                onChange={(e) => patchStep(index, { h: e.target.value })}
+              />
+            </Field>
+            <Field title={`Step ${index + 1} body`}>
+              <textarea
+                style={{ ...adminInput, minHeight: 56 }}
+                value={readString(step, "p")}
+                onChange={(e) => patchStep(index, { p: e.target.value })}
+              />
+            </Field>
+          </div>
+        ))}
+      </div>
       {cards.map((card, index) => (
         <div key={`wf-${index}`} style={cardBox}>
           <div style={row}>
@@ -844,6 +1047,22 @@ export function WorkflowSectionEditor({
               onChange={(e) => patchCard(index, { body: e.target.value })}
             />
           </Field>
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
+            <Field title="Metric (k)">
+              <input
+                style={adminInput}
+                value={readString(card, "k")}
+                onChange={(e) => patchCard(index, { k: e.target.value })}
+              />
+            </Field>
+            <Field title="Metric label (kl)">
+              <input
+                style={adminInput}
+                value={readString(card, "kl")}
+                onChange={(e) => patchCard(index, { kl: e.target.value })}
+              />
+            </Field>
+          </div>
           <Field title="Layout">
             <select
               style={adminInput}
@@ -872,6 +1091,8 @@ export function WorkflowSectionEditor({
               {
                 title: "",
                 body: "",
+                k: "",
+                kl: "",
                 image: "",
                 layout: "media-top",
               },

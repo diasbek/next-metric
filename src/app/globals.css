@@ -25,3 +25,7 @@
 @import "../styles/feedback.css";
 @import "../styles/project-brief.css";
 @import "../styles/cookie-consent.css";
+
+/* Concept visual system (metric-site.zip) — loads last so 1:1 classes win. */
+@import "../styles/proto-site.css";
+@import "../styles/proto-bridge.css";

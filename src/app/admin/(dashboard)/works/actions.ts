@@ -160,6 +160,7 @@ export async function saveProjectAction(formData: FormData) {
       featured: formData.get("featured") === "on",
       sort_order: Number(formData.get("sort_order") ?? 0),
       cover_image: coverImage,
+      case_accent: String(formData.get("case_accent") ?? "").trim(),
       og_image: ogImage,
       seo_indexable: formData.get("seo_indexable") !== "off",
       published_at: status === "published" ? new Date().toISOString() : null,

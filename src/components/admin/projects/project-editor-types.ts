@@ -59,6 +59,7 @@ export type ProjectEditorData = {
   sort_order: number;
   featured: boolean;
   cover_image: string;
+  case_accent: string;
   og_image: string;
   seo_indexable: boolean;
   translations: Record<AdminLocale, ProjectTranslationDraft>;

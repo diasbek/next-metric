@@ -21,7 +21,8 @@
  *   - chrome: --cta-height, --header-height, radii (slightly)
  */
 :root {
-  --page-padding: clamp(20px, 20px + (100vw - 320px) * 0.03356, 60px);
+  /* Align with concept --gut while keeping fluid shell growth. */
+  --page-padding: clamp(20px, 6vw, 104px);
   /* 1512 at design width; 90vw past ~1680px; hard-cap 3840 on 4K UHD.
      90vw (was 92vw) leaves a clearer side gutter on ultrawide / 4K. */
   --container-max: max(1512px, min(90vw, 3840px));

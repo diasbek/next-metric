@@ -671,6 +671,18 @@ export function ProjectEditor({ project, library, tagOptions }: Props) {
               />
               {t.pages.project.featured}
             </label>
+            <label style={{ display: "grid", gap: 6, fontSize: 13 }}>
+              Case accent (hex)
+              <input
+                name="case_accent"
+                value={draft.case_accent}
+                onChange={(e) =>
+                  setDraft((p) => ({ ...p, case_accent: e.target.value }))
+                }
+                placeholder="#A7D82B"
+                style={adminInput}
+              />
+            </label>
 
             <MediaSourceTabs
               mode={coverSource}

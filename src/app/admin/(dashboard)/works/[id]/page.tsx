@@ -78,6 +78,7 @@ export default async function AdminProjectEditPage({
     sort_order: project.sort_order ?? 0,
     featured: Boolean(project.featured),
     cover_image: project.cover_image ?? "",
+    case_accent: project.case_accent ?? "",
     og_image: project.og_image ?? "",
     seo_indexable: project.seo_indexable !== false,
     translations,

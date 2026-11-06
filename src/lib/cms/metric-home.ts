@@ -24,10 +24,12 @@ export type HomeCaseCardFields = {
   description: string;
   image: string;
   title?: string;
+  category?: string;
 };
 
 type ProjectEnrichment = {
   cover_image: string | null;
+  sphere: string | null;
   title: string | null;
   description: string | null;
   tags: string[];
@@ -70,7 +72,7 @@ export async function enrichCaseStudiesFromProjects(
     const { data, error } = await supabase
       .from("metric_projects")
       .select(
-        `slug, cover_image,
+        `slug, cover_image, sphere,
          metric_project_translations ( locale, title, description, tags, author, role, quote ),
          metric_project_reviews (
            id, sort_order,
@@ -118,6 +120,10 @@ export async function enrichCaseStudiesFromProjects(
           typeof row.cover_image === "string" && row.cover_image.trim()
             ? row.cover_image.trim()
             : null,
+        sphere:
+          typeof row.sphere === "string" && row.sphere.trim()
+            ? row.sphere.trim()
+            : null,
         title: coalesceLocalized(primary?.title, en?.title) || null,
         description:
           coalesceLocalized(primary?.description, en?.description) || null,
@@ -146,9 +152,10 @@ export async function enrichCaseStudiesFromProjects(
       const project = slug ? bySlug.get(slug) : undefined;
       if (!project) return item;
 
-      const quote = project.quote || project.title || item.quote;
-      const author = project.author || project.title || item.author;
-      const role = project.role || item.role;
+      // Only real review/CMS quotes — never fall back to title (proto: CASES.filter(c => c.rev)).
+      const quote = project.quote || item.quote || "";
+      const author = project.author || item.author || "";
+      const role = project.role || item.role || "";
       const itemDescription =
         typeof (item as { description?: unknown }).description === "string"
           ? (item as { description: string }).description.trim()
@@ -166,6 +173,7 @@ export async function enrichCaseStudiesFromProjects(
         description,
         image,
         ...(project.title ? { title: project.title } : {}),
+        ...(project.sphere ? { category: project.sphere } : {}),
       };
     });
 

@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { ProjectBriefCta } from "@/components/molecules/ProjectBriefCta";
+import { ProtoBtn } from "@/components/proto/ProtoBtn";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
-import { PageContainer } from "@/components/atoms/PageContainer";
-import { SiteNav } from "@/components/molecules/SiteNav";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
-import { localePath, localeBriefHref } from "@/i18n/paths";
+import { localePath } from "@/i18n/paths";
+import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
+import { usePathname } from "next/navigation";
+import { useActiveSectionHash } from "@/hooks/useActiveSectionHash";
+import { useLocationHash } from "@/hooks/useLocationHash";
+import { isNavPathActive } from "@/utils/nav";
 
 interface HeaderProps {
   locale: Locale;
@@ -19,55 +21,49 @@ interface HeaderProps {
   home: MetricHomeContent;
 }
 
-const HERO_SCROLL_SOLIDIFY_PX = 24;
-
-function MetricLogo({
-  name,
-  href,
-  onClick,
-  priority,
-}: {
-  name: string;
-  href: string;
-  onClick?: () => void;
-  priority?: boolean;
-}) {
+function MetricLogoMark() {
   return (
-    <TransitionLink
-      href={href}
-      aria-label={name}
-      onClick={onClick}
-      className="site-header__logo-link"
-    >
-      <Image
-        src="/images/metric/logo/metric-logo.svg"
-        alt={name}
-        fill
-        className="object-contain object-left"
-        priority={priority}
-      />
-    </TransitionLink>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      className="lg"
+      src="/images/metric/logo/metric-logo.svg"
+      alt=""
+      height={28}
+      style={{ height: 28, width: "auto" }}
+    />
   );
+}
+
+/** Map CMS nav hrefs onto the concept IA (projects listing + section anchors). */
+function resolveNavHref(href: string): string {
+  const h = href.trim();
+  if (h === "/#projects" || h === "/#case-studies" || h === "/#cases") {
+    if (h === "/#projects") return "/works/";
+    return "/#cases";
+  }
+  return h;
 }
 
 export function Header({
   locale,
   site,
   ui,
-  variant = "compact",
   home,
 }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const homePath = localePath(locale, "/");
-  const briefHref = localeBriefHref(locale);
-  const isHero = variant === "hero";
+  const pathname = usePathname();
+  const hash = useLocationHash();
   const cta = home.footer.startCta;
+
   const navItems = home.nav.map((item) => ({
     label: item.label,
-    path: item.href,
+    path: resolveNavHref(item.href),
   }));
+
+  const spyHash = useActiveSectionHash(navItems.map((item) => item.path));
+  const effectiveHash = spyHash !== null ? spyHash : hash;
 
   useEffect(() => {
     const inPreview = Boolean(headerRef.current?.closest(".admin-site-preview"));
@@ -78,9 +74,11 @@ export function Header({
       return;
     }
 
+    document.documentElement.classList.toggle("menu-open", open);
     document.documentElement.classList.toggle("is-mobile-menu-open", open);
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
+      document.documentElement.classList.remove("menu-open");
       document.documentElement.classList.remove("is-mobile-menu-open");
       document.body.style.overflow = "";
     };
@@ -92,145 +90,106 @@ export function Header({
       if (event.key === "Escape") setOpen(false);
     };
     const onResize = () => {
-      if (window.matchMedia("(min-width: 1024px)").matches) setOpen(false);
+      if (window.matchMedia("(min-width: 980px)").matches) setOpen(false);
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("resize", onResize);
-    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(frame);
     };
   }, [open]);
 
-  // Hero starts transparent over the white hero; solidify on scroll so
-  // dark nav doesn't disappear into pink/accent sections underneath.
-  useEffect(() => {
-    if (!isHero) return;
-    const header = headerRef.current;
-    if (!header) return;
-
-    let ticking = false;
-    const syncScrolled = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        header.classList.toggle(
-          "is-scrolled",
-          window.scrollY > HERO_SCROLL_SOLIDIFY_PX,
-        );
-      });
-    };
-
-    syncScrolled();
-    window.addEventListener("scroll", syncScrolled, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", syncScrolled);
-      header.classList.remove("is-scrolled");
-    };
-  }, [isHero]);
-
   return (
     <>
-      <header
-        ref={headerRef}
-        data-site-header
-        data-header-variant={variant}
-        className={
-          isHero
-            ? "site-header site-header--hero sticky top-0 z-50"
-            : "site-header sticky top-0 z-50 bg-white/90 backdrop-blur-md"
-        }
-      >
-        <PageContainer className="site-header__inner">
-          <MetricLogo name={site.name} href={homePath} priority />
+      <header ref={headerRef} className="nav wrap site-header proto-nav" id="nav">
+        <TransitionLink
+          href={homePath}
+          aria-label={site.name}
+          className="logo"
+          style={{ height: 28, display: "block" }}
+        >
+          <MetricLogoMark />
+        </TransitionLink>
 
-          <SiteNav
+        <nav aria-label={ui.navAria}>
+          <ul className="nav-ul" id="nav-ul">
+            {navItems.map((item) => {
+              const active = isNavPathActive(pathname, item.path, effectiveHash);
+              return (
+                <li key={item.path}>
+                  <TransitionLink
+                    href={localePath(locale, item.path)}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {item.label}
+                  </TransitionLink>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="nav-r">
+          <LanguageSwitcher
             locale={locale}
-            items={navItems}
-            variant="header"
-            ariaLabel={ui.navAria}
-            className="site-header__nav"
+            ariaLabel={ui.langAria}
+            variant="inline"
+            className="lang"
           />
-
-          <div className="flex items-center gap-3">
-            <ProjectBriefCta
-              href={briefHref}
-              variant="outlineAccent"
-              size="sm"
-              className="site-header__cta"
-            >
-              {cta}
-            </ProjectBriefCta>
-            <button
-              type="button"
-              className="site-header__menu-btn"
-              aria-label={ui.openMenu}
-              aria-expanded={open}
-              aria-controls="site-mobile-menu"
-              onClick={() => setOpen(true)}
-            >
-              <span className="sr-only">{ui.openMenu}</span>
-              <span className="site-header__menu-icon" aria-hidden>
-                <span />
-                <span />
-              </span>
-            </button>
-          </div>
-        </PageContainer>
+          <ProtoBtn brief locale={locale} className="sm nav-cta">
+            {cta}
+          </ProtoBtn>
+          <button
+            className="burger"
+            type="button"
+            aria-expanded={open}
+            aria-controls="menu"
+            aria-label={open ? ui.closeMenu : ui.openMenu}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <i />
+            <i />
+          </button>
+        </div>
       </header>
 
       <div
-        id="site-mobile-menu"
-        className="mobile-menu-panel lg:hidden"
+        className="menu wrap"
+        id="menu"
         role="dialog"
         aria-modal={open}
         aria-label={ui.navAria}
         aria-hidden={!open}
         inert={!open ? true : undefined}
-        data-open={open ? "true" : undefined}
       >
-        <PageContainer className="mobile-menu-panel__bar">
-          <MetricLogo
-            name={site.name}
-            href={homePath}
-            onClick={() => setOpen(false)}
-          />
-          <button
-            ref={closeButtonRef}
-            type="button"
-            className="mobile-menu-panel__close"
-            aria-label={ui.closeMenu}
-            onClick={() => setOpen(false)}
-          >
-            <span className="sr-only">{ui.closeMenu}</span>
-            <span className="mobile-menu-panel__close-icon" aria-hidden>
-              <span />
-              <span />
-            </span>
-          </button>
-        </PageContainer>
-
-        <PageContainer className="mobile-menu-panel__body">
-          <SiteNav
+        <div className="menu-l">
+          {navItems.map((item, i) => (
+            <TransitionLink
+              key={item.path}
+              href={localePath(locale, item.path)}
+              onClick={() => setOpen(false)}
+            >
+              {item.label}
+              <small>{String(i + 1).padStart(2, "0")}</small>
+            </TransitionLink>
+          ))}
+        </div>
+        <div className="menu-b">
+          <LanguageSwitcher
             locale={locale}
-            items={navItems}
-            variant="mobile"
-            ariaLabel={ui.navAria}
-            onNavigate={() => setOpen(false)}
+            ariaLabel={ui.langAria}
+            variant="inline"
           />
-          <ProjectBriefCta
-            href={briefHref}
-            variant="outlineAccent"
-            size="sm"
-            className="mobile-menu-panel__cta"
+          <ProtoBtn
+            brief
+            locale={locale}
+            className="sm wh"
             onClick={() => setOpen(false)}
           >
             {cta}
-          </ProjectBriefCta>
-        </PageContainer>
+          </ProtoBtn>
+        </div>
       </div>
     </>
   );

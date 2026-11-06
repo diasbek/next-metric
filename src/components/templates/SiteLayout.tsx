@@ -5,6 +5,9 @@ import { getPublicCaptchaConfig } from "@/lib/cms/settings";
 import { Header } from "@/components/organisms/Header";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { ProjectBriefProvider } from "@/components/molecules/ProjectBriefProvider";
+import { ProtoMotion } from "@/components/proto/ProtoMotion";
+import { ProtoBootOverlay } from "@/components/proto/ProtoBootOverlay";
+import { ProtoReviewsBind } from "@/components/proto/ProtoReviewsBind";
 
 interface SiteLayoutProps {
   locale: Locale;
@@ -37,12 +40,17 @@ export async function SiteLayout({
         variant={headerVariant}
         home={home}
       />
-      <div id="site-content">
-        <main id="main-content">
-          {children}
-        </main>
-      </div>
-      <SiteFooter locale={locale} content={content} home={home} />
+      <a className="skip" href="#main-content">
+        Skip to content
+      </a>
+      <ProtoMotion>
+        <div id="site-content">
+          <main id="main-content">{children}</main>
+        </div>
+        <SiteFooter locale={locale} content={content} home={home} />
+        <ProtoReviewsBind />
+      </ProtoMotion>
+      <ProtoBootOverlay />
     </ProjectBriefProvider>
   );
 }

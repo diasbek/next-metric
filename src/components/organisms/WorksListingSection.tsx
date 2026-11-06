@@ -1,9 +1,6 @@
-import { PageContainer } from "@/components/atoms/PageContainer";
-import { MetricCaseCard } from "@/components/molecules/MetricCaseCard";
-import { SiteBreadcrumbs } from "@/components/molecules/SiteBreadcrumbs";
+import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { WorksListingFilters } from "@/components/molecules/WorksListingFilters";
 import type { LocalePageProps } from "@/i18n/props";
-import { getLocalizedBreadcrumbs } from "@/i18n/page-seo";
 import { localePath } from "@/i18n/paths";
 import { getMetricHomeResolved } from "@/lib/cms/metric-home";
 import { getActiveTags } from "@/lib/cms/tags";
@@ -16,6 +13,10 @@ import {
   type WorksFilterOption,
 } from "@/utils/works-filters";
 
+function pad(n: number) {
+  return String(n).padStart(2, "0");
+}
+
 export async function WorksListingSection({
   locale,
   content,
@@ -27,10 +28,14 @@ export async function WorksListingSection({
     getMetricHomeResolved(locale),
     getActiveTags(locale),
   ]);
-  const breadcrumbs = getLocalizedBreadcrumbs(locale, ["home", "works"]);
+  const de = locale === "de";
 
   const items = projects.map((project) => {
     const rawTags = project.tags;
+    const peek =
+      project.peekImages && project.peekImages.length > 1
+        ? project.peekImages.join(",")
+        : "";
     return {
       slug: project.slug,
       href: localePath(locale, `/works/${project.slug}/`),
@@ -40,6 +45,7 @@ export async function WorksListingSection({
       image: project.image,
       imageAlt: project.title,
       sphere: project.sphere,
+      peek,
       rawTags,
     };
   });
@@ -71,6 +77,33 @@ export async function WorksListingSection({
     }));
   }
 
+  const categoryCounts: Record<string, number> = {};
+  const typeCounts: Record<string, number> = {};
+  for (const item of items) {
+    for (const opt of categoryOptions) {
+      if (
+        projectMatchesWorksFilters(
+          { sphere: item.sphere, tags: item.rawTags },
+          opt.value,
+          null,
+        )
+      ) {
+        categoryCounts[opt.value] = (categoryCounts[opt.value] ?? 0) + 1;
+      }
+    }
+    for (const opt of typeOptions) {
+      if (
+        projectMatchesWorksFilters(
+          { sphere: item.sphere, tags: item.rawTags },
+          null,
+          opt.value,
+        )
+      ) {
+        typeCounts[opt.value] = (typeCounts[opt.value] ?? 0) + 1;
+      }
+    }
+  }
+
   const filtered = items.filter((item) =>
     projectMatchesWorksFilters(
       {
@@ -83,16 +116,30 @@ export async function WorksListingSection({
   );
 
   return (
-    <div className="metric-works metric-case-studies bg-white pb-20 pt-10 md:pt-14">
-      <PageContainer>
-        <SiteBreadcrumbs items={breadcrumbs} className="mb-6" />
-        <div className="metric-works__header mb-12 md:mb-16">
-          <h1 className="metric-works__title font-display text-foreground">
-            {ui.allProjects}
-          </h1>
-          <p className="metric-works__subtitle">{home.caseStudies.subtitle}</p>
+    <div className="metric-works">
+      <header className="ph wrap">
+        <p className="cap" data-in="fade">
+          {de ? "Projekte" : "Projects"} · {pad(items.length)}
+        </p>
+        <h1 className="d1" data-in="chars">
+          {de ? (
+            <>
+              Ausgewählte <em>Projekte</em>
+            </>
+          ) : (
+            <>
+              Selected <em>projects</em>
+            </>
+          )}
+        </h1>
+        <div className="ph-f" data-in="up">
+          <p className="cap">
+            {de
+              ? "Amazon-Listing-Bilder · Premium A+ · 3D"
+              : "Amazon listing images · Premium A+ · 3D"}
+          </p>
+          <p className="lead">{home.caseStudies.subtitle}</p>
         </div>
-
         <WorksListingFilters
           ui={ui}
           categoryOptions={categoryOptions}
@@ -100,28 +147,62 @@ export async function WorksListingSection({
           category={category}
           type={type}
           pathname={localePath(locale, "/works/")}
+          categoryCounts={categoryCounts}
+          typeCounts={typeCounts}
+          totalCount={items.length}
         />
+      </header>
 
+      <div className="wrap">
         {filtered.length ? (
-          <div className="metric-case-studies__list">
+          <div className="wk-g" id="wk-g">
             {filtered.map((item) => (
-              <MetricCaseCard
-                key={item.slug}
-                locale={locale}
-                href={item.href}
-                tags={item.tags}
-                title={item.title}
-                description={item.description}
-                image={item.image}
-                imageAlt={item.imageAlt}
-                viewLabel={home.caseStudies.viewLabel}
-              />
+              <article className="wk" data-reveal="up" key={item.slug}>
+                <TransitionLink
+                  href={item.href}
+                  className="sc-m"
+                  data-cur={de ? "Fall ansehen" : "View case"}
+                  {...(item.peek ? { "data-peek": item.peek } : {})}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.image}
+                    alt={item.imageAlt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </TransitionLink>
+                {item.tags.length ? (
+                  <div className="tags">
+                    {item.tags.map((tag) => (
+                      <span className="tag" key={tag.slug}>
+                        {tag.label}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <h3>{item.title}</h3>
+                {item.description ? <p>{item.description}</p> : null}
+                <div>
+                  <TransitionLink className="lnk" href={item.href}>
+                    {home.caseStudies.viewLabel}{" "}
+                    <span className="ar" aria-hidden="true">
+                      →
+                    </span>
+                  </TransitionLink>
+                </div>
+              </article>
             ))}
           </div>
         ) : (
-          <p className="works-filters__empty">{ui.filterEmpty}</p>
+          <p className="wk-e">
+            {ui.filterEmpty}{" "}
+            <TransitionLink className="lnk" href={localePath(locale, "/works/")}>
+              {ui.filterClear}
+            </TransitionLink>
+          </p>
         )}
-      </PageContainer>
+      </div>
     </div>
   );
 }

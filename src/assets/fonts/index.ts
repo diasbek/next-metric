@@ -1,6 +1,7 @@
+import { Archivo } from "next/font/google";
 import localFont from "next/font/local";
 
-/** Body / UI — Degular Text. */
+/** Body / UI — Degular Text (licensed files in repo). */
 export const degular = localFont({
   src: [
     {
@@ -57,10 +58,34 @@ export const degularDisplay = localFont({
   variable: "--font-degular-display",
   display: "swap",
   fallback: ["system-ui", "sans-serif"],
-  // Metric-matched fallback + faux-bold of Regular were colliding
-  // with Display’s tight sidebearings on large headlines.
   adjustFontFallback: false,
-  // Headlines are above the fold; without preload they paint in system-ui
-  // first and every heading reflows once Display swaps in.
+  preload: true,
+});
+
+/**
+ * Scotch Text Comp Medium Italic — from metric-site concept handoff.
+ * Subset demo glyph coverage; DE umlauts may fall back to Archivo/Georgia
+ * until a full licensed cut is installed.
+ */
+export const scotch = localFont({
+  src: [
+    {
+      path: "./scotch-text-comp-mdit.woff2",
+      weight: "400",
+      style: "italic",
+    },
+  ],
+  variable: "--font-scotch",
+  display: "swap",
+  fallback: ["Georgia", "Times New Roman", "serif"],
+  preload: true,
+});
+
+/** UI / captions — Archivo variable (matches concept site). */
+export const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
   preload: true,
 });

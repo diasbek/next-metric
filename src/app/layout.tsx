@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { degular, degularDisplay } from "@/assets/fonts";
+import { archivo, degular, degularDisplay, scotch } from "@/assets/fonts";
 import "./globals.css";
 import { NavigationScrollReset } from "@/components/NavigationScrollReset";
 import { SiteAnalytics, LinkedInInsightTag, FacebookPixel } from "@/components/analytics";
@@ -70,7 +70,7 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      className={`${degular.variable} ${degularDisplay.variable}`}
+      className={`${degular.variable} ${degularDisplay.variable} ${scotch.variable} ${archivo.variable}`}
       suppressHydrationWarning
     >
       <head>

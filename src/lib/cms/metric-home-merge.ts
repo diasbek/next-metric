@@ -42,9 +42,48 @@ function mergeSection(
 }
 
 /**
+ * Merge services.items / trust / workflow.cards by index so new CMS fields
+ * (body, k, also, …) still fall back to defaults when the published array is older.
+ */
+function mergeObjectArray(
+  baseItems: unknown[],
+  payloadItems: unknown[],
+): unknown[] {
+  return payloadItems.map((item, index) => {
+    const baseItem = baseItems[index];
+    if (isPlainObject(item) && isPlainObject(baseItem)) {
+      return mergeSection(baseItem, item);
+    }
+    return item;
+  });
+}
+
+function mergeHomeSectionWithItemArrays(
+  key: keyof MetricHomeContent,
+  baseSection: Record<string, unknown>,
+  payloadSection: Record<string, unknown>,
+): Record<string, unknown> {
+  const merged = mergeSection(baseSection, payloadSection);
+  const arrayKey =
+    key === "services" ? "items" : key === "workflow" ? "cards" : null;
+  if (
+    arrayKey &&
+    Array.isArray(payloadSection[arrayKey]) &&
+    Array.isArray(baseSection[arrayKey])
+  ) {
+    merged[arrayKey] = mergeObjectArray(
+      baseSection[arrayKey] as unknown[],
+      payloadSection[arrayKey] as unknown[],
+    );
+  }
+  return merged;
+}
+
+/**
  * Merge CMS payload over static defaults.
  * - Empty strings do not wipe defaults.
  * - Explicit arrays (including empty `caseStudies.items`) always win.
+ * - services.items / workflow.cards merge per-index so new fields keep defaults.
  */
 export function mergeMetricHome(
   base: MetricHomeContent,
@@ -62,9 +101,10 @@ export function mergeMetricHome(
     }
 
     if (isPlainObject(candidate) && isPlainObject(current)) {
-      (next as Record<string, unknown>)[key] = mergeSection(
+      (next as Record<string, unknown>)[key] = mergeHomeSectionWithItemArrays(
+        key,
         current as Record<string, unknown>,
-        candidate,
+        candidate as Record<string, unknown>,
       );
       continue;
     }

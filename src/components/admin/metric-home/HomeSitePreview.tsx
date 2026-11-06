@@ -11,13 +11,18 @@ import { adminBtn } from "@/components/admin/ui/styles";
 import { ProjectBriefPreviewProvider } from "@/components/molecules/ProjectBriefProvider";
 import { Header } from "@/components/organisms/Header";
 import {
+  MetricBandSection,
   MetricCaseStudiesSection,
   MetricCategoriesSection,
+  MetricCtrSection,
+  MetricFaqSection,
   MetricHeroSection,
+  MetricProofSection,
+  MetricReviewsSection,
   MetricServicesSection,
   MetricWorkflowSection,
+  type HomeReview,
 } from "@/components/organisms/MetricHomeSections";
-import { MetricFaqSection } from "@/components/organisms/MetricFaqSection";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
 import { getMetricHome, type MetricHomeContent } from "@/data/metric-home";
 import type { FAQItem } from "@/data/faq";
@@ -144,6 +149,26 @@ export function HomeSitePreview({
     return siteContent.faq ?? [];
   }, [faq, locale, siteContent.faq]);
 
+  const reviews: HomeReview[] = useMemo(() => {
+    return home.caseStudies.items
+      .filter((item) => item.quote?.trim())
+      .map((item) => {
+        const name = item.author || item.title || item.slug;
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        const initials =
+          parts.length <= 1
+            ? (parts[0] || "M").slice(0, 2).toUpperCase()
+            : `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+        return {
+          slug: item.slug,
+          quote: item.quote,
+          author: name,
+          role: item.role || "",
+          initials,
+        };
+      });
+  }, [home.caseStudies.items]);
+
   const designWidth = device === "desktop" ? 1440 : 390;
   const viewportWidth = device === "desktop" ? 380 : 280;
   const publicPath = locale === "en" ? "/" : `/${locale}/`;
@@ -153,19 +178,29 @@ export function HomeSitePreview({
   function renderSection(id: MetricHomeSectionId) {
     switch (id) {
       case "hero":
-        return <MetricHeroSection locale={locale} home={home} />;
+        return (
+          <>
+            <MetricHeroSection locale={locale} home={home} />
+            <MetricProofSection locale={locale} home={home} />
+            <MetricCtrSection locale={locale} home={home} />
+            <MetricBandSection home={home} />
+          </>
+        );
       case "categories":
         return <MetricCategoriesSection locale={locale} home={home} />;
       case "case-studies":
         return (
-          <MetricCaseStudiesSection
-            locale={locale}
-            home={home}
-            taxonomy={taxonomy.map((tag) => ({
-              slug: tag.slug,
-              label: locale === "de" ? tag.de || tag.en : tag.en,
-            }))}
-          />
+          <>
+            <MetricCaseStudiesSection
+              locale={locale}
+              home={home}
+              taxonomy={taxonomy.map((tag) => ({
+                slug: tag.slug,
+                label: locale === "de" ? tag.de || tag.en : tag.en,
+              }))}
+            />
+            <MetricReviewsSection locale={locale} reviews={reviews} />
+          </>
         );
       case "services":
         return <MetricServicesSection locale={locale} home={home} />;
