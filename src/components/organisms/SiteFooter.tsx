@@ -3,6 +3,7 @@
 import type { MouseEvent } from "react";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
 import { ProtoBtn } from "@/components/proto/ProtoBtn";
+import { MetricProtoLogo } from "@/components/molecules/MetricProtoLogo";
 import { useOptionalProjectBrief } from "@/components/molecules/ProjectBriefProvider";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
@@ -22,31 +23,27 @@ function isVisibleFooterLink(link: { label: string; href: string }) {
   return !HIDDEN_FOOTER_LINK_HREFS.has(href);
 }
 
-function MetricLogoMark() {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      className="lg"
-      src="/images/metric/logo/metric-logo.svg"
-      alt=""
-      height={28}
-      style={{ height: 28, width: "auto", filter: "brightness(0) invert(1)" }}
-    />
-  );
-}
-
+/** Letter spans for Talk motion; words stay atomic so “talk” never orphans a letter. */
 function talkLetters(text: string) {
-  return Array.from(text).map((ch, i) =>
-    ch === " " ? (
-      <span key={`sp-${i}`} aria-hidden="true">
-        &nbsp;
+  return text.split(/(\s+)/).map((chunk, i) => {
+    if (!chunk) return null;
+    if (/^\s+$/.test(chunk)) {
+      return (
+        <span key={`sp-${i}`} className="talk-sp" aria-hidden="true">
+          &nbsp;
+        </span>
+      );
+    }
+    return (
+      <span key={`w-${i}`} className="talk-w" aria-hidden="true">
+        {Array.from(chunk).map((ch, j) => (
+          <span key={`${ch}-${j}`} className="talk-ch">
+            {ch}
+          </span>
+        ))}
       </span>
-    ) : (
-      <span key={`${ch}-${i}`} aria-hidden="true">
-        {ch}
-      </span>
-    ),
-  );
+    );
+  });
 }
 
 export function SiteFooter({ locale, content, home }: SiteFooterProps) {
@@ -154,7 +151,7 @@ export function SiteFooter({ locale, content, home }: SiteFooterProps) {
               className="logo"
               style={{ height: 28, display: "inline-block" }}
             >
-              <MetricLogoMark />
+              <MetricProtoLogo />
             </TransitionLink>
             <p>
               {de

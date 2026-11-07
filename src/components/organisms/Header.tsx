@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ProtoBtn } from "@/components/proto/ProtoBtn";
 import { TransitionLink } from "@/components/atoms/TransitionLink";
+import { MetricProtoLogo } from "@/components/molecules/MetricProtoLogo";
 import type { MetricHomeContent } from "@/data/metric-home";
 import type { Locale } from "@/i18n/config";
 import type { SiteContent } from "@/i18n/types";
@@ -21,19 +22,6 @@ interface HeaderProps {
   home: MetricHomeContent;
 }
 
-function MetricLogoMark() {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      className="lg"
-      src="/images/metric/logo/metric-logo.svg"
-      alt=""
-      height={28}
-      style={{ height: 28, width: "auto" }}
-    />
-  );
-}
-
 /** Map CMS nav hrefs onto the concept IA (projects listing + section anchors). */
 function resolveNavHref(href: string): string {
   const h = href.trim();
@@ -49,9 +37,14 @@ export function Header({
   site,
   ui,
   home,
+  variant = "compact",
 }: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const [sol, setSol] = useState(false);
+  const [hide, setHide] = useState(false);
+  const [dkn, setDkn] = useState(variant === "hero");
   const headerRef = useRef<HTMLElement>(null);
+  const navLastY = useRef(0);
   const homePath = localePath(locale, "/");
   const pathname = usePathname();
   const hash = useLocationHash();
@@ -100,16 +93,69 @@ export function Header({
     };
   }, [open]);
 
+  // Proto scroll chrome: solid bar, hide-on-down, dark-over-night sections.
+  useEffect(() => {
+    const inPreview = Boolean(headerRef.current?.closest(".admin-site-preview"));
+    if (inPreview) return;
+
+    navLastY.current = window.scrollY || 0;
+
+    const darkEls = () =>
+      Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "[data-dark], footer.ft, .ft.dk",
+        ),
+      );
+
+    const sync = () => {
+      const y = window.scrollY || 0;
+      const last = navLastY.current;
+      setSol(y > 30);
+      if (!document.documentElement.classList.contains("menu-open")) {
+        if (y > 480 && y > last + 4) setHide(true);
+        else if (y < last - 4 || y < 480) setHide(false);
+      }
+      navLastY.current = y;
+
+      let dark = false;
+      for (const el of darkEls()) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= 38 && r.bottom >= 38) {
+          dark = true;
+          break;
+        }
+      }
+      setDkn(dark);
+    };
+
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    return () => {
+      window.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+    };
+  }, [pathname]);
+
+  const navClass = [
+    "nav",
+    "wrap",
+    sol ? "sol" : "",
+    hide && !open ? "hide" : "",
+    dkn || open ? "dkn" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <>
-      <header ref={headerRef} className="nav wrap site-header proto-nav" id="nav">
+      <header ref={headerRef} className={navClass} id="nav">
         <TransitionLink
           href={homePath}
           aria-label={site.name}
           className="logo"
-          style={{ height: 28, display: "block" }}
         >
-          <MetricLogoMark />
+          <MetricProtoLogo />
         </TransitionLink>
 
         <nav aria-label={ui.navAria}>
@@ -135,7 +181,6 @@ export function Header({
             locale={locale}
             ariaLabel={ui.langAria}
             variant="inline"
-            className="lang"
           />
           <ProtoBtn brief locale={locale} className="sm nav-cta">
             {cta}

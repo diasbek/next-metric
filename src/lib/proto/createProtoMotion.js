@@ -528,7 +528,7 @@ const Proc = {
 };
 const Talk = {
   init() {
-    this.ls = Array.from(D.querySelectorAll('#ft .talk-h span'));
+    this.ls = Array.from(D.querySelectorAll('#ft .talk-h .talk-ch'));
     this.on = false;
     this._measured = false;
     this._measure();
@@ -641,25 +641,9 @@ const Peek = {
   startReveals();
 
   let last = performance.now();
-  let navLast = window.scrollY;
-  const NAV = D.querySelector('.nav, .site-header.proto-nav');
-  const DARK = $$('[data-dark]', root).concat(Array.from(D.querySelectorAll('footer.ft, .ft.dk')));
 
-  function fx(y) {
-    if (NAV) {
-      NAV.classList.toggle('sol', y > 30);
-      if (!H.classList.contains('menu-open')) {
-        if (y > 480 && y > navLast + 4) NAV.classList.add('hide');
-        else if (y < navLast - 4 || y < 480) NAV.classList.remove('hide');
-      }
-      navLast = y;
-      let dk = false;
-      for (const el of DARK) {
-        const r = el.getBoundingClientRect();
-        if (r.top <= 38 && r.bottom >= 38) { dk = true; break; }
-      }
-      NAV.classList.toggle('dkn', dk);
-    }
+  function fx() {
+    // Nav sol/hide/dkn is owned by Header (outside this root).
     Stack.frame();
     Pin.frame();
     Ctr.frame();
@@ -676,7 +660,7 @@ const Peek = {
     const y = window.scrollY;
     vel = lerp(vel, (y - sy) / Math.max(dt, 0.001), 0.15);
     sy = y;
-    fx(y);
+    fx();
     Heat.frame(dt);
     Ring.frame(dt);
     Band.frame(dt);

@@ -51,33 +51,40 @@ export function LanguageSwitcher({
   }, [open, variant]);
 
   if (variant === "inline") {
+    // Proto markup: <div class="lang"><button aria-pressed>EN</button><button>DE</button>
+    // Inactive locale is a real link so Next can switch routes.
     return (
       <div
-        className={`language-switcher language-switcher--inline ${className}`.trim()}
+        className={`lang ${className}`.trim()}
         role="group"
         aria-label={ariaLabel}
       >
-        {locales.map((targetLocale, index) => {
+        {locales.map((targetLocale) => {
           const isActive = targetLocale === locale;
           const href = switchLocalePath(pathname, targetLocale, hash);
+          const label = localeLabels[targetLocale];
+
+          if (isActive) {
+            return (
+              <button
+                key={targetLocale}
+                type="button"
+                aria-pressed="true"
+                aria-current="true"
+              >
+                {label}
+              </button>
+            );
+          }
 
           return (
-            <span key={targetLocale} className="language-switcher__item">
-              {index > 0 && (
-                <span className="language-switcher__sep" aria-hidden>
-                  /
-                </span>
-              )}
-              {isActive ? (
-                <span className="language-switcher__active" aria-current="true">
-                  {localeLabels[targetLocale]}
-                </span>
-              ) : (
-                <TransitionLink href={href} className="language-switcher__link">
-                  {localeLabels[targetLocale]}
-                </TransitionLink>
-              )}
-            </span>
+            <TransitionLink
+              key={targetLocale}
+              href={href}
+              aria-pressed="false"
+            >
+              {label}
+            </TransitionLink>
           );
         })}
       </div>

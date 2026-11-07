@@ -58,46 +58,6 @@ em,
   transform: none;
 }
 
-/* Concept nav sits fixed */
-.site-header.proto-nav,
-header.nav {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 80;
-  height: auto;
-  background: transparent;
-}
-
-/* Language switcher → concept .lang buttons */
-.lang.language-switcher,
-.nav-r .language-switcher {
-  display: flex;
-  gap: 2px;
-  margin-right: 6px;
-  align-items: center;
-}
-.lang .language-switcher__sep,
-.nav-r .language-switcher__sep {
-  display: none;
-}
-.lang .language-switcher__link,
-.lang .language-switcher__active,
-.nav-r .language-switcher__link,
-.nav-r .language-switcher__active {
-  padding: 6px 8px;
-  font: 600 13px/1 var(--f-s);
-  letter-spacing: 0.04em;
-  opacity: 0.5;
-  transition: opacity 0.3s;
-  text-transform: uppercase;
-}
-.lang .language-switcher__active,
-.nav-r .language-switcher__active,
-.lang .language-switcher__link:hover,
-.nav-r .language-switcher__link:hover {
-  opacity: 1;
-}
-
 /* Custom cursor only on fine pointers */
 html:not(.fine) .cur,
 html:not(.fine) .curl {
@@ -192,7 +152,6 @@ html:not(.fine) .curl {
 }
 
 /* Admin preview: don't run full-viewport fixed chrome */
-.admin-site-preview .site-header.proto-nav,
 .admin-site-preview header.nav {
   position: sticky;
   top: 0;
