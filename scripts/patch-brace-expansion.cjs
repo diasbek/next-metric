@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * brace-expansion 5.x only exports `{ expand }`. minimatch@3 (eslint) still
- * does `require("brace-expansion")(pattern)`. After the CVE-safe 5.0.9
+ * brace-expansion 5.x only exports `{ expand }`. Older minimatch still
+ * does `require("brace-expansion")(pattern)`. After the CVE-safe 5.0.12
  * override, make the CJS entry callable without changing expansion behavior.
  */
 const fs = require("fs");
