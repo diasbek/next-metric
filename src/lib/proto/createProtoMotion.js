@@ -16,8 +16,10 @@ export function createProtoMotion(root) {
   const eOut = (t) => 1 - Math.pow(1 - t, 4);
   const eIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const eIn = (t) => t * t * t;
+  // Proto smoothstep — keep signed (b-a); Talk uses ss(320,30,…) so near→1.
   const ss = (a, b, v) => {
-    const t = clamp((v - a) / Math.max(1e-6, b - a), 0, 1);
+    const d = b - a;
+    const t = clamp((v - a) / (d === 0 ? 1e-6 : d), 0, 1);
     return t * t * (3 - 2 * t);
   };
   const play = (el, kf, o) => el && el.animate ? el.animate(kf, Object.assign({ fill: 'backwards', easing: EO }, o)) : null;
@@ -529,12 +531,18 @@ const Proc = {
 };
 const Talk = {
   // Match metric-site.zip / :4000 — live rects, ss(320,30), rest 78/560 → hot 125/900.
-  init() {
+  gather() {
     this.ls = Array.from(D.querySelectorAll('#ft .talk-h .talk-ch'));
+  },
+  init() {
+    this.gather();
     this.on = false;
   },
   frame() {
-    if (!fine || reduce || !this.ls || !this.ls.length) return;
+    if (!fine || reduce) return;
+    // Soft-nav / locale re-renders replace letter nodes — refresh when detached.
+    if (!this.ls || !this.ls.length || !this.ls[0].isConnected) this.gather();
+    if (!this.ls.length) return;
     const r0 = this.ls[0].getBoundingClientRect();
     if (r0.top > VH || r0.bottom < 0) return;
     this.ls.forEach((l) => {
