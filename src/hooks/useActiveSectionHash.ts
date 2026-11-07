@@ -31,8 +31,8 @@ function notifySpyListeners() {
 }
 
 function readSpyHash(ids: string[]) {
-  const header = document.querySelector<HTMLElement>("[data-site-header]");
-  const probe = (header?.getBoundingClientRect().height ?? 88) + 12;
+  const header = document.querySelector<HTMLElement>("#nav, header.nav");
+  const probe = (header?.getBoundingClientRect().height ?? 76) + 12;
   let current = "";
   for (const id of ids) {
     const el = document.getElementById(id);
@@ -96,7 +96,7 @@ function subscribeSpy(listener: SpyListener, idsKey: string) {
  * so nav underlines match hash links while scrolling. `null` when not
  * on the homepage (caller should fall back to the URL hash).
  *
- * One shared window listener for all SiteNav instances.
+ * One shared window listener for all Header instances.
  */
 export function useActiveSectionHash(itemPaths: string[]): string | null {
   const pathname = usePathname();

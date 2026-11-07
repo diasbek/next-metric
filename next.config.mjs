@@ -198,16 +198,8 @@ const nextConfig = {
     return [
       ...stagingNoindex,
       {
-        // Fingerprinted build assets — safe to cache forever.
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
+        // Public image assets. Fingerprinted `/_next/static` already gets
+        // immutable Cache-Control from Next — don't redeclare it (build noise).
         source: "/images/:path*",
         headers: [
           {

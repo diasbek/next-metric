@@ -1,8 +1,6 @@
 export { Header } from "./Header";
-export { WorksSection } from "./WorksSection";
 export { WorksListingSection } from "./WorksListingSection";
 export { WorkCaseSection } from "./WorkCaseSection";
-export { ServicesSection } from "./ServicesSection";
 export { ServicesPageSection } from "./ServicesPageSection";
 export { AgencyPageSection } from "./AgencyPageSection";
 export { ContactsPageSection } from "./ContactsPageSection";

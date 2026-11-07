@@ -1,4 +1,5 @@
 
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-unused-expressions -- ported proto runtime */
 /** Adapted motion runtime from metric-site.zip for React-mounted DOM. */
 export function createProtoMotion(root) {
   const D = document;

@@ -1,20 +1,12 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
-@import "../styles/liquid-glass.css";
 
 /* Section modules — order matters for cascade */
 @import "../styles/base.css";
 @import "../styles/media-image.css";
 @import "../styles/cta.css";
-@import "../styles/hero.css";
-@import "../styles/home-categories.css";
 @import "../styles/case-card.css";
 @import "../styles/admin-site-preview.css";
-@import "../styles/home-case-studies.css";
-@import "../styles/home-services.css";
-@import "../styles/home-workflow.css";
-@import "../styles/header.css";
-@import "../styles/footer.css";
 @import "../styles/faq.css";
 @import "../styles/forms.css";
 @import "../styles/works.css";

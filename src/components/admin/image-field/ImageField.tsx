@@ -92,9 +92,9 @@ export function ImageField({
   editRequest,
   previewTitle,
   previewSubtitle,
-  previewQuote,
-  previewAuthor,
-  previewRole,
+  previewQuote: _previewQuote,
+  previewAuthor: _previewAuthor,
+  previewRole: _previewRole,
   previewTags,
   previewCta,
 }: ImageFieldProps) {

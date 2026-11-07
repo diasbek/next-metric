@@ -58,6 +58,12 @@ em,
   transform: none;
 }
 
+/* Mobile menu: lock page scroll (Header toggles both class names). */
+html.is-mobile-menu-open,
+html.menu-open {
+  overflow: hidden;
+}
+
 /* Custom cursor only on fine pointers */
 html:not(.fine) .cur,
 html:not(.fine) .curl {
