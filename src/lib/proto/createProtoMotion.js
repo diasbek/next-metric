@@ -528,47 +528,26 @@ const Proc = {
   }
 };
 const Talk = {
+  // Match metric-site.zip / :4000 — live rects, ss(320,30), rest 78/560 → hot 125/900.
   init() {
     this.ls = Array.from(D.querySelectorAll('#ft .talk-h .talk-ch'));
     this.on = false;
-    this._measured = false;
-    this._measure();
-  },
-  _measure() {
-    if (!this.ls || !this.ls.length) return;
-    // Reset to rest metrics before sampling — live stretched rects feedback into k.
-    this.ls.forEach((l) => {
-      l.style.fontVariationSettings = '"wdth" 78, "wght" 800';
-      l.style.fontStretch = '78%';
-      l.style.fontWeight = '800';
-      l.__st = 78;
-      l.__wg = 800;
-    });
-    if (this.ls[0]) void this.ls[0].offsetWidth;
-    const sy = window.scrollY || 0;
-    this.ls.forEach((l) => {
-      const r = l.getBoundingClientRect();
-      l.__cx0 = r.left + r.width / 2;
-      l.__cy0 = r.top + r.height / 2 + sy;
-    });
-    this._measured = true;
   },
   frame() {
     if (!fine || reduce || !this.ls || !this.ls.length) return;
     const r0 = this.ls[0].getBoundingClientRect();
     if (r0.top > VH || r0.bottom < 0) return;
-    if (!this._measured) this._measure();
-    const sy = window.scrollY || 0;
     this.ls.forEach((l) => {
-      if (l.__cx0 == null) return;
-      const cx = l.__cx0;
-      const cy = l.__cy0 - sy;
+      const r = l.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
       const k = PX < -1e3 ? 0 : ss(320, 30, Math.hypot(PX - cx, (PY - cy) * 1.4));
       const st = Math.round(78 + 47 * k);
       const wg = Math.round(560 + 340 * k);
       if (l.__st === st && l.__wg === wg) return;
       l.__st = st;
       l.__wg = wg;
+      // fontStretch/Weight for proto parity; variation settings so next/font Archivo applies wdth.
       l.style.fontVariationSettings = '"wdth" ' + st + ', "wght" ' + wg;
       l.style.fontStretch = st + '%';
       l.style.fontWeight = String(wg);
@@ -632,7 +611,6 @@ const Peek = {
   Gal.init(root);
   Mag.scan(root);
   Talk.init();
-  if (D.fonts && D.fonts.ready) D.fonts.ready.then(() => Talk._measure()).catch(() => {});
   Peek.bind(root);
 
   Heat.load().then(() => Heat.size(true)).catch(() => {});
@@ -681,7 +659,6 @@ const Peek = {
       Ring.layout();
       Pin.measure();
       Band.init(root);
-      Talk._measure();
     }, 180);
   };
   window.addEventListener('resize', onResize);

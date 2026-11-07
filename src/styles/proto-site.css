@@ -323,7 +323,7 @@ html.fine input,html.fine textarea,html.fine select{cursor:text}
 /* footer */
 .ft{position:relative;overflow:hidden;padding-top:clamp(100px,16vh,180px)}
 .talk{display:grid;gap:30px;justify-items:start}
-.talk-h{font:600 clamp(72px,17vw,300px)/.82 var(--f-d);letter-spacing:-.05em;display:flex;flex-wrap:wrap;align-items:baseline;color:var(--on-n)}
+.talk-h{font:600 clamp(72px,17vw,300px)/.82 var(--font-archivo),system-ui,sans-serif;letter-spacing:-.05em;display:flex;flex-wrap:wrap;align-items:baseline;color:var(--on-n)}
 .talk-h .talk-w{display:inline-flex;flex-wrap:nowrap;white-space:nowrap}
 .talk-h .talk-ch{display:inline-block;transition:color .3s}
 .talk-h .talk-sp{display:inline-block;white-space:pre}
@@ -530,7 +530,7 @@ fieldset.fld{border:0;padding:0;margin:0;min-width:0}
 @media (prefers-reduced-motion:reduce){.band2::before{animation:none}}
 /* slanted plates: left corner flush with the text edge */
 .ctr-hd .btn,.svc-hd .btn,.talk-r .btn{margin-left:13px}
-/* Let's talk: Archivo variable (width + weight react to the cursor) */
+/* Let's talk: Archivo variable (width + weight react to the cursor) — match :4000 */
 .talk-h,.talk-h .talk-ch{
   font-family:var(--font-archivo),system-ui,sans-serif;
   font-synthesis:none;
